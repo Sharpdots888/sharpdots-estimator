@@ -12,8 +12,8 @@ const metricStyles = {
 };
 
 const sourceProducts = [
-  { product: "2025 Letter Materials (stock, envelope, stickers)", type: "M", packageName: "Letter", notes: "4 Page + Envelope", qty: 41073, cost: 30969.47, markup: 0.4, marginAdj: 0.31, priorPpp: 1.0891176471 },
-  { product: "Letters by Santa (2025) Print and Fulfillment", type: "VF", packageName: "Letter", notes: "4 Page + Envelope", qty: 63486, cost: 79651.11, markup: 0.4, marginAdj: 0.1, priorPpp: 1.3206576833 },
+  { product: "2026 Letter Materials (stock, envelope, stickers)", type: "M", packageName: "Letter", notes: "4 Page + Envelope", qty: 41073, cost: 30969.47, markup: 0.4, marginAdj: 0.31, priorPpp: 1.0891176471 },
+  { product: "Letters by Santa (2026) Print and Fulfillment", type: "VF", packageName: "Letter", notes: "4 Page + Envelope", qty: 63486, cost: 79651.11, markup: 0.4, marginAdj: 0.1, priorPpp: 1.3206576833 },
   { product: "Ornament", type: "FP", packageName: "Letter", notes: "eflute cardboard cutout 5x3", qty: 41073, cost: 3577.4, markup: 0.4, marginAdj: 0.55, priorPpp: 0.2237793852 },
   { product: "Multi Letter Labeled Envelopes", type: "FP", packageName: "Multi", notes: "", qty: 9272, cost: 7554.71, markup: 0.4, marginAdj: 0.33, priorPpp: 1.3779630535 },
   { product: "Shipping software and fulfillment overhead", type: "VF", packageName: "Letter", notes: "Labor, insurance, utility, rent", qty: 63486, cost: 9522.9, markup: 0.4, marginAdj: 0, priorPpp: 0 },
@@ -817,9 +817,9 @@ els.resetBtn.addEventListener("click", () => {
   expanded = new Set(seedRows.filter((row) => row.level !== "element").map((row) => row.id));
   activePackage = "All";
   activeTypes = new Set(Object.keys(typeLabels));
-  els.projectName.value = "2025 Cost Estimator";
-  els.clientName.value = "";
-  els.estimateYear.value = "2025";
+  els.projectName.value = "2026 North Pole Post Office Estimate";
+  els.clientName.value = "North Pole Post Office";
+  els.estimateYear.value = "2026";
   els.searchInput.value = "";
   els.includeInactive.checked = false;
   els.globalMarkup.value = "0.40";
