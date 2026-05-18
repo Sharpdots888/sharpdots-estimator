@@ -167,6 +167,7 @@ const els = {
   footerInventoryQty: document.querySelector("#footerInventoryQty"),
   footerNeededQty: document.querySelector("#footerNeededQty"),
   footerQtyToOrder: document.querySelector("#footerQtyToOrder"),
+  footerPerPieceCost: document.querySelector("#footerPerPieceCost"),
   footerClientQoh: document.querySelector("#footerClientQoh"),
   footerQty: document.querySelector("#footerQty"),
   footerCost: document.querySelector("#footerCost"),
@@ -217,6 +218,11 @@ function average(values) {
   return numbers.length ? numbers.reduce((sum, value) => sum + value, 0) / numbers.length : 0;
 }
 
+function minValue(values) {
+  const numbers = values.map(asNumber).filter((value) => Number.isFinite(value) && value > 0);
+  return numbers.length ? Math.min(...numbers) : 0;
+}
+
 function childrenOf(row) {
   return rows.filter((candidate) => candidate.parentId === row.id);
 }
@@ -239,8 +245,10 @@ function baseCalculate(row) {
   const cost = Math.max(asNumber(row.cost), 0);
   const markup = Math.min(Math.max(asNumber(row.markup), 0), 0.95);
   const marginAdj = Math.min(Math.max(asNumber(row.marginAdj), -0.95), 0.95);
-  const priceFromMarkup = markup >= 0.95 ? 0 : cost / (1 - markup);
-  const clientPrice = marginAdj >= 0.95 ? priceFromMarkup : cost / (1 - marginAdj);
+  const perPieceCost = qtyToOrder ? cost / qtyToOrder : 0;
+  const markupBase = perPieceCost * qty;
+  const priceFromMarkup = markup >= 0.95 ? 0 : markupBase / (1 - markup);
+  const clientPrice = marginAdj >= 0.95 ? priceFromMarkup : markupBase / (1 - marginAdj);
   const ppp = qty > 0 ? clientPrice / qty : 0;
   const priorPpp = asNumber(row.priorPpp);
 
@@ -251,6 +259,7 @@ function baseCalculate(row) {
     qtyToOrder,
     clientQoh,
     cost,
+    perPieceCost,
     markup,
     marginAdj,
     priceFromMarkup,
@@ -269,44 +278,45 @@ function rollupCalculate(row) {
   const childRows = childrenOf(row).filter((child) => child.active);
   if (!childRows.length) return baseCalculate(row);
   const childCalcs = childRows.map(calculate);
-  const positiveQty = childCalcs.map((calc) => calc.qty).filter((qty) => qty > 0);
-  const positiveNeeded = childCalcs.map((calc) => calc.neededQty).filter((qty) => qty > 0);
   const markup = average(childCalcs.map((calc) => calc.markup));
   const marginAdj = average(childCalcs.map((calc) => calc.marginAdj));
+  const inventoryQty = minValue(childCalcs.map((calc) => calc.inventoryQty));
+  const neededQty = minValue(childCalcs.map((calc) => calc.neededQty));
+  const clientQoh = minValue(childCalcs.map((calc) => calc.clientQoh));
+  const qtyToOrder = row.level === "product" ? minValue(childCalcs.map((calc) => calc.qtyToOrder)) : 0;
+  const qty = row.level === "product" ? minValue(childCalcs.map((calc) => calc.qty)) : 0;
 
   const totals = childCalcs.reduce(
     (memo, child) => {
-      memo.inventoryQty += child.inventoryQty;
-      memo.neededQty = positiveNeeded.length ? Math.min(...positiveNeeded) : Math.max(memo.neededQty, child.neededQty);
-      memo.qtyToOrder += child.qtyToOrder;
-      memo.clientQoh += child.clientQoh;
-      memo.qty = positiveQty.length ? Math.min(...positiveQty) : Math.max(memo.qty, child.qty);
       memo.cost += child.cost;
       memo.priorValue += child.priorPpp * child.qty;
       memo.priorQty += child.qty;
       return memo;
     },
-    { inventoryQty: 0, neededQty: 0, qtyToOrder: 0, clientQoh: 0, qty: 0, cost: 0, priorValue: 0, priorQty: 0 }
+    { cost: 0, priorValue: 0, priorQty: 0 }
   );
-  const standardPrice = markup >= 0.95 ? 0 : totals.cost / (1 - markup);
-  const clientPrice = marginAdj >= 0.95 ? standardPrice : totals.cost / (1 - marginAdj);
+  const perPieceCost = qtyToOrder ? totals.cost / qtyToOrder : 0;
+  const markupBase = perPieceCost * qty;
+  const standardPrice = markup >= 0.95 ? 0 : markupBase / (1 - markup);
+  const clientPrice = marginAdj >= 0.95 ? standardPrice : markupBase / (1 - marginAdj);
   const marginDollars = clientPrice - totals.cost;
-  const ppp = totals.qty > 0 ? clientPrice / totals.qty : 0;
+  const ppp = qty > 0 ? clientPrice / qty : 0;
   const priorPpp = totals.priorQty > 0 ? totals.priorValue / totals.priorQty : asNumber(row.priorPpp);
 
   return {
-    qty: totals.qty,
-    neededQty: totals.neededQty,
-    inventoryQty: totals.inventoryQty,
-    qtyToOrder: totals.qtyToOrder,
-    clientQoh: totals.clientQoh,
+    qty,
+    neededQty,
+    inventoryQty,
+    qtyToOrder,
+    clientQoh,
     cost: totals.cost,
+    perPieceCost,
     markup,
     marginAdj,
     priceFromMarkup: standardPrice,
     clientPrice,
     ppp,
-    costPpp: totals.qty > 0 ? totals.cost / totals.qty : 0,
+    costPpp: qty > 0 ? totals.cost / qty : 0,
     priorPpp,
     diff: ppp - priorPpp,
     marginDollars,
@@ -375,13 +385,14 @@ function totalFor(sourceRows) {
       memo.qtyToOrder += calc.qtyToOrder;
       memo.clientQoh += calc.clientQoh;
       memo.cost += calc.cost;
+      memo.perPieceCostValue += calc.perPieceCost * calc.qtyToOrder;
       memo.client += calc.clientPrice;
       memo.margin += calc.marginDollars;
       memo.standardPrice += calc.standardPrice;
       memo.diffValue += calc.diff * calc.qty;
       return memo;
     },
-    { cost: 0, client: 0, margin: 0, standardPrice: 0, qty: 0, neededQty: 0, inventoryQty: 0, qtyToOrder: 0, clientQoh: 0, diffValue: 0 }
+    { cost: 0, client: 0, margin: 0, standardPrice: 0, qty: 0, neededQty: 0, inventoryQty: 0, qtyToOrder: 0, clientQoh: 0, perPieceCostValue: 0, diffValue: 0 }
   );
 }
 
@@ -782,8 +793,9 @@ function renderRows() {
       typeInput.disabled = true;
     }
 
-    fragment.querySelector(".qty-to-order").textContent = Math.round(calc.qtyToOrder).toLocaleString();
-    fragment.querySelector(".client-order-qty").textContent = Math.round(calc.qty).toLocaleString();
+    fragment.querySelector(".qty-to-order").textContent = row.level === "package" ? "" : Math.round(calc.qtyToOrder).toLocaleString();
+    fragment.querySelector(".client-order-qty").textContent = row.level === "package" ? "" : Math.round(calc.qty).toLocaleString();
+    fragment.querySelector(".per-piece-cost").textContent = money(calc.perPieceCost, 3);
     fragment.querySelector(".margin-dollars").textContent = money(calc.marginDollars, 0);
     fragment.querySelector(".standard-price").textContent = money(calc.standardPrice, 0);
     fragment.querySelector(".client-price").textContent = money(calc.clientPrice, 0);
@@ -811,6 +823,7 @@ function renderFooter(sourceRows) {
   els.footerClientQoh.textContent = Math.round(totals.clientQoh).toLocaleString();
   els.footerQty.textContent = Math.round(totals.qty).toLocaleString();
   els.footerCost.textContent = money(totals.cost, 0);
+  els.footerPerPieceCost.textContent = money(totals.qtyToOrder ? totals.perPieceCostValue / totals.qtyToOrder : 0, 3);
   els.footerStdMarkup.textContent = money(totals.standardPrice, 0);
   els.footerMargin.textContent = money(totals.margin, 0);
   els.footerClient.textContent = money(totals.client, 0);
@@ -973,13 +986,14 @@ function renderTrackingCompare(selectedMetrics) {
 }
 
 function renderStackedComparisonChart(items, selectedMetrics, note) {
+  const activeMetrics = selectedMetrics.includes("margin") && !selectedMetrics.includes("cost") ? ["cost", ...selectedMetrics] : selectedMetrics;
   const width = Math.max(760, items.length * 112);
   const height = els.yearPanel.classList.contains("chart-expanded") ? 520 : 300;
   const pad = { top: 52, right: 28, bottom: 78, left: 58 };
   const maxValue = Math.max(
     ...items.map((item) => {
-      const stackValue = (selectedMetrics.includes("cost") ? item.calc.cost : 0) + (selectedMetrics.includes("margin") ? Math.max(item.calc.margin, 0) : 0);
-      return Math.max(stackValue, selectedMetrics.includes("client") ? item.calc.client : 0);
+      const stackValue = (activeMetrics.includes("cost") ? item.calc.cost : 0) + (activeMetrics.includes("margin") ? Math.max(item.calc.margin, 0) : 0);
+      return Math.max(stackValue, activeMetrics.includes("client") ? item.calc.client : 0);
     }),
     1
   );
@@ -998,14 +1012,14 @@ function renderStackedComparisonChart(items, selectedMetrics, note) {
       const margin = Math.max(item.calc.margin, 0);
       const marginHeight = height - pad.bottom - yFor(margin);
       const clientHeight = height - pad.bottom - yFor(item.calc.client);
-      const stackBase = selectedMetrics.includes("cost") ? costHeight : 0;
-      const stackTotal = (selectedMetrics.includes("cost") ? item.calc.cost : 0) + (selectedMetrics.includes("margin") ? margin : 0);
+      const stackBase = activeMetrics.includes("cost") ? costHeight : 0;
+      const stackTotal = (activeMetrics.includes("cost") ? item.calc.cost : 0) + (activeMetrics.includes("margin") ? margin : 0);
       const stackLabelY = yFor(stackTotal) - 18;
       const clientLabelY = yFor(item.calc.client) - 6;
-      const costRect = selectedMetrics.includes("cost") ? `<rect x="${stackX}" y="${height - pad.bottom - costHeight}" width="${barWidth}" height="${costHeight}" rx="4" fill="${metricStyles.cost.color}" />` : "";
-      const marginRect = selectedMetrics.includes("margin") ? `<rect x="${stackX}" y="${height - pad.bottom - stackBase - marginHeight}" width="${barWidth}" height="${marginHeight}" rx="4" fill="${metricStyles.margin.color}" />` : "";
+      const costRect = activeMetrics.includes("cost") ? `<rect x="${stackX}" y="${height - pad.bottom - costHeight}" width="${barWidth}" height="${costHeight}" rx="4" fill="${metricStyles.cost.color}" />` : "";
+      const marginRect = activeMetrics.includes("margin") ? `<rect x="${stackX}" y="${height - pad.bottom - stackBase - marginHeight}" width="${barWidth}" height="${marginHeight}" rx="4" fill="${metricStyles.margin.color}" />` : "";
       const stackLabel = stackTotal ? `<text class="chart-value chart-value-stack" x="${stackX + barWidth / 2}" y="${Math.max(14, stackLabelY)}" text-anchor="middle">${compactMoney(stackTotal)}</text>` : "";
-      const clientBar = selectedMetrics.includes("client")
+      const clientBar = activeMetrics.includes("client")
         ? `<rect x="${clientX}" y="${height - pad.bottom - clientHeight}" width="${barWidth}" height="${clientHeight}" rx="4" fill="${metricStyles.client.color}" />
           <text class="chart-value chart-value-client" x="${clientX + barWidth / 2}" y="${Math.max(30, clientLabelY)}" text-anchor="middle">${compactMoney(item.calc.client)}</text>`
         : "";
@@ -1015,7 +1029,7 @@ function renderStackedComparisonChart(items, selectedMetrics, note) {
 
   els.yearTracking.innerHTML = `
     <div class="chart-legend">
-      ${selectedMetrics.map((metric) => `<span><i style="background:${metricStyles[metric].color}"></i>${metricStyles[metric].label}</span>`).join("")}
+      ${activeMetrics.map((metric) => `<span><i style="background:${metricStyles[metric].color}"></i>${metricStyles[metric].label}</span>`).join("")}
     </div>
     <svg class="line-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="Compare items by selected metric">
       <line x1="${pad.left}" y1="${height - pad.bottom}" x2="${width - pad.right}" y2="${height - pad.bottom}" stroke="#d9d9d9" />
@@ -1201,11 +1215,11 @@ function addElement() {
 }
 
 function exportCsv() {
-  const headers = ["Level", "Active", "Package", "Product / Service", "Element", "Description", "Production Type", "Inventory Qty", "Needed Qty", "Qty to Order", "Cost", "Client QOH", "Client Order Qty", "Markup", "Margin Adj", "Margin Dollars", "Client Price", "PPP", "2024 PPP", "Difference"];
+  const headers = ["Level", "Active", "Package", "Product / Service", "Element", "Description", "Production Type", "Inventory Qty", "Needed Qty", "Qty to Order", "Cost", "Per Piece Cost", "Client QOH", "Client Order Qty", "Markup", "Margin Adj", "Margin Dollars", "Client Price", "PPP", "2024 PPP", "Difference"];
   const lines = [headers];
   visibleRows().forEach((row) => {
     const calc = calculate(row);
-    lines.push([row.level, row.active, row.packageName, row.product, row.element, row.description, row.type, calc.inventoryQty, calc.neededQty, calc.qtyToOrder, calc.cost, calc.clientQoh, calc.qty, calc.markup, calc.marginAdj, calc.marginDollars, calc.clientPrice, calc.ppp, calc.priorPpp, calc.diff]);
+    lines.push([row.level, row.active, row.packageName, row.product, row.element, row.description, row.type, calc.inventoryQty, calc.neededQty, calc.qtyToOrder, calc.cost, calc.perPieceCost, calc.clientQoh, calc.qty, calc.markup, calc.marginAdj, calc.marginDollars, calc.clientPrice, calc.ppp, calc.priorPpp, calc.diff]);
   });
 
   const csv = lines.map((line) => line.map((value) => `"${String(value ?? "").replaceAll('"', '""')}"`).join(",")).join("\n");

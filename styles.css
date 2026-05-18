@@ -289,7 +289,7 @@ textarea {
 
 table {
   width: 100%;
-  min-width: 1660px;
+  min-width: 1740px;
   border-collapse: separate;
   border-spacing: 0;
 }
@@ -305,7 +305,7 @@ td {
 th {
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 3;
   color: #ffffff;
   background: #333333;
   font-size: 0.7rem;
@@ -335,7 +335,7 @@ tbody tr.inactive {
 tfoot td {
   position: sticky;
   bottom: 0;
-  z-index: 2;
+  z-index: 4;
   color: #ffffff;
   background: #333333;
   font-weight: 800;
@@ -365,6 +365,47 @@ tfoot td {
   font-weight: 400;
 }
 
+th:nth-child(1),
+td:nth-child(1),
+th:nth-child(2),
+td:nth-child(2) {
+  position: sticky;
+  z-index: 2;
+}
+
+th:nth-child(1),
+td:nth-child(1) {
+  left: 0;
+  width: 48px;
+  min-width: 48px;
+  box-shadow: 1px 0 0 var(--line);
+}
+
+th:nth-child(2),
+td:nth-child(2) {
+  left: 48px;
+  width: 260px;
+  min-width: 260px;
+  box-shadow: 2px 0 0 #333333;
+}
+
+tbody td:nth-child(1),
+tbody td:nth-child(2) {
+  background: inherit;
+}
+
+thead th:nth-child(1),
+thead th:nth-child(2) {
+  z-index: 5;
+  background: #333333;
+}
+
+tfoot td:nth-child(1),
+tfoot td:nth-child(2) {
+  z-index: 6;
+  background: #333333;
+}
+
 .use-cell,
 .tree-cell {
   display: grid;
@@ -373,7 +414,7 @@ tfoot td {
 }
 
 .use-cell {
-  grid-template-columns: 18px 16px;
+  grid-template-columns: 16px 18px;
 }
 
 .tree-cell {
@@ -465,6 +506,8 @@ tfoot td {
 .element-row .type-input,
 .product-row .cost-input,
 .element-row .cost-input,
+.product-row .per-piece-cost,
+.element-row .per-piece-cost,
 .product-row .markup-input,
 .element-row .markup-input,
 .product-row .standard-price,
@@ -948,6 +991,12 @@ td select {
   td {
     border: 0 !important;
     background: #ffffff !important;
+  }
+
+  th,
+  td {
+    position: static !important;
+    box-shadow: none !important;
   }
 
   td:first-child,

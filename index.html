@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>2026 North Pole Post Office Estimate</title>
-    <link rel="stylesheet" href="styles.css?v=hierarchy-tools6" />
+    <link rel="stylesheet" href="styles.css?v=hierarchy-tools9" />
   </head>
   <body>
     <main class="app-shell">
@@ -118,6 +118,7 @@
                   <th id="neededQtyHead">2026 Needed</th>
                   <th>Qty to Order</th>
                   <th>Cost</th>
+                  <th>Per Piece Cost</th>
                   <th>Client QOH</th>
                   <th>Client Order Qty</th>
                   <th class="internal-col">Markup</th>
@@ -134,11 +135,14 @@
               <tbody id="lineItems"></tbody>
               <tfoot>
                 <tr>
-                  <td colspan="4">Visible Active Total</td>
+                  <td></td>
+                  <td>Visible Active Total</td>
+                  <td colspan="2"></td>
                   <td id="footerInventoryQty">0</td>
                   <td id="footerNeededQty">0</td>
                   <td id="footerQtyToOrder">0</td>
                   <td id="footerCost">$0</td>
+                  <td id="footerPerPieceCost">$0.000</td>
                   <td id="footerClientQoh">0</td>
                   <td id="footerQty">0</td>
                   <td class="internal-col"></td>
@@ -274,6 +278,7 @@
         <td><input class="needed-input number-input" type="number" min="0" step="1" /></td>
         <td class="money-cell qty-to-order"></td>
         <td><input class="cost-input number-input" type="number" min="0" step="0.01" /></td>
+        <td class="money-cell per-piece-cost"></td>
         <td><input class="client-qoh-input number-input" type="number" min="0" step="1" /></td>
         <td class="money-cell client-order-qty"></td>
         <td class="internal-col"><input class="markup-input number-input" type="number" min="0" max="0.95" step="0.01" /></td>
@@ -292,6 +297,6 @@
     <datalist id="productLookup"></datalist>
     <datalist id="elementLookup"></datalist>
 
-    <script src="app.js?v=hierarchy-tools6"></script>
+    <script src="app.js?v=hierarchy-tools9"></script>
   </body>
 </html>
