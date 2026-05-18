@@ -7,7 +7,7 @@ const typeLabels = {
 
 const metricStyles = {
   cost: { label: "Cost", color: "#428bca" },
-  marginPct: { label: "Margin %", color: "#b84048" },
+  margin: { label: "Margin $", color: "#b84048" },
   client: { label: "Client Price", color: "#fe7300" }
 };
 
@@ -60,6 +60,9 @@ function buildSeedRows() {
       description: `${packageName} package`,
       type: "",
       qty: 0,
+      neededQty: 0,
+      inventoryQty: 0,
+      clientQoh: 0,
       cost: 0,
       markup: 0.4,
       marginAdj: 0.4,
@@ -82,6 +85,9 @@ function buildSeedRows() {
       description: source.notes,
       type: source.type,
       qty: source.qty,
+      neededQty: source.qty,
+      inventoryQty: 0,
+      clientQoh: 0,
       cost: source.cost,
       markup: source.markup,
       marginAdj: source.marginAdj,
@@ -100,6 +106,9 @@ function buildSeedRows() {
       description: source.notes,
       type: source.type,
       qty: source.qty,
+      neededQty: source.qty,
+      inventoryQty: 0,
+      clientQoh: 0,
       cost: source.cost,
       markup: source.markup,
       marginAdj: source.marginAdj,
@@ -122,6 +131,9 @@ let lookups = structuredClone(seedLookups);
 let activePackage = "All";
 let activeTypes = new Set(Object.keys(typeLabels));
 let expanded = new Set(seedRows.filter((row) => row.level !== "element").map((row) => row.id));
+let draggedRowId = null;
+let paymentDates = {};
+let paymentSettings = Object.fromEntries(Object.keys(typeLabels).map((type) => [type, { depositPct: 0.25, paymentCount: 3 }]));
 
 const els = {
   projectName: document.querySelector("#projectName"),
@@ -148,16 +160,26 @@ const els = {
   weightedPpp: document.querySelector("#weightedPpp"),
   visibleCount: document.querySelector("#visibleCount"),
   packageRollup: document.querySelector("#packageRollup"),
-  depositPct: document.querySelector("#depositPct"),
-  paymentCount: document.querySelector("#paymentCount"),
   paymentSchedule: document.querySelector("#paymentSchedule"),
+  promoteDropZone: document.querySelector("#promoteDropZone"),
+  printTypeSubtotals: document.querySelector("#printTypeSubtotals"),
+  neededQtyHead: document.querySelector("#neededQtyHead"),
+  footerInventoryQty: document.querySelector("#footerInventoryQty"),
+  footerNeededQty: document.querySelector("#footerNeededQty"),
+  footerQtyToOrder: document.querySelector("#footerQtyToOrder"),
+  footerClientQoh: document.querySelector("#footerClientQoh"),
   footerQty: document.querySelector("#footerQty"),
   footerCost: document.querySelector("#footerCost"),
+  footerStdMarkup: document.querySelector("#footerStdMarkup"),
   footerMargin: document.querySelector("#footerMargin"),
   footerClient: document.querySelector("#footerClient"),
   footerPpp: document.querySelector("#footerPpp"),
   footerDiff: document.querySelector("#footerDiff"),
   trackingLevel: document.querySelector("#trackingLevel"),
+  trackingMode: document.querySelector("#trackingMode"),
+  trackingItem: document.querySelector("#trackingItem"),
+  expandChartBtn: document.querySelector("#expandChartBtn"),
+  yearPanel: document.querySelector(".year-panel"),
   yearTracking: document.querySelector("#yearTracking"),
   lookupTable: document.querySelector("#lookupTable"),
   lookupValue: document.querySelector("#lookupValue"),
@@ -186,6 +208,15 @@ function asNumber(value) {
   return Number.isFinite(number) ? number : 0;
 }
 
+function rowNeededQty(row) {
+  return Math.max(asNumber(row.neededQty ?? row.qty), 0);
+}
+
+function average(values) {
+  const numbers = values.map(asNumber).filter(Number.isFinite);
+  return numbers.length ? numbers.reduce((sum, value) => sum + value, 0) / numbers.length : 0;
+}
+
 function childrenOf(row) {
   return rows.filter((candidate) => candidate.parentId === row.id);
 }
@@ -200,7 +231,11 @@ function packageRows() {
 }
 
 function baseCalculate(row) {
-  const qty = Math.max(asNumber(row.qty), 0);
+  const neededQty = rowNeededQty(row);
+  const inventoryQty = Math.max(asNumber(row.inventoryQty), 0);
+  const qtyToOrder = neededQty - inventoryQty;
+  const clientQoh = Math.max(asNumber(row.clientQoh), 0);
+  const qty = neededQty - clientQoh;
   const cost = Math.max(asNumber(row.cost), 0);
   const markup = Math.min(Math.max(asNumber(row.markup), 0), 0.95);
   const marginAdj = Math.min(Math.max(asNumber(row.marginAdj), -0.95), 0.95);
@@ -211,7 +246,13 @@ function baseCalculate(row) {
 
   return {
     qty,
+    neededQty,
+    inventoryQty,
+    qtyToOrder,
+    clientQoh,
     cost,
+    markup,
+    marginAdj,
     priceFromMarkup,
     clientPrice,
     ppp,
@@ -219,41 +260,58 @@ function baseCalculate(row) {
     priorPpp,
     diff: ppp - priorPpp,
     marginDollars: clientPrice - cost,
-    marginPct: clientPrice ? (clientPrice - cost) / clientPrice : 0
+    marginPct: clientPrice ? (clientPrice - cost) / clientPrice : 0,
+    standardPrice: priceFromMarkup
   };
 }
 
 function rollupCalculate(row) {
   const childRows = childrenOf(row).filter((child) => child.active);
   if (!childRows.length) return baseCalculate(row);
+  const childCalcs = childRows.map(calculate);
+  const positiveQty = childCalcs.map((calc) => calc.qty).filter((qty) => qty > 0);
+  const positiveNeeded = childCalcs.map((calc) => calc.neededQty).filter((qty) => qty > 0);
+  const markup = average(childCalcs.map((calc) => calc.markup));
+  const marginAdj = average(childCalcs.map((calc) => calc.marginAdj));
 
-  const totals = childRows.reduce(
+  const totals = childCalcs.reduce(
     (memo, child) => {
-      const calc = calculate(child);
-      memo.qty = Math.max(memo.qty, calc.qty);
-      memo.cost += calc.cost;
-      memo.clientPrice += calc.clientPrice;
-      memo.marginDollars += calc.marginDollars;
-      memo.priorValue += calc.priorPpp * calc.qty;
-      memo.priorQty += calc.qty;
+      memo.inventoryQty += child.inventoryQty;
+      memo.neededQty = positiveNeeded.length ? Math.min(...positiveNeeded) : Math.max(memo.neededQty, child.neededQty);
+      memo.qtyToOrder += child.qtyToOrder;
+      memo.clientQoh += child.clientQoh;
+      memo.qty = positiveQty.length ? Math.min(...positiveQty) : Math.max(memo.qty, child.qty);
+      memo.cost += child.cost;
+      memo.priorValue += child.priorPpp * child.qty;
+      memo.priorQty += child.qty;
       return memo;
     },
-    { qty: 0, cost: 0, clientPrice: 0, marginDollars: 0, priorValue: 0, priorQty: 0 }
+    { inventoryQty: 0, neededQty: 0, qtyToOrder: 0, clientQoh: 0, qty: 0, cost: 0, priorValue: 0, priorQty: 0 }
   );
-  const ppp = totals.qty > 0 ? totals.clientPrice / totals.qty : 0;
+  const standardPrice = markup >= 0.95 ? 0 : totals.cost / (1 - markup);
+  const clientPrice = marginAdj >= 0.95 ? standardPrice : totals.cost / (1 - marginAdj);
+  const marginDollars = clientPrice - totals.cost;
+  const ppp = totals.qty > 0 ? clientPrice / totals.qty : 0;
   const priorPpp = totals.priorQty > 0 ? totals.priorValue / totals.priorQty : asNumber(row.priorPpp);
 
   return {
     qty: totals.qty,
+    neededQty: totals.neededQty,
+    inventoryQty: totals.inventoryQty,
+    qtyToOrder: totals.qtyToOrder,
+    clientQoh: totals.clientQoh,
     cost: totals.cost,
-    priceFromMarkup: totals.clientPrice,
-    clientPrice: totals.clientPrice,
+    markup,
+    marginAdj,
+    priceFromMarkup: standardPrice,
+    clientPrice,
     ppp,
     costPpp: totals.qty > 0 ? totals.cost / totals.qty : 0,
     priorPpp,
     diff: ppp - priorPpp,
-    marginDollars: totals.marginDollars,
-    marginPct: totals.clientPrice ? totals.marginDollars / totals.clientPrice : 0
+    marginDollars,
+    marginPct: clientPrice ? marginDollars / clientPrice : 0,
+    standardPrice
   };
 }
 
@@ -312,14 +370,28 @@ function totalFor(sourceRows) {
     (memo, row) => {
       const calc = calculate(row);
       memo.qty += calc.qty;
+      memo.neededQty += calc.neededQty;
+      memo.inventoryQty += calc.inventoryQty;
+      memo.qtyToOrder += calc.qtyToOrder;
+      memo.clientQoh += calc.clientQoh;
       memo.cost += calc.cost;
       memo.client += calc.clientPrice;
       memo.margin += calc.marginDollars;
+      memo.standardPrice += calc.standardPrice;
       memo.diffValue += calc.diff * calc.qty;
       return memo;
     },
-    { cost: 0, client: 0, margin: 0, qty: 0, diffValue: 0 }
+    { cost: 0, client: 0, margin: 0, standardPrice: 0, qty: 0, neededQty: 0, inventoryQty: 0, qtyToOrder: 0, clientQoh: 0, diffValue: 0 }
   );
+}
+
+function activeElementsForVisiblePackages() {
+  const packageIds = new Set(visiblePackageRows().map((row) => row.id));
+  return rows.filter((row) => {
+    if (!row.active || row.level !== "element" || !activeTypes.has(row.type)) return false;
+    const product = rows.find((candidate) => candidate.id === row.parentId);
+    return product?.parentId ? packageIds.has(product.parentId) : false;
+  });
 }
 
 function syncLookupsFromRow(row) {
@@ -383,6 +455,192 @@ function setDescendantsActive(row, active) {
   rows = rows.map((candidate) => (descendantsOf(row).some((desc) => desc.id === candidate.id) ? { ...candidate, active } : candidate));
 }
 
+function levelRank(level) {
+  return { package: 0, product: 1, element: 2 }[level] ?? 2;
+}
+
+function rowName(row) {
+  return row.level === "package" ? row.packageName : row.level === "product" ? row.product : row.element;
+}
+
+function syncRowHierarchy(row) {
+  if (row.level === "package") {
+    return { ...row, parentId: undefined, product: "", element: "", type: "" };
+  }
+
+  const parent = rows.find((candidate) => candidate.id === row.parentId);
+  if (row.level === "product") {
+    return {
+      ...row,
+      packageName: parent?.packageName ?? row.packageName,
+      element: ""
+    };
+  }
+
+  return {
+    ...row,
+    packageName: parent?.packageName ?? row.packageName,
+    product: parent?.product ?? row.product,
+    type: row.type || parent?.type || "MP"
+  };
+}
+
+function cascadeHierarchy(parent) {
+  rows = rows.map((row) => {
+    if (row.id === parent.id) return syncRowHierarchy(row);
+    if (!descendantsOf(parent).some((child) => child.id === row.id)) return row;
+    return syncRowHierarchy(row);
+  });
+}
+
+function previousVisibleRow(row) {
+  const visible = visibleRows();
+  return visible[visible.findIndex((candidate) => candidate.id === row.id) - 1];
+}
+
+function siblingRows(row) {
+  return rows
+    .filter((candidate) => candidate.level === row.level && (candidate.parentId || "") === (row.parentId || ""))
+    .sort((a, b) => a.sourceOrder - b.sourceOrder);
+}
+
+function moveRowOrder(row, direction) {
+  const siblings = siblingRows(row);
+  const index = siblings.findIndex((candidate) => candidate.id === row.id);
+  const swapWith = siblings[index + direction];
+  if (!swapWith) return;
+  const order = row.sourceOrder;
+  rows = rows.map((candidate) => {
+    if (candidate.id === row.id) return { ...candidate, sourceOrder: swapWith.sourceOrder };
+    if (candidate.id === swapWith.id) return { ...candidate, sourceOrder: order };
+    return candidate;
+  });
+  render();
+}
+
+function normalizeSiblingOrder(parentId = "") {
+  const siblings = rows
+    .filter((row) => (row.parentId || "") === (parentId || ""))
+    .sort((a, b) => a.sourceOrder - b.sourceOrder);
+  rows = rows.map((row) => {
+    const index = siblings.findIndex((candidate) => candidate.id === row.id);
+    return index >= 0 ? { ...row, sourceOrder: index + 1 } : row;
+  });
+}
+
+function reparentRow(row, parent) {
+  const nextLevel = parent ? (parent.level === "package" ? "product" : "element") : "package";
+  const promotedName = rowName(row);
+  const targetParentId = parent?.id;
+  const targetOrder = parent ? childrenOf(parent).length + 1 : packageRows().length + 1;
+  rows = rows.map((candidate) => {
+    if (candidate.id !== row.id) return candidate;
+    const updated = {
+      ...candidate,
+      level: nextLevel,
+      parentId: targetParentId,
+      sourceOrder: targetOrder
+    };
+    if (nextLevel === "package") {
+      updated.packageName = promotedName || candidate.packageName;
+      updated.product = "";
+      updated.element = "";
+      updated.type = "";
+    } else if (nextLevel === "product") {
+      updated.packageName = parent.packageName;
+      updated.product = promotedName || candidate.product;
+      updated.element = "";
+    } else {
+      updated.packageName = parent.packageName;
+      updated.product = parent.product;
+      updated.element = promotedName || candidate.element;
+      updated.type = candidate.type || parent.type || "MP";
+    }
+    return syncRowHierarchy(updated);
+  });
+  const updated = rows.find((candidate) => candidate.id === row.id);
+  if (updated) cascadeHierarchy(updated);
+  if (parent) expanded.add(parent.id);
+  normalizeSiblingOrder(targetParentId || "");
+  render();
+}
+
+function reorderBefore(row, target) {
+  if (row.id === target.id || row.level !== target.level || (row.parentId || "") !== (target.parentId || "")) return;
+  const sorted = siblingRows(row).filter((candidate) => candidate.id !== row.id);
+  const targetIndex = sorted.findIndex((candidate) => candidate.id === target.id);
+  sorted.splice(targetIndex, 0, row);
+  rows = rows.map((candidate) => {
+    const index = sorted.findIndex((item) => item.id === candidate.id);
+    return index >= 0 ? { ...candidate, sourceOrder: index + 1 } : candidate;
+  });
+  render();
+}
+
+function handleRowDrop(source, target) {
+  if (!source || !target || source.id === target.id) return;
+  if (descendantsOf(source).some((row) => row.id === target.id)) return;
+
+  if (source.level === target.level && (source.parentId || "") === (target.parentId || "")) {
+    reorderBefore(source, target);
+    return;
+  }
+
+  if (target.level !== "element") {
+    reparentRow(source, target);
+  }
+}
+
+function demoteRow(row) {
+  const targetParent = previousVisibleRow(row);
+  if (!targetParent || levelRank(targetParent.level) !== levelRank(row.level) - 1) return;
+  rows = rows.map((candidate) => (candidate.id === row.id ? syncRowHierarchy({ ...candidate, parentId: targetParent.id, sourceOrder: targetParent.sourceOrder + 0.1 }) : candidate));
+  cascadeHierarchy(rows.find((candidate) => candidate.id === row.id));
+  expanded.add(targetParent.id);
+  render();
+}
+
+function promoteRow(row) {
+  if (row.level === "package") return;
+  const parent = rows.find((candidate) => candidate.id === row.parentId);
+  if (!parent) return;
+
+  if (row.level === "product") {
+    rows = rows.map((candidate) =>
+      candidate.id === row.id
+        ? syncRowHierarchy({
+            ...candidate,
+            level: "package",
+            parentId: undefined,
+            packageName: row.product || row.packageName,
+            product: "",
+            element: "",
+            description: row.description || `${row.product} package`,
+            type: "",
+            sourceOrder: parent.sourceOrder + 0.5
+          })
+        : candidate
+    );
+  } else {
+    rows = rows.map((candidate) =>
+      candidate.id === row.id
+        ? syncRowHierarchy({
+            ...candidate,
+            level: "product",
+            parentId: parent.parentId,
+            product: row.element || row.product,
+            element: "",
+            sourceOrder: parent.sourceOrder + 0.5
+          })
+        : candidate
+    );
+  }
+
+  const updated = rows.find((candidate) => candidate.id === row.id);
+  if (updated) cascadeHierarchy(updated);
+  render();
+}
+
 function updateRow(id, patch) {
   const original = rows.find((row) => row.id === id);
   if (!original) return;
@@ -406,6 +664,7 @@ function updateRow(id, patch) {
   });
 
   if (Object.hasOwn(patch, "active")) setDescendantsActive(updated, patch.active);
+  cascadeHierarchy(updated);
   render();
 }
 
@@ -439,7 +698,42 @@ function renderRows() {
     tr.classList.toggle("package-row", row.level === "package");
     tr.classList.toggle("product-row", row.level === "product");
     tr.classList.toggle("element-row", row.level === "element");
+    tr.classList.toggle("rollup-source", row.level !== "element" && childrenOf(row).some((child) => child.active));
     tr.dataset.level = row.level;
+    const dragHandle = fragment.querySelector(".drag-handle");
+    dragHandle.draggable = true;
+    dragHandle.addEventListener("dragstart", (event) => {
+      draggedRowId = row.id;
+      tr.classList.add("dragging-row");
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", row.id);
+    });
+    dragHandle.addEventListener("dragend", () => {
+      draggedRowId = null;
+      tr.classList.remove("dragging-row");
+      document.querySelectorAll(".drop-target").forEach((target) => target.classList.remove("drop-target"));
+    });
+    tr.addEventListener("dragover", (event) => {
+      const source = rows.find((candidate) => candidate.id === draggedRowId);
+      if (!source || source.id === row.id || descendantsOf(source).some((candidate) => candidate.id === row.id)) return;
+      event.preventDefault();
+      tr.classList.add("drop-target");
+    });
+    tr.addEventListener("dragleave", () => tr.classList.remove("drop-target"));
+    tr.addEventListener("drop", (event) => {
+      event.preventDefault();
+      tr.classList.remove("drop-target");
+      const source = rows.find((candidate) => candidate.id === draggedRowId || candidate.id === event.dataTransfer.getData("text/plain"));
+      handleRowDrop(source, row);
+    });
+
+    const deleteButton = fragment.querySelector(".delete-row-btn");
+    deleteButton.addEventListener("click", () => {
+      const removeIds = new Set([row.id, ...descendantsOf(row).map((child) => child.id)]);
+      rows = rows.filter((candidate) => !removeIds.has(candidate.id));
+      expanded.delete(row.id);
+      render();
+    });
 
     const useInput = fragment.querySelector(".use-input");
     useInput.checked = row.active;
@@ -460,18 +754,26 @@ function renderRows() {
     setupNameInput(fragment.querySelector(".name-input"), row);
     bindInput(fragment.querySelector(".description-input"), row, "description");
     bindInput(fragment.querySelector(".type-input"), row, "type");
-    bindInput(fragment.querySelector(".qty-input"), row, "qty", true);
+    bindInput(fragment.querySelector(".inventory-input"), row, "inventoryQty", true);
+    bindInput(fragment.querySelector(".needed-input"), row, "neededQty", true);
     bindInput(fragment.querySelector(".cost-input"), row, "cost", true);
+    bindInput(fragment.querySelector(".client-qoh-input"), row, "clientQoh", true);
     bindInput(fragment.querySelector(".markup-input"), row, "markup", true);
     bindInput(fragment.querySelector(".margin-input"), row, "marginAdj", true);
     bindInput(fragment.querySelector(".prior-input"), row, "priorPpp", true);
 
     if (row.level !== "element" && childrenOf(row).some((child) => child.active)) {
-      ["qty-input", "cost-input", "markup-input", "margin-input", "prior-input"].forEach((className) => {
+      ["inventory-input", "needed-input", "cost-input", "client-qoh-input", "markup-input", "margin-input", "prior-input"].forEach((className) => {
         const input = fragment.querySelector(`.${className}`);
         input.readOnly = true;
         input.title = "Calculated from nested active rows";
       });
+      fragment.querySelector(".inventory-input").value = Math.round(calc.inventoryQty);
+      fragment.querySelector(".needed-input").value = Math.round(calc.neededQty);
+      fragment.querySelector(".cost-input").value = decimal(calc.cost, 2);
+      fragment.querySelector(".client-qoh-input").value = Math.round(calc.clientQoh);
+      fragment.querySelector(".markup-input").value = decimal(calc.markup, 3);
+      fragment.querySelector(".margin-input").value = decimal(calc.marginAdj, 3);
     }
 
     if (row.level === "package") {
@@ -480,7 +782,10 @@ function renderRows() {
       typeInput.disabled = true;
     }
 
+    fragment.querySelector(".qty-to-order").textContent = Math.round(calc.qtyToOrder).toLocaleString();
+    fragment.querySelector(".client-order-qty").textContent = Math.round(calc.qty).toLocaleString();
     fragment.querySelector(".margin-dollars").textContent = money(calc.marginDollars, 0);
+    fragment.querySelector(".standard-price").textContent = money(calc.standardPrice, 0);
     fragment.querySelector(".client-price").textContent = money(calc.clientPrice, 0);
     fragment.querySelector(".ppp").textContent = money(calc.ppp, 3);
 
@@ -488,12 +793,6 @@ function renderRows() {
     diff.textContent = money(calc.diff, 3);
     diff.classList.toggle("negative", calc.diff < 0);
     diff.classList.toggle("positive", calc.diff > 0);
-
-    fragment.querySelector(".remove-row-btn").addEventListener("click", () => {
-      const removeIds = new Set([row.id, ...descendantsOf(row).map((desc) => desc.id)]);
-      rows = rows.filter((candidate) => !removeIds.has(candidate.id));
-      render();
-    });
 
     els.lineItems.append(fragment);
   });
@@ -505,12 +804,38 @@ function renderRows() {
 
 function renderFooter(sourceRows) {
   const totals = totalFor(sourceRows);
+  els.neededQtyHead.textContent = `${els.estimateYear.value || "Project"} Needed`;
+  els.footerInventoryQty.textContent = Math.round(totals.inventoryQty).toLocaleString();
+  els.footerNeededQty.textContent = Math.round(totals.neededQty).toLocaleString();
+  els.footerQtyToOrder.textContent = Math.round(totals.qtyToOrder).toLocaleString();
+  els.footerClientQoh.textContent = Math.round(totals.clientQoh).toLocaleString();
   els.footerQty.textContent = Math.round(totals.qty).toLocaleString();
   els.footerCost.textContent = money(totals.cost, 0);
+  els.footerStdMarkup.textContent = money(totals.standardPrice, 0);
   els.footerMargin.textContent = money(totals.margin, 0);
   els.footerClient.textContent = money(totals.client, 0);
   els.footerPpp.textContent = money(totals.qty ? totals.client / totals.qty : 0, 3);
   els.footerDiff.textContent = money(totals.qty ? totals.diffValue / totals.qty : 0, 3);
+}
+
+function renderPrintTypeSubtotals() {
+  const totals = activeElementsForVisiblePackages()
+    .reduce(
+      (memo, row) => {
+        const type = row.type || "MP";
+        memo[type] = (memo[type] || 0) + calculate(row).clientPrice;
+        return memo;
+      },
+      { M: 0, VF: 0, FP: 0, MP: 0 }
+    );
+  const grandTotal = Object.values(totals).reduce((sum, value) => sum + value, 0);
+  els.printTypeSubtotals.innerHTML = `
+    <strong>Total ${money(grandTotal, 2)}</strong>
+    ${Object.entries(totals)
+      .filter(([, total]) => total)
+      .map(([type, total]) => `<span>${type} - ${typeLabels[type]} ${money(total, 2)}</span>`)
+      .join("")}
+  `;
 }
 
 function renderSummary() {
@@ -541,6 +866,18 @@ function renderRollup() {
     });
 }
 
+function paymentTotalsByType() {
+  return activeElementsForVisiblePackages()
+    .reduce(
+      (memo, row) => {
+        const type = row.type || "MP";
+        memo[type] = (memo[type] || 0) + calculate(row).clientPrice;
+        return memo;
+      },
+      { M: 0, VF: 0, FP: 0, MP: 0 }
+    );
+}
+
 function historicalCalc(row, year) {
   const currentYear = Math.max(asNumber(els.estimateYear.value), 2025);
   const calc = calculate(row);
@@ -558,85 +895,183 @@ function historicalCalc(row, year) {
 
 function trackingRows() {
   const level = els.trackingLevel.value;
-  if (level === "package") return packageRows().filter((row) => row.active);
-  return rows.filter((row) => row.level === level && row.active && rowPassesBaseFilters(row));
+  const selectedId = els.trackingItem.value;
+  const candidates = (level === "package" ? packageRows().filter((row) => row.active) : rows.filter((row) => row.level === level && row.active && rowPassesBaseFilters(row))).sort((a, b) => calculate(b).clientPrice - calculate(a).clientPrice);
+  return selectedId === "all" ? candidates : candidates.filter((row) => row.id === selectedId);
+}
+
+function renderTrackingItems() {
+  const level = els.trackingLevel.value;
+  const current = els.trackingItem.value || "all";
+  const candidates = level === "package" ? packageRows().filter((row) => row.active) : rows.filter((row) => row.level === level && row.active && rowPassesBaseFilters(row));
+  els.trackingItem.innerHTML = '<option value="all">All visible</option>';
+  candidates
+    .sort((a, b) => calculate(b).clientPrice - calculate(a).clientPrice)
+    .forEach((row) => {
+      const option = document.createElement("option");
+      option.value = row.id;
+      option.textContent = rowName(row);
+      els.trackingItem.append(option);
+    });
+  els.trackingItem.value = Array.from(els.trackingItem.options).some((option) => option.value === current) ? current : "all";
 }
 
 function renderTracking() {
   const selectedMetrics = Array.from(document.querySelectorAll(".metric-filter:checked")).map((input) => input.value);
+  if (!selectedMetrics.length) {
+    els.yearTracking.innerHTML = '<p class="chart-note">Select at least one metric to view tracking.</p>';
+    return;
+  }
+
+  if (els.trackingMode.value === "compare") {
+    renderTrackingCompare(selectedMetrics);
+    return;
+  }
+
   const currentYear = Math.max(asNumber(els.estimateYear.value), 2025);
   const years = [currentYear - 2, currentYear - 1, currentYear];
   const candidates = trackingRows();
-  const series = selectedMetrics.map((metric) => ({
-    metric,
-    ...metricStyles[metric],
-    values: years.map((year) => {
-      const aggregate = candidates.reduce(
-        (memo, row) => {
-          const calc = historicalCalc(row, year);
-          memo.cost += calc.cost;
-          memo.client += calc.client;
-          memo.margin += calc.margin;
-          return memo;
-        },
-        { cost: 0, client: 0, margin: 0 }
-      );
-      if (metric === "cost") return aggregate.cost;
-      if (metric === "client") return aggregate.client;
-      return aggregate.client ? aggregate.margin / aggregate.client : 0;
-    })
-  }));
-  const width = 720;
-  const height = 260;
-  const pad = { top: 28, right: 28, bottom: 42, left: 58 };
-  const xFor = (index) => pad.left + (index * (width - pad.left - pad.right)) / (years.length - 1 || 1);
+  const items = years.map((year) => {
+    const calc = candidates.reduce(
+      (memo, row) => {
+        const historical = historicalCalc(row, year);
+        memo.cost += historical.cost;
+        memo.margin += historical.margin;
+        memo.client += historical.client;
+        return memo;
+      },
+      { cost: 0, margin: 0, client: 0 }
+    );
+    return { label: String(year), calc };
+  });
+  renderStackedComparisonChart(items, selectedMetrics, `${candidates.length} active ${els.trackingLevel.value} row${candidates.length === 1 ? "" : "s"} included.`);
+}
 
-  const lines = series
-    .map((item) => {
-      const localMin = Math.min(...item.values);
-      const localMax = Math.max(...item.values);
-      const localRange = localMax - localMin || 1;
-      const yFor = (value) => height - pad.bottom - ((value - localMin) / localRange) * (height - pad.top - pad.bottom);
-      const points = item.values.map((value, index) => `${xFor(index)},${yFor(value)}`).join(" ");
-      const labels = item.values
-        .map((value, index) => {
-          const display = item.metric === "marginPct" ? `${decimal(value * 100, 1)}%` : money(value, 0);
-          return `<text x="${xFor(index)}" y="${yFor(value) - 8}" text-anchor="middle" fill="${item.color}">${display}</text>`;
-        })
-        .join("");
-      return `<polyline points="${points}" fill="none" stroke="${item.color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />${item.values
-        .map((value, index) => `<circle cx="${xFor(index)}" cy="${yFor(value)}" r="4" fill="${item.color}" />`)
-        .join("")}${labels}`;
+function shortLabel(value, max = 18) {
+  const text = String(value || "");
+  return text.length > max ? `${text.slice(0, max - 1)}…` : text;
+}
+
+function compactMoney(value) {
+  const number = Math.abs(asNumber(value));
+  const sign = asNumber(value) < 0 ? "-" : "";
+  if (number >= 1000000) return `${sign}$${decimal(number / 1000000, 1)}M`;
+  if (number >= 10000) return `${sign}$${decimal(number / 1000, 0)}k`;
+  if (number >= 1000) return `${sign}$${decimal(number / 1000, 1)}k`;
+  return `${sign}$${decimal(number, 0)}`;
+}
+
+function renderTrackingCompare(selectedMetrics) {
+  const level = els.trackingLevel.value;
+  const currentYear = Math.max(asNumber(els.estimateYear.value), 2025);
+  const candidates = (level === "package" ? packageRows().filter((row) => row.active) : rows.filter((row) => row.level === level && row.active && rowPassesBaseFilters(row))).sort((a, b) => calculate(b).clientPrice - calculate(a).clientPrice);
+  const items = candidates.map((row) => ({
+    label: rowName(row),
+    calc: historicalCalc(row, currentYear)
+  }));
+  renderStackedComparisonChart(items, selectedMetrics, `${candidates.length} active ${level} row${candidates.length === 1 ? "" : "s"} compared for ${currentYear}.`);
+}
+
+function renderStackedComparisonChart(items, selectedMetrics, note) {
+  const width = Math.max(760, items.length * 112);
+  const height = els.yearPanel.classList.contains("chart-expanded") ? 520 : 300;
+  const pad = { top: 52, right: 28, bottom: 78, left: 58 };
+  const maxValue = Math.max(
+    ...items.map((item) => {
+      const stackValue = (selectedMetrics.includes("cost") ? item.calc.cost : 0) + (selectedMetrics.includes("margin") ? Math.max(item.calc.margin, 0) : 0);
+      return Math.max(stackValue, selectedMetrics.includes("client") ? item.calc.client : 0);
+    }),
+    1
+  );
+  const plotWidth = width - pad.left - pad.right;
+  const plotHeight = height - pad.top - pad.bottom;
+  const groupWidth = plotWidth / Math.max(items.length, 1);
+  const barWidth = Math.min(26, groupWidth * 0.24);
+  const barGap = Math.min(22, groupWidth * 0.18);
+  const yFor = (value) => height - pad.bottom - (value / maxValue) * plotHeight;
+  const bars = items
+    .map((item, itemIndex) => {
+      const groupX = pad.left + itemIndex * groupWidth + groupWidth / 2;
+      const stackX = groupX - barWidth - barGap / 2;
+      const clientX = groupX + barGap / 2;
+      const costHeight = height - pad.bottom - yFor(item.calc.cost);
+      const margin = Math.max(item.calc.margin, 0);
+      const marginHeight = height - pad.bottom - yFor(margin);
+      const clientHeight = height - pad.bottom - yFor(item.calc.client);
+      const stackBase = selectedMetrics.includes("cost") ? costHeight : 0;
+      const stackTotal = (selectedMetrics.includes("cost") ? item.calc.cost : 0) + (selectedMetrics.includes("margin") ? margin : 0);
+      const stackLabelY = yFor(stackTotal) - 18;
+      const clientLabelY = yFor(item.calc.client) - 6;
+      const costRect = selectedMetrics.includes("cost") ? `<rect x="${stackX}" y="${height - pad.bottom - costHeight}" width="${barWidth}" height="${costHeight}" rx="4" fill="${metricStyles.cost.color}" />` : "";
+      const marginRect = selectedMetrics.includes("margin") ? `<rect x="${stackX}" y="${height - pad.bottom - stackBase - marginHeight}" width="${barWidth}" height="${marginHeight}" rx="4" fill="${metricStyles.margin.color}" />` : "";
+      const stackLabel = stackTotal ? `<text class="chart-value chart-value-stack" x="${stackX + barWidth / 2}" y="${Math.max(14, stackLabelY)}" text-anchor="middle">${compactMoney(stackTotal)}</text>` : "";
+      const clientBar = selectedMetrics.includes("client")
+        ? `<rect x="${clientX}" y="${height - pad.bottom - clientHeight}" width="${barWidth}" height="${clientHeight}" rx="4" fill="${metricStyles.client.color}" />
+          <text class="chart-value chart-value-client" x="${clientX + barWidth / 2}" y="${Math.max(30, clientLabelY)}" text-anchor="middle">${compactMoney(item.calc.client)}</text>`
+        : "";
+      return `${costRect}${marginRect}${stackLabel}${clientBar}<text x="${groupX}" y="${height - 50}" text-anchor="end" transform="rotate(-38 ${groupX} ${height - 50})">${shortLabel(item.label)}</text>`;
     })
     .join("");
 
   els.yearTracking.innerHTML = `
     <div class="chart-legend">
-      ${series.map((item) => `<span><i style="background:${item.color}"></i>${item.label}</span>`).join("")}
+      ${selectedMetrics.map((metric) => `<span><i style="background:${metricStyles[metric].color}"></i>${metricStyles[metric].label}</span>`).join("")}
     </div>
-    <svg class="line-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="Year tracking line chart">
+    <svg class="line-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="Compare items by selected metric">
       <line x1="${pad.left}" y1="${height - pad.bottom}" x2="${width - pad.right}" y2="${height - pad.bottom}" stroke="#d9d9d9" />
       <line x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${height - pad.bottom}" stroke="#d9d9d9" />
-      ${years.map((year, index) => `<text x="${xFor(index)}" y="${height - 14}" text-anchor="middle">${year}</text>`).join("")}
-      ${lines}
+      ${bars}
     </svg>
-    <p class="chart-note">${candidates.length} active ${els.trackingLevel.value} row${candidates.length === 1 ? "" : "s"} included.</p>
+    <p class="chart-note">${note}</p>
   `;
 }
 
 function renderPayments() {
-  const total = totalFor(packageRows().filter((row) => row.active)).client;
-  const depositPct = Math.min(Math.max(asNumber(els.depositPct.value), 0), 1);
-  const paymentCount = Math.max(Math.round(asNumber(els.paymentCount.value)), 1);
-  const deposit = total * depositPct;
-  const payment = (total - deposit) / paymentCount;
-
+  const totalsByType = paymentTotalsByType();
   els.paymentSchedule.innerHTML = "";
-  [["Deposit", deposit, `${decimal(depositPct * 100, 0)}%`], ...Array.from({ length: paymentCount }, (_, index) => [`Balance ${index + 1}`, payment, `${decimal((1 - depositPct) * 100 / paymentCount, 1)}%`])].forEach(([label, amount, note]) => {
-    const row = document.createElement("div");
-    row.className = "rollup-row";
-    row.innerHTML = `<div><strong>${label}</strong><small>${note}</small></div><span>${money(amount, 2)}</span><span></span>`;
-    els.paymentSchedule.append(row);
+  Object.entries(totalsByType).forEach(([type, total]) => {
+    if (!total) return;
+    const settings = paymentSettings[type] || { depositPct: 0.25, paymentCount: 3 };
+    const depositPct = Math.min(Math.max(asNumber(settings.depositPct), 0), 1);
+    const paymentCount = Math.max(Math.round(asNumber(settings.paymentCount)), 1);
+    const header = document.createElement("div");
+    header.className = "payment-type-heading";
+    header.innerHTML = `
+      <strong>${type} - ${typeLabels[type]}</strong>
+      <label class="payment-header-control internal-col">Deposit % <input class="deposit-setting" type="number" min="0" max="100" step="5" value="${decimal(depositPct * 100, 0)}" /></label>
+      <label class="payment-header-control internal-col">Balance <input class="count-setting" type="number" min="1" max="12" step="1" value="${paymentCount}" /></label>
+      <span>${money(total, 0)}</span>
+    `;
+    header.querySelector(".deposit-setting").addEventListener("change", (event) => {
+      paymentSettings[type] = {
+        ...paymentSettings[type],
+        depositPct: Math.min(Math.max(asNumber(event.target.value) / 100, 0), 1)
+      };
+      renderPayments();
+    });
+    header.querySelector(".count-setting").addEventListener("change", (event) => {
+      paymentSettings[type] = {
+        ...paymentSettings[type],
+        paymentCount: Math.max(Math.round(asNumber(event.target.value)), 1)
+      };
+      renderPayments();
+    });
+    els.paymentSchedule.append(header);
+    const entries = [["Deposit", total * depositPct, `${decimal(depositPct * 100, 0)}%`], ...Array.from({ length: paymentCount }, (_, index) => [`Balance ${index + 1}`, ((1 - depositPct) * total) / paymentCount, `${decimal((1 - depositPct) * 100 / paymentCount, 1)}%`])];
+    entries.forEach(([label, amount, note], index) => {
+      const key = `${type}-${index}`;
+      const row = document.createElement("label");
+      row.className = "payment-row";
+      row.innerHTML = `
+        <span><strong>${label}</strong><small>${note}</small></span>
+        <input type="date" value="${paymentDates[key] || ""}" aria-label="${type} ${label} date" />
+        <strong>${money(amount, 2)}</strong>
+      `;
+      row.querySelector("input").addEventListener("change", (event) => {
+        paymentDates[key] = event.target.value;
+      });
+      els.paymentSchedule.append(row);
+    });
   });
 }
 
@@ -665,8 +1100,10 @@ function render() {
   renderRows();
   renderSummary();
   renderRollup();
+  renderTrackingItems();
   renderTracking();
   renderPayments();
+  renderPrintTypeSubtotals();
   renderLookupList();
 }
 
@@ -683,6 +1120,9 @@ function addPackage() {
     description: "",
     type: "",
     qty: 0,
+    neededQty: 0,
+    inventoryQty: 0,
+    clientQoh: 0,
     cost: 0,
     markup: asNumber(els.globalMarkup.value),
     marginAdj: 0.4,
@@ -713,6 +1153,9 @@ function addProduct() {
     description: "",
     type: "MP",
     qty: 0,
+    neededQty: 0,
+    inventoryQty: 0,
+    clientQoh: 0,
     cost: 0,
     markup: asNumber(els.globalMarkup.value),
     marginAdj: 0.4,
@@ -743,6 +1186,9 @@ function addElement() {
     description: "",
     type: parent.type || "MP",
     qty: 0,
+    neededQty: 0,
+    inventoryQty: 0,
+    clientQoh: 0,
     cost: 0,
     markup: asNumber(els.globalMarkup.value),
     marginAdj: 0.4,
@@ -755,11 +1201,11 @@ function addElement() {
 }
 
 function exportCsv() {
-  const headers = ["Level", "Active", "Package", "Product / Service", "Element", "Description", "Production Type", "Order Qty", "Cost", "Markup", "Margin Adj", "Margin Dollars", "Client Price", "PPP", "2024 PPP", "Difference"];
+  const headers = ["Level", "Active", "Package", "Product / Service", "Element", "Description", "Production Type", "Inventory Qty", "Needed Qty", "Qty to Order", "Cost", "Client QOH", "Client Order Qty", "Markup", "Margin Adj", "Margin Dollars", "Client Price", "PPP", "2024 PPP", "Difference"];
   const lines = [headers];
   visibleRows().forEach((row) => {
     const calc = calculate(row);
-    lines.push([row.level, row.active, row.packageName, row.product, row.element, row.description, row.type, calc.qty, calc.cost, row.markup, row.marginAdj, calc.marginDollars, calc.clientPrice, calc.ppp, calc.priorPpp, calc.diff]);
+    lines.push([row.level, row.active, row.packageName, row.product, row.element, row.description, row.type, calc.inventoryQty, calc.neededQty, calc.qtyToOrder, calc.cost, calc.clientQoh, calc.qty, calc.markup, calc.marginAdj, calc.marginDollars, calc.clientPrice, calc.ppp, calc.priorPpp, calc.diff]);
   });
 
   const csv = lines.map((line) => line.map((value) => `"${String(value ?? "").replaceAll('"', '""')}"`).join(",")).join("\n");
@@ -795,11 +1241,28 @@ function saveLookup() {
 els.searchInput.addEventListener("input", render);
 els.includeInactive.addEventListener("change", render);
 els.tariffRate.addEventListener("change", render);
-els.depositPct.addEventListener("change", render);
-els.paymentCount.addEventListener("change", render);
 els.estimateYear.addEventListener("change", render);
 els.trackingLevel.addEventListener("change", render);
+els.trackingMode.addEventListener("change", renderTracking);
+els.trackingItem.addEventListener("change", renderTracking);
+els.expandChartBtn.addEventListener("click", () => {
+  els.yearPanel.classList.toggle("chart-expanded");
+  els.expandChartBtn.textContent = els.yearPanel.classList.contains("chart-expanded") ? "Close" : "Expand";
+  renderTracking();
+});
 document.querySelectorAll(".metric-filter").forEach((input) => input.addEventListener("change", render));
+els.promoteDropZone.addEventListener("dragover", (event) => {
+  if (!draggedRowId) return;
+  event.preventDefault();
+  els.promoteDropZone.classList.add("drop-target");
+});
+els.promoteDropZone.addEventListener("dragleave", () => els.promoteDropZone.classList.remove("drop-target"));
+els.promoteDropZone.addEventListener("drop", (event) => {
+  event.preventDefault();
+  els.promoteDropZone.classList.remove("drop-target");
+  const source = rows.find((row) => row.id === draggedRowId || row.id === event.dataTransfer.getData("text/plain"));
+  if (source) promoteRow(source);
+});
 els.lookupTable.addEventListener("change", () => {
   els.lookupValue.value = "";
   delete els.lookupValue.dataset.editing;
@@ -824,8 +1287,8 @@ els.resetBtn.addEventListener("click", () => {
   els.includeInactive.checked = false;
   els.globalMarkup.value = "0.40";
   els.tariffRate.value = "0.30";
-  els.depositPct.value = "0.25";
-  els.paymentCount.value = "3";
+  paymentDates = {};
+  paymentSettings = Object.fromEntries(Object.keys(typeLabels).map((type) => [type, { depositPct: 0.25, paymentCount: 3 }]));
   render();
 });
 els.applyMarkupBtn.addEventListener("click", () => {

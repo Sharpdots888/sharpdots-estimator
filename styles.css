@@ -35,7 +35,7 @@ textarea {
 }
 
 button {
-  min-height: 40px;
+  min-height: 32px;
   border: 1px solid var(--primary);
   border-radius: 7px;
   padding: 0 14px;
@@ -61,7 +61,7 @@ button:hover {
 .app-shell {
   width: min(1480px, calc(100vw - 32px));
   margin: 0 auto;
-  padding: 24px 0 40px;
+  padding: 8px 0 20px;
 }
 
 .topbar,
@@ -76,7 +76,7 @@ button:hover {
 .topbar {
   justify-content: space-between;
   gap: 20px;
-  padding: 20px 0;
+  padding: 6px 0;
 }
 
 .topbar h1,
@@ -87,7 +87,7 @@ button:hover {
 
 .project-title-wrap {
   display: grid;
-  gap: 6px;
+  gap: 4px;
   flex: 1;
 }
 
@@ -106,7 +106,7 @@ button:hover {
   padding: 0;
   color: var(--ink);
   background: transparent;
-  font-size: clamp(2rem, 4vw, 4rem);
+  font-size: clamp(1.45rem, 2.4vw, 2.35rem);
   font-weight: 800;
   line-height: 1;
 }
@@ -137,7 +137,7 @@ button:hover {
 .lower-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
 }
 
 .metric,
@@ -151,7 +151,7 @@ button:hover {
 }
 
 .metric {
-  padding: 18px;
+  padding: 7px 10px;
 }
 
 .metric span,
@@ -163,29 +163,29 @@ legend {
 
 .metric strong {
   display: block;
-  margin-top: 8px;
-  font-size: clamp(1.35rem, 2.4vw, 2.4rem);
+  margin-top: 2px;
+  font-size: clamp(1rem, 1.45vw, 1.4rem);
   line-height: 1.1;
 }
 
 .workspace {
   display: grid;
   grid-template-columns: 300px minmax(0, 1fr);
-  gap: 16px;
-  margin-top: 16px;
+  gap: 12px;
+  margin-top: 8px;
 }
 
 .control-panel {
   display: grid;
   align-content: start;
-  gap: 18px;
-  padding: 16px;
+  gap: 9px;
+  padding: 9px;
 }
 
 label,
 legend {
   display: grid;
-  gap: 7px;
+  gap: 5px;
   font-size: 0.84rem;
   font-weight: 700;
 }
@@ -203,7 +203,7 @@ textarea {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 7px;
-  padding: 9px 10px;
+  padding: 5px 7px;
   color: var(--ink);
   accent-color: var(--primary);
   background: #ffffff;
@@ -260,13 +260,13 @@ textarea {
 .estimate-area,
 .panel {
   min-width: 0;
-  padding: 16px;
+  padding: 8px;
 }
 
 .section-head {
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 6px;
 }
 
 .section-head h2 {
@@ -274,21 +274,22 @@ textarea {
 }
 
 .section-head p {
-  margin: 4px 0 0;
-  font-size: 0.86rem;
+  margin: 1px 0 0;
+  font-size: 0.76rem;
 }
 
 .table-wrap {
   overflow: auto;
-  max-height: 68vh;
+  max-height: 74vh;
   border: 1px solid var(--line);
   border-radius: 8px;
+  padding-bottom: 0;
   scrollbar-gutter: stable both-edges;
 }
 
 table {
   width: 100%;
-  min-width: 1180px;
+  min-width: 1660px;
   border-collapse: separate;
   border-spacing: 0;
 }
@@ -296,7 +297,7 @@ table {
 th,
 td {
   border-bottom: 1px solid var(--line);
-  padding: 6px;
+  padding: 1px 3px;
   text-align: left;
   vertical-align: middle;
 }
@@ -307,7 +308,7 @@ th {
   z-index: 1;
   color: #ffffff;
   background: #333333;
-  font-size: 0.78rem;
+  font-size: 0.7rem;
   font-weight: 800;
 }
 
@@ -323,7 +324,18 @@ tbody tr.inactive {
   opacity: 0.55;
 }
 
+.rollup-source td:first-child {
+  box-shadow: inset 4px 0 0 var(--orange);
+}
+
+.rollup-source {
+  background: #fff8f2;
+}
+
 tfoot td {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
   color: #ffffff;
   background: #333333;
   font-weight: 800;
@@ -333,6 +345,14 @@ tfoot td {
 .package-row {
   background: #eef5fb;
   font-weight: 800;
+}
+
+.package-row.rollup-source {
+  background: #eaf4ff;
+}
+
+.product-row.rollup-source {
+  background: #fff8f2;
 }
 
 .product-row {
@@ -345,20 +365,54 @@ tfoot td {
   font-weight: 400;
 }
 
+.use-cell,
 .tree-cell {
   display: grid;
-  grid-template-columns: 24px minmax(180px, 1fr);
-  gap: 6px;
+  gap: 2px;
   align-items: center;
 }
 
+.use-cell {
+  grid-template-columns: 18px 16px;
+}
+
+.tree-cell {
+  grid-template-columns: 18px minmax(170px, 1fr);
+}
+
+.drag-handle,
+.delete-row-btn,
 .chevron-btn {
-  width: 24px;
-  min-width: 24px;
-  min-height: 24px;
+  width: 18px;
+  min-width: 18px;
+  min-height: 18px;
   padding: 0;
+}
+
+.drag-handle {
+  color: var(--muted);
+  cursor: grab;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.delete-row-btn {
+  color: var(--red);
+  font-weight: 900;
   line-height: 1;
+}
+
+.action-col,
+.action-cell {
+  width: 54px;
+  text-align: center;
+}
+
+.chevron-btn {
   color: var(--primary);
+  line-height: 1;
 }
 
 .empty-chevron {
@@ -366,12 +420,32 @@ tfoot td {
   pointer-events: none;
 }
 
+.dragging-row {
+  opacity: 0.45;
+}
+
+.drop-target {
+  outline: 2px solid var(--orange);
+  outline-offset: -2px;
+}
+
+.promote-drop-zone {
+  margin-bottom: 6px;
+  border: 1px dashed var(--primary);
+  border-radius: 7px;
+  padding: 6px 10px;
+  color: var(--primary);
+  background: #f4f9ff;
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+
 .product-row .tree-cell {
-  padding-left: 18px;
+  padding-left: 16px;
 }
 
 .element-row .tree-cell {
-  padding-left: 58px;
+  padding-left: 46px;
 }
 
 .package-row input,
@@ -393,6 +467,8 @@ tfoot td {
 .element-row .cost-input,
 .product-row .markup-input,
 .element-row .markup-input,
+.product-row .standard-price,
+.element-row .standard-price,
 .product-row .margin-input,
 .element-row .margin-input,
 .product-row .prior-input,
@@ -408,14 +484,24 @@ tfoot td {
 
 .product-row .qty-input,
 .element-row .qty-input,
+.product-row .needed-input,
+.element-row .needed-input,
+.product-row .inventory-input,
+.element-row .inventory-input,
+.product-row .client-qoh-input,
+.element-row .client-qoh-input,
+.product-row .qty-to-order,
+.element-row .qty-to-order,
+.product-row .client-order-qty,
+.element-row .client-order-qty,
 .product-row .client-price,
 .element-row .client-price {
   font-weight: 800;
 }
 
 .use-input {
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
 }
 
 .text-input {
@@ -432,8 +518,9 @@ tfoot td {
 
 td input,
 td select {
-  min-height: 34px;
-  padding: 6px 8px;
+  min-height: 18px;
+  padding: 1px 4px;
+  font-size: 0.78rem;
 }
 
 .type-input {
@@ -447,13 +534,6 @@ td select {
   white-space: nowrap;
 }
 
-.remove-row-btn {
-  width: 32px;
-  min-width: 32px;
-  min-height: 32px;
-  padding: 0;
-}
-
 .diff.negative {
   color: var(--red);
 }
@@ -464,7 +544,7 @@ td select {
 
 .lower-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-top: 16px;
+  margin-top: 12px;
 }
 
 .rollup-list {
@@ -494,34 +574,147 @@ td select {
   color: var(--muted);
 }
 
-.payment-grid {
+.payment-settings {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.payment-schedule {
+  display: grid;
+  gap: 5px;
+  max-height: 320px;
+  overflow: auto;
+}
+
+.payment-setting-row {
+  display: grid;
+  grid-template-columns: 30px 1fr minmax(80px, 94px) minmax(80px, 94px);
+  gap: 6px;
   align-items: end;
-  gap: 12px;
-  margin-bottom: 12px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--soft);
+}
+
+.payment-setting-row span {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.payment-setting-row label {
+  gap: 2px;
+  font-size: 0.68rem;
+}
+
+.payment-setting-row input {
+  min-height: 26px;
+  padding: 3px 5px;
+}
+
+.payment-type-heading,
+.payment-row {
+  display: grid;
+  grid-template-columns: 1fr 122px auto;
+  gap: 8px;
+  align-items: center;
+  min-height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 5px 8px;
+  background: var(--soft);
+}
+
+.payment-type-heading {
+  grid-template-columns: 1fr minmax(82px, 96px) minmax(82px, 96px) auto;
+  margin-top: 6px;
+  color: #ffffff;
+  border-color: #333333;
+  background: #333333;
+}
+
+.payment-header-control {
+  gap: 2px;
+  color: #ffffff;
+  font-size: 0.66rem;
+}
+
+.payment-header-control input {
+  min-height: 24px;
+  border-color: rgba(255, 255, 255, 0.32);
+  padding: 2px 5px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.payment-row small {
+  display: block;
+  color: var(--muted);
+}
+
+.payment-row input {
+  min-height: 28px;
+  padding: 4px 6px;
 }
 
 .tracking-controls,
 .lookup-editor {
   display: grid;
-  grid-template-columns: minmax(150px, 220px) 1fr auto;
-  gap: 12px;
+  grid-template-columns: minmax(140px, 200px) 1fr auto;
+  gap: 8px;
   align-items: end;
   margin-bottom: 12px;
 }
 
 .tracking-controls {
-  grid-template-columns: minmax(150px, 220px) 1fr;
+  grid-template-columns: minmax(104px, 0.8fr) minmax(138px, 1fr) minmax(150px, 1.2fr);
+}
+
+.tracking-controls fieldset {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+  grid-column: 1 / -1;
+}
+
+.tracking-controls legend {
+  padding-bottom: 7px;
 }
 
 .compact-checks {
+  flex-wrap: nowrap;
   gap: 10px;
+  margin-top: 0;
+  white-space: nowrap;
 }
 
 .tracking-table-wrap {
   overflow: auto;
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 12px;
+  padding: 8px;
+}
+
+.year-panel.chart-expanded {
+  position: fixed;
+  inset: 16px;
+  z-index: 20;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  background: #ffffff;
+}
+
+.year-panel.chart-expanded .tracking-table-wrap {
+  min-height: 0;
+}
+
+.year-panel.chart-expanded .line-chart {
+  min-width: 1200px;
 }
 
 .chart-legend {
@@ -559,6 +752,23 @@ td select {
   font-weight: 700;
 }
 
+.line-chart .chart-value {
+  fill: var(--ink);
+  font-size: 10px;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.line-chart .chart-value-stack {
+  fill: var(--blue);
+}
+
+.line-chart .chart-value-client {
+  fill: var(--orange);
+}
+
 .chart-note {
   margin: 8px 0 0;
   color: var(--muted);
@@ -593,6 +803,10 @@ td select {
 
 .lookup-row button {
   min-height: 32px;
+}
+
+.print-type-subtotals {
+  display: none;
 }
 
 @media (max-width: 980px) {
@@ -650,17 +864,41 @@ td select {
   }
 
   .top-actions,
+  .summary-grid,
   .control-panel,
-  .remove-row-btn,
+  .row-tools,
+  .drag-handle,
+  .delete-row-btn,
+  .chevron-btn,
+  #expandChartBtn,
+  .promote-drop-zone,
+  .lookup-panel,
   .lookup-editor,
-  .lookup-list {
+  .lookup-list,
+  .lower-grid .panel:not(.payment-panel),
+  .use-input,
+  .button-group {
+    display: none !important;
+  }
+
+  .internal-col {
     display: none !important;
   }
 
   .workspace,
-  .lower-grid,
-  .summary-grid {
+  .lower-grid {
     display: block;
+  }
+
+  .project-title-label,
+  .section-head p,
+  .payment-settings {
+    display: none !important;
+  }
+
+  .project-title-input {
+    max-width: none;
+    font-size: 20px;
   }
 
   .metric,
@@ -671,7 +909,22 @@ td select {
     break-inside: avoid;
   }
 
+  .estimate-area .section-head h2 {
+    font-size: 0;
+  }
+
+  .estimate-area .section-head h2::after {
+    content: "Project costs";
+    font-size: 16px;
+  }
+
+  .payment-panel .section-head h2 {
+    font-size: 16px;
+  }
+
   .table-wrap {
+    border: 0;
+    padding-bottom: 0;
     max-height: none;
     overflow: visible;
   }
@@ -679,6 +932,84 @@ td select {
   table {
     min-width: 0;
     font-size: 10px;
+    border-spacing: 0;
+  }
+
+  thead,
+  tfoot {
+    display: none;
+  }
+
+  tr.element-row {
+    display: none !important;
+  }
+
+  tr,
+  td {
+    border: 0 !important;
+    background: #ffffff !important;
+  }
+
+  td:first-child,
+  th:first-child,
+  td:nth-child(6),
+  th:nth-child(6),
+  td:nth-child(12),
+  th:nth-child(12) {
+    display: none !important;
+  }
+
+  .tree-cell {
+    display: block;
+    padding-left: 0 !important;
+  }
+
+  .product-row .tree-cell {
+    padding-left: 16px !important;
+  }
+
+  .package-row,
+  .product-row {
+    color: #111111;
+  }
+
+  .package-row input {
+    font-weight: 800;
+  }
+
+  .product-row input {
+    font-weight: 500;
+  }
+
+  .payment-schedule {
+    max-height: none;
+    overflow: visible;
+    gap: 0;
+  }
+
+  .payment-type-heading,
+  .payment-row {
+    grid-template-columns: 1fr 120px auto;
+    min-height: 0;
+    border: 0;
+    border-radius: 0;
+    padding: 2px 0;
+    color: #111111;
+    background: #ffffff;
+  }
+
+  .payment-row small {
+    display: inline;
+    margin-left: 8px;
+  }
+
+  .print-type-subtotals {
+    display: grid;
+    gap: 3px;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #cccccc;
+    font-size: 11px;
   }
 
   input,

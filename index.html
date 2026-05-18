@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>2026 North Pole Post Office Estimate</title>
-    <link rel="stylesheet" href="styles.css?v=sharpdots3" />
+    <link rel="stylesheet" href="styles.css?v=hierarchy-tools6" />
   </head>
   <body>
     <main class="app-shell">
@@ -104,6 +104,7 @@
               <button id="addElementBtn" class="ghost-btn" type="button">Add Element</button>
             </div>
           </div>
+          <div id="promoteDropZone" class="promote-drop-zone internal-col">Drag a row here to move it out one level</div>
 
           <div class="table-wrap">
             <table>
@@ -113,69 +114,62 @@
                   <th>Name</th>
                   <th>Description</th>
                   <th>Type</th>
-                  <th>Qty</th>
+                  <th>Inventory Qty</th>
+                  <th id="neededQtyHead">2026 Needed</th>
+                  <th>Qty to Order</th>
                   <th>Cost</th>
-                  <th>Markup</th>
-                  <th>Margin Adj</th>
-                  <th>Margin $</th>
+                  <th>Client QOH</th>
+                  <th>Client Order Qty</th>
+                  <th class="internal-col">Markup</th>
+                  <th class="internal-col">Std Markup Price</th>
+                  <th class="internal-col">Margin Adj</th>
+                  <th class="internal-col">Margin $</th>
                   <th>Client Price</th>
                   <th>PPP</th>
-                  <th>2024 PPP</th>
-                  <th>Diff</th>
-                  <th></th>
+                  <th class="internal-col">2024 PPP</th>
+                  <th class="internal-col">Diff</th>
+                  <th class="internal-col action-col">Action</th>
                 </tr>
               </thead>
               <tbody id="lineItems"></tbody>
               <tfoot>
                 <tr>
                   <td colspan="4">Visible Active Total</td>
-                  <td id="footerQty">0</td>
+                  <td id="footerInventoryQty">0</td>
+                  <td id="footerNeededQty">0</td>
+                  <td id="footerQtyToOrder">0</td>
                   <td id="footerCost">$0</td>
-                  <td></td>
-                  <td></td>
-                  <td id="footerMargin">$0</td>
+                  <td id="footerClientQoh">0</td>
+                  <td id="footerQty">0</td>
+                  <td class="internal-col"></td>
+                  <td id="footerStdMarkup" class="internal-col">$0</td>
+                  <td class="internal-col"></td>
+                  <td id="footerMargin" class="internal-col">$0</td>
                   <td id="footerClient">$0</td>
                   <td id="footerPpp">$0.000</td>
-                  <td></td>
-  <td id="footerDiff">$0.000</td>
-                  <td></td>
+                  <td class="internal-col"></td>
+                  <td id="footerDiff" class="internal-col">$0.000</td>
+                  <td class="internal-col"></td>
                 </tr>
-              </tfoot>
+          </tfoot>
             </table>
           </div>
+          <div id="printTypeSubtotals" class="print-type-subtotals"></div>
         </section>
       </section>
 
       <section class="lower-grid">
-        <article class="panel">
+        <article class="panel payment-panel">
           <div class="section-head">
             <div>
-              <h2>Year Tracking</h2>
-              <p>Package, product, and element view</p>
+              <h2>Payment Schedule</h2>
+              <p>By production type with client report dates</p>
             </div>
           </div>
-          <div class="tracking-controls">
-            <label>
-              Level
-              <select id="trackingLevel">
-                <option value="package">Package</option>
-                <option value="product">Product / Service</option>
-                <option value="element">Element</option>
-              </select>
-            </label>
-            <fieldset>
-              <legend>Metrics</legend>
-              <div class="check-list compact-checks">
-                <label><input class="metric-filter" type="checkbox" value="cost" checked /> Cost</label>
-                <label><input class="metric-filter" type="checkbox" value="marginPct" checked /> Margin %</label>
-                <label><input class="metric-filter" type="checkbox" value="client" checked /> Client Price</label>
-              </div>
-            </fieldset>
-          </div>
-          <div id="yearTracking" class="tracking-table-wrap"></div>
+          <div id="paymentSchedule" class="payment-schedule"></div>
         </article>
 
-        <article class="panel">
+        <article class="panel lookup-panel">
           <div class="section-head">
             <div>
               <h2>Package Rollup</h2>
@@ -210,31 +204,56 @@
           <div id="lookupList" class="lookup-list"></div>
         </article>
 
-        <article class="panel">
+        <article class="panel year-panel">
           <div class="section-head">
             <div>
-              <h2>Payment Schedule</h2>
-              <p>Based on current total client price</p>
+              <h2>Year Tracking</h2>
+              <p>Compare cost, margin dollars, and client price</p>
             </div>
+            <button id="expandChartBtn" class="ghost-btn compact-btn" type="button">Expand</button>
           </div>
-          <div class="payment-grid">
+          <div class="tracking-controls">
             <label>
-              Deposit %
-              <input id="depositPct" type="number" min="0" max="1" step="0.05" value="0.25" />
+              Level
+              <select id="trackingLevel">
+                <option value="package">Package</option>
+                <option value="product">Product / Service</option>
+                <option value="element">Element</option>
+              </select>
             </label>
             <label>
-              Balance Payments
-              <input id="paymentCount" type="number" min="1" max="12" step="1" value="3" />
+              View
+              <select id="trackingMode">
+                <option value="trend">Trend over years</option>
+                <option value="compare">Compare items</option>
+              </select>
             </label>
+            <label>
+              Item
+              <select id="trackingItem"></select>
+            </label>
+            <fieldset>
+              <legend>Metrics</legend>
+              <div class="check-list compact-checks">
+                <label><input class="metric-filter" type="checkbox" value="cost" checked /> Cost</label>
+                <label><input class="metric-filter" type="checkbox" value="margin" checked /> Margin $</label>
+                <label><input class="metric-filter" type="checkbox" value="client" checked /> Client Price</label>
+              </div>
+            </fieldset>
           </div>
-          <div id="paymentSchedule" class="rollup-list"></div>
+          <div id="yearTracking" class="tracking-table-wrap"></div>
         </article>
       </section>
     </main>
 
     <template id="rowTemplate">
       <tr>
-        <td><input class="use-input" type="checkbox" /></td>
+        <td>
+          <div class="use-cell">
+            <input class="use-input" type="checkbox" />
+            <button class="drag-handle ghost-btn internal-col" type="button" title="Drag to reorder or nest">⋮⋮</button>
+          </div>
+        </td>
         <td>
           <div class="tree-cell">
             <button class="chevron-btn ghost-btn" type="button" title="Show or hide nested rows">›</button>
@@ -251,16 +270,21 @@
             <option value="MP">MP</option>
           </select>
         </td>
-        <td><input class="qty-input number-input" type="number" min="0" step="1" /></td>
+        <td><input class="inventory-input number-input" type="number" min="0" step="1" /></td>
+        <td><input class="needed-input number-input" type="number" min="0" step="1" /></td>
+        <td class="money-cell qty-to-order"></td>
         <td><input class="cost-input number-input" type="number" min="0" step="0.01" /></td>
-        <td><input class="markup-input number-input" type="number" min="0" max="0.95" step="0.01" /></td>
-        <td><input class="margin-input number-input" type="number" min="-0.95" max="0.95" step="0.01" /></td>
-        <td class="money-cell margin-dollars"></td>
+        <td><input class="client-qoh-input number-input" type="number" min="0" step="1" /></td>
+        <td class="money-cell client-order-qty"></td>
+        <td class="internal-col"><input class="markup-input number-input" type="number" min="0" max="0.95" step="0.01" /></td>
+        <td class="money-cell standard-price internal-col"></td>
+        <td class="internal-col"><input class="margin-input number-input" type="number" min="-0.95" max="0.95" step="0.01" /></td>
+        <td class="money-cell margin-dollars internal-col"></td>
         <td class="money-cell client-price"></td>
         <td class="money-cell ppp"></td>
-        <td><input class="prior-input number-input" type="number" min="0" step="0.001" /></td>
-        <td class="money-cell diff"></td>
-        <td><button class="remove-row-btn ghost-btn" type="button" title="Remove row">×</button></td>
+        <td class="internal-col"><input class="prior-input number-input" type="number" min="0" step="0.001" /></td>
+        <td class="money-cell diff internal-col"></td>
+        <td class="internal-col action-cell"><button class="delete-row-btn ghost-btn" type="button" title="Delete row">×</button></td>
       </tr>
     </template>
 
@@ -268,6 +292,6 @@
     <datalist id="productLookup"></datalist>
     <datalist id="elementLookup"></datalist>
 
-    <script src="app.js?v=sharpdots3"></script>
+    <script src="app.js?v=hierarchy-tools6"></script>
   </body>
 </html>
