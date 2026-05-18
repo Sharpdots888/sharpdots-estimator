@@ -1,0 +1,12 @@
+{
+  "name": "sharpdots-estimator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Estimator application for package, product/service, and element costing.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": "22.x"
+  }
+}

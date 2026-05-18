@@ -1,0 +1,690 @@
+:root {
+  color-scheme: light;
+  --ink: #262626;
+  --muted: #6f6f6f;
+  --line: #d9d9d9;
+  --panel: #ffffff;
+  --soft: #f7f7f7;
+  --mist: #ebebeb;
+  --primary: #428bca;
+  --primary-dark: #2d6ca2;
+  --accent: #b84048;
+  --orange: #fe7300;
+  --red: #b84048;
+  --blue: #428bca;
+  --shadow: 0 14px 40px rgba(0, 0, 0, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  color: var(--ink);
+  background: linear-gradient(180deg, #f7faf8 0%, #edf3f0 100%);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  min-height: 40px;
+  border: 1px solid var(--primary);
+  border-radius: 7px;
+  padding: 0 14px;
+  color: #ffffff;
+  background: var(--primary);
+  cursor: pointer;
+}
+
+button:hover {
+  filter: brightness(0.96);
+}
+
+.ghost-btn {
+  color: var(--ink);
+  border-color: var(--line);
+  background: #ffffff;
+}
+
+.compact-btn {
+  min-width: 72px;
+}
+
+.app-shell {
+  width: min(1480px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 24px 0 40px;
+}
+
+.topbar,
+.section-head,
+.top-actions,
+.control-row,
+.payment-grid {
+  display: flex;
+  align-items: center;
+}
+
+.topbar {
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.topbar h1,
+.section-head h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.project-title-wrap {
+  display: grid;
+  gap: 6px;
+  flex: 1;
+}
+
+.project-title-label {
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.project-title-input {
+  max-width: 720px;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  color: var(--ink);
+  background: transparent;
+  font-size: clamp(2rem, 4vw, 4rem);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.top-actions {
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.button-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.summary-grid,
+.lower-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric,
+.panel,
+.control-panel,
+.estimate-area {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: var(--shadow);
+}
+
+.metric {
+  padding: 18px;
+}
+
+.metric span,
+.section-head p,
+label,
+legend {
+  color: var(--muted);
+}
+
+.metric strong {
+  display: block;
+  margin-top: 8px;
+  font-size: clamp(1.35rem, 2.4vw, 2.4rem);
+  line-height: 1.1;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.control-panel {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  padding: 16px;
+}
+
+label,
+legend {
+  display: grid;
+  gap: 7px;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 9px 10px;
+  color: var(--ink);
+  accent-color: var(--primary);
+  background: #ffffff;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.segmented,
+.check-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.segmented button {
+  min-height: 34px;
+  padding: 0 10px;
+  color: var(--ink);
+  border-color: var(--line);
+  background: var(--soft);
+}
+
+.segmented button.active {
+  color: #ffffff;
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+.check-list label,
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+}
+
+.check-list input,
+.toggle input {
+  width: 16px;
+  height: 16px;
+}
+
+.control-row {
+  gap: 8px;
+}
+
+.control-row label {
+  flex: 1;
+}
+
+.estimate-area,
+.panel {
+  min-width: 0;
+  padding: 16px;
+}
+
+.section-head {
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.section-head h2 {
+  font-size: 1.1rem;
+}
+
+.section-head p {
+  margin: 4px 0 0;
+  font-size: 0.86rem;
+}
+
+.table-wrap {
+  overflow: auto;
+  max-height: 68vh;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  scrollbar-gutter: stable both-edges;
+}
+
+table {
+  width: 100%;
+  min-width: 1180px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--line);
+  padding: 6px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  color: #ffffff;
+  background: #333333;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+tbody tr {
+  background: #ffffff;
+}
+
+tbody tr:nth-child(even) {
+  background: #fbfcfb;
+}
+
+tbody tr.inactive {
+  opacity: 0.55;
+}
+
+tfoot td {
+  color: #ffffff;
+  background: #333333;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.package-row {
+  background: #eef5fb;
+  font-weight: 800;
+}
+
+.product-row {
+  font-weight: 400;
+}
+
+.element-row {
+  color: var(--ink);
+  background: #fcfcfc;
+  font-weight: 400;
+}
+
+.tree-cell {
+  display: grid;
+  grid-template-columns: 24px minmax(180px, 1fr);
+  gap: 6px;
+  align-items: center;
+}
+
+.chevron-btn {
+  width: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0;
+  line-height: 1;
+  color: var(--primary);
+}
+
+.empty-chevron {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.product-row .tree-cell {
+  padding-left: 18px;
+}
+
+.element-row .tree-cell {
+  padding-left: 58px;
+}
+
+.package-row input,
+.package-row select,
+.package-row .money-cell {
+  font-weight: 800;
+}
+
+.product-row .name-input,
+.element-row .name-input {
+  font-weight: 800;
+}
+
+.product-row .description-input,
+.element-row .description-input,
+.product-row .type-input,
+.element-row .type-input,
+.product-row .cost-input,
+.element-row .cost-input,
+.product-row .markup-input,
+.element-row .markup-input,
+.product-row .margin-input,
+.element-row .margin-input,
+.product-row .prior-input,
+.element-row .prior-input,
+.product-row .margin-dollars,
+.element-row .margin-dollars,
+.product-row .ppp,
+.element-row .ppp,
+.product-row .diff,
+.element-row .diff {
+  font-weight: 400;
+}
+
+.product-row .qty-input,
+.element-row .qty-input,
+.product-row .client-price,
+.element-row .client-price {
+  font-weight: 800;
+}
+
+.use-input {
+  width: 18px;
+  height: 18px;
+}
+
+.text-input {
+  min-width: 170px;
+}
+
+.compact-input {
+  min-width: 80px;
+}
+
+.number-input {
+  min-width: 76px;
+}
+
+td input,
+td select {
+  min-height: 34px;
+  padding: 6px 8px;
+}
+
+.type-input {
+  min-width: 58px;
+}
+
+.money-cell {
+  min-width: 88px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.remove-row-btn {
+  width: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0;
+}
+
+.diff.negative {
+  color: var(--red);
+}
+
+.diff.positive {
+  color: var(--blue);
+}
+
+.lower-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 16px;
+}
+
+.rollup-list {
+  display: grid;
+  gap: 8px;
+}
+
+.rollup-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--soft);
+}
+
+.rollup-row strong,
+.rollup-row span {
+  font-variant-numeric: tabular-nums;
+}
+
+.rollup-row small {
+  display: block;
+  color: var(--muted);
+}
+
+.payment-grid {
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.tracking-controls,
+.lookup-editor {
+  display: grid;
+  grid-template-columns: minmax(150px, 220px) 1fr auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 12px;
+}
+
+.tracking-controls {
+  grid-template-columns: minmax(150px, 220px) 1fr;
+}
+
+.compact-checks {
+  gap: 10px;
+}
+
+.tracking-table-wrap {
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 8px;
+  color: var(--ink);
+  font-size: 0.86rem;
+  font-weight: 750;
+}
+
+.chart-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chart-legend i {
+  width: 20px;
+  height: 3px;
+  border-radius: 3px;
+}
+
+.line-chart {
+  display: block;
+  width: 100%;
+  min-width: 520px;
+  height: auto;
+}
+
+.line-chart text {
+  fill: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.chart-note {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.lookup-list {
+  display: grid;
+  gap: 8px;
+  max-height: 280px;
+  overflow: auto;
+}
+
+.lookup-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--soft);
+}
+
+.lookup-row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: text;
+}
+
+.lookup-row button {
+  min-height: 32px;
+}
+
+@media (max-width: 980px) {
+  .summary-grid,
+  .lower-grid,
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .top-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 620px) {
+  .app-shell {
+    width: min(100vw - 20px, 1480px);
+    padding-top: 12px;
+  }
+
+  .summary-grid {
+    gap: 8px;
+  }
+
+  .metric,
+  .panel,
+  .control-panel,
+  .estimate-area {
+    padding: 12px;
+  }
+
+  .payment-grid,
+  .control-row,
+  .tracking-controls,
+  .lookup-editor {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+}
+
+@media print {
+  body {
+    background: #ffffff;
+  }
+
+  .app-shell {
+    width: 100%;
+    padding: 0;
+  }
+
+  .top-actions,
+  .control-panel,
+  .remove-row-btn,
+  .lookup-editor,
+  .lookup-list {
+    display: none !important;
+  }
+
+  .workspace,
+  .lower-grid,
+  .summary-grid {
+    display: block;
+  }
+
+  .metric,
+  .panel,
+  .estimate-area {
+    margin-bottom: 12px;
+    box-shadow: none;
+    break-inside: avoid;
+  }
+
+  .table-wrap {
+    max-height: none;
+    overflow: visible;
+  }
+
+  table {
+    min-width: 0;
+    font-size: 10px;
+  }
+
+  input,
+  select {
+    border: 0;
+    padding: 0;
+    background: transparent;
+  }
+}
