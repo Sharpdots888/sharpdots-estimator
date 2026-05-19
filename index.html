@@ -4,16 +4,25 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>2026 North Pole Post Office Estimate</title>
-    <link rel="stylesheet" href="styles.css?v=hierarchy-tools9" />
+    <link rel="stylesheet" href="styles.css?v=project-save1" />
   </head>
   <body>
     <main class="app-shell">
       <header class="topbar">
-        <div class="project-title-wrap">
-          <label class="project-title-label" for="projectName">Project Name</label>
-          <input id="projectName" class="project-title-input" type="text" value="2026 North Pole Post Office Estimate" />
+        <div class="project-title-wrap project-meta-grid">
+          <label>
+            Project #
+            <input id="projectNumber" class="project-number-input" list="projectLookup" type="text" value="P-000001" />
+          </label>
+          <label class="project-name-field">
+            Project Name
+            <input id="projectName" class="project-title-input" list="projectLookup" type="text" value="2026 North Pole Post Office Estimate" />
+          </label>
+          <datalist id="projectLookup"></datalist>
         </div>
         <div class="top-actions">
+          <button id="saveEstimateBtn" class="ghost-btn" type="button" title="Save current project estimate">Save</button>
+          <button id="loadEstimateBtn" class="ghost-btn" type="button" title="Load by project number or name">Load</button>
           <button id="resetBtn" class="ghost-btn" type="button" title="Reset to sheet values">Reset</button>
           <button id="pdfBtn" class="ghost-btn" type="button" title="Generate PDF from current view">PDF</button>
           <button id="exportBtn" type="button" title="Export current estimate">Export CSV</button>
@@ -53,8 +62,9 @@
 
           <label>
             Year
-            <input id="estimateYear" type="number" min="2020" max="2035" step="1" value="2026" />
+            <input id="estimateYear" list="yearLookup" type="number" min="2020" max="2035" step="1" value="2026" />
           </label>
+          <datalist id="yearLookup"></datalist>
 
           <label>
             Search
@@ -104,7 +114,7 @@
               <button id="addElementBtn" class="ghost-btn" type="button">Add Element</button>
             </div>
           </div>
-          <div id="promoteDropZone" class="promote-drop-zone internal-col">Drag a row here to move it out one level</div>
+          <div id="promoteDropZone" class="promote-drop-zone internal-col">Drag a product or element here to make it a package</div>
 
           <div class="table-wrap">
             <table>
@@ -197,6 +207,8 @@
                 <option value="packages">Packages</option>
                 <option value="products">Products / Services</option>
                 <option value="elements">Elements</option>
+                <option value="clients">Clients / Accounts</option>
+                <option value="years">Years</option>
               </select>
             </label>
             <label>
@@ -297,6 +309,6 @@
     <datalist id="productLookup"></datalist>
     <datalist id="elementLookup"></datalist>
 
-    <script src="app.js?v=hierarchy-tools9"></script>
+    <script src="app.js?v=project-save1"></script>
   </body>
 </html>

@@ -91,6 +91,19 @@ button:hover {
   flex: 1;
 }
 
+.project-meta-grid {
+  grid-template-columns: 130px minmax(280px, 720px);
+  align-items: end;
+}
+
+.project-meta-grid label {
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 .project-title-label {
   color: var(--primary);
   font-size: 0.78rem;
@@ -109,6 +122,14 @@ button:hover {
   font-size: clamp(1.45rem, 2.4vw, 2.35rem);
   font-weight: 800;
   line-height: 1;
+}
+
+.project-number-input {
+  min-height: 32px;
+  padding: 4px 6px;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 800;
 }
 
 .eyebrow {
@@ -827,7 +848,7 @@ td select {
 
 .lookup-row {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr auto auto;
   gap: 10px;
   align-items: center;
   min-height: 38px;

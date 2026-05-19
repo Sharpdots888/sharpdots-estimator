@@ -123,9 +123,12 @@ const seedRows = buildSeedRows();
 const seedLookups = {
   packages: uniqueValues(seedRows.map((row) => row.packageName)),
   products: uniqueValues(seedRows.map((row) => row.product)),
-  elements: uniqueValues(seedRows.map((row) => row.element).filter(Boolean))
+  elements: uniqueValues(seedRows.map((row) => row.element).filter(Boolean)),
+  clients: ["North Pole Post Office", "Portofino", "Santa Direct"],
+  years: ["2024", "2025", "2026"]
 };
 
+const estimateStoreKey = "sharpdots-estimator-projects-v1";
 let rows = structuredClone(seedRows);
 let lookups = structuredClone(seedLookups);
 let activePackage = "All";
@@ -136,7 +139,9 @@ let paymentDates = {};
 let paymentSettings = Object.fromEntries(Object.keys(typeLabels).map((type) => [type, { depositPct: 0.25, paymentCount: 3 }]));
 
 const els = {
+  projectNumber: document.querySelector("#projectNumber"),
   projectName: document.querySelector("#projectName"),
+  projectLookup: document.querySelector("#projectLookup"),
   clientName: document.querySelector("#clientName"),
   estimateYear: document.querySelector("#estimateYear"),
   lineItems: document.querySelector("#lineItems"),
@@ -151,6 +156,8 @@ const els = {
   addPackageBtn: document.querySelector("#addPackageBtn"),
   addProductBtn: document.querySelector("#addProductBtn"),
   addElementBtn: document.querySelector("#addElementBtn"),
+  saveEstimateBtn: document.querySelector("#saveEstimateBtn"),
+  loadEstimateBtn: document.querySelector("#loadEstimateBtn"),
   resetBtn: document.querySelector("#resetBtn"),
   exportBtn: document.querySelector("#exportBtn"),
   pdfBtn: document.querySelector("#pdfBtn"),
@@ -188,8 +195,12 @@ const els = {
   lookupList: document.querySelector("#lookupList"),
   packageLookup: document.querySelector("#packageLookup"),
   productLookup: document.querySelector("#productLookup"),
-  elementLookup: document.querySelector("#elementLookup")
+  elementLookup: document.querySelector("#elementLookup"),
+  clientLookup: document.querySelector("#clientLookup"),
+  yearLookup: document.querySelector("#yearLookup")
 };
+
+document.querySelector("#projectNumber").value = nextProjectNumber();
 
 function money(value, digits = 0) {
   return new Intl.NumberFormat("en-US", {
@@ -207,6 +218,27 @@ function decimal(value, digits = 3) {
 function asNumber(value) {
   const number = Number(value);
   return Number.isFinite(number) ? number : 0;
+}
+
+function readSavedEstimates() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(estimateStoreKey) || "[]");
+    return Array.isArray(saved) ? saved : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeSavedEstimates(estimates) {
+  localStorage.setItem(estimateStoreKey, JSON.stringify(estimates));
+}
+
+function nextProjectNumber() {
+  const highest = readSavedEstimates().reduce((max, estimate) => {
+    const match = String(estimate.projectNumber || "").match(/^P-(\d{6})$/);
+    return match ? Math.max(max, Number(match[1])) : max;
+  }, 0);
+  return `P-${String(highest + 1).padStart(6, "0")}`;
 }
 
 function rowNeededQty(row) {
@@ -417,10 +449,15 @@ function syncLookupsFromRow(row) {
 }
 
 function renderDatalists() {
+  const savedEstimates = readSavedEstimates();
+  const projectValues = uniqueValues(savedEstimates.flatMap((estimate) => [estimate.projectNumber, estimate.projectName]));
   [
     [els.packageLookup, lookups.packages],
     [els.productLookup, lookups.products],
-    [els.elementLookup, lookups.elements]
+    [els.elementLookup, lookups.elements],
+    [els.clientLookup, uniqueValues([...(lookups.clients || []), ...savedEstimates.map((estimate) => estimate.clientName), els.clientName.value])],
+    [els.yearLookup, uniqueValues([...(lookups.years || []), ...savedEstimates.map((estimate) => estimate.estimateYear), els.estimateYear.value])],
+    [els.projectLookup, projectValues]
   ].forEach(([list, values]) => {
     list.innerHTML = "";
     values.forEach((value) => {
@@ -440,6 +477,11 @@ function renderFilters() {
     button.textContent = name;
     button.className = name === activePackage ? "active" : "";
     button.addEventListener("click", () => {
+      if (name !== "All" && !packageRows().some((row) => row.packageName === name)) {
+        activePackage = name;
+        addPackage(name);
+        return;
+      }
       activePackage = name;
       render();
     });
@@ -649,6 +691,45 @@ function promoteRow(row) {
 
   const updated = rows.find((candidate) => candidate.id === row.id);
   if (updated) cascadeHierarchy(updated);
+  render();
+}
+
+function makePackage(row) {
+  if (!row || row.level === "package") return;
+  const packageName = rowName(row) || "New Package";
+  const originalLevel = row.level;
+  rows = rows.map((candidate) => {
+    if (candidate.id === row.id) {
+      return syncRowHierarchy({
+        ...candidate,
+        level: "package",
+        parentId: undefined,
+        packageName,
+        product: "",
+        element: "",
+        description: candidate.description || `${packageName} package`,
+        type: "",
+        sourceOrder: packageRows().length + 1
+      });
+    }
+
+    if (originalLevel === "product" && candidate.parentId === row.id && candidate.level === "element") {
+      return syncRowHierarchy({
+        ...candidate,
+        level: "product",
+        parentId: row.id,
+        packageName,
+        product: candidate.element || candidate.product || "New Product / Service",
+        element: "",
+        sourceOrder: candidate.sourceOrder
+      });
+    }
+
+    return candidate;
+  });
+  syncLookupsFromRow(rows.find((candidate) => candidate.id === row.id));
+  expanded.add(row.id);
+  activePackage = packageName;
   render();
 }
 
@@ -1092,17 +1173,32 @@ function renderPayments() {
 function renderLookupList() {
   const tableName = els.lookupTable.value;
   els.lookupList.innerHTML = "";
-  lookups[tableName].forEach((value) => {
+  (lookups[tableName] || []).forEach((value) => {
     const row = document.createElement("div");
     row.className = "lookup-row";
-    row.innerHTML = `<span>${value}</span><button class="ghost-btn" type="button">Remove</button>`;
-    row.querySelector("button").addEventListener("click", () => {
-      lookups[tableName] = lookups[tableName].filter((candidate) => candidate !== value);
+    row.innerHTML = `
+      <input class="lookup-row-input" type="text" value="${value.replaceAll('"', "&quot;")}" />
+      <button class="ghost-btn save-lookup-row" type="button">Save</button>
+      <button class="ghost-btn remove-lookup-row" type="button">Remove</button>
+    `;
+    row.querySelector(".save-lookup-row").addEventListener("click", () => {
+      const nextValue = row.querySelector(".lookup-row-input").value.trim();
+      if (!nextValue || nextValue === value) return;
+      lookups[tableName] = uniqueValues(lookups[tableName].map((candidate) => (candidate === value ? nextValue : candidate)));
+      rows = rows.map((item) => ({
+        ...item,
+        packageName: tableName === "packages" && item.packageName === value ? nextValue : item.packageName,
+        product: tableName === "products" && item.product === value ? nextValue : item.product,
+        element: tableName === "elements" && item.element === value ? nextValue : item.element
+      }));
+      if (tableName === "packages" && activePackage === value) activePackage = nextValue;
+      if (tableName === "clients" && els.clientName.value === value) els.clientName.value = nextValue;
+      if (tableName === "years" && String(els.estimateYear.value) === String(value)) els.estimateYear.value = nextValue;
       render();
     });
-    row.querySelector("span").addEventListener("click", () => {
-      els.lookupValue.value = value;
-      els.lookupValue.dataset.editing = value;
+    row.querySelector(".remove-lookup-row").addEventListener("click", () => {
+      lookups[tableName] = lookups[tableName].filter((candidate) => candidate !== value);
+      render();
     });
     els.lookupList.append(row);
   });
@@ -1121,8 +1217,54 @@ function render() {
   renderLookupList();
 }
 
-function addPackage() {
-  const packageName = "New Package";
+function saveCurrentEstimate() {
+  const projectName = els.projectName.value.trim() || "Untitled Estimate";
+  const projectNumber = els.projectNumber.value.trim() || nextProjectNumber();
+  els.projectName.value = projectName;
+  els.projectNumber.value = projectNumber;
+  const estimate = {
+    projectNumber,
+    projectName,
+    clientName: els.clientName.value.trim(),
+    estimateYear: String(els.estimateYear.value || ""),
+    rows: structuredClone(rows),
+    lookups: structuredClone(lookups),
+    activePackage,
+    activeTypes: Array.from(activeTypes),
+    expanded: Array.from(expanded),
+    paymentDates: structuredClone(paymentDates),
+    paymentSettings: structuredClone(paymentSettings),
+    savedAt: new Date().toISOString()
+  };
+  const estimates = readSavedEstimates().filter((saved) => saved.projectNumber !== projectNumber && saved.projectName !== projectName);
+  estimates.push(estimate);
+  writeSavedEstimates(estimates);
+  if (estimate.clientName) lookups.clients = uniqueValues([...(lookups.clients || []), estimate.clientName]);
+  if (estimate.estimateYear) lookups.years = uniqueValues([...(lookups.years || []), estimate.estimateYear]);
+  render();
+}
+
+function loadCurrentEstimate() {
+  const key = els.projectNumber.value.trim() || els.projectName.value.trim();
+  const estimates = readSavedEstimates();
+  const estimate = estimates.find((saved) => saved.projectNumber === key || saved.projectName === key) || estimates.find((saved) => saved.projectName === els.projectName.value.trim());
+  if (!estimate) return;
+  els.projectNumber.value = estimate.projectNumber || "";
+  els.projectName.value = estimate.projectName || "";
+  els.clientName.value = estimate.clientName || "";
+  els.estimateYear.value = estimate.estimateYear || "";
+  rows = structuredClone(estimate.rows || seedRows);
+  lookups = structuredClone({ ...seedLookups, ...(estimate.lookups || {}) });
+  activePackage = estimate.activePackage || "All";
+  activeTypes = new Set(estimate.activeTypes || Object.keys(typeLabels));
+  expanded = new Set(estimate.expanded || rows.filter((row) => row.level !== "element").map((row) => row.id));
+  paymentDates = structuredClone(estimate.paymentDates || {});
+  paymentSettings = structuredClone(estimate.paymentSettings || Object.fromEntries(Object.keys(typeLabels).map((type) => [type, { depositPct: 0.25, paymentCount: 3 }])));
+  render();
+}
+
+function addPackage(packageName = "New Package") {
+  if (typeof packageName !== "string") packageName = "New Package";
   const row = {
     id: uid("package"),
     level: "package",
@@ -1238,7 +1380,7 @@ function saveLookup() {
   const editing = els.lookupValue.dataset.editing;
   if (!value) return;
 
-  lookups[tableName] = uniqueValues(lookups[tableName].map((candidate) => (candidate === editing ? value : candidate)).concat(value));
+  lookups[tableName] = uniqueValues((lookups[tableName] || []).map((candidate) => (candidate === editing ? value : candidate)).concat(value));
   if (editing && editing !== value) {
     rows = rows.map((row) => ({
       ...row,
@@ -1247,6 +1389,8 @@ function saveLookup() {
       element: tableName === "elements" && row.element === editing ? value : row.element
     }));
   }
+  if (tableName === "clients" && editing && els.clientName.value === editing) els.clientName.value = value;
+  if (tableName === "years" && editing && String(els.estimateYear.value) === String(editing)) els.estimateYear.value = value;
   els.lookupValue.value = "";
   delete els.lookupValue.dataset.editing;
   render();
@@ -1275,7 +1419,7 @@ els.promoteDropZone.addEventListener("drop", (event) => {
   event.preventDefault();
   els.promoteDropZone.classList.remove("drop-target");
   const source = rows.find((row) => row.id === draggedRowId || row.id === event.dataTransfer.getData("text/plain"));
-  if (source) promoteRow(source);
+  if (source) makePackage(source);
 });
 els.lookupTable.addEventListener("change", () => {
   els.lookupValue.value = "";
@@ -1283,6 +1427,8 @@ els.lookupTable.addEventListener("change", () => {
   renderLookupList();
 });
 els.saveLookupBtn.addEventListener("click", saveLookup);
+els.saveEstimateBtn.addEventListener("click", saveCurrentEstimate);
+els.loadEstimateBtn.addEventListener("click", loadCurrentEstimate);
 els.addPackageBtn.addEventListener("click", addPackage);
 els.addProductBtn.addEventListener("click", addProduct);
 els.addElementBtn.addEventListener("click", addElement);
@@ -1294,6 +1440,7 @@ els.resetBtn.addEventListener("click", () => {
   expanded = new Set(seedRows.filter((row) => row.level !== "element").map((row) => row.id));
   activePackage = "All";
   activeTypes = new Set(Object.keys(typeLabels));
+  els.projectNumber.value = nextProjectNumber();
   els.projectName.value = "2026 North Pole Post Office Estimate";
   els.clientName.value = "North Pole Post Office";
   els.estimateYear.value = "2026";
