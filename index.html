@@ -3,26 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>2026 North Pole Post Office Estimate</title>
-    <link rel="stylesheet" href="styles.css?v=project-save1" />
+    <title>2026 North Pole Inventory Estimate</title>
+    <link rel="stylesheet" href="styles.css?v=save-load3" />
   </head>
   <body>
     <main class="app-shell">
       <header class="topbar">
-        <div class="project-title-wrap project-meta-grid">
-          <label>
-            Project #
-            <input id="projectNumber" class="project-number-input" list="projectLookup" type="text" value="P-000001" />
-          </label>
-          <label class="project-name-field">
-            Project Name
-            <input id="projectName" class="project-title-input" list="projectLookup" type="text" value="2026 North Pole Post Office Estimate" />
-          </label>
-          <datalist id="projectLookup"></datalist>
+        <div class="project-title-wrap">
+          <label class="project-title-label" for="projectName">Project Name</label>
+          <input id="projectName" class="project-title-input" list="projectNameLookup" type="text" value="2026 North Pole Inventory Estimate" />
+          <span id="reportProjectTitle" class="report-project-title">2026 North Pole Inventory Estimate</span>
+          <datalist id="projectNameLookup"></datalist>
+        </div>
+        <div class="report-meta">
+          <span id="estimateDate" class="estimate-date"></span>
+          <span class="report-project-number">Project # <strong id="reportProjectNumber">P-000001</strong></span>
         </div>
         <div class="top-actions">
           <button id="saveEstimateBtn" class="ghost-btn" type="button" title="Save current project estimate">Save</button>
           <button id="loadEstimateBtn" class="ghost-btn" type="button" title="Load by project number or name">Load</button>
+          <span id="estimateSaveStatus" class="estimate-save-status" aria-live="polite"></span>
           <button id="resetBtn" class="ghost-btn" type="button" title="Reset to sheet values">Reset</button>
           <button id="pdfBtn" class="ghost-btn" type="button" title="Generate PDF from current view">PDF</button>
           <button id="exportBtn" type="button" title="Export current estimate">Export CSV</button>
@@ -50,6 +50,11 @@
 
       <section class="workspace">
         <aside class="control-panel" aria-label="Estimator controls">
+          <label>
+            Project #
+            <output id="projectNumber" class="project-number-input">P-000001</output>
+          </label>
+
           <label>
             Client / Account
             <input id="clientName" list="clientLookup" type="text" value="North Pole Post Office" placeholder="Enter or look up client" />
@@ -137,8 +142,8 @@
                   <th class="internal-col">Margin $</th>
                   <th>Client Price</th>
                   <th>PPP</th>
-                  <th class="internal-col">2024 PPP</th>
-                  <th class="internal-col">Diff</th>
+                  <th id="priorPppHead">2025 PPP</th>
+                  <th>Diff</th>
                   <th class="internal-col action-col">Action</th>
                 </tr>
               </thead>
@@ -299,8 +304,8 @@
         <td class="money-cell margin-dollars internal-col"></td>
         <td class="money-cell client-price"></td>
         <td class="money-cell ppp"></td>
-        <td class="internal-col"><input class="prior-input number-input" type="number" min="0" step="0.001" /></td>
-        <td class="money-cell diff internal-col"></td>
+        <td><input class="prior-input number-input" type="number" min="0" step="0.001" /></td>
+        <td class="money-cell diff"></td>
         <td class="internal-col action-cell"><button class="delete-row-btn ghost-btn" type="button" title="Delete row">×</button></td>
       </tr>
     </template>
@@ -309,6 +314,20 @@
     <datalist id="productLookup"></datalist>
     <datalist id="elementLookup"></datalist>
 
-    <script src="app.js?v=project-save1"></script>
+    <div id="loadEstimateModal" class="modal-backdrop" hidden>
+      <section class="load-estimate-dialog" role="dialog" aria-modal="true" aria-labelledby="loadEstimateTitle">
+        <header class="load-estimate-head">
+          <h2 id="loadEstimateTitle">Load Project</h2>
+          <button id="closeLoadEstimateBtn" class="ghost-btn" type="button" title="Close">×</button>
+        </header>
+        <label class="load-search-label">
+          Search saved projects
+          <input id="loadEstimateSearch" type="search" placeholder="Project number, name, client, or year" />
+        </label>
+        <div id="loadEstimateList" class="load-estimate-list"></div>
+      </section>
+    </div>
+
+    <script src="app.js?v=save-load3"></script>
   </body>
 </html>
