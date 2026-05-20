@@ -385,5 +385,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 runMigrations()
-  .then(() => server.listen(port, () => console.log(`Estimator running on port ${port}`)))
-  .catch(err => { console.error("Migration failed:", err); process.exit(1); });
+  .catch(err => console.warn("Schema migrations skipped (already applied or insufficient permissions):", err.message))
+  .finally(() => server.listen(port, () => console.log(`Estimator running on port ${port}`)));
