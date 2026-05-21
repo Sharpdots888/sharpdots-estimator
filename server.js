@@ -81,6 +81,10 @@ const migrations = [
   `ALTER TABLE sfpq_product_elements ADD COLUMN IF NOT EXISTS markup NUMERIC DEFAULT 0.4`,
   `ALTER TABLE sfpq_product_elements ADD COLUMN IF NOT EXISTS margin_adj NUMERIC DEFAULT 0.4`,
   `ALTER TABLE sfpq_product_elements ADD COLUMN IF NOT EXISTS prior_ppp NUMERIC DEFAULT 0`,
+  // sku column on all three per-estimate tables
+  `ALTER TABLE sfpq_project_packages ADD COLUMN IF NOT EXISTS sku VARCHAR(100)`,
+  `ALTER TABLE sfpq_package_products ADD COLUMN IF NOT EXISTS sku VARCHAR(100)`,
+  `ALTER TABLE sfpq_product_elements ADD COLUMN IF NOT EXISTS sku VARCHAR(100)`,
   // sfpq_manufacturers — link to sfvc_companies contact record
   `ALTER TABLE sfpq_manufacturers ADD COLUMN IF NOT EXISTS sfvc_company_id UUID REFERENCES sfvc_companies(company_id)`
 ];
@@ -188,7 +192,7 @@ async function handleGetEstimate(key, res) {
     pool.query(
       `SELECT pp.row_id AS id, 'package' AS level, NULL::text AS "parentId",
               pkg.name AS "packageName", '' AS product, '' AS element,
-              pp.description, '' AS type,
+              COALESCE(pp.sku, '') AS sku, pp.description, '' AS type,
               pp.active, pp.source_order AS "sourceOrder",
               pp.needed_qty AS "neededQty", pp.needed_qty AS qty,
               pp.inventory_qty AS "inventoryQty", pp.client_qoh AS "clientQoh",
@@ -202,7 +206,7 @@ async function handleGetEstimate(key, res) {
     pool.query(
       `SELECT bpp.row_id AS id, 'product' AS level, ppp.row_id AS "parentId",
               pkg.name AS "packageName", pr.name AS product, '' AS element,
-              bpp.description, bpp.type,
+              COALESCE(bpp.sku, '') AS sku, bpp.description, bpp.type,
               bpp.active, bpp.source_order AS "sourceOrder",
               bpp.needed_qty AS "neededQty", bpp.needed_qty AS qty,
               bpp.inventory_qty AS "inventoryQty", bpp.client_qoh AS "clientQoh",
@@ -219,7 +223,7 @@ async function handleGetEstimate(key, res) {
     pool.query(
       `SELECT pe.row_id AS id, 'element' AS level, bpp.row_id AS "parentId",
               pkg.name AS "packageName", pr.name AS product, e.name AS element,
-              pe.description, pe.type,
+              COALESCE(pe.sku, '') AS sku, pe.description, pe.type,
               pe.active, pe.source_order AS "sourceOrder",
               pe.needed_qty AS "neededQty", pe.needed_qty AS qty,
               pe.inventory_qty AS "inventoryQty", pe.client_qoh AS "clientQoh",
@@ -306,11 +310,11 @@ async function handlePostEstimate(body, res) {
       packageIds.set(row.packageName, pkgId);
       await client.query(
         `INSERT INTO sfpq_project_packages
-           (project_id, package_id, quantity, row_id, active, source_order, description,
+           (project_id, package_id, quantity, row_id, active, source_order, sku, description,
             needed_qty, inventory_qty, client_qoh, cost, markup, margin_adj, prior_ppp)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,
         [projectId, pkgId, Math.max(row.neededQty || 0, 1),
-         row.id, row.active !== false, row.sourceOrder || 0, row.description || "",
+         row.id, row.active !== false, row.sourceOrder || 0, row.sku || "", row.description || "",
          row.neededQty || 0, row.inventoryQty || 0, row.clientQoh || 0,
          row.cost || 0, row.markup || 0.4, row.marginAdj || 0.4, row.priorPpp || 0]
       );
@@ -323,12 +327,12 @@ async function handlePostEstimate(body, res) {
       await client.query(
         `INSERT INTO sfpq_package_products
            (package_id, product_id, quantity, project_id, row_id, active, source_order,
-            description, type, needed_qty, inventory_qty, client_qoh,
+            sku, description, type, needed_qty, inventory_qty, client_qoh,
             cost, markup, margin_adj, prior_ppp)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`,
         [pkgId, prId, Math.max(row.neededQty || 0, 1),
          projectId, row.id, row.active !== false, row.sourceOrder || 0,
-         row.description || "", row.type || "",
+         row.sku || "", row.description || "", row.type || "",
          row.neededQty || 0, row.inventoryQty || 0, row.clientQoh || 0,
          row.cost || 0, row.markup || 0.4, row.marginAdj || 0.4, row.priorPpp || 0]
       );
@@ -344,12 +348,12 @@ async function handlePostEstimate(body, res) {
       await client.query(
         `INSERT INTO sfpq_product_elements
            (product_id, element_id, quantity, project_id, package_id, row_id, active, source_order,
-            description, type, needed_qty, inventory_qty, client_qoh,
+            sku, description, type, needed_qty, inventory_qty, client_qoh,
             cost, markup, margin_adj, prior_ppp)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`,
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)`,
         [prId, elId, Math.max(row.neededQty || 0, 1),
          projectId, pkgId, row.id, row.active !== false, row.sourceOrder || 0,
-         row.description || "", row.type || "",
+         row.sku || "", row.description || "", row.type || "",
          row.neededQty || 0, row.inventoryQty || 0, row.clientQoh || 0,
          row.cost || 0, row.markup || 0.4, row.marginAdj || 0.4, row.priorPpp || 0]
       );

@@ -59,6 +59,7 @@ function buildSeedRows() {
       packageName,
       product: "",
       element: "",
+      sku: "",
       description: `${packageName} package`,
       type: "",
       qty: 0,
@@ -90,7 +91,8 @@ function buildSeedRows() {
         packageName: source.packageName,
         product: source.product,
         element: "",
-        description: source.sku ? `SKU ${source.sku}` : source.notes,
+        sku: source.sku || "",
+        description: "",
         type: source.type,
         qty: 0,
         neededQty: 0,
@@ -112,7 +114,8 @@ function buildSeedRows() {
       packageName: source.packageName,
       product: source.product,
       element: source.element || source.product,
-      description: source.notes,
+      sku: source.sku || "",
+      description: "",
       type: source.type,
       qty: source.qty,
       neededQty: source.neededQty,
@@ -428,7 +431,7 @@ function calculate(row) {
 
 function rowMatchesQuery(row, query) {
   if (!query) return true;
-  const haystack = [row.packageName, row.product, row.element, row.description, row.type, typeLabels[row.type]].join(" ").toLowerCase();
+  const haystack = [row.packageName, row.product, row.element, row.sku, row.description, row.type, typeLabels[row.type]].join(" ").toLowerCase();
   return haystack.includes(query) || descendantsOf(row).some((child) => rowMatchesQuery(child, query));
 }
 
@@ -919,6 +922,7 @@ function renderRows() {
     });
 
     setupNameInput(fragment.querySelector(".name-input"), row);
+    bindInput(fragment.querySelector(".sku-input"), row, "sku");
     bindInput(fragment.querySelector(".description-input"), row, "description");
     bindInput(fragment.querySelector(".type-input"), row, "type");
     bindInput(fragment.querySelector(".inventory-input"), row, "inventoryQty", true);
@@ -1439,6 +1443,7 @@ function addPackage(packageName = "New Package") {
     packageName,
     product: "",
     element: "",
+    sku: "",
     description: "",
     type: "",
     qty: 0,
@@ -1472,6 +1477,7 @@ function addProduct() {
     packageName: parent.packageName,
     product,
     element: "",
+    sku: "",
     description: "",
     type: "MP",
     qty: 0,
@@ -1505,6 +1511,7 @@ function addElement() {
     packageName: parent.packageName,
     product: parent.product,
     element: "New Element",
+    sku: "",
     description: "",
     type: parent.type || "MP",
     qty: 0,
@@ -1523,11 +1530,11 @@ function addElement() {
 }
 
 function exportCsv() {
-  const headers = ["Level", "Active", "Package", "Product / Service", "Element", "Description", "Production Type", "Inventory Qty", "Needed Qty", "Qty to Order", "Cost", "Per Piece Cost", "Client QOH", "Client Order Qty", "Markup", "Margin Adj", "Margin Dollars", "Client Price", "PPP", "Prior PPP", "Difference"];
+  const headers = ["Level", "Active", "Package", "Product / Service", "Element", "SKU", "Description", "Production Type", "Inventory Qty", "Needed Qty", "Qty to Order", "Cost", "Per Piece Cost", "Client QOH", "Client Order Qty", "Markup", "Margin Adj", "Margin Dollars", "Client Price", "PPP", "Prior PPP", "Difference"];
   const lines = [headers];
   visibleRows().forEach((row) => {
     const calc = calculate(row);
-    lines.push([row.level, row.active, row.packageName, row.product, row.element, row.description, row.type, calc.inventoryQty, calc.neededQty, calc.qtyToOrder, calc.cost, calc.perPieceCost, calc.clientQoh, calc.qty, calc.markup, calc.marginAdj, calc.marginDollars, calc.clientPrice, calc.ppp, calc.priorPpp, calc.diff]);
+    lines.push([row.level, row.active, row.packageName, row.product, row.element, row.sku || "", row.description, row.type, calc.inventoryQty, calc.neededQty, calc.qtyToOrder, calc.cost, calc.perPieceCost, calc.clientQoh, calc.qty, calc.markup, calc.marginAdj, calc.marginDollars, calc.clientPrice, calc.ppp, calc.priorPpp, calc.diff]);
   });
 
   const csv = lines.map((line) => line.map((value) => `"${String(value ?? "").replaceAll('"', '""')}"`).join(",")).join("\n");
