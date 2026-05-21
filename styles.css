@@ -1459,3 +1459,40 @@ td select {
     font-size: 8.5px;
   }
 }
+
+/* ── Inventory lookup dropdown ───────────────────────────────────────────── */
+.inv-lookup-dropdown {
+  position: fixed;
+  z-index: 1000;
+  background: #fff;
+  border: 1px solid #c8cdd3;
+  border-radius: 5px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+  overflow-y: auto;
+  max-height: 240px;
+  min-width: 380px;
+}
+
+.inv-lookup-option {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 14px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+}
+.inv-lookup-option:last-child { border-bottom: none; }
+.inv-lookup-option:hover { background: #f0f4ff; }
+
+.inv-lookup-name { font-weight: 500; }
+.inv-lookup-sku  { color: #666; font-family: monospace; font-size: 12px; }
+.inv-lookup-qty  { color: #428bca; font-weight: 600; font-size: 12px; white-space: nowrap; }
+
+.inv-lookup-empty {
+  padding: 10px 12px;
+  color: #999;
+  font-size: 13px;
+  font-style: italic;
+}

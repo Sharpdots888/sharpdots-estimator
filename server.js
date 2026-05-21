@@ -153,6 +153,36 @@ async function handleGetClients(res) {
   sendJson(res, 200, result.rows.map(r => r.name));
 }
 
+async function handleInventorySearch(reqUrl, res) {
+  const params = new URL(`http://localhost${reqUrl}`).searchParams;
+  const q = (params.get("q") || "").trim();
+  const clientName = (params.get("client") || "").trim();
+  if (q.length < 2) { sendJson(res, 200, []); return; }
+  const result = await pool.query(
+    `SELECT i.item_id   AS "itemId",
+            i.sku,
+            i.name,
+            COALESCE(s.warehouse_qty, 0) AS "warehouseQty",
+            s.year
+     FROM sfinv_items i
+     LEFT JOIN LATERAL (
+       SELECT warehouse_qty, year
+       FROM sfinv_stock
+       WHERE item_id = i.item_id
+       ORDER BY snapshot_date DESC LIMIT 1
+     ) s ON true
+     LEFT JOIN sfvc_companies c ON c.company_id = i.client_id
+     WHERE i.level = 'element'
+       AND i.is_active = true
+       AND (i.name ILIKE $1 OR i.sku ILIKE $1)
+       AND ($2 = '' OR LOWER(COALESCE(c.display_name, c.legal_name)) ILIKE $2)
+     ORDER BY i.name
+     LIMIT 20`,
+    [`%${q}%`, clientName ? `%${clientName.toLowerCase()}%` : ""]
+  );
+  sendJson(res, 200, result.rows);
+}
+
 async function handleGetManufacturers(res) {
   // Return all manufacturers with contact info joined from sfvc_companies / sfvc_people where available
   const result = await pool.query(
@@ -394,6 +424,8 @@ const server = http.createServer(async (req, res) => {
       await handleGetClients(res);
     } else if (url === "/api/manufacturers" && method === "GET") {
       await handleGetManufacturers(res);
+    } else if (url.startsWith("/api/inventory/search") && method === "GET") {
+      await handleInventorySearch(req.url, res);
     } else {
       const filePath = safePath(req.url || "/");
       fs.readFile(filePath, (error, content) => {

@@ -850,10 +850,87 @@ function nameKeyFor(row) {
   return "element";
 }
 
+// ── Inventory lookup dropdown ─────────────────────────────────────────────────
+const invDropdown = document.getElementById("invLookupDropdown");
+let invDropdownRowId = null;
+let invDebounceTimer = null;
+
+function closeInvDropdown() {
+  invDropdown.hidden = true;
+  invDropdown.innerHTML = "";
+  invDropdownRowId = null;
+}
+
+function positionInvDropdown(input) {
+  const rect = input.getBoundingClientRect();
+  invDropdown.style.top  = `${rect.bottom + window.scrollY + 2}px`;
+  invDropdown.style.left = `${rect.left + window.scrollX}px`;
+  invDropdown.style.width = `${Math.max(rect.width, 380)}px`;
+}
+
+function renderInvDropdown(input, results, onSelect) {
+  invDropdown.innerHTML = "";
+  if (!results.length) {
+    const empty = document.createElement("div");
+    empty.className = "inv-lookup-empty";
+    empty.textContent = "No inventory items found";
+    invDropdown.appendChild(empty);
+  } else {
+    results.forEach(item => {
+      const opt = document.createElement("div");
+      opt.className = "inv-lookup-option";
+      opt.innerHTML =
+        `<span class="inv-lookup-name">${escapeHtml(item.name)}</span>` +
+        `<span class="inv-lookup-sku">${escapeHtml(item.sku || "")}</span>` +
+        `<span class="inv-lookup-qty">${item.warehouseQty != null ? Number(item.warehouseQty).toLocaleString() : "—"}</span>`;
+      opt.addEventListener("mousedown", e => {
+        e.preventDefault();
+        onSelect(item);
+        closeInvDropdown();
+      });
+      invDropdown.appendChild(opt);
+    });
+  }
+  positionInvDropdown(input);
+  invDropdown.hidden = false;
+}
+
+function setupElementInventoryLookup(input, row) {
+  input.addEventListener("input", () => {
+    clearTimeout(invDebounceTimer);
+    const q = input.value.trim();
+    if (q.length < 2) { closeInvDropdown(); return; }
+    invDropdownRowId = row.id;
+    invDebounceTimer = setTimeout(async () => {
+      if (invDropdownRowId !== row.id) return;
+      const clientName = els.clientName.value.trim();
+      try {
+        const res = await fetch(`/api/inventory/search?q=${encodeURIComponent(q)}&client=${encodeURIComponent(clientName)}`);
+        const results = await res.json();
+        if (invDropdownRowId !== row.id) return;
+        positionInvDropdown(input);
+        renderInvDropdown(input, results, item => {
+          updateRow(row.id, {
+            element: item.name,
+            sku: item.sku || "",
+            inventoryQty: Number(item.warehouseQty) || 0
+          });
+        });
+      } catch { closeInvDropdown(); }
+    }, 300);
+  });
+
+  input.addEventListener("blur", () => setTimeout(closeInvDropdown, 150));
+  input.addEventListener("focus", () => {
+    if (input.value.trim().length >= 2) input.dispatchEvent(new Event("input"));
+  });
+}
+
 function setupNameInput(input, row) {
   const key = nameKeyFor(row);
   input.setAttribute("list", row.level === "package" ? "packageLookup" : row.level === "product" ? "productLookup" : "elementLookup");
   bindInput(input, row, key);
+  if (row.level === "element") setupElementInventoryLookup(input, row);
 }
 
 function renderRows() {
