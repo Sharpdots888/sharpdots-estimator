@@ -80,7 +80,9 @@ const migrations = [
   `ALTER TABLE sfpq_product_elements ADD COLUMN IF NOT EXISTS cost NUMERIC DEFAULT 0`,
   `ALTER TABLE sfpq_product_elements ADD COLUMN IF NOT EXISTS markup NUMERIC DEFAULT 0.4`,
   `ALTER TABLE sfpq_product_elements ADD COLUMN IF NOT EXISTS margin_adj NUMERIC DEFAULT 0.4`,
-  `ALTER TABLE sfpq_product_elements ADD COLUMN IF NOT EXISTS prior_ppp NUMERIC DEFAULT 0`
+  `ALTER TABLE sfpq_product_elements ADD COLUMN IF NOT EXISTS prior_ppp NUMERIC DEFAULT 0`,
+  // sfpq_manufacturers — link to sfvc_companies contact record
+  `ALTER TABLE sfpq_manufacturers ADD COLUMN IF NOT EXISTS sfvc_company_id UUID REFERENCES sfvc_companies(company_id)`
 ];
 
 async function runMigrations() {
@@ -137,8 +139,38 @@ async function handleGetEstimates(res) {
 }
 
 async function handleGetClients(res) {
-  const result = await pool.query(`SELECT name FROM sfpq_customers ORDER BY name`);
+  // Pull from sfvc_companies (full contact DB) rather than the sparse sfpq_customers table
+  const result = await pool.query(
+    `SELECT COALESCE(display_name, legal_name) AS name
+     FROM sfvc_companies
+     WHERE status = 'Active'
+     ORDER BY COALESCE(display_name, legal_name)`
+  );
   sendJson(res, 200, result.rows.map(r => r.name));
+}
+
+async function handleGetManufacturers(res) {
+  // Return all manufacturers with contact info joined from sfvc_companies / sfvc_people where available
+  const result = await pool.query(
+    `SELECT m.id, m.name,
+            COALESCE(m.contact_name,
+                     p.first_name || ' ' || p.last_name) AS contact_name,
+            COALESCE(m.email, p.email)   AS email,
+            COALESCE(m.phone, p.phone)   AS phone,
+            c.company_id                 AS sfvc_company_id,
+            c.website
+     FROM sfpq_manufacturers m
+     LEFT JOIN sfvc_companies c
+            ON LOWER(c.legal_name) = LOWER(m.name)
+           AND c.status = 'Active'
+     LEFT JOIN sfvc_company_people cp
+            ON cp.company_id = c.company_id
+           AND cp.is_primary = true
+     LEFT JOIN sfvc_people p
+            ON p.person_id = cp.person_id
+     ORDER BY m.name`
+  );
+  sendJson(res, 200, result.rows);
 }
 
 async function handleGetEstimate(key, res) {
@@ -356,6 +388,8 @@ const server = http.createServer(async (req, res) => {
       await handleGetEstimate(key, res);
     } else if (url === "/api/clients" && method === "GET") {
       await handleGetClients(res);
+    } else if (url === "/api/manufacturers" && method === "GET") {
+      await handleGetManufacturers(res);
     } else {
       const filePath = safePath(req.url || "/");
       fs.readFile(filePath, (error, content) => {
