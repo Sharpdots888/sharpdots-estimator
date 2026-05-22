@@ -558,6 +558,30 @@ function activeElementsForVisiblePackages() {
   });
 }
 
+// Returns all leaf pricing nodes for visible packages:
+// - element rows (deepest level), OR
+// - leaf product rows (products with no active element children)
+// Used for payment schedule and production-type subtotals.
+function activeLeafRowsForVisiblePackages() {
+  const packageIds = new Set(visiblePackageRows().map((row) => row.id));
+  const activeElementParentIds = new Set(
+    rows.filter((r) => r.level === "element" && r.active).map((r) => r.parentId)
+  );
+  return rows.filter((row) => {
+    if (!row.active || !activeTypes.has(row.type)) return false;
+    if (row.level === "element") {
+      const product = rows.find((r) => r.id === row.parentId);
+      return product?.parentId ? packageIds.has(product.parentId) : false;
+    }
+    if (row.level === "product") {
+      // Leaf product: belongs to a visible package and has no active element children
+      if (!packageIds.has(row.parentId)) return false;
+      return !activeElementParentIds.has(row.id);
+    }
+    return false;
+  });
+}
+
 function syncLookupsFromRow(row) {
   const changes = {
     packages: row.packageName,
@@ -1146,7 +1170,7 @@ function renderFooter(sourceRows) {
 }
 
 function renderPrintTypeSubtotals() {
-  const totals = activeElementsForVisiblePackages()
+  const totals = activeLeafRowsForVisiblePackages()
     .reduce(
       (memo, row) => {
         const type = row.type || "MP";
@@ -1194,7 +1218,7 @@ function renderRollup() {
 }
 
 function paymentTotalsByType() {
-  return activeElementsForVisiblePackages()
+  return activeLeafRowsForVisiblePackages()
     .reduce(
       (memo, row) => {
         const type = row.type || "MP";
