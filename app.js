@@ -12,26 +12,26 @@ const metricStyles = {
 };
 
 const sourceProducts = [
-  { product: "2026 Letter Materials (stock, envelope, stickers)", type: "M", packageName: "Letter", notes: "4 Page + Envelope", qty: 41073, cost: 30969.47, markup: 0.4, marginAdj: 0.31, priorPpp: 1.0891176471 },
-  { product: "Letters by Santa (2026) Print and Fulfillment", type: "VF", packageName: "Letter", notes: "4 Page + Envelope", qty: 63486, cost: 79651.11, markup: 0.4, marginAdj: 0.1, priorPpp: 1.3206576833 },
-  { product: "Ornament", type: "FP", packageName: "Letter", notes: "eflute cardboard cutout 5x3", qty: 41073, cost: 3577.4, markup: 0.4, marginAdj: 0.55, priorPpp: 0.2237793852 },
-  { product: "Multi Letter Labeled Envelopes", type: "FP", packageName: "Multi", notes: "", qty: 9272, cost: 7554.71, markup: 0.4, marginAdj: 0.33, priorPpp: 1.3779630535 },
-  { product: "Shipping software and fulfillment overhead", type: "VF", packageName: "Letter", notes: "Labor, insurance, utility, rent", qty: 63486, cost: 9522.9, markup: 0.4, marginAdj: 0, priorPpp: 0 },
-  { product: "Carton Eflute 11x5x4 + kitting", type: "FP", packageName: "Gold", notes: "", qty: 7785, cost: 6855.74, markup: 0.4, marginAdj: 0.53, priorPpp: 1.8214916985 },
-  { product: "Door Hangers", type: "FP", packageName: "Gold", notes: "4.25x11, 4/4, die cut, 14pt.", qty: 7785, cost: 1318.7, markup: 0.4, marginAdj: 0.2, priorPpp: 0.1726793372 },
-  { product: "Window Sticker 5\"", type: "MP", packageName: "Gold", notes: "5x5 clear, 4/0", qty: 7785, cost: 1373.59, markup: 0.4, marginAdj: 0.73, priorPpp: 0.4809772727 },
-  { product: "Magnet 5\"", type: "MP", packageName: "Gold", notes: "5x5 magnet, 4/0", qty: 7785, cost: 1928.89, markup: 0.4, marginAdj: 0.4, priorPpp: 0.309879798 },
-  { product: "Fake Snow (incl label)", type: "MP", packageName: "Gold", notes: "Custom Label + Polybag inserted (10g)", qty: 7785, cost: 4515.3, markup: 0.4, marginAdj: 0.5, priorPpp: 0.8989577778 },
-  { product: "Reindeer food", type: "MP", packageName: "Gold", notes: "Stand up Pouch, Kraft, CMYK+white", qty: 10000, cost: 10048.95, markup: 0.4, marginAdj: 0.35, priorPpp: 1.4527268519 },
-  { product: "Reindeer food pouch", type: "MP", packageName: "Gold", notes: "Pouch component", qty: 10000, cost: 1622.95, markup: 0.4, marginAdj: 0.45, priorPpp: 0.1333 },
-  { product: "Fulfillment", type: "VF", packageName: "Gold", notes: "", qty: 15993, cost: 19900.22, markup: 0.4, marginAdj: -0.39, priorPpp: 0.8844131483 },
-  { product: "Shipping software and fulfillment overhead", type: "VF", packageName: "Gold", notes: "Labor, insurance, utility, rent", qty: 15993, cost: 2398.95, markup: 0.4, marginAdj: 0, priorPpp: 0 },
-  { product: "Carton Eflute 10x10x6 + kitting", type: "FP", packageName: "Eve", notes: "Sizes to be confirmed with final products", qty: 2221, cost: 5882.71, markup: 0.4, marginAdj: 0.1, priorPpp: 2.5079627365 },
-  { product: "Bell (7000 qty)", type: "MP", packageName: "Eve", notes: "Ribbon supplied and tied", qty: 2221, cost: 310.94, markup: 0.4, marginAdj: 0.4, priorPpp: 0.1833333333 },
-  { product: "Plate 9\"", type: "MP", packageName: "Eve", notes: "111g, design supplied", qty: 2221, cost: 3598.02, markup: 0.4, marginAdj: 0.24, priorPpp: 1.5875 },
-  { product: "Mug 4\"d x 4\"", type: "MP", packageName: "Eve", notes: "125g, design supplied", qty: 2221, cost: 5019.46, markup: 0.4, marginAdj: 0.25, priorPpp: 2.275 },
-  { product: "Fulfillment", type: "VF", packageName: "Eve", notes: "", qty: 5455, cost: 5814.59, markup: 0.4, marginAdj: 0.485, priorPpp: 2.0583531928 },
-  { product: "Shipping software and fulfillment overhead", type: "VF", packageName: "Eve", notes: "Labor, insurance, utility, rent", qty: 5455, cost: 818.25, markup: 0.4, marginAdj: 0, priorPpp: 0 }
+  { packageName: "Eve Kit Package", product: "Bell", element: "Bell", notes: "SKU NPO-XX-01-002-01", type: "M", inventoryQty: 2905, clientQoh: 1500, neededQty: 5455, qty: 3955, year: "2025", sku: "NPO-XX-01-002-01", cost: 0, markup: 0.4, marginAdj: 0.4, priorPpp: 0 },
+  { packageName: "Eve Kit Package", product: "Carton eFlute 10x10x6", element: "Carton eFlute 10x10x6", notes: "SKU NPO-XX-01-001-01", type: "M", inventoryQty: 3030, clientQoh: 1500, neededQty: 5455, qty: 3955, year: "2025", sku: "NPO-XX-01-001-01", cost: 0, markup: 0.4, marginAdj: 0.4, priorPpp: 0 },
+  { packageName: "Eve Kit Package", product: "Mug", element: "Mug", notes: "SKU NPO-XX-01-003-01", type: "M", inventoryQty: 1961, clientQoh: 1500, neededQty: 5455, qty: 3955, year: "2025", sku: "NPO-XX-01-003-01", cost: 0, markup: 0.4, marginAdj: 0.4, priorPpp: 0 },
+  { packageName: "Eve Kit Package", product: "Plate 9\"\" (2024)", element: "Plate 9", notes: "SKU NPO-XX-01-004-01", type: "M", inventoryQty: 1960, clientQoh: 1500, neededQty: 5455, qty: 3955, year: "2025", sku: "NPO-XX-01-004-01", cost: 0, markup: 0.4, marginAdj: 0.4, priorPpp: 0 },
+  { packageName: "Gold Kit Package", product: "Reindeer Food", element: "Burlap Sack", notes: "SKU NPO-XX-02-002-01", type: "M", inventoryQty: 1250, clientQoh: 5970, neededQty: 15993, qty: 10023, year: "2024", sku: "NPO-XX-02-002-01", cost: 0, markup: 0.4, marginAdj: 0.4, priorPpp: 0 },
+  { packageName: "Gold Kit Package", product: "Reindeer Food", element: "Reindeer Food Label", notes: "SKU NPO-XX-02-002-02", type: "M", inventoryQty: 1250, clientQoh: 5970, neededQty: 15993, qty: 10023, year: "2024", sku: "NPO-XX-02-002-02", cost: 0, markup: 0.4, marginAdj: 0.4, priorPpp: 0 },
+  { packageName: "Gold Kit Package", product: "Reindeer Food (2024) v1 Non-Printed", element: "Windowed Pouch (2024) v1 Non-Printed", notes: "SKU NPO-XX-02-004-01", type: "M", inventoryQty: 3000, clientQoh: 5970, neededQty: 15993, qty: 10023, year: "2024", sku: "NPO-XX-02-004-01", cost: 0, markup: 0.4, marginAdj: 0.4, priorPpp: 0 },
+  { packageName: "Gold Kit Package", product: "Carton Eflute 11x5x4", element: "Carton Eflute 11x5x4", notes: "SKU NPO-XX-02-001-01", type: "M", inventoryQty: 8460, clientQoh: 5970, neededQty: 15993, qty: 10023, year: "2025", sku: "NPO-XX-02-001-01", cost: 0, markup: 0.4, marginAdj: 0.4, priorPpp: 0 },
+  { packageName: "Gold Kit Package", product: "Door Hangers", element: "Door Hangers", notes: "SKU NPO-XX-02-005-01", type: "M", inventoryQty: 7802, clientQoh: 5970, neededQty: 15993, qty: 10023, year: "2025", sku: "NPO-XX-02-005-01", cost: 0, markup: 0.4, marginAdj: 0.4, priorPpp: 0 },
+  { packageName: "Gold Kit Package", product: "Fake Snow", element: "Fake Snow", notes: "SKU NPO-XX-02-006-01", type: "M", inventoryQty: 5115, clientQoh: 5970, neededQty: 15993, qty: 10023, year: "2025", sku: "NPO-XX-02-006-01", cost: 0, markup: 0.4, marginAdj: 0.4, priorPpp: 0 },
+  { packageName: "Gold Kit Package", product: "Fake Snow", element: "Fake Snow Labels", notes: "SKU NPO-XX-02-006-02", type: "M", inventoryQty: 1296, clientQoh: 5970, neededQty: 15993, qty: 10023, year: "2025", sku: "NPO-XX-02-006-02", cost: 0, markup: 0.4, marginAdj: 0.4, priorPpp: 0 },
+  { packageName: "Gold Kit Package", product: "Magnet 5\"", element: "Magnet 5\"", notes: "SKU NPO-XX-02-007-01", type: "M", inventoryQty: 7820, clientQoh: 5970, neededQty: 15993, qty: 10023, year: "2025", sku: "NPO-XX-02-007-01", cost: 0, markup: 0.4, marginAdj: 0.4, priorPpp: 0 },
+  { packageName: "Gold Kit Package", product: "Window Sticker 5\"", element: "Window Sticker 5\"", notes: "SKU NPO-XX-02-007-01", type: "M", inventoryQty: 7810, clientQoh: 5970, neededQty: 15993, qty: 10023, year: "2025", sku: "NPO-XX-02-007-01", cost: 0, markup: 0.4, marginAdj: 0.4, priorPpp: 0 },
+  { packageName: "Gold Kit Package", product: "Reindeer Food v2 Printed", element: "Windowed Pouch v2 Printed", notes: "SKU NPO-XX-02-003-01", type: "M", inventoryQty: 6428, clientQoh: 5970, neededQty: 15993, qty: 10023, year: "2025", sku: "NPO-XX-02-003-01", cost: 0, markup: 0.4, marginAdj: 0.4, priorPpp: 0 },
+  { packageName: "Letter Package", product: "Envelopes", element: "Envelopes", notes: "SKU NPO-XX-03-001-01", type: "M", inventoryQty: 43000, clientQoh: 21000, neededQty: 63486, qty: 42486, year: "2025", sku: "NPO-XX-03-001-01", cost: 0, markup: 0.4, marginAdj: 0.4, priorPpp: 0 },
+  { packageName: "Letter Package", product: "Linen Paper", element: "Linen Paper (Letter Sets)", notes: "SKU NPO-XX-03-002-01", type: "M", inventoryQty: 19800, clientQoh: 21000, neededQty: 63486, qty: 42486, year: "2025", sku: "NPO-XX-03-002-01", cost: 0, markup: 0.4, marginAdj: 0.4, priorPpp: 0 },
+  { packageName: "Letter Package", product: "Ornaments", element: "Ornaments", notes: "SKU NPO-XX-03-003-01", type: "M", inventoryQty: 28176, clientQoh: 21000, neededQty: 63486, qty: 42486, year: "2025", sku: "NPO-XX-03-003-01", cost: 0, markup: 0.4, marginAdj: 0.4, priorPpp: 0 },
+  { packageName: "Letter Package", product: "Sticker Seals", element: "Sticker Seals", notes: "SKU NPO-XX-03-004-01", type: "M", inventoryQty: 43800, clientQoh: 21000, neededQty: 63486, qty: 42486, year: "2025", sku: "NPO-XX-03-004-01", cost: 0, markup: 0.4, marginAdj: 0.4, priorPpp: 0 },
+  { packageName: "Multi-Letter Package", product: "FedEx Envelopes", element: "FedEx Enelopes", notes: "SKU NPO-XX-03-006-01", type: "M", inventoryQty: 3750, clientQoh: 0, neededQty: 0, qty: 0, year: "2023", sku: "NPO-XX-03-006-01", cost: 0, markup: 0.4, marginAdj: 0.4, priorPpp: 0 },
+  { packageName: "Multi-Letter Package", product: "Multi Letter Envelopes", element: "Multi Letter Envelopes", notes: "SKU NPO-XX-03-005-01", type: "M", inventoryQty: 6300, clientQoh: 7000, neededQty: 9272, qty: 2272, year: "2025", sku: "NPO-XX-03-005-01", cost: 0, markup: 0.4, marginAdj: 0.4, priorPpp: 0 }
 ];
 
 function uid(prefix) {
@@ -42,13 +42,16 @@ function uniqueValues(values) {
   return Array.from(new Set(values.map((value) => String(value || "").trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b));
 }
 
-function buildSeedRows() {
+function buildSeedRows(sourceData) {
   const packageIds = new Map();
+  const productIds = new Map();
   const rows = [];
+  const packageNames = uniqueValues(sourceData.map((row) => row.packageName));
 
-  uniqueValues(sourceProducts.map((row) => row.packageName)).forEach((packageName, index) => {
+  packageNames.forEach((packageName, index) => {
     const id = uid("package");
     packageIds.set(packageName, id);
+    const firstSource = sourceData.find((s) => s.packageName === packageName);
     rows.push({
       id,
       level: "package",
@@ -57,6 +60,7 @@ function buildSeedRows() {
       packageName,
       product: "",
       element: "",
+      sku: firstSource?.packageSku || "",
       description: `${packageName} package`,
       type: "",
       qty: 0,
@@ -70,65 +74,83 @@ function buildSeedRows() {
     });
   });
 
-  sourceProducts.forEach((source, index) => {
-    const productId = uid("product");
+  sourceData.forEach((source, index) => {
     const parentPackageId = packageIds.get(source.packageName);
-    rows.push({
-      id: productId,
-      level: "product",
-      parentId: parentPackageId,
-      active: true,
-      sourceOrder: (Array.from(packageIds.keys()).indexOf(source.packageName) + 1) * 100 + index + 1,
-      packageName: source.packageName,
-      product: source.product,
-      element: "",
-      description: source.notes,
-      type: source.type,
-      qty: source.qty,
-      neededQty: source.qty,
-      inventoryQty: 0,
-      clientQoh: 0,
-      cost: source.cost,
-      markup: source.markup,
-      marginAdj: source.marginAdj,
-      priorPpp: source.priorPpp
-    });
+    const packageIndex = packageNames.indexOf(source.packageName);
+    const productKey = `${source.packageName}::${source.product}`;
+    // Leaf-product: product sits directly under package with no element children
+    const isLeafProduct = !source.element;
+    let productId = productIds.get(productKey);
 
-    rows.push({
-      id: uid("element"),
-      level: "element",
-      parentId: productId,
-      active: true,
-      sourceOrder: (Array.from(packageIds.keys()).indexOf(source.packageName) + 1) * 100 + index + 1.1,
-      packageName: source.packageName,
-      product: source.product,
-      element: source.notes || `${source.product} base cost`,
-      description: source.notes,
-      type: source.type,
-      qty: source.qty,
-      neededQty: source.qty,
-      inventoryQty: 0,
-      clientQoh: 0,
-      cost: source.cost,
-      markup: source.markup,
-      marginAdj: source.marginAdj,
-      priorPpp: source.priorPpp
-    });
+    if (!productId) {
+      productId = uid("product");
+      productIds.set(productKey, productId);
+      rows.push({
+        id: productId,
+        level: "product",
+        parentId: parentPackageId,
+        active: true,
+        sourceOrder: (packageIndex + 1) * 100 + productIds.size,
+        packageName: source.packageName,
+        product: source.product,
+        element: "",
+        sku: source.productSku || source.sku || "",
+        description: "",
+        type: source.type,
+        // For leaf products the product row itself carries the inventory/cost data
+        qty: isLeafProduct ? source.qty : 0,
+        neededQty: isLeafProduct ? source.neededQty : 0,
+        inventoryQty: isLeafProduct ? source.inventoryQty : 0,
+        clientQoh: isLeafProduct ? source.clientQoh : 0,
+        cost: isLeafProduct ? source.cost : 0,
+        markup: source.markup,
+        marginAdj: source.marginAdj,
+        priorPpp: isLeafProduct ? source.priorPpp : 0
+      });
+    }
+
+    // Leaf-product rows have no element child — skip element creation
+    if (!isLeafProduct) {
+      rows.push({
+        id: uid("element"),
+        level: "element",
+        parentId: productId,
+        active: true,
+        sourceOrder: (packageIndex + 1) * 100 + index + 1.1,
+        packageName: source.packageName,
+        product: source.product,
+        element: source.element || source.product,
+        sku: source.sku || "",
+        description: "",
+        type: source.type,
+        qty: source.qty,
+        neededQty: source.neededQty,
+        inventoryQty: source.inventoryQty,
+        clientQoh: source.clientQoh,
+        cost: source.cost,
+        markup: source.markup,
+        marginAdj: source.marginAdj,
+        priorPpp: source.priorPpp
+      });
+    }
   });
 
   return rows;
 }
 
-const seedRows = buildSeedRows();
-const seedLookups = {
-  packages: uniqueValues(seedRows.map((row) => row.packageName)),
-  products: uniqueValues(seedRows.map((row) => row.product)),
-  elements: uniqueValues(seedRows.map((row) => row.element).filter(Boolean)),
-  clients: ["North Pole Post Office", "Portofino", "Santa Direct"],
-  years: ["2024", "2025", "2026"]
-};
+function buildSeedLookups(theRows, sourceData) {
+  return {
+    packages: uniqueValues(theRows.map((row) => row.packageName)),
+    products: uniqueValues(theRows.map((row) => row.product)),
+    elements: uniqueValues(theRows.map((row) => row.element).filter(Boolean)),
+    clients: ["North Pole Post Office", "Portofino", "Santa Direct"],
+    years: uniqueValues(["2026", ...(sourceData || []).map((row) => row.year).filter(Boolean)])
+  };
+}
 
-const estimateStoreKey = "sharpdots-estimator-projects-v1";
+let seedRows = buildSeedRows(sourceProducts);
+let seedLookups = buildSeedLookups(seedRows, sourceProducts);
+
 let rows = structuredClone(seedRows);
 let lookups = structuredClone(seedLookups);
 let activePackage = "All";
@@ -137,11 +159,15 @@ let expanded = new Set(seedRows.filter((row) => row.level !== "element").map((ro
 let draggedRowId = null;
 let paymentDates = {};
 let paymentSettings = Object.fromEntries(Object.keys(typeLabels).map((type) => [type, { depositPct: 0.25, paymentCount: 3 }]));
+let estimatesList = [];
+let clientsList = [];
 
 const els = {
   projectNumber: document.querySelector("#projectNumber"),
+  reportProjectTitle: document.querySelector("#reportProjectTitle"),
+  reportProjectNumber: document.querySelector("#reportProjectNumber"),
   projectName: document.querySelector("#projectName"),
-  projectLookup: document.querySelector("#projectLookup"),
+  projectNameLookup: document.querySelector("#projectNameLookup"),
   clientName: document.querySelector("#clientName"),
   estimateYear: document.querySelector("#estimateYear"),
   lineItems: document.querySelector("#lineItems"),
@@ -158,9 +184,15 @@ const els = {
   addElementBtn: document.querySelector("#addElementBtn"),
   saveEstimateBtn: document.querySelector("#saveEstimateBtn"),
   loadEstimateBtn: document.querySelector("#loadEstimateBtn"),
+  estimateSaveStatus: document.querySelector("#estimateSaveStatus"),
+  loadEstimateModal: document.querySelector("#loadEstimateModal"),
+  closeLoadEstimateBtn: document.querySelector("#closeLoadEstimateBtn"),
+  loadEstimateSearch: document.querySelector("#loadEstimateSearch"),
+  loadEstimateList: document.querySelector("#loadEstimateList"),
   resetBtn: document.querySelector("#resetBtn"),
   exportBtn: document.querySelector("#exportBtn"),
   pdfBtn: document.querySelector("#pdfBtn"),
+  estimateDate: document.querySelector("#estimateDate"),
   clientTotal: document.querySelector("#clientTotal"),
   costTotal: document.querySelector("#costTotal"),
   marginTotal: document.querySelector("#marginTotal"),
@@ -183,6 +215,7 @@ const els = {
   footerClient: document.querySelector("#footerClient"),
   footerPpp: document.querySelector("#footerPpp"),
   footerDiff: document.querySelector("#footerDiff"),
+  priorPppHead: document.querySelector("#priorPppHead"),
   trackingLevel: document.querySelector("#trackingLevel"),
   trackingMode: document.querySelector("#trackingMode"),
   trackingItem: document.querySelector("#trackingItem"),
@@ -200,8 +233,6 @@ const els = {
   yearLookup: document.querySelector("#yearLookup")
 };
 
-document.querySelector("#projectNumber").value = nextProjectNumber();
-
 function money(value, digits = 0) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -215,30 +246,94 @@ function decimal(value, digits = 3) {
   return (Number.isFinite(value) ? value : 0).toFixed(digits);
 }
 
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
 function asNumber(value) {
   const number = Number(value);
   return Number.isFinite(number) ? number : 0;
 }
 
-function readSavedEstimates() {
+async function fetchEstimatesList() {
   try {
-    const saved = JSON.parse(localStorage.getItem(estimateStoreKey) || "[]");
-    return Array.isArray(saved) ? saved : [];
+    const res = await fetch("/api/estimates");
+    estimatesList = res.ok ? await res.json() : [];
   } catch {
-    return [];
+    estimatesList = [];
   }
 }
 
-function writeSavedEstimates(estimates) {
-  localStorage.setItem(estimateStoreKey, JSON.stringify(estimates));
+async function fetchAndApplySeed() {
+  try {
+    const priorYear = Math.max(asNumber(els.estimateYear.value) - 1, 2024);
+    const res = await fetch(`/api/seed?year=${priorYear}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length) {
+        seedRows = buildSeedRows(data);
+        seedLookups = buildSeedLookups(seedRows, data);
+      }
+    }
+  } catch {
+    // network error — keep hardcoded sourceProducts as fallback
+  }
+}
+
+function projectNumberSortValue(projectNumber) {
+  const match = String(projectNumber || "").match(/^P-(\d{6})$/);
+  return match ? Number(match[1]) : 0;
+}
+
+function sortEstimatesList(estimates) {
+  return [...estimates].sort((a, b) => projectNumberSortValue(a.projectNumber) - projectNumberSortValue(b.projectNumber));
 }
 
 function nextProjectNumber() {
-  const highest = readSavedEstimates().reduce((max, estimate) => {
-    const match = String(estimate.projectNumber || "").match(/^P-(\d{6})$/);
-    return match ? Math.max(max, Number(match[1])) : max;
-  }, 0);
+  const highest = estimatesList.reduce((max, estimate) => Math.max(max, projectNumberSortValue(estimate.projectNumber)), 0);
   return `P-${String(highest + 1).padStart(6, "0")}`;
+}
+
+function estimateMatchesName(estimate, projectName) {
+  return String(estimate.projectName || "").trim().toLowerCase() === String(projectName || "").trim().toLowerCase();
+}
+
+function findEstimateByProjectName(projectName) {
+  const matches = sortEstimatesList(estimatesList).filter((estimate) => estimateMatchesName(estimate, projectName));
+  return matches.at(-1);
+}
+
+let saveStatusTimer;
+
+function setSaveStatus(message) {
+  els.estimateSaveStatus.textContent = message;
+  const isError = message === "Not found" || message === "No saved projects" || message === "Save failed";
+  els.estimateSaveStatus.classList.toggle("error", isError);
+  els.estimateSaveStatus.classList.toggle("success", !isError);
+  clearTimeout(saveStatusTimer);
+  saveStatusTimer = setTimeout(() => {
+    els.estimateSaveStatus.textContent = "";
+    els.estimateSaveStatus.classList.remove("error", "success");
+  }, 5000);
+}
+
+function updateProjectHeader() {
+  els.reportProjectTitle.textContent = els.projectName.value || "Estimate";
+  els.reportProjectNumber.textContent = els.projectNumber.value || els.projectNumber.textContent || "P-000001";
+}
+
+function setProjectNumber(projectNumber) {
+  const assigned = projectNumber || nextProjectNumber();
+  els.projectNumber.value = assigned;
+  els.projectNumber.textContent = assigned;
+  els.projectNumber.title = assigned;
+  updateProjectHeader();
 }
 
 function rowNeededQty(row) {
@@ -333,7 +428,9 @@ function rollupCalculate(row) {
   const clientPrice = marginAdj >= 0.95 ? standardPrice : markupBase / (1 - marginAdj);
   const marginDollars = clientPrice - totals.cost;
   const ppp = qty > 0 ? clientPrice / qty : 0;
-  const priorPpp = totals.priorQty > 0 ? totals.priorValue / totals.priorQty : asNumber(row.priorPpp);
+  const priorPpp = totals.priorQty > 0
+    ? totals.priorValue / totals.priorQty
+    : childCalcs.reduce((sum, calc) => sum + calc.priorPpp, 0);
 
   return {
     qty,
@@ -363,14 +460,19 @@ function calculate(row) {
 
 function rowMatchesQuery(row, query) {
   if (!query) return true;
-  const haystack = [row.packageName, row.product, row.element, row.description, row.type, typeLabels[row.type]].join(" ").toLowerCase();
+  const haystack = [row.packageName, row.product, row.element, row.sku, row.description, row.type, typeLabels[row.type]].join(" ").toLowerCase();
   return haystack.includes(query) || descendantsOf(row).some((child) => rowMatchesQuery(child, query));
 }
 
 function rowMatchesType(row) {
   if (row.level === "element") return activeTypes.has(row.type);
-  const descendants = descendantsOf(row).filter((child) => child.level === "element");
-  return descendants.length ? descendants.some((child) => activeTypes.has(child.type)) : activeTypes.has(row.type);
+  // Check typed descendants at element OR product level (leaf products carry type directly)
+  const typedDescendants = descendantsOf(row).filter(
+    (child) => (child.level === "element" || child.level === "product") && child.type
+  );
+  return typedDescendants.length
+    ? typedDescendants.some((child) => activeTypes.has(child.type))
+    : activeTypes.has(row.type);
 }
 
 function rowPassesBaseFilters(row) {
@@ -449,15 +551,13 @@ function syncLookupsFromRow(row) {
 }
 
 function renderDatalists() {
-  const savedEstimates = readSavedEstimates();
-  const projectValues = uniqueValues(savedEstimates.flatMap((estimate) => [estimate.projectNumber, estimate.projectName]));
+  const sorted = sortEstimatesList(estimatesList);
   [
     [els.packageLookup, lookups.packages],
     [els.productLookup, lookups.products],
     [els.elementLookup, lookups.elements],
-    [els.clientLookup, uniqueValues([...(lookups.clients || []), ...savedEstimates.map((estimate) => estimate.clientName), els.clientName.value])],
-    [els.yearLookup, uniqueValues([...(lookups.years || []), ...savedEstimates.map((estimate) => estimate.estimateYear), els.estimateYear.value])],
-    [els.projectLookup, projectValues]
+    [els.clientLookup, uniqueValues([...(lookups.clients || []), ...clientsList, ...sorted.map((e) => e.clientName), els.clientName.value])],
+    [els.yearLookup, uniqueValues([...(lookups.years || []), ...sorted.map((e) => e.estimateYear), els.estimateYear.value])]
   ].forEach(([list, values]) => {
     list.innerHTML = "";
     values.forEach((value) => {
@@ -465,6 +565,18 @@ function renderDatalists() {
       option.value = value;
       list.append(option);
     });
+  });
+
+  els.projectNameLookup.innerHTML = "";
+  sorted.forEach((estimate) => {
+    const projectNumber = String(estimate.projectNumber || "").trim();
+    const projectName = String(estimate.projectName || "").trim();
+    if (projectName) {
+      const option = document.createElement("option");
+      option.value = projectName;
+      option.label = projectNumber;
+      els.projectNameLookup.append(option);
+    }
   });
 }
 
@@ -772,10 +884,104 @@ function nameKeyFor(row) {
   return "element";
 }
 
+// ── Inventory lookup dropdown ─────────────────────────────────────────────────
+const invDropdown = document.getElementById("invLookupDropdown");
+let invDropdownRowId = null;
+let invDebounceTimer = null;
+
+function closeInvDropdown() {
+  invDropdown.hidden = true;
+  invDropdown.innerHTML = "";
+  invDropdownRowId = null;
+}
+
+function positionInvDropdown(input) {
+  const rect = input.getBoundingClientRect();
+  // position: fixed coords are relative to viewport — do NOT add scroll offsets
+  invDropdown.style.top  = `${rect.bottom + 2}px`;
+  invDropdown.style.left = `${rect.left}px`;
+  invDropdown.style.width = `${Math.max(rect.width, 380)}px`;
+}
+
+function renderInvDropdown(input, results, onSelect) {
+  invDropdown.innerHTML = "";
+  if (!results.length) {
+    const empty = document.createElement("div");
+    empty.className = "inv-lookup-empty";
+    empty.textContent = "No inventory items found";
+    invDropdown.appendChild(empty);
+  } else {
+    results.forEach(item => {
+      const opt = document.createElement("div");
+      opt.className = "inv-lookup-option";
+      opt.innerHTML =
+        `<span class="inv-lookup-name">${escapeHtml(item.name)}</span>` +
+        `<span class="inv-lookup-sku">${escapeHtml(item.sku || "")}</span>` +
+        `<span class="inv-lookup-qty">${item.warehouseQty != null ? Number(item.warehouseQty).toLocaleString() : "—"}</span>`;
+      opt.addEventListener("mousedown", e => {
+        e.preventDefault();
+        onSelect(item);
+        closeInvDropdown();
+      });
+      invDropdown.appendChild(opt);
+    });
+  }
+  positionInvDropdown(input);
+  invDropdown.hidden = false;
+}
+
+function setupInventoryLookup(input, row, nameField) {
+  input.addEventListener("input", () => {
+    clearTimeout(invDebounceTimer);
+    const q = input.value.trim();
+    if (q.length < 2) { closeInvDropdown(); return; }
+    invDropdownRowId = row.id;
+    invDebounceTimer = setTimeout(async () => {
+      if (invDropdownRowId !== row.id) return;
+      const clientName = els.clientName.value.trim();
+      const estimateYear = parseInt(els.estimateYear.value) || new Date().getFullYear();
+      const priorYear = estimateYear - 1;
+      try {
+        const res = await fetch(`/api/inventory/search?q=${encodeURIComponent(q)}&client=${encodeURIComponent(clientName)}&year=${priorYear}`);
+        const results = await res.json();
+        if (invDropdownRowId !== row.id) return;
+        positionInvDropdown(input);
+        renderInvDropdown(input, results, item => {
+          updateRow(row.id, {
+            [nameField]: item.name,
+            sku: item.sku || "",
+            inventoryQty: Number(item.warehouseQty) || 0,
+            priorPpp: Number(item.priorPpp) || 0
+          });
+        });
+      } catch { closeInvDropdown(); }
+    }, 300);
+  });
+
+  input.addEventListener("blur", () => setTimeout(closeInvDropdown, 150));
+  input.addEventListener("focus", () => {
+    if (input.value.trim().length >= 2) input.dispatchEvent(new Event("input"));
+  });
+}
+
 function setupNameInput(input, row) {
   const key = nameKeyFor(row);
-  input.setAttribute("list", row.level === "package" ? "packageLookup" : row.level === "product" ? "productLookup" : "elementLookup");
+  const isLeafProduct = row.level === "product" && !childrenOf(row).some(c => c.level === "element");
+  const hasInventoryLookup = row.level === "element" || isLeafProduct;
+
+  // Only attach datalist for rows that don't use the custom inventory dropdown
+  // (native datalist would overlap and block the custom dropdown)
+  if (!hasInventoryLookup) {
+    input.setAttribute("list", row.level === "package" ? "packageLookup" : "productLookup");
+  }
+
   bindInput(input, row, key);
+
+  if (row.level === "element") {
+    setupInventoryLookup(input, row, "element");
+  } else if (isLeafProduct) {
+    setupInventoryLookup(input, row, "product");
+  }
 }
 
 function renderRows() {
@@ -844,6 +1050,7 @@ function renderRows() {
     });
 
     setupNameInput(fragment.querySelector(".name-input"), row);
+    bindInput(fragment.querySelector(".sku-input"), row, "sku");
     bindInput(fragment.querySelector(".description-input"), row, "description");
     bindInput(fragment.querySelector(".type-input"), row, "type");
     bindInput(fragment.querySelector(".inventory-input"), row, "inventoryQty", true);
@@ -866,6 +1073,7 @@ function renderRows() {
       fragment.querySelector(".client-qoh-input").value = Math.round(calc.clientQoh);
       fragment.querySelector(".markup-input").value = decimal(calc.markup, 3);
       fragment.querySelector(".margin-input").value = decimal(calc.marginAdj, 3);
+      fragment.querySelector(".prior-input").value = decimal(calc.priorPpp, 3);
     }
 
     if (row.level === "package") {
@@ -874,16 +1082,17 @@ function renderRows() {
       typeInput.disabled = true;
     }
 
+    fragment.querySelector(".cost-input").value = decimal(calc.cost, 2);
     fragment.querySelector(".qty-to-order").textContent = row.level === "package" ? "" : Math.round(calc.qtyToOrder).toLocaleString();
     fragment.querySelector(".client-order-qty").textContent = row.level === "package" ? "" : Math.round(calc.qty).toLocaleString();
     fragment.querySelector(".per-piece-cost").textContent = money(calc.perPieceCost, 3);
-    fragment.querySelector(".margin-dollars").textContent = money(calc.marginDollars, 0);
-    fragment.querySelector(".standard-price").textContent = money(calc.standardPrice, 0);
-    fragment.querySelector(".client-price").textContent = money(calc.clientPrice, 0);
-    fragment.querySelector(".ppp").textContent = money(calc.ppp, 3);
+    fragment.querySelector(".margin-dollars").textContent = money(calc.marginDollars, 2);
+    fragment.querySelector(".standard-price").textContent = money(calc.standardPrice, 2);
+    fragment.querySelector(".client-price").textContent = money(calc.clientPrice, 2);
+    fragment.querySelector(".ppp").textContent = money(calc.ppp, 2);
 
     const diff = fragment.querySelector(".diff");
-    diff.textContent = money(calc.diff, 3);
+    diff.textContent = money(calc.diff, 2);
     diff.classList.toggle("negative", calc.diff < 0);
     diff.classList.toggle("positive", calc.diff > 0);
 
@@ -898,18 +1107,19 @@ function renderRows() {
 function renderFooter(sourceRows) {
   const totals = totalFor(sourceRows);
   els.neededQtyHead.textContent = `${els.estimateYear.value || "Project"} Needed`;
+  els.priorPppHead.textContent = `${asNumber(els.estimateYear.value) - 1 || "Previous"} PPP`;
   els.footerInventoryQty.textContent = Math.round(totals.inventoryQty).toLocaleString();
   els.footerNeededQty.textContent = Math.round(totals.neededQty).toLocaleString();
   els.footerQtyToOrder.textContent = Math.round(totals.qtyToOrder).toLocaleString();
   els.footerClientQoh.textContent = Math.round(totals.clientQoh).toLocaleString();
   els.footerQty.textContent = Math.round(totals.qty).toLocaleString();
-  els.footerCost.textContent = money(totals.cost, 0);
-  els.footerPerPieceCost.textContent = money(totals.qtyToOrder ? totals.perPieceCostValue / totals.qtyToOrder : 0, 3);
-  els.footerStdMarkup.textContent = money(totals.standardPrice, 0);
-  els.footerMargin.textContent = money(totals.margin, 0);
-  els.footerClient.textContent = money(totals.client, 0);
-  els.footerPpp.textContent = money(totals.qty ? totals.client / totals.qty : 0, 3);
-  els.footerDiff.textContent = money(totals.qty ? totals.diffValue / totals.qty : 0, 3);
+  els.footerCost.textContent = money(totals.cost, 2);
+  els.footerPerPieceCost.textContent = money(totals.qtyToOrder ? totals.perPieceCostValue / totals.qtyToOrder : 0, 2);
+  els.footerStdMarkup.textContent = money(totals.standardPrice, 2);
+  els.footerMargin.textContent = money(totals.margin, 2);
+  els.footerClient.textContent = money(totals.client, 2);
+  els.footerPpp.textContent = money(totals.qty ? totals.client / totals.qty : 0, 2);
+  els.footerDiff.textContent = money(totals.qty ? totals.diffValue / totals.qty : 0, 2);
 }
 
 function renderPrintTypeSubtotals() {
@@ -1132,7 +1342,7 @@ function renderPayments() {
     const header = document.createElement("div");
     header.className = "payment-type-heading";
     header.innerHTML = `
-      <strong>${type} - ${typeLabels[type]}</strong>
+      <strong>${type} - ${typeLabels[type]} Total</strong>
       <label class="payment-header-control internal-col">Deposit % <input class="deposit-setting" type="number" min="0" max="100" step="5" value="${decimal(depositPct * 100, 0)}" /></label>
       <label class="payment-header-control internal-col">Balance <input class="count-setting" type="number" min="1" max="12" step="1" value="${paymentCount}" /></label>
       <span>${money(total, 0)}</span>
@@ -1205,6 +1415,7 @@ function renderLookupList() {
 }
 
 function render() {
+  updateProjectHeader();
   renderDatalists();
   renderFilters();
   renderRows();
@@ -1217,11 +1428,64 @@ function render() {
   renderLookupList();
 }
 
-function saveCurrentEstimate() {
+function estimateSearchText(estimate) {
+  return [estimate.projectNumber, estimate.projectName, estimate.clientName, estimate.estimateYear]
+    .map((value) => String(value || "").toLowerCase())
+    .join(" ");
+}
+
+function renderLoadEstimateList() {
+  const query = els.loadEstimateSearch.value.trim().toLowerCase();
+  const estimates = sortEstimatesList(estimatesList).filter((estimate) => !query || estimateSearchText(estimate).includes(query));
+  els.loadEstimateList.innerHTML = "";
+
+  if (!estimates.length) {
+    const empty = document.createElement("div");
+    empty.className = "load-estimate-empty";
+    empty.textContent = query ? "No saved projects match that search." : "No saved projects yet.";
+    els.loadEstimateList.append(empty);
+    return;
+  }
+
+  estimates.forEach((estimate) => {
+    const row = document.createElement("div");
+    row.className = "load-estimate-row";
+    const savedDate = estimate.savedAt ? new Date(estimate.savedAt).toLocaleDateString() : "";
+    row.innerHTML = `
+      <span class="load-project-number">${escapeHtml(estimate.projectNumber || "")}</span>
+      <span class="load-project-main">
+        <strong>${escapeHtml(estimate.projectName || "Untitled Estimate")}</strong>
+        <small>${escapeHtml([estimate.clientName, estimate.estimateYear, savedDate && `Saved ${savedDate}`].filter(Boolean).join(" · "))}</small>
+      </span>
+      <button class="ghost-btn compact-btn" type="button">Load</button>
+    `;
+    row.querySelector("button").addEventListener("click", () => loadEstimate(estimate));
+    els.loadEstimateList.append(row);
+  });
+}
+
+function openLoadEstimateDialog() {
+  if (!estimatesList.length) {
+    setSaveStatus("No saved projects");
+    return;
+  }
+  els.loadEstimateModal.hidden = false;
+  els.loadEstimateSearch.value = "";
+  renderLoadEstimateList();
+  els.loadEstimateSearch.focus();
+}
+
+function closeLoadEstimateDialog() {
+  els.loadEstimateModal.hidden = true;
+}
+
+async function saveCurrentEstimate() {
+  els.saveEstimateBtn.disabled = true;
+  els.saveEstimateBtn.textContent = "Saving…";
   const projectName = els.projectName.value.trim() || "Untitled Estimate";
-  const projectNumber = els.projectNumber.value.trim() || nextProjectNumber();
+  const projectNumber = String(els.projectNumber.value || els.projectNumber.textContent || "").trim() || nextProjectNumber();
   els.projectName.value = projectName;
-  els.projectNumber.value = projectNumber;
+  setProjectNumber(projectNumber);
   const estimate = {
     projectNumber,
     projectName,
@@ -1234,33 +1498,73 @@ function saveCurrentEstimate() {
     expanded: Array.from(expanded),
     paymentDates: structuredClone(paymentDates),
     paymentSettings: structuredClone(paymentSettings),
-    savedAt: new Date().toISOString()
+    tariffRate: asNumber(els.tariffRate.value),
+    globalMarkup: asNumber(els.globalMarkup.value)
   };
-  const estimates = readSavedEstimates().filter((saved) => saved.projectNumber !== projectNumber && saved.projectName !== projectName);
-  estimates.push(estimate);
-  writeSavedEstimates(estimates);
-  if (estimate.clientName) lookups.clients = uniqueValues([...(lookups.clients || []), estimate.clientName]);
-  if (estimate.estimateYear) lookups.years = uniqueValues([...(lookups.years || []), estimate.estimateYear]);
-  render();
+  try {
+    const res = await fetch("/api/estimates", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(estimate)
+    });
+    if (!res.ok) throw new Error((await res.json()).error || res.statusText);
+    await fetchEstimatesList();
+    if (estimate.clientName) lookups.clients = uniqueValues([...(lookups.clients || []), estimate.clientName]);
+    if (estimate.estimateYear) lookups.years = uniqueValues([...(lookups.years || []), estimate.estimateYear]);
+    render();
+    setSaveStatus(`Saved ${projectNumber}`);
+  } catch (err) {
+    console.error("Save error:", err);
+    setSaveStatus("Save failed");
+  } finally {
+    els.saveEstimateBtn.disabled = false;
+    els.saveEstimateBtn.textContent = "Save";
+  }
 }
 
-function loadCurrentEstimate() {
-  const key = els.projectNumber.value.trim() || els.projectName.value.trim();
-  const estimates = readSavedEstimates();
-  const estimate = estimates.find((saved) => saved.projectNumber === key || saved.projectName === key) || estimates.find((saved) => saved.projectName === els.projectName.value.trim());
-  if (!estimate) return;
-  els.projectNumber.value = estimate.projectNumber || "";
-  els.projectName.value = estimate.projectName || "";
-  els.clientName.value = estimate.clientName || "";
-  els.estimateYear.value = estimate.estimateYear || "";
-  rows = structuredClone(estimate.rows || seedRows);
-  lookups = structuredClone({ ...seedLookups, ...(estimate.lookups || {}) });
-  activePackage = estimate.activePackage || "All";
-  activeTypes = new Set(estimate.activeTypes || Object.keys(typeLabels));
-  expanded = new Set(estimate.expanded || rows.filter((row) => row.level !== "element").map((row) => row.id));
-  paymentDates = structuredClone(estimate.paymentDates || {});
-  paymentSettings = structuredClone(estimate.paymentSettings || Object.fromEntries(Object.keys(typeLabels).map((type) => [type, { depositPct: 0.25, paymentCount: 3 }])));
-  render();
+async function loadEstimate(summary) {
+  if (!summary) {
+    setSaveStatus("Not found");
+    return;
+  }
+  try {
+    const key = String(summary.projectNumber || summary.projectName || "").trim();
+    if (!key) return;
+    const res = await fetch(`/api/estimates/${encodeURIComponent(key)}`);
+    if (!res.ok) {
+      setSaveStatus("Not found");
+      return;
+    }
+    const estimate = await res.json();
+    setProjectNumber(estimate.projectNumber || nextProjectNumber());
+    els.projectName.value = estimate.projectName || "";
+    els.clientName.value = estimate.clientName || "";
+    els.estimateYear.value = estimate.estimateYear || "";
+    rows = structuredClone(estimate.rows || seedRows);
+    lookups = structuredClone({ ...seedLookups, ...(estimate.lookups || {}) });
+    activePackage = estimate.activePackage || "All";
+    activeTypes = new Set(estimate.activeTypes || Object.keys(typeLabels));
+    expanded = new Set(estimate.expanded || rows.filter((row) => row.level !== "element").map((row) => row.id));
+    paymentDates = structuredClone(estimate.paymentDates || {});
+    paymentSettings = structuredClone(estimate.paymentSettings || Object.fromEntries(Object.keys(typeLabels).map((type) => [type, { depositPct: 0.25, paymentCount: 3 }])));
+    closeLoadEstimateDialog();
+    render();
+    setSaveStatus(`Loaded ${estimate.projectNumber}`);
+  } catch (err) {
+    console.error("Load error:", err);
+    setSaveStatus("Not found");
+  }
+}
+
+function syncProjectAssociationFromName() {
+  const estimate = findEstimateByProjectName(els.projectName.value.trim());
+  if (estimate?.projectNumber) {
+    setProjectNumber(estimate.projectNumber);
+    els.clientName.value = estimate.clientName || els.clientName.value;
+    els.estimateYear.value = estimate.estimateYear || els.estimateYear.value;
+    renderDatalists();
+    renderPrintTypeSubtotals();
+  }
 }
 
 function addPackage(packageName = "New Package") {
@@ -1273,6 +1577,7 @@ function addPackage(packageName = "New Package") {
     packageName,
     product: "",
     element: "",
+    sku: "",
     description: "",
     type: "",
     qty: 0,
@@ -1306,6 +1611,7 @@ function addProduct() {
     packageName: parent.packageName,
     product,
     element: "",
+    sku: "",
     description: "",
     type: "MP",
     qty: 0,
@@ -1339,6 +1645,7 @@ function addElement() {
     packageName: parent.packageName,
     product: parent.product,
     element: "New Element",
+    sku: "",
     description: "",
     type: parent.type || "MP",
     qty: 0,
@@ -1357,11 +1664,11 @@ function addElement() {
 }
 
 function exportCsv() {
-  const headers = ["Level", "Active", "Package", "Product / Service", "Element", "Description", "Production Type", "Inventory Qty", "Needed Qty", "Qty to Order", "Cost", "Per Piece Cost", "Client QOH", "Client Order Qty", "Markup", "Margin Adj", "Margin Dollars", "Client Price", "PPP", "2024 PPP", "Difference"];
+  const headers = ["Level", "Active", "Package", "Product / Service", "Element", "SKU", "Description", "Production Type", "Inventory Qty", "Needed Qty", "Qty to Order", "Cost", "Per Piece Cost", "Client QOH", "Client Order Qty", "Markup", "Margin Adj", "Margin Dollars", "Client Price", "PPP", "Prior PPP", "Difference"];
   const lines = [headers];
   visibleRows().forEach((row) => {
     const calc = calculate(row);
-    lines.push([row.level, row.active, row.packageName, row.product, row.element, row.description, row.type, calc.inventoryQty, calc.neededQty, calc.qtyToOrder, calc.cost, calc.perPieceCost, calc.clientQoh, calc.qty, calc.markup, calc.marginAdj, calc.marginDollars, calc.clientPrice, calc.ppp, calc.priorPpp, calc.diff]);
+    lines.push([row.level, row.active, row.packageName, row.product, row.element, row.sku || "", row.description, row.type, calc.inventoryQty, calc.neededQty, calc.qtyToOrder, calc.cost, calc.perPieceCost, calc.clientQoh, calc.qty, calc.markup, calc.marginAdj, calc.marginDollars, calc.clientPrice, calc.ppp, calc.priorPpp, calc.diff]);
   });
 
   const csv = lines.map((line) => line.map((value) => `"${String(value ?? "").replaceAll('"', '""')}"`).join(",")).join("\n");
@@ -1400,6 +1707,8 @@ els.searchInput.addEventListener("input", render);
 els.includeInactive.addEventListener("change", render);
 els.tariffRate.addEventListener("change", render);
 els.estimateYear.addEventListener("change", render);
+els.projectName.addEventListener("change", syncProjectAssociationFromName);
+els.projectName.addEventListener("input", updateProjectHeader);
 els.trackingLevel.addEventListener("change", render);
 els.trackingMode.addEventListener("change", renderTracking);
 els.trackingItem.addEventListener("change", renderTracking);
@@ -1428,20 +1737,29 @@ els.lookupTable.addEventListener("change", () => {
 });
 els.saveLookupBtn.addEventListener("click", saveLookup);
 els.saveEstimateBtn.addEventListener("click", saveCurrentEstimate);
-els.loadEstimateBtn.addEventListener("click", loadCurrentEstimate);
+els.loadEstimateBtn.addEventListener("click", openLoadEstimateDialog);
+els.closeLoadEstimateBtn.addEventListener("click", closeLoadEstimateDialog);
+els.loadEstimateSearch.addEventListener("input", renderLoadEstimateList);
+els.loadEstimateModal.addEventListener("click", (event) => {
+  if (event.target === els.loadEstimateModal) closeLoadEstimateDialog();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !els.loadEstimateModal.hidden) closeLoadEstimateDialog();
+});
 els.addPackageBtn.addEventListener("click", addPackage);
 els.addProductBtn.addEventListener("click", addProduct);
 els.addElementBtn.addEventListener("click", addElement);
 els.exportBtn.addEventListener("click", exportCsv);
 els.pdfBtn.addEventListener("click", () => window.print());
-els.resetBtn.addEventListener("click", () => {
+els.resetBtn.addEventListener("click", async () => {
+  await fetchAndApplySeed();
   rows = structuredClone(seedRows);
   lookups = structuredClone(seedLookups);
   expanded = new Set(seedRows.filter((row) => row.level !== "element").map((row) => row.id));
   activePackage = "All";
   activeTypes = new Set(Object.keys(typeLabels));
-  els.projectNumber.value = nextProjectNumber();
-  els.projectName.value = "2026 North Pole Post Office Estimate";
+  setProjectNumber(nextProjectNumber());
+  els.projectName.value = "2026 North Pole Inventory Estimate";
   els.clientName.value = "North Pole Post Office";
   els.estimateYear.value = "2026";
   els.searchInput.value = "";
@@ -1458,4 +1776,19 @@ els.applyMarkupBtn.addEventListener("click", () => {
   render();
 });
 
-render();
+async function init() {
+  const [, clientsRes] = await Promise.all([
+    fetchEstimatesList(),
+    fetch("/api/clients").then((r) => r.json()).catch(() => []),
+    fetchAndApplySeed()
+  ]);
+  clientsList = Array.isArray(clientsRes) ? clientsRes : [];
+  rows = structuredClone(seedRows);
+  lookups = structuredClone(seedLookups);
+  expanded = new Set(seedRows.filter((row) => row.level !== "element").map((row) => row.id));
+  setProjectNumber(nextProjectNumber());
+  els.estimateDate.textContent = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date());
+  render();
+}
+
+init();
