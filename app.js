@@ -1127,18 +1127,22 @@ function renderFooter(sourceRows) {
   const totals = totalFor(sourceRows);
   els.neededQtyHead.textContent = `${els.estimateYear.value || "Project"} Needed`;
   els.priorPppHead.textContent = `${asNumber(els.estimateYear.value) - 1 || "Previous"} PPP`;
-  els.footerInventoryQty.textContent = Math.round(totals.inventoryQty).toLocaleString();
-  els.footerNeededQty.textContent = Math.round(totals.neededQty).toLocaleString();
-  els.footerQtyToOrder.textContent = Math.round(totals.qtyToOrder).toLocaleString();
-  els.footerClientQoh.textContent = Math.round(totals.clientQoh).toLocaleString();
-  els.footerQty.textContent = Math.round(totals.qty).toLocaleString();
+  // Quantity columns — not shown in footer
+  els.footerInventoryQty.textContent = "";
+  els.footerNeededQty.textContent = "";
+  els.footerQtyToOrder.textContent = "";
+  els.footerClientQoh.textContent = "";
+  els.footerQty.textContent = "";
+  els.footerPerPieceCost.textContent = "";
+  // Dollar totals
   els.footerCost.textContent = money(totals.cost, 2);
-  els.footerPerPieceCost.textContent = money(totals.qtyToOrder ? totals.perPieceCostValue / totals.qtyToOrder : 0, 2);
   els.footerStdMarkup.textContent = money(totals.standardPrice, 2);
   els.footerMargin.textContent = money(totals.margin, 2);
   els.footerClient.textContent = money(totals.client, 2);
-  els.footerPpp.textContent = money(totals.qty ? totals.client / totals.qty : 0, 2);
-  els.footerDiff.textContent = money(totals.qty ? totals.diffValue / totals.qty : 0, 2);
+  // PPP and Diff — sum of package-level values (additive, matching package rollup)
+  const packageCalcs = sourceRows.map(calculate);
+  els.footerPpp.textContent = money(packageCalcs.reduce((s, c) => s + c.ppp, 0), 2);
+  els.footerDiff.textContent = money(packageCalcs.reduce((s, c) => s + c.diff, 0), 2);
 }
 
 function renderPrintTypeSubtotals() {
