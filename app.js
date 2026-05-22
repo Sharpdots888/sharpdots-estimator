@@ -42,15 +42,16 @@ function uniqueValues(values) {
   return Array.from(new Set(values.map((value) => String(value || "").trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b));
 }
 
-function buildSeedRows() {
+function buildSeedRows(sourceData) {
   const packageIds = new Map();
   const productIds = new Map();
   const rows = [];
-  const packageNames = uniqueValues(sourceProducts.map((row) => row.packageName));
+  const packageNames = uniqueValues(sourceData.map((row) => row.packageName));
 
   packageNames.forEach((packageName, index) => {
     const id = uid("package");
     packageIds.set(packageName, id);
+    const firstSource = sourceData.find((s) => s.packageName === packageName);
     rows.push({
       id,
       level: "package",
@@ -59,7 +60,7 @@ function buildSeedRows() {
       packageName,
       product: "",
       element: "",
-      sku: "",
+      sku: firstSource?.packageSku || "",
       description: `${packageName} package`,
       type: "",
       qty: 0,
@@ -73,10 +74,12 @@ function buildSeedRows() {
     });
   });
 
-  sourceProducts.forEach((source, index) => {
+  sourceData.forEach((source, index) => {
     const parentPackageId = packageIds.get(source.packageName);
     const packageIndex = packageNames.indexOf(source.packageName);
     const productKey = `${source.packageName}::${source.product}`;
+    // Leaf-product: product sits directly under package with no element children
+    const isLeafProduct = !source.element;
     let productId = productIds.get(productKey);
 
     if (!productId) {
@@ -91,54 +94,62 @@ function buildSeedRows() {
         packageName: source.packageName,
         product: source.product,
         element: "",
-        sku: source.sku || "",
+        sku: source.productSku || source.sku || "",
         description: "",
         type: source.type,
-        qty: 0,
-        neededQty: 0,
-        inventoryQty: 0,
-        clientQoh: 0,
-        cost: 0,
+        // For leaf products the product row itself carries the inventory/cost data
+        qty: isLeafProduct ? source.qty : 0,
+        neededQty: isLeafProduct ? source.neededQty : 0,
+        inventoryQty: isLeafProduct ? source.inventoryQty : 0,
+        clientQoh: isLeafProduct ? source.clientQoh : 0,
+        cost: isLeafProduct ? source.cost : 0,
         markup: source.markup,
         marginAdj: source.marginAdj,
-        priorPpp: 0
+        priorPpp: isLeafProduct ? source.priorPpp : 0
       });
     }
 
-    rows.push({
-      id: uid("element"),
-      level: "element",
-      parentId: productId,
-      active: true,
-      sourceOrder: (packageIndex + 1) * 100 + index + 1.1,
-      packageName: source.packageName,
-      product: source.product,
-      element: source.element || source.product,
-      sku: source.sku || "",
-      description: "",
-      type: source.type,
-      qty: source.qty,
-      neededQty: source.neededQty,
-      inventoryQty: source.inventoryQty,
-      clientQoh: source.clientQoh,
-      cost: source.cost,
-      markup: source.markup,
-      marginAdj: source.marginAdj,
-      priorPpp: source.priorPpp
-    });
+    // Leaf-product rows have no element child — skip element creation
+    if (!isLeafProduct) {
+      rows.push({
+        id: uid("element"),
+        level: "element",
+        parentId: productId,
+        active: true,
+        sourceOrder: (packageIndex + 1) * 100 + index + 1.1,
+        packageName: source.packageName,
+        product: source.product,
+        element: source.element || source.product,
+        sku: source.sku || "",
+        description: "",
+        type: source.type,
+        qty: source.qty,
+        neededQty: source.neededQty,
+        inventoryQty: source.inventoryQty,
+        clientQoh: source.clientQoh,
+        cost: source.cost,
+        markup: source.markup,
+        marginAdj: source.marginAdj,
+        priorPpp: source.priorPpp
+      });
+    }
   });
 
   return rows;
 }
 
-const seedRows = buildSeedRows();
-const seedLookups = {
-  packages: uniqueValues(seedRows.map((row) => row.packageName)),
-  products: uniqueValues(seedRows.map((row) => row.product)),
-  elements: uniqueValues(seedRows.map((row) => row.element).filter(Boolean)),
-  clients: ["North Pole Post Office", "Portofino", "Santa Direct"],
-  years: uniqueValues(["2026", ...sourceProducts.map((row) => row.year)])
-};
+function buildSeedLookups(theRows, sourceData) {
+  return {
+    packages: uniqueValues(theRows.map((row) => row.packageName)),
+    products: uniqueValues(theRows.map((row) => row.product)),
+    elements: uniqueValues(theRows.map((row) => row.element).filter(Boolean)),
+    clients: ["North Pole Post Office", "Portofino", "Santa Direct"],
+    years: uniqueValues(["2026", ...(sourceData || []).map((row) => row.year).filter(Boolean)])
+  };
+}
+
+let seedRows = buildSeedRows(sourceProducts);
+let seedLookups = buildSeedLookups(seedRows, sourceProducts);
 
 let rows = structuredClone(seedRows);
 let lookups = structuredClone(seedLookups);
@@ -256,6 +267,22 @@ async function fetchEstimatesList() {
     estimatesList = res.ok ? await res.json() : [];
   } catch {
     estimatesList = [];
+  }
+}
+
+async function fetchAndApplySeed() {
+  try {
+    const priorYear = Math.max(asNumber(els.estimateYear.value) - 1, 2024);
+    const res = await fetch(`/api/seed?year=${priorYear}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length) {
+        seedRows = buildSeedRows(data);
+        seedLookups = buildSeedLookups(seedRows, data);
+      }
+    }
+  } catch {
+    // network error — keep hardcoded sourceProducts as fallback
   }
 }
 
@@ -401,7 +428,9 @@ function rollupCalculate(row) {
   const clientPrice = marginAdj >= 0.95 ? standardPrice : markupBase / (1 - marginAdj);
   const marginDollars = clientPrice - totals.cost;
   const ppp = qty > 0 ? clientPrice / qty : 0;
-  const priorPpp = totals.priorQty > 0 ? totals.priorValue / totals.priorQty : asNumber(row.priorPpp);
+  const priorPpp = totals.priorQty > 0
+    ? totals.priorValue / totals.priorQty
+    : childCalcs.reduce((sum, calc) => sum + calc.priorPpp, 0);
 
   return {
     qty,
@@ -437,8 +466,13 @@ function rowMatchesQuery(row, query) {
 
 function rowMatchesType(row) {
   if (row.level === "element") return activeTypes.has(row.type);
-  const descendants = descendantsOf(row).filter((child) => child.level === "element");
-  return descendants.length ? descendants.some((child) => activeTypes.has(child.type)) : activeTypes.has(row.type);
+  // Check typed descendants at element OR product level (leaf products carry type directly)
+  const typedDescendants = descendantsOf(row).filter(
+    (child) => (child.level === "element" || child.level === "product") && child.type
+  );
+  return typedDescendants.length
+    ? typedDescendants.some((child) => activeTypes.has(child.type))
+    : activeTypes.has(row.type);
 }
 
 function rowPassesBaseFilters(row) {
@@ -863,8 +897,9 @@ function closeInvDropdown() {
 
 function positionInvDropdown(input) {
   const rect = input.getBoundingClientRect();
-  invDropdown.style.top  = `${rect.bottom + window.scrollY + 2}px`;
-  invDropdown.style.left = `${rect.left + window.scrollX}px`;
+  // position: fixed coords are relative to viewport — do NOT add scroll offsets
+  invDropdown.style.top  = `${rect.bottom + 2}px`;
+  invDropdown.style.left = `${rect.left}px`;
   invDropdown.style.width = `${Math.max(rect.width, 380)}px`;
 }
 
@@ -895,7 +930,7 @@ function renderInvDropdown(input, results, onSelect) {
   invDropdown.hidden = false;
 }
 
-function setupElementInventoryLookup(input, row) {
+function setupInventoryLookup(input, row, nameField) {
   input.addEventListener("input", () => {
     clearTimeout(invDebounceTimer);
     const q = input.value.trim();
@@ -904,16 +939,19 @@ function setupElementInventoryLookup(input, row) {
     invDebounceTimer = setTimeout(async () => {
       if (invDropdownRowId !== row.id) return;
       const clientName = els.clientName.value.trim();
+      const estimateYear = parseInt(els.estimateYear.value) || new Date().getFullYear();
+      const priorYear = estimateYear - 1;
       try {
-        const res = await fetch(`/api/inventory/search?q=${encodeURIComponent(q)}&client=${encodeURIComponent(clientName)}`);
+        const res = await fetch(`/api/inventory/search?q=${encodeURIComponent(q)}&client=${encodeURIComponent(clientName)}&year=${priorYear}`);
         const results = await res.json();
         if (invDropdownRowId !== row.id) return;
         positionInvDropdown(input);
         renderInvDropdown(input, results, item => {
           updateRow(row.id, {
-            element: item.name,
+            [nameField]: item.name,
             sku: item.sku || "",
-            inventoryQty: Number(item.warehouseQty) || 0
+            inventoryQty: Number(item.warehouseQty) || 0,
+            priorPpp: Number(item.priorPpp) || 0
           });
         });
       } catch { closeInvDropdown(); }
@@ -928,9 +966,22 @@ function setupElementInventoryLookup(input, row) {
 
 function setupNameInput(input, row) {
   const key = nameKeyFor(row);
-  input.setAttribute("list", row.level === "package" ? "packageLookup" : row.level === "product" ? "productLookup" : "elementLookup");
+  const isLeafProduct = row.level === "product" && !childrenOf(row).some(c => c.level === "element");
+  const hasInventoryLookup = row.level === "element" || isLeafProduct;
+
+  // Only attach datalist for rows that don't use the custom inventory dropdown
+  // (native datalist would overlap and block the custom dropdown)
+  if (!hasInventoryLookup) {
+    input.setAttribute("list", row.level === "package" ? "packageLookup" : "productLookup");
+  }
+
   bindInput(input, row, key);
-  if (row.level === "element") setupElementInventoryLookup(input, row);
+
+  if (row.level === "element") {
+    setupInventoryLookup(input, row, "element");
+  } else if (isLeafProduct) {
+    setupInventoryLookup(input, row, "product");
+  }
 }
 
 function renderRows() {
@@ -1022,6 +1073,7 @@ function renderRows() {
       fragment.querySelector(".client-qoh-input").value = Math.round(calc.clientQoh);
       fragment.querySelector(".markup-input").value = decimal(calc.markup, 3);
       fragment.querySelector(".margin-input").value = decimal(calc.marginAdj, 3);
+      fragment.querySelector(".prior-input").value = decimal(calc.priorPpp, 3);
     }
 
     if (row.level === "package") {
@@ -1428,6 +1480,8 @@ function closeLoadEstimateDialog() {
 }
 
 async function saveCurrentEstimate() {
+  els.saveEstimateBtn.disabled = true;
+  els.saveEstimateBtn.textContent = "Saving…";
   const projectName = els.projectName.value.trim() || "Untitled Estimate";
   const projectNumber = String(els.projectNumber.value || els.projectNumber.textContent || "").trim() || nextProjectNumber();
   els.projectName.value = projectName;
@@ -1462,6 +1516,9 @@ async function saveCurrentEstimate() {
   } catch (err) {
     console.error("Save error:", err);
     setSaveStatus("Save failed");
+  } finally {
+    els.saveEstimateBtn.disabled = false;
+    els.saveEstimateBtn.textContent = "Save";
   }
 }
 
@@ -1694,7 +1751,8 @@ els.addProductBtn.addEventListener("click", addProduct);
 els.addElementBtn.addEventListener("click", addElement);
 els.exportBtn.addEventListener("click", exportCsv);
 els.pdfBtn.addEventListener("click", () => window.print());
-els.resetBtn.addEventListener("click", () => {
+els.resetBtn.addEventListener("click", async () => {
+  await fetchAndApplySeed();
   rows = structuredClone(seedRows);
   lookups = structuredClone(seedLookups);
   expanded = new Set(seedRows.filter((row) => row.level !== "element").map((row) => row.id));
@@ -1721,9 +1779,13 @@ els.applyMarkupBtn.addEventListener("click", () => {
 async function init() {
   const [, clientsRes] = await Promise.all([
     fetchEstimatesList(),
-    fetch("/api/clients").then((r) => r.json()).catch(() => [])
+    fetch("/api/clients").then((r) => r.json()).catch(() => []),
+    fetchAndApplySeed()
   ]);
   clientsList = Array.isArray(clientsRes) ? clientsRes : [];
+  rows = structuredClone(seedRows);
+  lookups = structuredClone(seedLookups);
+  expanded = new Set(seedRows.filter((row) => row.level !== "element").map((row) => row.id));
   setProjectNumber(nextProjectNumber());
   els.estimateDate.textContent = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date());
   render();

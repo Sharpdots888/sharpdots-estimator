@@ -6,8 +6,9 @@ const { Pool } = require("pg");
 const port = process.env.PORT || 3000;
 const root = __dirname;
 
+// Strip sslmode from connection string — pg Pool's ssl config handles this explicitly
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: (process.env.DATABASE_URL || "").replace(/[?&]sslmode=[^&]*/i, "").replace(/[?&]uselibpqcompat=[^&]*/i, "").replace(/[?&]$/, ""),
   ssl: { rejectUnauthorized: false }
 });
 
@@ -157,13 +158,15 @@ async function handleInventorySearch(reqUrl, res) {
   const params = new URL(`http://localhost${reqUrl}`).searchParams;
   const q = (params.get("q") || "").trim();
   const clientName = (params.get("client") || "").trim();
+  const priorYear = parseInt(params.get("year") || "") || (new Date().getFullYear() - 1);
   if (q.length < 2) { sendJson(res, 200, []); return; }
   const result = await pool.query(
     `SELECT i.item_id   AS "itemId",
             i.sku,
             i.name,
             COALESCE(s.warehouse_qty, 0) AS "warehouseQty",
-            s.year
+            s.year,
+            COALESCE(mq.quoted_price, 0) AS "priorPpp"
      FROM sfinv_items i
      LEFT JOIN LATERAL (
        SELECT warehouse_qty, year
@@ -171,14 +174,108 @@ async function handleInventorySearch(reqUrl, res) {
        WHERE item_id = i.item_id
        ORDER BY snapshot_date DESC LIMIT 1
      ) s ON true
+     LEFT JOIN LATERAL (
+       SELECT quoted_price
+       FROM sfpq_manufacturer_quotes
+       WHERE element_id = i.sfpq_element_id AND year = $3
+       ORDER BY is_active DESC, quote_date DESC LIMIT 1
+     ) mq ON i.sfpq_element_id IS NOT NULL
      LEFT JOIN sfvc_companies c ON c.company_id = i.client_id
-     WHERE i.level = 'element'
+     WHERE i.level IN ('element', 'product')
        AND i.is_active = true
        AND (i.name ILIKE $1 OR i.sku ILIKE $1)
-       AND ($2 = '' OR LOWER(COALESCE(c.display_name, c.legal_name)) ILIKE $2)
+       AND ($2 = '' OR i.client_id IS NULL OR LOWER(COALESCE(c.display_name, c.legal_name)) ILIKE $2)
+       AND NOT EXISTS (
+         SELECT 1 FROM sfinv_bom b
+         JOIN sfinv_items child ON child.item_id = b.component_item_id AND child.is_active = true
+         WHERE b.assembly_item_id = i.item_id
+       )
      ORDER BY i.name
      LIMIT 20`,
-    [`%${q}%`, clientName ? `%${clientName.toLowerCase()}%` : ""]
+    [`%${q}%`, clientName ? `%${clientName.toLowerCase()}%` : "", priorYear]
+  );
+  sendJson(res, 200, result.rows);
+}
+
+async function handleGetSeed(reqUrl, res) {
+  const params = new URL(`http://localhost${reqUrl}`).searchParams;
+  const priorYear = parseInt(params.get("year") || "") || (new Date().getFullYear() - 1);
+
+  const result = await pool.query(
+    `-- Branch 1: 3-level items (package → product → element)
+     SELECT
+       pkg.name  AS "packageName",
+       pkg.sku   AS "packageSku",
+       pr.name   AS product,
+       pr.sku    AS "productSku",
+       e.name    AS element,
+       e.sku,
+       'M'       AS type,
+       COALESCE(s.warehouse_qty, 0) AS "inventoryQty",
+       0         AS "clientQoh",
+       0         AS "neededQty",
+       0         AS qty,
+       0         AS cost,
+       0.4       AS markup,
+       0.4       AS "marginAdj",
+       COALESCE(mq.quoted_price, 0) AS "priorPpp"
+     FROM sfinv_items e
+     JOIN sfinv_bom bom_ep ON bom_ep.component_item_id = e.item_id
+     JOIN sfinv_items pr    ON pr.item_id = bom_ep.assembly_item_id AND pr.level = 'product'
+     JOIN sfinv_bom bom_pp  ON bom_pp.component_item_id = pr.item_id
+     JOIN sfinv_items pkg   ON pkg.item_id = bom_pp.assembly_item_id AND pkg.level = 'package'
+     LEFT JOIN LATERAL (
+       SELECT warehouse_qty FROM sfinv_stock
+       WHERE item_id = e.item_id ORDER BY snapshot_date DESC LIMIT 1
+     ) s ON true
+     LEFT JOIN LATERAL (
+       SELECT quoted_price FROM sfpq_manufacturer_quotes
+       WHERE element_id = e.sfpq_element_id AND year = $1
+       ORDER BY is_active DESC, quote_date DESC LIMIT 1
+     ) mq ON e.sfpq_element_id IS NOT NULL
+     WHERE e.level = 'element' AND e.is_active = true
+
+     UNION ALL
+
+     -- Branch 2: 2-level items (package → product, no element children)
+     SELECT
+       pkg.name   AS "packageName",
+       pkg.sku    AS "packageSku",
+       pr.name    AS product,
+       pr.sku     AS "productSku",
+       NULL::text AS element,
+       pr.sku     AS sku,
+       'M'        AS type,
+       COALESCE(s.warehouse_qty, 0) AS "inventoryQty",
+       0          AS "clientQoh",
+       0          AS "neededQty",
+       0          AS qty,
+       0          AS cost,
+       0.4        AS markup,
+       0.4        AS "marginAdj",
+       COALESCE(mq.quoted_price, 0) AS "priorPpp"
+     FROM sfinv_items pr
+     JOIN sfinv_bom bom_pp ON bom_pp.component_item_id = pr.item_id
+     JOIN sfinv_items pkg  ON pkg.item_id = bom_pp.assembly_item_id AND pkg.level = 'package'
+     LEFT JOIN LATERAL (
+       SELECT warehouse_qty FROM sfinv_stock
+       WHERE item_id = pr.item_id ORDER BY snapshot_date DESC LIMIT 1
+     ) s ON true
+     LEFT JOIN LATERAL (
+       SELECT quoted_price FROM sfpq_manufacturer_quotes
+       WHERE element_id = pr.sfpq_element_id AND year = $1
+       ORDER BY is_active DESC, quote_date DESC LIMIT 1
+     ) mq ON pr.sfpq_element_id IS NOT NULL
+     WHERE pr.level = 'product' AND pr.is_active = true
+       AND NOT EXISTS (
+         SELECT 1 FROM sfinv_bom b2
+         JOIN sfinv_items child ON child.item_id = b2.component_item_id
+           AND child.level = 'element' AND child.is_active = true
+         WHERE b2.assembly_item_id = pr.item_id
+       )
+
+     ORDER BY "packageName", product, element`,
+    [priorYear]
   );
   sendJson(res, 200, result.rows);
 }
@@ -420,6 +517,8 @@ const server = http.createServer(async (req, res) => {
     } else if (url.startsWith("/api/estimates/") && method === "GET") {
       const key = decodeURIComponent(url.slice("/api/estimates/".length));
       await handleGetEstimate(key, res);
+    } else if (url === "/api/seed" && method === "GET") {
+      await handleGetSeed(req.url, res);
     } else if (url === "/api/clients" && method === "GET") {
       await handleGetClients(res);
     } else if (url === "/api/manufacturers" && method === "GET") {
