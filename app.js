@@ -372,10 +372,9 @@ function baseCalculate(row) {
   const cost = Math.max(asNumber(row.cost), 0);
   const markup = Math.min(Math.max(asNumber(row.markup), 0), 0.95);
   const marginAdj = Math.min(Math.max(asNumber(row.marginAdj), -0.95), 0.95);
-  const perPieceCost = qtyToOrder ? cost / qtyToOrder : 0;
-  const markupBase = perPieceCost * qty;
-  const priceFromMarkup = markup >= 0.95 ? 0 : markupBase / (1 - markup);
-  const clientPrice = marginAdj >= 0.95 ? priceFromMarkup : markupBase / (1 - marginAdj);
+  const perPieceCost = qty ? cost / qty : 0;
+  const priceFromMarkup = markup >= 0.95 ? 0 : cost / (1 - markup);
+  const clientPrice = marginAdj >= 0.95 ? priceFromMarkup : cost / (1 - marginAdj);
   const ppp = qty > 0 ? clientPrice / qty : 0;
   const priorPpp = asNumber(row.priorPpp);
 
@@ -405,53 +404,68 @@ function rollupCalculate(row) {
   const childRows = childrenOf(row).filter((child) => child.active);
   if (!childRows.length) return baseCalculate(row);
   const childCalcs = childRows.map(calculate);
-  const markup = average(childCalcs.map((calc) => calc.markup));
-  const marginAdj = average(childCalcs.map((calc) => calc.marginAdj));
   const inventoryQty = minValue(childCalcs.map((calc) => calc.inventoryQty));
-  const neededQty = minValue(childCalcs.map((calc) => calc.neededQty));
-  const clientQoh = minValue(childCalcs.map((calc) => calc.clientQoh));
-  const qtyToOrder = row.level === "product" ? minValue(childCalcs.map((calc) => calc.qtyToOrder)) : 0;
-  const qty = row.level === "product" ? minValue(childCalcs.map((calc) => calc.qty)) : 0;
+  const neededQty    = minValue(childCalcs.map((calc) => calc.neededQty));
+  const clientQoh    = minValue(childCalcs.map((calc) => calc.clientQoh));
 
-  const totals = childCalcs.reduce(
-    (memo, child) => {
-      memo.cost += child.cost;
-      memo.priorValue += child.priorPpp * child.qty;
-      memo.priorQty += child.qty;
-      return memo;
-    },
-    { cost: 0, priorValue: 0, priorQty: 0 }
-  );
-  const perPieceCost = qtyToOrder ? totals.cost / qtyToOrder : 0;
-  const markupBase = perPieceCost * qty;
-  const standardPrice = markup >= 0.95 ? 0 : markupBase / (1 - markup);
-  const clientPrice = marginAdj >= 0.95 ? standardPrice : markupBase / (1 - marginAdj);
-  const marginDollars = clientPrice - totals.cost;
-  const ppp = qty > 0 ? clientPrice / qty : 0;
-  const priorPpp = totals.priorQty > 0
-    ? totals.priorValue / totals.priorQty
-    : childCalcs.reduce((sum, calc) => sum + calc.priorPpp, 0);
+  // Helper: build a summed-totals rollup object used by both package and product levels
+  function summedRollup(qtys, totalClientPrice, totalCost, totalNeededQty, totalQtyToOrder, totalPriorValue, totalPriorQty) {
+    const qty          = qtys;
+    const avgMarkup    = average(childCalcs.map((c) => c.markup));
+    const priorPpp     = totalPriorQty > 0 ? totalPriorValue / totalPriorQty : 0;
+    const marginDollars = totalClientPrice - totalCost;
+    const effectiveMarginAdj = totalClientPrice > 0 ? marginDollars / totalClientPrice : 0;
+    const ppp          = qty > 0 ? totalClientPrice / qty : 0;
+    const perPieceCost = qty > 0 ? totalCost / qty : 0;
+    // standardPrice uses the averaged markup applied to total cost (same logic as baseCalculate)
+    const standardPrice = avgMarkup >= 0.95 ? 0 : (totalCost / (1 - avgMarkup));
+    return {
+      qty,
+      neededQty: totalNeededQty,
+      inventoryQty,
+      qtyToOrder: totalQtyToOrder,
+      clientQoh,
+      cost: totalCost,
+      perPieceCost,
+      markup: avgMarkup,
+      marginAdj: effectiveMarginAdj,
+      priceFromMarkup: standardPrice,
+      clientPrice: totalClientPrice,
+      ppp,
+      costPpp: qty > 0 ? totalCost / qty : 0,
+      priorPpp,
+      diff: ppp - priorPpp,
+      marginDollars,
+      marginPct: totalClientPrice ? marginDollars / totalClientPrice : 0,
+      standardPrice
+    };
+  }
 
-  return {
+  // Package rows: sum all child totals — each product has its own qty
+  if (row.level === "package") {
+    return summedRollup(
+      childCalcs.reduce((s, c) => s + c.qty, 0),
+      childCalcs.reduce((s, c) => s + c.clientPrice, 0),
+      childCalcs.reduce((s, c) => s + c.cost, 0),
+      childCalcs.reduce((s, c) => s + c.neededQty, 0),
+      childCalcs.reduce((s, c) => s + c.qtyToOrder, 0),
+      childCalcs.reduce((s, c) => s + c.priorPpp * c.qty, 0),
+      childCalcs.reduce((s, c) => s + c.qty, 0)
+    );
+  }
+
+  // Product rows with children: sum child prices — elements price themselves
+  const qty         = minValue(childCalcs.map((c) => c.qty));
+  const qtyToOrder  = minValue(childCalcs.map((c) => c.qtyToOrder));
+  return summedRollup(
     qty,
+    childCalcs.reduce((s, c) => s + c.clientPrice, 0),
+    childCalcs.reduce((s, c) => s + c.cost, 0),
     neededQty,
-    inventoryQty,
     qtyToOrder,
-    clientQoh,
-    cost: totals.cost,
-    perPieceCost,
-    markup,
-    marginAdj,
-    priceFromMarkup: standardPrice,
-    clientPrice,
-    ppp,
-    costPpp: qty > 0 ? totals.cost / qty : 0,
-    priorPpp,
-    diff: ppp - priorPpp,
-    marginDollars,
-    marginPct: clientPrice ? marginDollars / clientPrice : 0,
-    standardPrice
-  };
+    childCalcs.reduce((s, c) => s + c.priorPpp * c.qty, 0),
+    childCalcs.reduce((s, c) => s + c.qty, 0)
+  );
 }
 
 function calculate(row) {
