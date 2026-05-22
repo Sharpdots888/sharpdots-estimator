@@ -441,9 +441,9 @@ function rollupCalculate(row) {
     };
   }
 
-  // Package rows: sum all child totals — each product has its own qty
+  // Package rows: sum all child totals — PPP = sum of child PPPs (additive, like elements→product)
   if (row.level === "package") {
-    return summedRollup(
+    const result = summedRollup(
       childCalcs.reduce((s, c) => s + c.qty, 0),
       childCalcs.reduce((s, c) => s + c.clientPrice, 0),
       childCalcs.reduce((s, c) => s + c.cost, 0),
@@ -452,6 +452,11 @@ function rollupCalculate(row) {
       childCalcs.reduce((s, c) => s + c.priorPpp * c.qty, 0),
       childCalcs.reduce((s, c) => s + c.qty, 0)
     );
+    // PPP rolls up additively: package PPP = sum of child PPPs
+    result.ppp = childCalcs.reduce((s, c) => s + c.ppp, 0);
+    result.priorPpp = childCalcs.reduce((s, c) => s + c.priorPpp, 0);
+    result.diff = result.ppp - result.priorPpp;
+    return result;
   }
 
   // Product rows with children: sum child prices — elements price themselves
