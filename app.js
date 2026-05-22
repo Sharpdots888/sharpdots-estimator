@@ -558,6 +558,30 @@ function activeElementsForVisiblePackages() {
   });
 }
 
+// Returns all leaf pricing nodes for visible packages:
+// - element rows (deepest level), OR
+// - leaf product rows (products with no active element children)
+// Used for payment schedule and production-type subtotals.
+function activeLeafRowsForVisiblePackages() {
+  const packageIds = new Set(visiblePackageRows().map((row) => row.id));
+  const activeElementParentIds = new Set(
+    rows.filter((r) => r.level === "element" && r.active).map((r) => r.parentId)
+  );
+  return rows.filter((row) => {
+    if (!row.active || !activeTypes.has(row.type)) return false;
+    if (row.level === "element") {
+      const product = rows.find((r) => r.id === row.parentId);
+      return product?.parentId ? packageIds.has(product.parentId) : false;
+    }
+    if (row.level === "product") {
+      // Leaf product: belongs to a visible package and has no active element children
+      if (!packageIds.has(row.parentId)) return false;
+      return !activeElementParentIds.has(row.id);
+    }
+    return false;
+  });
+}
+
 function syncLookupsFromRow(row) {
   const changes = {
     packages: row.packageName,
@@ -1127,22 +1151,26 @@ function renderFooter(sourceRows) {
   const totals = totalFor(sourceRows);
   els.neededQtyHead.textContent = `${els.estimateYear.value || "Project"} Needed`;
   els.priorPppHead.textContent = `${asNumber(els.estimateYear.value) - 1 || "Previous"} PPP`;
-  els.footerInventoryQty.textContent = Math.round(totals.inventoryQty).toLocaleString();
-  els.footerNeededQty.textContent = Math.round(totals.neededQty).toLocaleString();
-  els.footerQtyToOrder.textContent = Math.round(totals.qtyToOrder).toLocaleString();
-  els.footerClientQoh.textContent = Math.round(totals.clientQoh).toLocaleString();
-  els.footerQty.textContent = Math.round(totals.qty).toLocaleString();
+  // Quantity columns — not shown in footer
+  els.footerInventoryQty.textContent = "";
+  els.footerNeededQty.textContent = "";
+  els.footerQtyToOrder.textContent = "";
+  els.footerClientQoh.textContent = "";
+  els.footerQty.textContent = "";
+  els.footerPerPieceCost.textContent = "";
+  // Dollar totals
   els.footerCost.textContent = money(totals.cost, 2);
-  els.footerPerPieceCost.textContent = money(totals.qtyToOrder ? totals.perPieceCostValue / totals.qtyToOrder : 0, 2);
   els.footerStdMarkup.textContent = money(totals.standardPrice, 2);
   els.footerMargin.textContent = money(totals.margin, 2);
   els.footerClient.textContent = money(totals.client, 2);
-  els.footerPpp.textContent = money(totals.qty ? totals.client / totals.qty : 0, 2);
-  els.footerDiff.textContent = money(totals.qty ? totals.diffValue / totals.qty : 0, 2);
+  // PPP and Diff — sum of package-level values (additive, matching package rollup)
+  const packageCalcs = sourceRows.map(calculate);
+  els.footerPpp.textContent = money(packageCalcs.reduce((s, c) => s + c.ppp, 0), 2);
+  els.footerDiff.textContent = money(packageCalcs.reduce((s, c) => s + c.diff, 0), 2);
 }
 
 function renderPrintTypeSubtotals() {
-  const totals = activeElementsForVisiblePackages()
+  const totals = activeLeafRowsForVisiblePackages()
     .reduce(
       (memo, row) => {
         const type = row.type || "MP";
@@ -1190,7 +1218,7 @@ function renderRollup() {
 }
 
 function paymentTotalsByType() {
-  return activeElementsForVisiblePackages()
+  return activeLeafRowsForVisiblePackages()
     .reduce(
       (memo, row) => {
         const type = row.type || "MP";
