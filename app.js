@@ -192,6 +192,7 @@ const els = {
   resetBtn: document.querySelector("#resetBtn"),
   exportBtn: document.querySelector("#exportBtn"),
   pdfBtn: document.querySelector("#pdfBtn"),
+  pdfScope: document.querySelector("#pdfScope"),
   estimateDate: document.querySelector("#estimateDate"),
   clientTotal: document.querySelector("#clientTotal"),
   costTotal: document.querySelector("#costTotal"),
@@ -244,6 +245,13 @@ function money(value, digits = 0) {
 
 function decimal(value, digits = 3) {
   return (Number.isFinite(value) ? value : 0).toFixed(digits);
+}
+
+function formatNumberForReport(value, digits = 0) {
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits
+  }).format(asNumber(value));
 }
 
 function escapeHtml(value) {
@@ -1041,6 +1049,7 @@ function renderRows() {
     tr.classList.toggle("element-row", row.level === "element");
     tr.classList.toggle("rollup-source", row.level !== "element" && childrenOf(row).some((child) => child.active));
     tr.dataset.level = row.level;
+    tr.dataset.id = row.id;
     const dragHandle = fragment.querySelector(".drag-handle");
     dragHandle.draggable = true;
     dragHandle.addEventListener("dragstart", (event) => {
@@ -1132,10 +1141,10 @@ function renderRows() {
     fragment.querySelector(".margin-dollars").textContent = money(calc.marginDollars, 2);
     fragment.querySelector(".standard-price").textContent = money(calc.standardPrice, 2);
     fragment.querySelector(".client-price").textContent = money(calc.clientPrice, 2);
-    fragment.querySelector(".ppp").textContent = money(calc.ppp, 2);
+    fragment.querySelector(".ppp").textContent = money(calc.ppp, 3);
 
     const diff = fragment.querySelector(".diff");
-    diff.textContent = money(calc.diff, 2);
+    diff.textContent = money(calc.diff, 3);
     diff.classList.toggle("negative", calc.diff < 0);
     diff.classList.toggle("positive", calc.diff > 0);
 
@@ -1719,13 +1728,17 @@ function exportCsv() {
   });
 
   const csv = lines.map((line) => line.map((value) => `"${String(value ?? "").replaceAll('"', '""')}"`).join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
+  const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `${els.projectName.value || "estimate"}-${els.estimateYear.value || "year"}.csv`;
+  link.download = `${(els.projectName.value || "estimate").replace(/[^\w-]+/g, "-")}-${els.estimateYear.value || "year"}.csv`;
+  link.style.display = "none";
+  document.body.append(link);
   link.click();
-  URL.revokeObjectURL(url);
+  link.remove();
+  setSaveStatus("CSV exported");
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 function saveLookup() {
@@ -1748,6 +1761,58 @@ function saveLookup() {
   els.lookupValue.value = "";
   delete els.lookupValue.dataset.editing;
   render();
+}
+
+let printInputState = [];
+
+function setPrintInputValue(input, formattedValue) {
+  printInputState.push({
+    input,
+    type: input.type,
+    value: input.value,
+    step: input.getAttribute("step")
+  });
+  input.type = "text";
+  input.value = formattedValue;
+}
+
+function prepareReportPrint() {
+  printInputState = [];
+  document.querySelectorAll("#lineItems tr").forEach((tr) => {
+    const row = rows.find((candidate) => candidate.id === tr.dataset.id);
+    if (!row) return;
+    const calc = calculate(row);
+    const isPackage = row.level === "package";
+    const formats = [
+      [".inventory-input", isPackage ? "" : formatNumberForReport(calc.inventoryQty, 0)],
+      [".needed-input", isPackage ? "" : formatNumberForReport(calc.neededQty, 0)],
+      [".cost-input", money(calc.cost, 2)],
+      [".client-qoh-input", isPackage ? "" : formatNumberForReport(calc.clientQoh, 0)],
+      [".prior-input", money(calc.priorPpp, 3)]
+    ];
+    formats.forEach(([selector, value]) => {
+      const input = tr.querySelector(selector);
+      if (input) setPrintInputValue(input, value);
+    });
+  });
+}
+
+function restoreReportPrint() {
+  printInputState.forEach(({ input, type, value, step }) => {
+    input.type = type;
+    input.value = value;
+    if (step === null) input.removeAttribute("step");
+    else input.setAttribute("step", step);
+  });
+  printInputState = [];
+  document.body.classList.remove("report-print-costs", "report-print-schedule", "report-print-both");
+}
+
+function printReport() {
+  const scope = els.pdfScope.value || "both";
+  document.body.classList.remove("report-print-costs", "report-print-schedule", "report-print-both");
+  document.body.classList.add(`report-print-${scope}`);
+  window.print();
 }
 
 els.searchInput.addEventListener("input", render);
@@ -1797,7 +1862,9 @@ els.addPackageBtn.addEventListener("click", addPackage);
 els.addProductBtn.addEventListener("click", addProduct);
 els.addElementBtn.addEventListener("click", addElement);
 els.exportBtn.addEventListener("click", exportCsv);
-els.pdfBtn.addEventListener("click", () => window.print());
+els.pdfBtn.addEventListener("click", printReport);
+window.addEventListener("beforeprint", prepareReportPrint);
+window.addEventListener("afterprint", restoreReportPrint);
 els.resetBtn.addEventListener("click", async () => {
   await fetchAndApplySeed();
   rows = structuredClone(seedRows);

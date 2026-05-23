@@ -89,6 +89,7 @@ button:hover {
   display: grid;
   gap: 4px;
   flex: 1;
+  min-width: 0;
 }
 
 .project-meta-grid {
@@ -113,6 +114,7 @@ button:hover {
 }
 
 .project-title-input {
+  width: 100%;
   max-width: 720px;
   border: 0;
   border-radius: 0;
@@ -146,21 +148,39 @@ button:hover {
 }
 
 .top-actions {
-  gap: 10px;
-  flex-wrap: wrap;
+  flex: 0 0 auto;
+  gap: 6px;
+  flex-wrap: nowrap;
   justify-content: flex-end;
 }
 
+.pdf-scope {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: max-content;
+  min-height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 0 26px 0 8px;
+  color: var(--ink);
+  background: #ffffff;
+  font-size: 0.84rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
 .estimate-save-status {
+  flex: 0 0 auto;
   align-self: center;
   color: var(--muted);
   border: 1px solid transparent;
   border-radius: 999px;
-  padding: 5px 10px;
+  padding: 5px 6px;
   font-size: 0.78rem;
   font-weight: 800;
-  min-width: 148px;
+  min-width: 86px;
   text-align: right;
+  white-space: nowrap;
 }
 
 .estimate-save-status.success {
@@ -1082,7 +1102,7 @@ td select {
 
 @media print {
   @page {
-    size: letter landscape;
+    size: 11in 8.5in;
     margin: 0.34in;
   }
 
@@ -1092,7 +1112,7 @@ td select {
 
   .app-shell {
     width: 100%;
-    padding: 0.74in 0 0;
+    padding: 0.8in 0 0;
   }
 
   * {
@@ -1102,7 +1122,7 @@ td select {
 
   .topbar {
     position: fixed;
-    inset: 0.12in 0.34in auto;
+    inset: 0.12in 0 auto;
     display: grid;
     grid-template-columns: minmax(0, 1fr) 1.55in;
     align-items: start;
@@ -1224,7 +1244,7 @@ td select {
     width: 100%;
     min-width: 0;
     table-layout: fixed;
-    font-size: 8.2px;
+    font-size: 7.8px;
     border-spacing: 0;
     border-collapse: collapse;
     print-color-adjust: exact;
@@ -1258,8 +1278,14 @@ td select {
     color: #ffffff !important;
     background: #000000 !important;
     background-color: #000000 !important;
-    font-size: 7.5px;
+    font-size: 7.2px;
     font-weight: 800;
+    line-height: 1.08;
+    max-width: none;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    word-break: normal;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
@@ -1283,74 +1309,88 @@ td select {
     display: none !important;
   }
 
-  th:nth-child(2),
-  td:nth-child(2) {
-    width: 15%;
+  td:nth-child(3),
+  th:nth-child(3),
+  td:nth-child(6),
+  th:nth-child(6),
+  td:nth-child(8),
+  th:nth-child(8),
+  td:nth-child(9),
+  th:nth-child(9),
+  td:nth-child(10),
+  th:nth-child(10) {
+    display: none !important;
   }
 
-  th:nth-child(3),
-  td:nth-child(3) {
-    width: 15%;
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 31%;
+    max-width: none;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    word-break: normal;
   }
 
   th:nth-child(4),
   td:nth-child(4) {
-    width: 3.5%;
+    width: 24%;
+    max-width: none;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    word-break: normal;
   }
 
   th:nth-child(5),
   td:nth-child(5) {
-    width: 5.4%;
+    width: 6%;
+    text-align: center;
   }
 
-  th:nth-child(6),
-  td:nth-child(6) {
-    width: 5.8%;
+  td:nth-child(5) input,
+  td:nth-child(5) select {
+    text-align: center;
   }
 
   th:nth-child(7),
   td:nth-child(7) {
-    width: 5.8%;
-  }
-
-  th:nth-child(8),
-  td:nth-child(8) {
-    width: 5.8%;
-  }
-
-  th:nth-child(9),
-  td:nth-child(9) {
-    width: 5.6%;
-  }
-
-  th:nth-child(10),
-  td:nth-child(10) {
-    width: 5%;
+    width: 8%;
   }
 
   th:nth-child(11),
   td:nth-child(11) {
-    width: 6.2%;
+    width: 7%;
+  }
+
+  th:nth-child(12),
+  td:nth-child(12) {
+    width: 8%;
   }
 
   th:nth-child(16),
   td:nth-child(16) {
-    width: 7.1%;
+    width: 0;
   }
 
   th:nth-child(17),
   td:nth-child(17) {
-    width: 4.8%;
+    width: 8%;
   }
 
   th:nth-child(18),
   td:nth-child(18) {
-    width: 5.2%;
+    width: 5%;
   }
 
   th:nth-child(19),
   td:nth-child(19) {
-    width: 5.3%;
+    width: 6%;
+  }
+
+  th:nth-child(20),
+  td:nth-child(20) {
+    width: 7%;
   }
 
   .tree-cell {
@@ -1387,24 +1427,43 @@ td select {
   .payment-schedule {
     max-height: none;
     overflow: visible;
-    gap: 2px;
+    gap: 1px;
+  }
+
+  .payment-panel {
+    break-before: page;
+    padding-top: 0.66in;
+  }
+
+  body.report-print-costs .payment-panel {
+    display: none !important;
+  }
+
+  body.report-print-schedule .workspace {
+    display: none !important;
+  }
+
+  body.report-print-schedule .payment-panel {
+    break-before: auto;
+    padding-top: 0;
   }
 
   .payment-type-heading,
   .payment-row {
-    grid-template-columns: 1.45in 1in 1.05in;
+    grid-template-columns: 1.25in 0.9in 0.95in;
     justify-content: start;
     min-height: 0;
     border: 0;
     border-radius: 0;
-    padding: 2px 4px;
+    padding: 1px 3px;
+    font-size: 8px;
     color: #111111;
     background: #ffffff;
     column-gap: 0.1in;
   }
 
   .payment-type-heading {
-    margin-top: 5px;
+    margin-top: 3px;
     color: #111111 !important;
     background: #d9d9d9 !important;
     background-color: #d9d9d9 !important;
@@ -1415,7 +1474,7 @@ td select {
 
   .payment-row small {
     display: inline;
-    margin-left: 8px;
+    margin-left: 5px;
   }
 
   .print-type-subtotals {
@@ -1449,14 +1508,16 @@ td select {
   }
 
   .type-input {
-    font-size: 7.5px;
+    width: 100%;
+    font-size: 7.2px;
     font-weight: 700;
     text-align: center;
+    text-align-last: center;
   }
 
   .payment-row input {
-    width: 1in;
-    font-size: 8.5px;
+    width: 0.88in;
+    font-size: 7.5px;
   }
 }
 
