@@ -158,11 +158,45 @@ let activeTypes = new Set(Object.keys(typeLabels));
 let expanded = new Set(seedRows.filter((row) => row.level !== "element").map((row) => row.id));
 let draggedRowId = null;
 let paymentDates = {};
-let paymentSettings = Object.fromEntries(Object.keys(typeLabels).map((type) => [type, { depositPct: 0.25, paymentCount: 3 }]));
+function defaultPaymentSettings() {
+  return Object.fromEntries(Object.keys(typeLabels).map((type) => [type, { depositCount: 1, depositPct: 0.25, paymentCount: 3 }]));
+}
+
+function paymentSettingFor(type) {
+  const settings = paymentSettings[type] || {};
+  return {
+    depositCount: Math.min(Math.max(Math.round(asNumber(settings.depositCount ?? 1)), 0), 1),
+    depositPct: Math.min(Math.max(asNumber(settings.depositPct ?? 0.25), 0), 1),
+    paymentCount: Math.min(Math.max(Math.round(asNumber(settings.paymentCount ?? 3)), 0), 12)
+  };
+}
+
+let paymentSettings = defaultPaymentSettings();
 let estimatesList = [];
 let clientsList = [];
+let activeView = "estimateView";
+
+function defaultProposal() {
+  return {
+    title: "Proposal for Client",
+    subtitle: "Direct Mail Campaign",
+    preparedFor: "",
+    pricingMode: "package",
+    overview: "This campaign is designed to replace guesswork with a clear, trackable plan. The estimate below turns the selected package structure into proposal-ready pricing.",
+    audience: "Target audience, geography, quantity assumptions, and campaign scope can be summarized here before final production counts are locked.",
+    deliverables: "Included deliverables are generated from the active estimating grid. Use the pricing section to review package rollups, detailed line items, or production type summaries.",
+    valueNarrative: "The meaningful cost is the investment required to acquire and serve the right lead, customer, or recipient. Pricing should be evaluated against the expected return from each successful response.",
+    nextSteps: "1. Review the campaign scope and pricing.\n2. Confirm any list, artwork, quantity, and schedule details.\n3. Approve the proposal so final numbers and production timing can be completed.",
+    terms: "This proposal is based on the current project scope and may be refined as details are confirmed. Changes outside the approved scope may affect pricing, schedule, or required approvals."
+  };
+}
+
+let proposal = defaultProposal();
 
 const els = {
+  appTabs: document.querySelectorAll(".app-tab"),
+  estimateView: document.querySelector("#estimateView"),
+  proposalView: document.querySelector("#proposalView"),
   projectNumber: document.querySelector("#projectNumber"),
   reportProjectTitle: document.querySelector("#reportProjectTitle"),
   reportProjectNumber: document.querySelector("#reportProjectNumber"),
@@ -231,7 +265,32 @@ const els = {
   productLookup: document.querySelector("#productLookup"),
   elementLookup: document.querySelector("#elementLookup"),
   clientLookup: document.querySelector("#clientLookup"),
-  yearLookup: document.querySelector("#yearLookup")
+  yearLookup: document.querySelector("#yearLookup"),
+  proposalTitle: document.querySelector("#proposalTitle"),
+  proposalSubtitle: document.querySelector("#proposalSubtitle"),
+  proposalPreparedFor: document.querySelector("#proposalPreparedFor"),
+  proposalPricingMode: document.querySelector("#proposalPricingMode"),
+  proposalOverview: document.querySelector("#proposalOverview"),
+  proposalAudience: document.querySelector("#proposalAudience"),
+  proposalDeliverables: document.querySelector("#proposalDeliverables"),
+  proposalValueNarrative: document.querySelector("#proposalValueNarrative"),
+  proposalNextSteps: document.querySelector("#proposalNextSteps"),
+  proposalTerms: document.querySelector("#proposalTerms"),
+  proposalPreviewTitle: document.querySelector("#proposalPreviewTitle"),
+  proposalPreviewSubtitle: document.querySelector("#proposalPreviewSubtitle"),
+  proposalPreviewPreparedFor: document.querySelector("#proposalPreviewPreparedFor"),
+  proposalPreviewProject: document.querySelector("#proposalPreviewProject"),
+  proposalPreviewDate: document.querySelector("#proposalPreviewDate"),
+  proposalPreviewOverview: document.querySelector("#proposalPreviewOverview"),
+  proposalPreviewAudience: document.querySelector("#proposalPreviewAudience"),
+  proposalPreviewDeliverables: document.querySelector("#proposalPreviewDeliverables"),
+  proposalPreviewValueNarrative: document.querySelector("#proposalPreviewValueNarrative"),
+  proposalPreviewNextSteps: document.querySelector("#proposalPreviewNextSteps"),
+  proposalPreviewTerms: document.querySelector("#proposalPreviewTerms"),
+  proposalPricingNote: document.querySelector("#proposalPricingNote"),
+  proposalPricingTotal: document.querySelector("#proposalPricingTotal"),
+  proposalPricingSummary: document.querySelector("#proposalPricingSummary"),
+  proposalPricingLines: document.querySelector("#proposalPricingLines")
 };
 
 function money(value, digits = 0) {
@@ -262,6 +321,10 @@ function escapeHtml(value) {
     '"': "&quot;",
     "'": "&#39;"
   })[char]);
+}
+
+function textWithBreaks(value) {
+  return escapeHtml(value || "").replace(/\n/g, "<br>");
 }
 
 function asNumber(value) {
@@ -588,6 +651,187 @@ function activeLeafRowsForVisiblePackages() {
     }
     return false;
   });
+}
+
+function activeLeafRowsForProposal() {
+  const activeElementParentIds = new Set(
+    rows.filter((row) => row.level === "element" && row.active).map((row) => row.parentId)
+  );
+  return rows.filter((row) => {
+    if (!row.active || !row.type) return false;
+    if (row.level === "element") return true;
+    return row.level === "product" && !activeElementParentIds.has(row.id);
+  });
+}
+
+function proposalTotals() {
+  const activePackages = packageRows().filter((row) => row.active);
+  const totals = totalFor(activePackages);
+  return {
+    ...totals,
+    packageCount: activePackages.length,
+    lineCount: activeLeafRowsForProposal().length,
+    weightedPpp: totals.qty ? totals.client / totals.qty : 0
+  };
+}
+
+function ensureProposalDefaults() {
+  const client = els.clientName.value.trim();
+  const projectName = els.projectName.value.trim();
+  if (!proposal.preparedFor && client) proposal.preparedFor = client;
+  if ((!proposal.title || proposal.title === "Proposal for Client") && client) proposal.title = `Proposal for ${client}`;
+  if (!proposal.subtitle && projectName) proposal.subtitle = projectName;
+}
+
+function setProposalEditorValues() {
+  ensureProposalDefaults();
+  [
+    [els.proposalTitle, "title"],
+    [els.proposalSubtitle, "subtitle"],
+    [els.proposalPreparedFor, "preparedFor"],
+    [els.proposalPricingMode, "pricingMode"],
+    [els.proposalOverview, "overview"],
+    [els.proposalAudience, "audience"],
+    [els.proposalDeliverables, "deliverables"],
+    [els.proposalValueNarrative, "valueNarrative"],
+    [els.proposalNextSteps, "nextSteps"],
+    [els.proposalTerms, "terms"]
+  ].forEach(([input, key]) => {
+    if (input && document.activeElement !== input) input.value = proposal[key] || "";
+  });
+}
+
+function proposalLineName(row) {
+  if (row.level === "package") return row.packageName;
+  if (row.level === "product") return row.product;
+  return row.element || row.product;
+}
+
+function proposalPricingRows() {
+  if (proposal.pricingMode === "detail") {
+    return activeLeafRowsForProposal()
+      .sort((a, b) => a.packageName.localeCompare(b.packageName) || proposalLineName(a).localeCompare(proposalLineName(b)))
+      .map((row) => {
+        const calc = calculate(row);
+        return {
+          name: proposalLineName(row),
+          context: [row.packageName, row.sku, row.type && typeLabels[row.type]].filter(Boolean).join(" / "),
+          qty: calc.qty,
+          unit: calc.qty ? calc.clientPrice / calc.qty : calc.clientPrice,
+          total: calc.clientPrice
+        };
+      });
+  }
+
+  if (proposal.pricingMode === "type") {
+    const totals = activeLeafRowsForProposal().reduce((memo, row) => {
+      const type = row.type || "MP";
+      if (!memo[type]) memo[type] = { qty: 0, total: 0, count: 0 };
+      const calc = calculate(row);
+      memo[type].qty += calc.qty;
+      memo[type].total += calc.clientPrice;
+      memo[type].count += 1;
+      return memo;
+    }, {});
+    return Object.entries(totals)
+      .filter(([, total]) => total.total)
+      .map(([type, total]) => ({
+        name: `${type} - ${typeLabels[type] || "Production"}`,
+        context: `${total.count} active line item${total.count === 1 ? "" : "s"}`,
+        qty: total.qty,
+        unit: total.qty ? total.total / total.qty : total.total,
+        total: total.total
+      }));
+  }
+
+  return packageRows()
+    .filter((row) => row.active)
+    .sort((a, b) => a.sourceOrder - b.sourceOrder)
+    .map((row) => {
+      const calc = calculate(row);
+      const childCount = descendantsOf(row).filter((child) => child.active && (child.level === "element" || child.level === "product")).length;
+      return {
+        name: row.packageName,
+        context: row.description || `${childCount} active component${childCount === 1 ? "" : "s"}`,
+        qty: calc.qty,
+        unit: calc.qty ? calc.clientPrice / calc.qty : calc.clientPrice,
+        total: calc.clientPrice
+      };
+    });
+}
+
+function renderProposalPricing() {
+  const totals = proposalTotals();
+  const rowsForPricing = proposalPricingRows();
+  const modeLabels = {
+    package: "Active package rows from the estimate grid",
+    detail: "Active product and element rows from the estimate grid",
+    type: "Active line items grouped by production type"
+  };
+  els.proposalPricingNote.textContent = modeLabels[proposal.pricingMode] || modeLabels.package;
+  els.proposalPricingTotal.textContent = money(totals.client, 0);
+  els.proposalPricingSummary.innerHTML = `
+    <div><span>Total</span><strong>${money(totals.client, 2)}</strong></div>
+    <div><span>Quantity</span><strong>${Math.round(totals.qty).toLocaleString()}</strong></div>
+    <div><span>Weighted PPP</span><strong>${money(totals.weightedPpp, 3)}</strong></div>
+    <div><span>Packages</span><strong>${totals.packageCount}</strong></div>
+  `;
+
+  if (!rowsForPricing.length) {
+    els.proposalPricingLines.innerHTML = `<div class="proposal-empty">No active pricing rows yet.</div>`;
+    return;
+  }
+
+  els.proposalPricingLines.innerHTML = `
+    <div class="proposal-line header">
+      <span>Item</span>
+      <span>Qty</span>
+      <span>Unit</span>
+      <span>Total</span>
+    </div>
+    ${rowsForPricing.map((row) => `
+      <div class="proposal-line">
+        <span><strong>${escapeHtml(row.name)}</strong><small>${escapeHtml(row.context)}</small></span>
+        <span>${Math.round(row.qty).toLocaleString()}</span>
+        <span>${money(row.unit, 3)}</span>
+        <span>${money(row.total, 2)}</span>
+      </div>
+    `).join("")}
+  `;
+}
+
+function renderProposalPreview() {
+  if (!els.proposalView) return;
+  ensureProposalDefaults();
+  els.proposalPreviewTitle.textContent = proposal.title || "Proposal";
+  els.proposalPreviewSubtitle.textContent = proposal.subtitle || els.projectName.value || "";
+  els.proposalPreviewPreparedFor.textContent = proposal.preparedFor || els.clientName.value || "Client";
+  els.proposalPreviewProject.textContent = els.projectName.value || "Untitled Project";
+  els.proposalPreviewDate.textContent = els.estimateDate.textContent || new Date().toLocaleDateString();
+  els.proposalPreviewOverview.innerHTML = textWithBreaks(proposal.overview);
+  els.proposalPreviewAudience.innerHTML = textWithBreaks(proposal.audience);
+  els.proposalPreviewDeliverables.innerHTML = textWithBreaks(proposal.deliverables);
+  els.proposalPreviewValueNarrative.innerHTML = textWithBreaks(proposal.valueNarrative);
+  els.proposalPreviewNextSteps.innerHTML = textWithBreaks(proposal.nextSteps);
+  els.proposalPreviewTerms.innerHTML = textWithBreaks(proposal.terms);
+  renderProposalPricing();
+}
+
+function renderProposal() {
+  setProposalEditorValues();
+  renderProposalPreview();
+}
+
+function setActiveView(viewId) {
+  activeView = viewId;
+  [els.estimateView, els.proposalView].forEach((view) => {
+    if (!view) return;
+    const isActive = view.id === viewId;
+    view.hidden = !isActive;
+    view.classList.toggle("active-view", isActive);
+  });
+  els.appTabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.view === viewId));
+  if (viewId === "proposalView") renderProposal();
 }
 
 function syncLookupsFromRow(row) {
@@ -1390,50 +1634,110 @@ function renderStackedComparisonChart(items, selectedMetrics, note) {
 function renderPayments() {
   const totalsByType = paymentTotalsByType();
   els.paymentSchedule.innerHTML = "";
+  const printRows = [];
   Object.entries(totalsByType).forEach(([type, total]) => {
-    if (!total) return;
-    const settings = paymentSettings[type] || { depositPct: 0.25, paymentCount: 3 };
-    const depositPct = Math.min(Math.max(asNumber(settings.depositPct), 0), 1);
-    const paymentCount = Math.max(Math.round(asNumber(settings.paymentCount)), 1);
+    const settings = paymentSettingFor(type);
+    const depositCount = settings.depositCount;
+    const depositPct = settings.depositPct;
+    const paymentCount = settings.paymentCount;
+    const balancePct = depositCount ? 1 - depositPct : 1;
     const header = document.createElement("div");
     header.className = "payment-type-heading";
+    header.classList.toggle("no-payment-rows", depositCount === 0 && paymentCount === 0);
     header.innerHTML = `
-      <strong>${type} - ${typeLabels[type]} Total</strong>
-      <label class="payment-header-control internal-col">Deposit % <input class="deposit-setting" type="number" min="0" max="100" step="5" value="${decimal(depositPct * 100, 0)}" /></label>
-      <label class="payment-header-control internal-col">Balance <input class="count-setting" type="number" min="1" max="12" step="1" value="${paymentCount}" /></label>
+      <strong class="payment-type-name">${type} - ${typeLabels[type]} Total</strong>
+      <div class="payment-header-controls internal-col">
+        <label class="payment-header-control">Deposit <input class="deposit-count-setting" type="number" min="0" max="1" step="1" value="${depositCount}" /></label>
+        <label class="payment-header-control">Deposit % <input class="deposit-setting" type="number" min="0" max="100" step="5" value="${decimal(depositPct * 100, 0)}" /></label>
+        <label class="payment-header-control">Balance <input class="count-setting" type="number" min="0" max="12" step="1" value="${paymentCount}" /></label>
+      </div>
       <span>${money(total, 0)}</span>
     `;
+    header.querySelector(".deposit-count-setting").addEventListener("change", (event) => {
+      paymentSettings[type] = {
+        ...paymentSettingFor(type),
+        depositCount: Math.min(Math.max(Math.round(asNumber(event.target.value)), 0), 1)
+      };
+      renderPayments();
+    });
     header.querySelector(".deposit-setting").addEventListener("change", (event) => {
       paymentSettings[type] = {
-        ...paymentSettings[type],
+        ...paymentSettingFor(type),
         depositPct: Math.min(Math.max(asNumber(event.target.value) / 100, 0), 1)
       };
       renderPayments();
     });
     header.querySelector(".count-setting").addEventListener("change", (event) => {
       paymentSettings[type] = {
-        ...paymentSettings[type],
-        paymentCount: Math.max(Math.round(asNumber(event.target.value)), 1)
+        ...paymentSettingFor(type),
+        paymentCount: Math.min(Math.max(Math.round(asNumber(event.target.value)), 0), 12)
       };
       renderPayments();
     });
     els.paymentSchedule.append(header);
-    const entries = [["Deposit", total * depositPct, `${decimal(depositPct * 100, 0)}%`], ...Array.from({ length: paymentCount }, (_, index) => [`Balance ${index + 1}`, ((1 - depositPct) * total) / paymentCount, `${decimal((1 - depositPct) * 100 / paymentCount, 1)}%`])];
+    if (!total) return;
+    const entries = [
+      ...Array.from({ length: depositCount }, () => ["Deposit", total * depositPct, `${decimal(depositPct * 100, 0)}%`]),
+      ...Array.from({ length: paymentCount }, (_, index) => [`Balance ${index + 1}`, paymentCount ? (balancePct * total) / paymentCount : 0, paymentCount ? `${decimal((balancePct * 100) / paymentCount, 1)}%` : "0%"])
+    ];
+    let typeBalance = total;
     entries.forEach(([label, amount, note], index) => {
-      const key = `${type}-${index}`;
+      const key = `${type}-${label.toLowerCase().replace(/\s+/g, "-")}`;
+      const legacyDate = depositCount ? paymentDates[`${type}-${index}`] : "";
+      const rowDate = paymentDates[key] || legacyDate || "";
+      typeBalance = Math.max(typeBalance - amount, 0);
+      printRows.push({
+        date: rowDate,
+        type,
+        typeLabel: typeLabels[type],
+        label,
+        note,
+        amount,
+        typeBalance
+      });
       const row = document.createElement("label");
       row.className = "payment-row";
       row.innerHTML = `
         <span><strong>${label}</strong><small>${note}</small></span>
-        <input type="date" value="${paymentDates[key] || ""}" aria-label="${type} ${label} date" />
+        <input type="date" value="${rowDate}" aria-label="${type} ${label} date" />
         <strong>${money(amount, 2)}</strong>
       `;
       row.querySelector("input").addEventListener("change", (event) => {
         paymentDates[key] = event.target.value;
+        renderPayments();
       });
       els.paymentSchedule.append(row);
     });
   });
+  if (printRows.length) {
+    const sortedRows = printRows.sort((a, b) => {
+      if (!a.date && !b.date) return a.type.localeCompare(b.type) || a.label.localeCompare(b.label);
+      if (!a.date) return 1;
+      if (!b.date) return -1;
+      return a.date.localeCompare(b.date) || a.type.localeCompare(b.type) || a.label.localeCompare(b.label);
+    });
+    const printSchedule = document.createElement("div");
+    printSchedule.className = "print-payment-schedule";
+    printSchedule.innerHTML = `
+      <div class="print-payment-row print-payment-head">
+        <span>Date</span>
+        <span>Type</span>
+        <span>Payment</span>
+        <span>Type Balance</span>
+        <span>Amount</span>
+      </div>
+      ${sortedRows.map((row) => `
+        <div class="print-payment-row">
+          <span>${row.date || "TBD"}</span>
+          <span>${row.type} - ${row.typeLabel}</span>
+          <span>${row.label} <small>${row.note}</small></span>
+          <span>${money(row.typeBalance, 2)}</span>
+          <span>${money(row.amount, 2)}</span>
+        </div>
+      `).join("")}
+    `;
+    els.paymentSchedule.append(printSchedule);
+  }
 }
 
 function renderLookupList() {
@@ -1482,6 +1786,7 @@ function render() {
   renderPayments();
   renderPrintTypeSubtotals();
   renderLookupList();
+  renderProposal();
 }
 
 function estimateSearchText(estimate) {
@@ -1554,6 +1859,7 @@ async function saveCurrentEstimate() {
     expanded: Array.from(expanded),
     paymentDates: structuredClone(paymentDates),
     paymentSettings: structuredClone(paymentSettings),
+    proposal: structuredClone(proposal),
     tariffRate: asNumber(els.tariffRate.value),
     globalMarkup: asNumber(els.globalMarkup.value)
   };
@@ -1602,7 +1908,8 @@ async function loadEstimate(summary) {
     activeTypes = new Set(estimate.activeTypes || Object.keys(typeLabels));
     expanded = new Set(estimate.expanded || rows.filter((row) => row.level !== "element").map((row) => row.id));
     paymentDates = structuredClone(estimate.paymentDates || {});
-    paymentSettings = structuredClone(estimate.paymentSettings || Object.fromEntries(Object.keys(typeLabels).map((type) => [type, { depositPct: 0.25, paymentCount: 3 }])));
+    paymentSettings = structuredClone(estimate.paymentSettings || defaultPaymentSettings());
+    proposal = { ...defaultProposal(), ...(estimate.proposal || {}) };
     closeLoadEstimateDialog();
     render();
     setSaveStatus(`Loaded ${estimate.projectNumber}`);
@@ -1719,7 +2026,20 @@ function addElement() {
   render();
 }
 
-function exportCsv() {
+function downloadCsvInBrowser(csv, filename) {
+  const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.style.display = "none";
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function exportCsv() {
   const headers = ["Level", "Active", "Package", "Product / Service", "Element", "SKU", "Description", "Production Type", "Inventory Qty", "Needed Qty", "Qty to Order", "Cost", "Per Piece Cost", "Client QOH", "Client Order Qty", "Markup", "Margin Adj", "Margin Dollars", "Client Price", "PPP", "Prior PPP", "Difference"];
   const lines = [headers];
   visibleRows().forEach((row) => {
@@ -1728,17 +2048,21 @@ function exportCsv() {
   });
 
   const csv = lines.map((line) => line.map((value) => `"${String(value ?? "").replaceAll('"', '""')}"`).join(",")).join("\n");
-  const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `${(els.projectName.value || "estimate").replace(/[^\w-]+/g, "-")}-${els.estimateYear.value || "year"}.csv`;
-  link.style.display = "none";
-  document.body.append(link);
-  link.click();
-  link.remove();
-  setSaveStatus("CSV exported");
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  const filename = `${(els.projectName.value || "estimate").replace(/[^\w-]+/g, "-")}-${els.estimateYear.value || "year"}.csv`;
+  try {
+    const response = await fetch("/api/export-csv", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ filename, csv: `\uFEFF${csv}` })
+    });
+    if (!response.ok) throw new Error("Save failed");
+    const result = await response.json();
+    setSaveStatus(`Saved to Downloads: ${result.filename}`);
+  } catch (err) {
+    console.warn("Downloads export failed, using browser download:", err);
+    downloadCsvInBrowser(csv, filename);
+    setSaveStatus(`Downloaded: ${filename}`);
+  }
 }
 
 function saveLookup() {
@@ -1815,12 +2139,36 @@ function printReport() {
   window.print();
 }
 
+els.appTabs.forEach((tab) => {
+  tab.addEventListener("click", () => setActiveView(tab.dataset.view || "estimateView"));
+});
+[
+  [els.proposalTitle, "title"],
+  [els.proposalSubtitle, "subtitle"],
+  [els.proposalPreparedFor, "preparedFor"],
+  [els.proposalPricingMode, "pricingMode"],
+  [els.proposalOverview, "overview"],
+  [els.proposalAudience, "audience"],
+  [els.proposalDeliverables, "deliverables"],
+  [els.proposalValueNarrative, "valueNarrative"],
+  [els.proposalNextSteps, "nextSteps"],
+  [els.proposalTerms, "terms"]
+].forEach(([input, key]) => {
+  input.addEventListener("input", () => {
+    proposal[key] = input.value;
+    renderProposalPreview();
+  });
+});
 els.searchInput.addEventListener("input", render);
 els.includeInactive.addEventListener("change", render);
 els.tariffRate.addEventListener("change", render);
 els.estimateYear.addEventListener("change", render);
+els.clientName.addEventListener("input", renderProposalPreview);
 els.projectName.addEventListener("change", syncProjectAssociationFromName);
-els.projectName.addEventListener("input", updateProjectHeader);
+els.projectName.addEventListener("input", () => {
+  updateProjectHeader();
+  renderProposalPreview();
+});
 els.trackingLevel.addEventListener("change", render);
 els.trackingMode.addEventListener("change", renderTracking);
 els.trackingItem.addEventListener("change", renderTracking);
@@ -1881,7 +2229,8 @@ els.resetBtn.addEventListener("click", async () => {
   els.globalMarkup.value = "0.40";
   els.tariffRate.value = "0.30";
   paymentDates = {};
-  paymentSettings = Object.fromEntries(Object.keys(typeLabels).map((type) => [type, { depositPct: 0.25, paymentCount: 3 }]));
+  paymentSettings = defaultPaymentSettings();
+  proposal = defaultProposal();
   render();
 });
 els.applyMarkupBtn.addEventListener("click", () => {

@@ -34,6 +34,12 @@
         </div>
       </header>
 
+      <nav class="app-tabs" aria-label="Estimating app sections">
+        <button class="app-tab active" type="button" data-view="estimateView">Estimate</button>
+        <button class="app-tab" type="button" data-view="proposalView">Proposal</button>
+      </nav>
+
+      <section id="estimateView" class="app-view active-view">
       <section class="summary-grid" aria-label="Estimate summary">
         <article class="metric">
           <span>Total Client Price</span>
@@ -270,6 +276,130 @@
           </div>
           <div id="yearTracking" class="tracking-table-wrap"></div>
         </article>
+      </section>
+      </section>
+
+      <section id="proposalView" class="app-view proposal-view" hidden>
+        <section class="proposal-layout">
+          <aside class="panel proposal-editor" aria-label="Proposal editor">
+            <div class="section-head">
+              <div>
+                <h2>Proposal Copy</h2>
+                <p>Template-based narrative and pricing setup</p>
+              </div>
+            </div>
+            <label>
+              Proposal Title
+              <input id="proposalTitle" type="text" />
+            </label>
+            <label>
+              Campaign / Offering
+              <input id="proposalSubtitle" type="text" />
+            </label>
+            <label>
+              Prepared For
+              <input id="proposalPreparedFor" type="text" />
+            </label>
+            <label>
+              Pricing View
+              <select id="proposalPricingMode">
+                <option value="package">Package rollup</option>
+                <option value="detail">Detailed line items</option>
+                <option value="type">Production type summary</option>
+              </select>
+            </label>
+            <label>
+              Overview
+              <textarea id="proposalOverview" rows="4"></textarea>
+            </label>
+            <label>
+              Audience / Scope
+              <textarea id="proposalAudience" rows="4"></textarea>
+            </label>
+            <label>
+              Deliverables
+              <textarea id="proposalDeliverables" rows="5"></textarea>
+            </label>
+            <label>
+              Value Narrative
+              <textarea id="proposalValueNarrative" rows="5"></textarea>
+            </label>
+            <label>
+              Next Steps
+              <textarea id="proposalNextSteps" rows="4"></textarea>
+            </label>
+            <label>
+              Terms Summary
+              <textarea id="proposalTerms" rows="5"></textarea>
+            </label>
+          </aside>
+
+          <section class="proposal-preview-wrap" aria-label="Proposal preview">
+            <article class="proposal-page">
+              <header class="proposal-hero">
+                <span>Proposal</span>
+                <h2 id="proposalPreviewTitle"></h2>
+                <p id="proposalPreviewSubtitle"></p>
+                <dl class="proposal-meta-grid">
+                  <div>
+                    <dt>Prepared for</dt>
+                    <dd id="proposalPreviewPreparedFor"></dd>
+                  </div>
+                  <div>
+                    <dt>Project</dt>
+                    <dd id="proposalPreviewProject"></dd>
+                  </div>
+                  <div>
+                    <dt>Date</dt>
+                    <dd id="proposalPreviewDate"></dd>
+                  </div>
+                </dl>
+              </header>
+
+              <section class="proposal-copy-grid">
+                <article>
+                  <h3>Campaign Overview</h3>
+                  <p id="proposalPreviewOverview"></p>
+                </article>
+                <article>
+                  <h3>Audience / Scope</h3>
+                  <p id="proposalPreviewAudience"></p>
+                </article>
+                <article>
+                  <h3>Deliverables</h3>
+                  <p id="proposalPreviewDeliverables"></p>
+                </article>
+                <article>
+                  <h3>The Real Cost</h3>
+                  <p id="proposalPreviewValueNarrative"></p>
+                </article>
+              </section>
+
+              <section class="proposal-pricing-section">
+                <div class="proposal-section-title">
+                  <div>
+                    <h3>Pricing</h3>
+                    <p id="proposalPricingNote"></p>
+                  </div>
+                  <strong id="proposalPricingTotal">$0</strong>
+                </div>
+                <div id="proposalPricingSummary" class="proposal-pricing-summary"></div>
+                <div id="proposalPricingLines" class="proposal-pricing-lines"></div>
+              </section>
+
+              <section class="proposal-copy-grid closing-grid">
+                <article>
+                  <h3>Next Steps</h3>
+                  <p id="proposalPreviewNextSteps"></p>
+                </article>
+                <article>
+                  <h3>Terms Summary</h3>
+                  <p id="proposalPreviewTerms"></p>
+                </article>
+              </section>
+            </article>
+          </section>
+        </section>
       </section>
     </main>
 

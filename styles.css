@@ -59,7 +59,7 @@ button:hover {
 }
 
 .app-shell {
-  width: min(1480px, calc(100vw - 32px));
+  width: min(2528px, calc(100vw - 32px));
   margin: 0 auto;
   padding: 8px 0 20px;
 }
@@ -152,6 +152,32 @@ button:hover {
   gap: 6px;
   flex-wrap: nowrap;
   justify-content: flex-end;
+}
+
+.app-tabs {
+  display: flex;
+  gap: 6px;
+  margin: 4px 0 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.app-tab {
+  min-height: 34px;
+  border-color: transparent;
+  border-radius: 7px 7px 0 0;
+  color: var(--muted);
+  background: transparent;
+  font-weight: 800;
+}
+
+.app-tab.active {
+  color: #ffffff;
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+.app-view[hidden] {
+  display: none;
 }
 
 .pdf-scope {
@@ -830,7 +856,7 @@ td select {
 
 .payment-schedule {
   display: grid;
-  gap: 5px;
+  gap: 3px;
   max-height: 320px;
   overflow: auto;
 }
@@ -868,33 +894,56 @@ td select {
 .payment-row {
   display: grid;
   grid-template-columns: 1fr 122px auto;
-  gap: 8px;
+  gap: 5px;
   align-items: center;
-  min-height: 32px;
+  min-height: 24px;
   border: 1px solid var(--line);
   border-radius: 7px;
-  padding: 5px 8px;
+  padding: 3px 6px;
   background: var(--soft);
 }
 
 .payment-type-heading {
-  grid-template-columns: 1fr minmax(82px, 96px) minmax(82px, 96px) auto;
-  margin-top: 6px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin-top: 3px;
   color: #ffffff;
   border-color: #333333;
   background: #333333;
 }
 
+.payment-type-heading > span {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.payment-type-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.payment-header-controls {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+}
+
 .payment-header-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 2px;
   color: #ffffff;
-  font-size: 0.66rem;
+  font-size: 0.6rem;
+  white-space: nowrap;
 }
 
 .payment-header-control input {
-  min-height: 24px;
+  min-height: 20px;
   border-color: rgba(255, 255, 255, 0.32);
-  padding: 2px 5px;
+  padding: 1px 4px;
   color: #ffffff;
   background: rgba(255, 255, 255, 0.14);
 }
@@ -905,8 +954,219 @@ td select {
 }
 
 .payment-row input {
-  min-height: 28px;
-  padding: 4px 6px;
+  min-height: 22px;
+  padding: 2px 4px;
+}
+
+.print-payment-schedule {
+  display: none;
+}
+
+.proposal-layout {
+  display: grid;
+  grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.proposal-editor {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.proposal-editor textarea {
+  min-height: 92px;
+  line-height: 1.45;
+}
+
+.proposal-preview-wrap {
+  min-width: 0;
+  overflow: auto;
+  max-height: calc(100vh - 128px);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #e7ecef;
+  box-shadow: var(--shadow);
+}
+
+.proposal-page {
+  width: min(980px, calc(100vw - 468px));
+  min-width: 640px;
+  margin: 16px auto;
+  padding: 34px;
+  background: #ffffff;
+  box-shadow: 0 16px 36px rgba(20, 24, 26, 0.12);
+}
+
+.proposal-hero {
+  padding: 26px;
+  color: #ffffff;
+  background: #1b2f3d;
+}
+
+.proposal-hero span {
+  color: #b7d5ed;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.proposal-hero h2 {
+  margin: 8px 0 4px;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 0.98;
+  letter-spacing: 0;
+}
+
+.proposal-hero p {
+  max-width: 700px;
+  margin: 0;
+  color: #dbe7ed;
+  font-size: 1.08rem;
+}
+
+.proposal-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 26px 0 0;
+}
+
+.proposal-meta-grid div {
+  min-width: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.32);
+  padding-top: 9px;
+}
+
+.proposal-meta-grid dt {
+  color: #b7d5ed;
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.proposal-meta-grid dd {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+  font-weight: 800;
+}
+
+.proposal-copy-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  padding: 26px 0 0;
+}
+
+.proposal-copy-grid article {
+  min-width: 0;
+}
+
+.proposal-copy-grid h3,
+.proposal-section-title h3 {
+  margin: 0 0 8px;
+  color: #1b2f3d;
+  font-size: 1rem;
+}
+
+.proposal-copy-grid p,
+.proposal-section-title p {
+  margin: 0;
+  color: #33414a;
+  line-height: 1.55;
+}
+
+.proposal-pricing-section {
+  margin-top: 28px;
+  border-top: 4px solid #1b2f3d;
+  padding-top: 18px;
+}
+
+.proposal-section-title {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.proposal-section-title strong {
+  color: #1b2f3d;
+  font-size: 2rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.proposal-pricing-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.proposal-pricing-summary div {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 10px;
+  background: #f7f9fa;
+}
+
+.proposal-pricing-summary span,
+.proposal-line small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.proposal-pricing-summary strong {
+  display: block;
+  margin-top: 3px;
+  color: #1b2f3d;
+  font-size: 1.05rem;
+}
+
+.proposal-pricing-lines {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+
+.proposal-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 90px 110px 120px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  background: #ffffff;
+  font-variant-numeric: tabular-nums;
+}
+
+.proposal-line.header {
+  color: #ffffff;
+  background: #333333;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.proposal-line span:not(:first-child) {
+  text-align: right;
+}
+
+.proposal-empty {
+  padding: 16px;
+  color: var(--muted);
+  background: #ffffff;
+  font-weight: 800;
+}
+
+.closing-grid {
+  padding-bottom: 4px;
 }
 
 .tracking-controls,
@@ -1059,7 +1319,8 @@ td select {
 @media (max-width: 980px) {
   .summary-grid,
   .lower-grid,
-  .workspace {
+  .workspace,
+  .proposal-layout {
     grid-template-columns: 1fr;
   }
 
@@ -1070,6 +1331,15 @@ td select {
 
   .top-actions {
     justify-content: flex-start;
+  }
+
+  .proposal-preview-wrap {
+    max-height: none;
+  }
+
+  .proposal-page {
+    width: 100%;
+    min-width: 0;
   }
 }
 
@@ -1093,10 +1363,32 @@ td select {
   .payment-grid,
   .control-row,
   .tracking-controls,
-  .lookup-editor {
+  .lookup-editor,
+  .proposal-section-title {
     align-items: stretch;
     grid-template-columns: 1fr;
     flex-direction: column;
+  }
+
+  .proposal-page {
+    padding: 16px;
+  }
+
+  .proposal-hero {
+    padding: 18px;
+  }
+
+  .proposal-meta-grid,
+  .proposal-copy-grid,
+  .proposal-pricing-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .proposal-line {
+    grid-template-columns: minmax(0, 1fr) 64px 78px 90px;
+    gap: 8px;
+    padding: 9px 8px;
+    font-size: 0.82rem;
   }
 }
 
@@ -1136,6 +1428,7 @@ td select {
   }
 
   .top-actions,
+  .app-tabs,
   .summary-grid,
   .control-panel,
   .row-tools,
@@ -1450,6 +1743,56 @@ td select {
 
   .payment-type-heading,
   .payment-row {
+    display: none !important;
+  }
+
+  .print-payment-schedule {
+    display: grid !important;
+    gap: 0;
+    width: 100%;
+    font-size: 9px;
+  }
+
+  .print-payment-row {
+    display: grid;
+    grid-template-columns: 0.85in 1.95in 1.25in 1.15in 1.15in;
+    align-items: center;
+    column-gap: 0.1in;
+    min-height: 0.18in;
+    padding: 2px 4px;
+    color: #111111;
+    background: #ffffff;
+  }
+
+  .print-payment-row:nth-child(even) {
+    background: #f1f3f4 !important;
+  }
+
+  .print-payment-row span:nth-child(4),
+  .print-payment-row span:nth-child(5) {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .print-payment-row small {
+    margin-left: 5px;
+  }
+
+  .print-payment-head {
+    color: #ffffff !important;
+    background: #000000 !important;
+    background-color: #000000 !important;
+    font-weight: 800;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .print-payment-head span {
+    color: #ffffff !important;
+  }
+
+  .payment-type-heading,
+  .payment-row {
     grid-template-columns: 1.25in 0.9in 0.95in;
     justify-content: start;
     min-height: 0;
@@ -1470,6 +1813,10 @@ td select {
     font-weight: 800;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
+  }
+
+  .payment-type-heading.no-payment-rows {
+    display: none !important;
   }
 
   .payment-row small {

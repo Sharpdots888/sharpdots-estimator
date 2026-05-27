@@ -1,9 +1,11 @@
 const http = require("http");
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
 const { Pool } = require("pg");
 
 const port = process.env.PORT || 3000;
+const host = process.env.HOST || (process.env.PORT ? "0.0.0.0" : "127.0.0.1");
 const root = __dirname;
 
 // Strip sslmode from connection string — pg Pool's ssl config handles this explicitly
@@ -33,6 +35,7 @@ const migrations = [
   `ALTER TABLE sfpq_projects ADD COLUMN IF NOT EXISTS lookups JSONB DEFAULT '{}'`,
   `ALTER TABLE sfpq_projects ADD COLUMN IF NOT EXISTS payment_dates JSONB DEFAULT '{}'`,
   `ALTER TABLE sfpq_projects ADD COLUMN IF NOT EXISTS payment_settings JSONB DEFAULT '{}'`,
+  `ALTER TABLE sfpq_projects ADD COLUMN IF NOT EXISTS proposal JSONB DEFAULT '{}'`,
   `ALTER TABLE sfpq_projects ADD COLUMN IF NOT EXISTS tariff_rate NUMERIC DEFAULT 0.30`,
   `ALTER TABLE sfpq_projects ADD COLUMN IF NOT EXISTS global_markup NUMERIC DEFAULT 0.40`,
   // sfpq_project_packages — per-estimate package data
@@ -127,6 +130,29 @@ function collectBody(req) {
 function sendJson(res, status, data) {
   res.writeHead(status, { "Content-Type": "application/json" });
   res.end(JSON.stringify(data));
+}
+
+function safeExportFilename(value) {
+  const base = String(value || "estimate-export.csv")
+    .replace(/[^\w.-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 120);
+  return base.toLowerCase().endsWith(".csv") ? base : `${base || "estimate-export"}.csv`;
+}
+
+async function handleExportCsv(body, res) {
+  const payload = JSON.parse(body || "{}");
+  const csv = typeof payload.csv === "string" ? payload.csv : "";
+  if (!csv.trim()) {
+    sendJson(res, 400, { error: "No CSV content provided" });
+    return;
+  }
+  const downloadsDir = path.join(os.homedir(), "Downloads");
+  const filename = safeExportFilename(payload.filename);
+  const filePath = path.join(downloadsDir, filename);
+  await fs.promises.mkdir(downloadsDir, { recursive: true });
+  await fs.promises.writeFile(filePath, csv, "utf8");
+  sendJson(res, 200, { filename, path: filePath });
 }
 
 async function handleGetEstimates(res) {
@@ -379,6 +405,7 @@ async function handleGetEstimate(key, res) {
     lookups: p.lookups || {},
     paymentDates: p.payment_dates || {},
     paymentSettings: p.payment_settings || {},
+    proposal: p.proposal || {},
     rows: [...pkgRes.rows, ...prodRes.rows, ...elRes.rows]
   });
 }
@@ -393,8 +420,8 @@ async function handlePostEstimate(body, res) {
       `INSERT INTO sfpq_projects
          (project_number, name, client_name, season, status,
           active_package, active_types, expanded, lookups,
-          payment_dates, payment_settings, tariff_rate, global_markup, updated_at)
-       VALUES ($1,$2,$3,$4,'draft',$5,$6,$7,$8,$9,$10,$11,$12,NOW())
+          payment_dates, payment_settings, proposal, tariff_rate, global_markup, updated_at)
+       VALUES ($1,$2,$3,$4,'draft',$5,$6,$7,$8,$9,$10,$11,$12,$13,NOW())
        ON CONFLICT (project_number) DO UPDATE SET
          name              = EXCLUDED.name,
          client_name       = EXCLUDED.client_name,
@@ -405,6 +432,7 @@ async function handlePostEstimate(body, res) {
          lookups           = EXCLUDED.lookups,
          payment_dates     = EXCLUDED.payment_dates,
          payment_settings  = EXCLUDED.payment_settings,
+         proposal          = EXCLUDED.proposal,
          tariff_rate       = EXCLUDED.tariff_rate,
          global_markup     = EXCLUDED.global_markup,
          updated_at        = NOW()
@@ -418,6 +446,7 @@ async function handlePostEstimate(body, res) {
         JSON.stringify(estimate.lookups || {}),
         JSON.stringify(estimate.paymentDates || {}),
         JSON.stringify(estimate.paymentSettings || {}),
+        JSON.stringify(estimate.proposal || {}),
         estimate.tariffRate ?? 0.30,
         estimate.globalMarkup ?? 0.40
       ]
@@ -514,6 +543,9 @@ const server = http.createServer(async (req, res) => {
     } else if (url === "/api/estimates" && method === "POST") {
       const body = await collectBody(req);
       await handlePostEstimate(body, res);
+    } else if (url === "/api/export-csv" && method === "POST") {
+      const body = await collectBody(req);
+      await handleExportCsv(body, res);
     } else if (url.startsWith("/api/estimates/") && method === "GET") {
       const key = decodeURIComponent(url.slice("/api/estimates/".length));
       await handleGetEstimate(key, res);
@@ -555,4 +587,4 @@ const server = http.createServer(async (req, res) => {
 
 runMigrations()
   .catch(err => console.warn("Schema migrations skipped (already applied or insufficient permissions):", err.message))
-  .finally(() => server.listen(port, () => console.log(`Estimator running on port ${port}`)));
+  .finally(() => server.listen(port, host, () => console.log(`Estimator running on http://${host}:${port}`)));
