@@ -37,6 +37,7 @@
       <nav class="app-tabs" aria-label="Estimating app sections">
         <button class="app-tab active" type="button" data-view="estimateView">Estimate</button>
         <button class="app-tab" type="button" data-view="proposalView">Proposal</button>
+        <button class="app-tab" type="button" data-view="servicesView">Services Calculator</button>
       </nav>
 
       <section id="estimateView" class="app-view active-view">
@@ -398,6 +399,114 @@
                 </article>
               </section>
             </article>
+          </section>
+        </section>
+      </section>
+
+      <section id="servicesView" class="app-view services-view" hidden>
+        <section class="services-layout">
+          <aside class="panel services-controls" aria-label="SalesMachine controls">
+            <div class="section-head">
+              <div>
+                <h2>SalesMachine</h2>
+                <p>Omnichannel appointment engine prototype</p>
+              </div>
+            </div>
+            <label>
+              Scenario
+              <select id="serviceScenario">
+                <option value="salesmachine">SalesMachine base + channels</option>
+                <option value="fractional">Fractional sales focus</option>
+                <option value="coldEmail">Cold email + fractional sales</option>
+              </select>
+            </label>
+            <label>
+              Initial Term Months
+              <input id="serviceTermMonths" type="number" min="1" max="12" step="1" value="3" />
+            </label>
+            <label>
+              Ongoing Term Months
+              <input id="serviceOngoingMonths" type="number" min="1" max="36" step="1" value="1" />
+            </label>
+            <fieldset class="service-term-toggle">
+              <legend>Calculation Mode</legend>
+              <label><input name="serviceTermMode" type="radio" value="initial" checked /> Initial term</label>
+              <label><input name="serviceTermMode" type="radio" value="monthly" /> Monthly after initial</label>
+            </fieldset>
+            <label>
+              Target Appointments / Month
+              <input id="serviceAppointments" type="number" min="0" step="1" value="10" />
+            </label>
+            <div class="execution-calculator compact-execution">
+              <label>Dials / Day <input id="execDialsPerDay" type="number" min="0" step="1" value="500" /></label>
+              <label>Days / Week <input id="execDaysPerWeek" type="number" min="0" max="7" step="1" value="5" /></label>
+              <label>Conversations / Day <input id="execConversationsPerDay" type="number" min="0" step="1" value="35" /></label>
+              <label>SETS / Week <input id="execSetsPerWeek" type="number" min="0" step="1" value="8" /></label>
+              <label>Show Rate % <input id="execShowRate" type="number" min="0" max="100" step="1" value="70" /></label>
+              <label>Win Rate % <input id="execWinRate" type="number" min="0" max="100" step="1" value="20" /></label>
+              <div id="executionSummary" class="execution-summary"></div>
+            </div>
+            <label>
+              Startup Markup %
+              <input id="serviceStartupMarkup" type="number" min="0" max="300" step="5" value="50" />
+            </label>
+            <label>
+              Monthly + Variable Markup %
+              <input id="serviceMonthlyMarkup" type="number" min="0" max="300" step="5" value="50" />
+            </label>
+          </aside>
+
+          <section class="services-workspace">
+            <section class="services-summary" aria-label="SalesMachine summary">
+              <article>
+                <span>Activation Price</span>
+                <strong id="serviceActivationPrice">$0</strong>
+              </article>
+              <article>
+                <span>Monthly Price</span>
+                <strong id="serviceMonthlyPrice">$0</strong>
+              </article>
+              <article>
+                <span>Term Price</span>
+                <strong id="serviceTermPrice">$0</strong>
+              </article>
+              <article>
+                <span>Price / Appointment</span>
+                <strong id="serviceAppointmentPrice">$0</strong>
+              </article>
+            </section>
+
+            <section class="panel services-panel">
+              <div class="section-head">
+                <div>
+                  <h2>Service Components</h2>
+                  <p>Services, platforms, assets, reps, and setup/activation</p>
+                </div>
+              </div>
+              <div id="serviceRows" class="service-rows"></div>
+              <datalist id="servicePlatformLookup"></datalist>
+            </section>
+
+            <section class="services-lower">
+              <article class="panel">
+                <div class="section-head">
+                  <div>
+                    <h2>Cost Center Split</h2>
+                    <p>Joint venture execution allocation</p>
+                  </div>
+                </div>
+                <div id="serviceCostCenters" class="service-cost-centers"></div>
+              </article>
+              <article class="panel">
+                <div class="section-head">
+                  <div>
+                    <h2>Assumptions</h2>
+                    <p>Editable later; seeded from spreadsheet examples</p>
+                  </div>
+                </div>
+                <div id="serviceAssumptions" class="service-assumptions"></div>
+              </article>
+            </section>
           </section>
         </section>
       </section>

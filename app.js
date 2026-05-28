@@ -193,6 +193,39 @@ function defaultProposal() {
 
 let proposal = defaultProposal();
 
+const serviceScenarioNames = {
+  salesmachine: "SalesMachine base + channels",
+  fractional: "Fractional sales focus",
+  coldEmail: "Cold email + fractional sales"
+};
+
+const serviceSeedRows = [
+  { id: "base", level: "product", active: true, scenario: "salesmachine", group: "Base Product", item: "SalesMachine base product", platform: "SalesMachine", costCenter: "Sharpdots", costType: "Services", startup: 0, recurring: 0, variable: 0, quantity: 1, variableModel: "monthly", startupMarkup: 50, monthlyMarkup: 50, notes: "Rollup of strategy, copywriting, cold email execution, and campaign management." },
+  { id: "base-strategy", parentId: "base", level: "element", active: true, scenario: "salesmachine", group: "Base Product", item: "Strategy and offer architecture", platform: "SalesMachine", costCenter: "Sharpdots", costType: "Services", startup: 600, recurring: 350, variable: 0, quantity: 1, variableModel: "monthly", startupMarkup: 50, monthlyMarkup: 50, notes: "ICP, offer, sequence strategy, and testing plan." },
+  { id: "base-copy", parentId: "base", level: "element", active: true, scenario: "salesmachine", group: "Base Product", item: "Copywriting and campaign creative", platform: "SalesMachine", costCenter: "Sharpdots", costType: "Assets", startup: 650, recurring: 250, variable: 0, quantity: 1, variableModel: "asset", startupMarkup: 50, monthlyMarkup: 50, notes: "Email copy, LinkedIn variants, voicemail scripts, and landing/message assets." },
+  { id: "base-email", parentId: "base", level: "element", active: true, scenario: "salesmachine", group: "Base Product", item: "Cold email execution", platform: "Smartlead / ThorsHammer / Bison", costCenter: "Sharpdots", costType: "Services", startup: 250, recurring: 700, variable: 0.0012, quantity: 30000, variableModel: "metered", startupMarkup: 50, monthlyMarkup: 50, notes: "Execution labor plus metered sending/list tier model from Apollo/Smartlead examples." },
+  { id: "base-management", parentId: "base", level: "element", active: true, scenario: "salesmachine", group: "Base Product", item: "Campaign management and optimization", platform: "HighLevel / HubSpot", costCenter: "Sharpdots", costType: "Services", startup: 0, recurring: 600, variable: 0, quantity: 1, variableModel: "monthly", startupMarkup: 50, monthlyMarkup: 50, notes: "Ongoing reporting, optimization, and coordination." },
+  { id: "data-standard", level: "product", active: true, scenario: "salesmachine", group: "Data Streams", item: "Standard intent topic datastream", platform: "ZoomInfo", costCenter: "SalesArmy", costType: "Platforms", startup: 1000, recurring: 625, variable: 0.5, quantity: 1, variableModel: "seat/account", startupMarkup: 50, monthlyMarkup: 50, notes: "Sheet model: $625/mo shared account plus per-contact/direct dial style fees." },
+  { id: "data-custom", level: "product", active: true, scenario: "salesmachine", group: "Data Streams", item: "Custom intent topic datastream", platform: "Apollo / Leadpipe / Audience Lab", costCenter: "Sharpdots", costType: "Assets", startup: 1200, recurring: 129, variable: 0.0012, quantity: 30000, variableModel: "metered", startupMarkup: 50, monthlyMarkup: 50, notes: "Use quantity as records, credits, enrichment calls, or cleaned leads depending on source." },
+  { id: "platform-email", level: "product", active: true, scenario: "salesmachine", group: "Platforms", item: "Cold email domains and inbox infrastructure", platform: "Spaceship / Smartlead / Email warmup", costCenter: "SalesArmy", costType: "Platforms", startup: 50, recurring: 250, variable: 0, quantity: 1, variableModel: "monthly", startupMarkup: 50, monthlyMarkup: 50, notes: "Domains, sending platform, and warmup." },
+  { id: "platform-crm", level: "product", active: true, scenario: "salesmachine", group: "Platforms", item: "CRM, scheduling, workflow, and reporting stack", platform: "HighLevel / HubSpot / Calendly / RevReply", costCenter: "Sharpdots", costType: "Platforms", startup: 300, recurring: 279, variable: 0, quantity: 1, variableModel: "monthly", startupMarkup: 50, monthlyMarkup: 50, notes: "CRM, calendar, automation, dashboard, and workflow tools." },
+  { id: "channel-bdr", level: "product", active: false, scenario: "salesmachine", group: "Channels", item: "Fractional business development rep", platform: "LATAM BPO / Deel", costCenter: "SalesArmy", costType: "Fractional Representatives", startup: 2850, recurring: 3260, variable: 0, quantity: 1, variableModel: "rep/month", startupMarkup: 50, monthlyMarkup: 50, notes: "Rep, assessment, recruiting, onboarding, training, coaching." },
+  { id: "channel-dialer", level: "product", active: false, scenario: "salesmachine", group: "Channels", item: "Automated dialing / virtual sales floor", platform: "Koncert / CallBlitz / Aloware / Kixie", costCenter: "SalesArmy", costType: "Platforms", startup: 1220, recurring: 470, variable: 0.06, quantity: 2500, variableModel: "metered", startupMarkup: 50, monthlyMarkup: 50, notes: "Use quantity as dials, call minutes, or metered voice events." },
+  { id: "channel-linkedin", level: "product", active: false, scenario: "salesmachine", group: "Channels", item: "Cold LinkedIn", platform: "HeyReach / GetLia", costCenter: "SalesArmy", costType: "Platforms", startup: 0, recurring: 650, variable: 0, quantity: 1, variableModel: "profiles", startupMarkup: 50, monthlyMarkup: 50, notes: "User licenses, extra profiles, and LinkedIn execution." },
+  { id: "channel-dsp", level: "product", active: false, scenario: "salesmachine", group: "Channels", item: "Programmatic ads for intent stream", platform: "Sharpdots DSP", costCenter: "Sharpdots", costType: "Platforms", startup: 1000, recurring: 1500, variable: 0, quantity: 1, variableModel: "budget", startupMarkup: 50, monthlyMarkup: 50, notes: "Prototype DSP channel tied to intent-stream audiences." },
+  { id: "channel-voicemail", level: "product", active: false, scenario: "salesmachine", group: "Channels", item: "Ringless voicemail", platform: "Drop.co", costCenter: "SalesArmy", costType: "Platforms", startup: 0, recurring: 0, variable: 0.06, quantity: 1000, variableModel: "each", startupMarkup: 50, monthlyMarkup: 50, notes: "Use quantity as voicemail drops." },
+  { id: "setup-workflow", level: "product", active: true, scenario: "salesmachine", group: "Setup / Activation", item: "Campaign build, workflows, integrations, and admin", platform: "SalesMachine / HighLevel / Tableau", costCenter: "Sharpdots", costType: "Setup/Activation", startup: 1500, recurring: 100, variable: 0, quantity: 1, variableModel: "monthly", startupMarkup: 50, monthlyMarkup: 50, notes: "Workflow build, pipeline, integration, data, admin, and dashboard." },
+  { id: "setup-close", level: "product", active: true, scenario: "salesmachine", group: "Setup / Activation", item: "SalesMachine activation package", platform: "SalesArmy", costCenter: "SalesArmy", costType: "Setup/Activation", startup: 1480, recurring: 0, variable: 0, quantity: 1, variableModel: "activation", startupMarkup: 0, monthlyMarkup: 0, notes: "SalesArmy close / activation component." },
+  { id: "frac-rep", level: "product", active: true, scenario: "fractional", group: "Fractional Representatives", item: "Outsourced Sales Rep LATAM (Base +)", platform: "LATAM BPO / Deel", costCenter: "SalesArmy", costType: "Fractional Representatives", startup: 0, recurring: 2500, variable: 0, quantity: 1, variableModel: "rep/month", startupMarkup: 50, monthlyMarkup: 50, notes: "Prorated rep base." },
+  { id: "frac-coach", level: "product", active: true, scenario: "fractional", group: "Fractional Representatives", item: "Sales rep coaching, accountability, onboarding, and training", platform: "SalesArmy", costCenter: "SalesArmy", costType: "Services", startup: 2550, recurring: 1085, variable: 0, quantity: 1, variableModel: "monthly", startupMarkup: 50, monthlyMarkup: 50, notes: "Assessments, onboarding, training, Deel, coaching, recruiting." },
+  { id: "cold-platform", level: "product", active: true, scenario: "coldEmail", group: "Cold Email", item: "Cold email platform and domain stack", platform: "ThorsHammer / Bison / Superwave / Smartlead", costCenter: "SalesArmy", costType: "Platforms", startup: 50, recurring: 350, variable: 0, quantity: 1, variableModel: "monthly", startupMarkup: 50, monthlyMarkup: 50, notes: "Sending infrastructure from sheet examples." },
+  { id: "cold-fulfillment", level: "product", active: true, scenario: "coldEmail", group: "Cold Email", item: "Cold email fulfillment and conversion support", platform: "SalesMachine", costCenter: "Sharpdots", costType: "Services", startup: 500, recurring: 500, variable: 0, quantity: 1, variableModel: "monthly", startupMarkup: 50, monthlyMarkup: 50, notes: "External source rows reassigned to Sharpdots." }
+];
+
+let serviceScenario = "salesmachine";
+let serviceRows = structuredClone(serviceSeedRows);
+let serviceExpanded = new Set(serviceSeedRows.filter((row) => row.level === "product").map((row) => row.id));
+
 const els = {
   appTabs: document.querySelectorAll(".app-tab"),
   estimateView: document.querySelector("#estimateView"),
@@ -290,7 +323,30 @@ const els = {
   proposalPricingNote: document.querySelector("#proposalPricingNote"),
   proposalPricingTotal: document.querySelector("#proposalPricingTotal"),
   proposalPricingSummary: document.querySelector("#proposalPricingSummary"),
-  proposalPricingLines: document.querySelector("#proposalPricingLines")
+  proposalPricingLines: document.querySelector("#proposalPricingLines"),
+  servicesView: document.querySelector("#servicesView"),
+  serviceScenario: document.querySelector("#serviceScenario"),
+  serviceTermMonths: document.querySelector("#serviceTermMonths"),
+  serviceOngoingMonths: document.querySelector("#serviceOngoingMonths"),
+  serviceAppointments: document.querySelector("#serviceAppointments"),
+  serviceStartupMarkup: document.querySelector("#serviceStartupMarkup"),
+  serviceMonthlyMarkup: document.querySelector("#serviceMonthlyMarkup"),
+  serviceRows: document.querySelector("#serviceRows"),
+  servicePlatformLookup: document.querySelector("#servicePlatformLookup"),
+  serviceActivationPrice: document.querySelector("#serviceActivationPrice"),
+  serviceMonthlyPrice: document.querySelector("#serviceMonthlyPrice"),
+  serviceTermPrice: document.querySelector("#serviceTermPrice"),
+  serviceAppointmentPrice: document.querySelector("#serviceAppointmentPrice"),
+  serviceCostCenters: document.querySelector("#serviceCostCenters"),
+  serviceAssumptions: document.querySelector("#serviceAssumptions"),
+  serviceTermModes: document.querySelectorAll("input[name='serviceTermMode']"),
+  execDialsPerDay: document.querySelector("#execDialsPerDay"),
+  execDaysPerWeek: document.querySelector("#execDaysPerWeek"),
+  execConversationsPerDay: document.querySelector("#execConversationsPerDay"),
+  execSetsPerWeek: document.querySelector("#execSetsPerWeek"),
+  execShowRate: document.querySelector("#execShowRate"),
+  execWinRate: document.querySelector("#execWinRate"),
+  executionSummary: document.querySelector("#executionSummary")
 };
 
 function money(value, digits = 0) {
@@ -822,9 +878,259 @@ function renderProposal() {
   renderProposalPreview();
 }
 
+function serviceNormalizeCostCenter(value) {
+  return String(value || "").toLowerCase() === "salesarmy" ? "SalesArmy" : "Sharpdots";
+}
+
+function serviceVisibleRows() {
+  return serviceRows.filter((row) => row.scenario === serviceScenario || row.scenario === "salesmachine");
+}
+
+function serviceChildren(row) {
+  return serviceVisibleRows().filter((candidate) => candidate.parentId === row.id);
+}
+
+function serviceActiveCalcRows() {
+  return serviceVisibleRows().filter((row) => row.active && !serviceChildren(row).some((child) => child.active));
+}
+
+function servicePlatformValues() {
+  return uniqueValues([
+    "SalesMachine",
+    "ZoomInfo",
+    "Apollo",
+    "Leadpipe",
+    "Audience Lab",
+    "Smartlead",
+    "ThorsHammer",
+    "Bison",
+    "Spaceship",
+    "Email warmup",
+    "HighLevel",
+    "HubSpot",
+    "Calendly",
+    "RevReply",
+    "LATAM BPO / Deel",
+    "Koncert",
+    "CallBlitz",
+    "Aloware",
+    "Kixie",
+    "HeyReach",
+    "GetLia",
+    "Sharpdots DSP",
+    "Drop.co",
+    ...serviceRows.map((row) => row.platform)
+  ]);
+}
+
+function serviceCalc(row) {
+  const children = serviceChildren(row).filter((child) => child.active);
+  if (children.length) {
+    return children.reduce(
+      (memo, child) => {
+        const calc = serviceCalc(child);
+        memo.activationCost += calc.activationCost;
+        memo.monthlyCost += calc.monthlyCost;
+        memo.activationPrice += calc.activationPrice;
+        memo.monthlyPrice += calc.monthlyPrice;
+        return memo;
+      },
+      { activationCost: 0, monthlyCost: 0, activationPrice: 0, monthlyPrice: 0 }
+    );
+  }
+  const quantity = Math.max(asNumber(row.quantity), 0);
+  const startup = asNumber(row.startup);
+  const recurring = asNumber(row.recurring);
+  const variable = asNumber(row.variable) * quantity;
+  const startupMarkup = Math.max(asNumber(row.startupMarkup ?? row.markup), 0) / 100;
+  const monthlyMarkup = Math.max(asNumber(row.monthlyMarkup ?? row.markup), 0) / 100;
+  const activationCost = startup;
+  const monthlyCost = recurring + variable;
+  return {
+    activationCost,
+    monthlyCost,
+    activationPrice: activationCost * (1 + startupMarkup),
+    monthlyPrice: monthlyCost * (1 + monthlyMarkup)
+  };
+}
+
+function serviceTermMode() {
+  return document.querySelector("input[name='serviceTermMode']:checked")?.value || "initial";
+}
+
+function executionMetrics() {
+  const dialsPerDay = asNumber(els.execDialsPerDay?.value);
+  const daysPerWeek = asNumber(els.execDaysPerWeek?.value);
+  const conversationsPerDay = asNumber(els.execConversationsPerDay?.value);
+  const setsPerWeek = asNumber(els.execSetsPerWeek?.value);
+  const showRate = asNumber(els.execShowRate?.value) / 100;
+  const winRate = asNumber(els.execWinRate?.value) / 100;
+  const dialsPerWeek = dialsPerDay * daysPerWeek;
+  const conversationsPerWeek = conversationsPerDay * daysPerWeek;
+  const setsPerMonth = setsPerWeek * 4;
+  const meetingsPerMonth = setsPerMonth * showRate;
+  const winsPerMonth = meetingsPerMonth * winRate;
+  return { dialsPerDay, daysPerWeek, conversationsPerDay, dialsPerWeek, conversationsPerWeek, setsPerWeek, setsPerMonth, showRate, meetingsPerMonth, winRate, winsPerMonth };
+}
+
+function updateServiceAppointmentsFromExecution() {
+  if (!els.serviceAppointments) return;
+  els.serviceAppointments.value = decimal(executionMetrics().meetingsPerMonth, 1);
+}
+
+function serviceTotals() {
+  const initialTermMonths = Math.max(Math.round(asNumber(els.serviceTermMonths?.value || 3)), 1);
+  const ongoingTermMonths = Math.max(Math.round(asNumber(els.serviceOngoingMonths?.value || 1)), 1);
+  const termMonths = serviceTermMode() === "monthly" ? ongoingTermMonths : initialTermMonths;
+  const appointments = Math.max(asNumber(els.serviceAppointments?.value || 0), 0);
+  return serviceActiveCalcRows().reduce(
+    (memo, row) => {
+      const calc = serviceCalc(row);
+      const center = serviceNormalizeCostCenter(row.costCenter);
+      memo.activationCost += calc.activationCost;
+      memo.monthlyCost += calc.monthlyCost;
+      memo.activationPrice += calc.activationPrice;
+      memo.monthlyPrice += calc.monthlyPrice;
+      memo.byCenter[center].activationCost += calc.activationCost;
+      memo.byCenter[center].monthlyCost += calc.monthlyCost;
+      memo.byCenter[center].activationPrice += calc.activationPrice;
+      memo.byCenter[center].monthlyPrice += calc.monthlyPrice;
+      memo.byType[row.costType] = memo.byType[row.costType] || { activationCost: 0, monthlyCost: 0, activationPrice: 0, monthlyPrice: 0 };
+      memo.byType[row.costType].activationCost += calc.activationCost;
+      memo.byType[row.costType].monthlyCost += calc.monthlyCost;
+      memo.byType[row.costType].activationPrice += calc.activationPrice;
+      memo.byType[row.costType].monthlyPrice += calc.monthlyPrice;
+      return memo;
+    },
+    {
+      termMonths,
+      initialTermMonths,
+      ongoingTermMonths,
+      appointments,
+      activationCost: 0,
+      monthlyCost: 0,
+      activationPrice: 0,
+      monthlyPrice: 0,
+      byCenter: {
+        SalesArmy: { activationCost: 0, monthlyCost: 0, activationPrice: 0, monthlyPrice: 0 },
+        Sharpdots: { activationCost: 0, monthlyCost: 0, activationPrice: 0, monthlyPrice: 0 }
+      },
+      byType: {}
+    }
+  );
+}
+
+function renderServiceRows() {
+  const rowsForScenario = serviceVisibleRows();
+  if (els.servicePlatformLookup) {
+    els.servicePlatformLookup.innerHTML = servicePlatformValues().map((value) => `<option value="${escapeHtml(value)}"></option>`).join("");
+  }
+  const grouped = rowsForScenario.reduce((memo, row) => {
+    memo[row.group] = memo[row.group] || [];
+    memo[row.group].push(row);
+    return memo;
+  }, {});
+  els.serviceRows.innerHTML = Object.entries(grouped).map(([group, groupRows]) => `
+    <section class="service-group">
+      <h3>
+        <span>${escapeHtml(group)}</span>
+        <small>${money(groupRows.filter((row) => row.active && !serviceChildren(row).some((child) => child.active)).reduce((sum, row) => sum + serviceCalc(row).activationPrice, 0), 2)} startup / ${money(groupRows.filter((row) => row.active && !serviceChildren(row).some((child) => child.active)).reduce((sum, row) => sum + serviceCalc(row).monthlyPrice, 0), 2)} monthly</small>
+      </h3>
+      <div class="service-row service-row-head">
+        <span>Use</span>
+        <span>Component</span>
+        <span>Platform / Driver</span>
+        <span>Cost Type</span>
+        <span>Center</span>
+        <span>Startup</span>
+        <span>Monthly</span>
+        <span>Unit Cost</span>
+        <span>Qty</span>
+        <span>Model</span>
+        <span>Startup %</span>
+        <span>Monthly %</span>
+        <span>Monthly Price</span>
+      </div>
+      ${groupRows.filter((row) => row.level !== "element" || serviceExpanded.has(row.parentId)).map((row) => {
+        const index = serviceRows.indexOf(row);
+        const calc = serviceCalc(row);
+        const children = serviceChildren(row);
+        return `
+          <div class="service-row ${row.level === "element" ? "service-element-row" : "service-product-row"}" data-index="${index}">
+            <span class="service-use-cell">
+              <input class="service-active" type="checkbox" ${row.active ? "checked" : ""} />
+              ${children.length ? `<button class="service-chevron ghost-btn" type="button" title="Show or hide elements">${serviceExpanded.has(row.id) ? "⌄" : "›"}</button>` : ""}
+            </span>
+            <span><strong>${escapeHtml(row.item)}</strong><small>${escapeHtml(row.notes || "")}</small></span>
+            <input class="service-platform" list="servicePlatformLookup" type="text" value="${escapeHtml(row.platform || "")}" />
+            <select class="service-cost-type">
+              ${["Services", "Platforms", "Assets", "Fractional Representatives", "Setup/Activation"].map((type) => `<option value="${type}" ${row.costType === type ? "selected" : ""}>${type}</option>`).join("")}
+            </select>
+            <select class="service-cost-center">
+              ${["SalesArmy", "Sharpdots"].map((center) => `<option value="${center}" ${serviceNormalizeCostCenter(row.costCenter) === center ? "selected" : ""}>${center}</option>`).join("")}
+            </select>
+            <input class="service-startup" type="number" step="1" value="${decimal(row.startup, 0)}" />
+            <input class="service-recurring" type="number" step="1" value="${decimal(row.recurring, 0)}" />
+            <input class="service-variable" type="number" step="0.0001" value="${decimal(row.variable, 4)}" />
+            <input class="service-quantity" type="number" step="1" value="${decimal(row.quantity, 0)}" />
+            <select class="service-variable-model">
+              ${["monthly", "each", "metered", "seat/account", "rep/month", "profiles", "asset", "budget", "activation"].map((model) => `<option value="${model}" ${row.variableModel === model ? "selected" : ""}>${model}</option>`).join("")}
+            </select>
+            <input class="service-startup-markup" type="number" step="5" value="${decimal(row.startupMarkup ?? row.markup, 0)}" />
+            <input class="service-monthly-markup" type="number" step="5" value="${decimal(row.monthlyMarkup ?? row.markup, 0)}" />
+            <strong>${money(calc.monthlyPrice, 2)}</strong>
+          </div>
+        `;
+      }).join("")}
+    </section>
+  `).join("");
+}
+
+function renderServiceSummary() {
+  const totals = serviceTotals();
+  const isMonthlyMode = serviceTermMode() === "monthly";
+  const termPrice = (isMonthlyMode ? 0 : totals.activationPrice) + totals.monthlyPrice * totals.termMonths;
+  const appointmentCount = totals.appointments * totals.termMonths;
+  els.serviceActivationPrice.textContent = isMonthlyMode ? "$0.00" : money(totals.activationPrice, 2);
+  els.serviceMonthlyPrice.textContent = money(totals.monthlyPrice, 2);
+  els.serviceTermPrice.textContent = money(termPrice, 2);
+  els.serviceAppointmentPrice.textContent = money(appointmentCount ? termPrice / appointmentCount : 0, 2);
+  els.serviceCostCenters.innerHTML = Object.entries(totals.byCenter).map(([center, total]) => `
+    <div class="service-center-row">
+      <strong>${center}</strong>
+      <span>Activation cost ${money(total.activationCost, 2)}</span>
+      <span>Monthly cost ${money(total.monthlyCost, 2)}</span>
+      <span>Activation price ${money(total.activationPrice, 2)}</span>
+      <span>Monthly price ${money(total.monthlyPrice, 2)}</span>
+    </div>
+  `).join("");
+  els.serviceAssumptions.innerHTML = `
+    <p><strong>${serviceScenarioNames[serviceScenario]}</strong></p>
+    <p>Base SalesMachine includes cold email, strategy, copywriting, and standard/custom intent topic datastreams.</p>
+    <p>Optional channels can be layered in for the client use case: fractional BDR, automated dialing, Cold LinkedIn, intent DSP ads, ringless voicemail, and other outbound surfaces.</p>
+    <p>Costing types are separated as services, platforms, assets, fractional representatives, and setup/activation.</p>
+  `;
+  const metrics = executionMetrics();
+  els.executionSummary.innerHTML = `
+    <div><span>Dials / Week</span><strong>${Math.round(metrics.dialsPerWeek).toLocaleString()}</strong></div>
+    <div><span>Conversations / Week</span><strong>${Math.round(metrics.conversationsPerWeek).toLocaleString()}</strong></div>
+    <div><span>SETS / Month</span><strong>${Math.round(metrics.setsPerMonth).toLocaleString()}</strong></div>
+    <div><span>Meetings / Month</span><strong>${decimal(metrics.meetingsPerMonth, 1)}</strong></div>
+    <div><span>Wins / Month</span><strong>${decimal(metrics.winsPerMonth, 1)}</strong></div>
+  `;
+}
+
+function renderServicesCalculator() {
+  if (!els.servicesView) return;
+  serviceScenario = els.serviceScenario.value || "salesmachine";
+  updateServiceAppointmentsFromExecution();
+  renderServiceRows();
+  renderServiceSummary();
+}
+
 function setActiveView(viewId) {
   activeView = viewId;
-  [els.estimateView, els.proposalView].forEach((view) => {
+  [els.estimateView, els.proposalView, els.servicesView].forEach((view) => {
     if (!view) return;
     const isActive = view.id === viewId;
     view.hidden = !isActive;
@@ -832,6 +1138,7 @@ function setActiveView(viewId) {
   });
   els.appTabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.view === viewId));
   if (viewId === "proposalView") renderProposal();
+  if (viewId === "servicesView") renderServicesCalculator();
 }
 
 function syncLookupsFromRow(row) {
@@ -2142,6 +2449,57 @@ function printReport() {
 els.appTabs.forEach((tab) => {
   tab.addEventListener("click", () => setActiveView(tab.dataset.view || "estimateView"));
 });
+if (els.serviceScenario) {
+  [els.serviceScenario, els.serviceTermMonths, els.serviceOngoingMonths, els.serviceAppointments, els.serviceStartupMarkup, els.serviceMonthlyMarkup, ...els.serviceTermModes].forEach((input) => {
+    input.addEventListener("change", () => {
+      if (input === els.serviceStartupMarkup) {
+        serviceVisibleRows().forEach((row) => {
+          row.startupMarkup = asNumber(els.serviceStartupMarkup.value);
+        });
+      }
+      if (input === els.serviceMonthlyMarkup) {
+        serviceVisibleRows().forEach((row) => {
+          row.monthlyMarkup = asNumber(els.serviceMonthlyMarkup.value);
+        });
+      }
+      renderServicesCalculator();
+    });
+  });
+  [els.execDialsPerDay, els.execDaysPerWeek, els.execConversationsPerDay, els.execSetsPerWeek, els.execShowRate, els.execWinRate].forEach((input) => {
+    input.addEventListener("input", () => {
+      updateServiceAppointmentsFromExecution();
+      renderServicesCalculator();
+    });
+  });
+  els.serviceRows.addEventListener("change", (event) => {
+    const rowEl = event.target.closest(".service-row[data-index]");
+    if (!rowEl) return;
+    const row = serviceRows[Number(rowEl.dataset.index)];
+    if (!row) return;
+    if (event.target.classList.contains("service-active")) row.active = event.target.checked;
+    if (event.target.classList.contains("service-platform")) row.platform = event.target.value;
+    if (event.target.classList.contains("service-cost-type")) row.costType = event.target.value;
+    if (event.target.classList.contains("service-cost-center")) row.costCenter = serviceNormalizeCostCenter(event.target.value);
+    if (event.target.classList.contains("service-startup")) row.startup = asNumber(event.target.value);
+    if (event.target.classList.contains("service-recurring")) row.recurring = asNumber(event.target.value);
+    if (event.target.classList.contains("service-variable")) row.variable = asNumber(event.target.value);
+    if (event.target.classList.contains("service-quantity")) row.quantity = asNumber(event.target.value);
+    if (event.target.classList.contains("service-variable-model")) row.variableModel = event.target.value;
+    if (event.target.classList.contains("service-startup-markup")) row.startupMarkup = asNumber(event.target.value);
+    if (event.target.classList.contains("service-monthly-markup")) row.monthlyMarkup = asNumber(event.target.value);
+    renderServicesCalculator();
+  });
+  els.serviceRows.addEventListener("click", (event) => {
+    const button = event.target.closest(".service-chevron");
+    if (!button) return;
+    const rowEl = button.closest(".service-row[data-index]");
+    const row = serviceRows[Number(rowEl?.dataset.index)];
+    if (!row) return;
+    if (serviceExpanded.has(row.id)) serviceExpanded.delete(row.id);
+    else serviceExpanded.add(row.id);
+    renderServicesCalculator();
+  });
+}
 [
   [els.proposalTitle, "title"],
   [els.proposalSubtitle, "subtitle"],
