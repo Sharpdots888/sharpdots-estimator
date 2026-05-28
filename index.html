@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>2026 North Pole Inventory Estimate</title>
+    <title>Sharpdots Estimator</title>
     <link rel="stylesheet" href="styles.css?v=save-load3" />
   </head>
   <body>
@@ -11,13 +11,13 @@
       <header class="topbar">
         <div class="project-title-wrap">
           <label class="project-title-label" for="projectName">Project Name</label>
-          <input id="projectName" class="project-title-input" list="projectNameLookup" type="text" value="2026 North Pole Inventory Estimate" />
-          <span id="reportProjectTitle" class="report-project-title">2026 North Pole Inventory Estimate</span>
+          <input id="projectName" class="project-title-input" list="projectNameLookup" type="text" value="" placeholder="New estimate" />
+          <span id="reportProjectTitle" class="report-project-title">Estimate</span>
           <datalist id="projectNameLookup"></datalist>
         </div>
         <div class="report-meta">
           <span id="estimateDate" class="estimate-date"></span>
-          <span class="report-project-number">Project # <strong id="reportProjectNumber">P-000001</strong></span>
+          <span class="report-project-number">Project # <strong id="reportProjectNumber">Unassigned</strong></span>
         </div>
         <div class="top-actions">
           <button id="saveEstimateBtn" class="ghost-btn" type="button" title="Save current project estimate">Save</button>
@@ -64,12 +64,12 @@
         <aside class="control-panel" aria-label="Estimator controls">
           <label>
             Project #
-            <output id="projectNumber" class="project-number-input">P-000001</output>
+            <output id="projectNumber" class="project-number-input"></output>
           </label>
 
           <label>
             Client / Account
-            <input id="clientName" list="clientLookup" type="text" value="North Pole Post Office" placeholder="Enter or look up client" />
+            <input id="clientName" list="clientLookup" type="text" value="" placeholder="Enter or look up client" />
           </label>
           <datalist id="clientLookup">
             <option value="North Pole Post Office"></option>

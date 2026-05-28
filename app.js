@@ -151,11 +151,11 @@ function buildSeedLookups(theRows, sourceData) {
 let seedRows = buildSeedRows(sourceProducts);
 let seedLookups = buildSeedLookups(seedRows, sourceProducts);
 
-let rows = structuredClone(seedRows);
+let rows = [];
 let lookups = structuredClone(seedLookups);
 let activePackage = "All";
 let activeTypes = new Set(Object.keys(typeLabels));
-let expanded = new Set(seedRows.filter((row) => row.level !== "element").map((row) => row.id));
+let expanded = new Set();
 let draggedRowId = null;
 let paymentDates = {};
 function defaultPaymentSettings() {
@@ -452,7 +452,7 @@ function setSaveStatus(message) {
 
 function updateProjectHeader() {
   els.reportProjectTitle.textContent = els.projectName.value || "Estimate";
-  els.reportProjectNumber.textContent = els.projectNumber.value || els.projectNumber.textContent || "P-000001";
+  els.reportProjectNumber.textContent = els.projectNumber.value || els.projectNumber.textContent || "Unassigned";
 }
 
 function setProjectNumber(projectNumber) {
@@ -461,6 +461,32 @@ function setProjectNumber(projectNumber) {
   els.projectNumber.textContent = assigned;
   els.projectNumber.title = assigned;
   updateProjectHeader();
+}
+
+function clearProjectNumber() {
+  els.projectNumber.value = "";
+  els.projectNumber.textContent = "";
+  els.projectNumber.title = "Assigned when saved";
+  updateProjectHeader();
+}
+
+function startBlankEstimate() {
+  rows = [];
+  lookups = structuredClone(seedLookups);
+  expanded = new Set();
+  activePackage = "All";
+  activeTypes = new Set(Object.keys(typeLabels));
+  els.projectName.value = "";
+  els.clientName.value = "";
+  els.estimateYear.value = "";
+  els.searchInput.value = "";
+  els.includeInactive.checked = false;
+  els.globalMarkup.value = "0.40";
+  els.tariffRate.value = "0.30";
+  paymentDates = {};
+  paymentSettings = defaultPaymentSettings();
+  proposal = defaultProposal();
+  clearProjectNumber();
 }
 
 function rowNeededQty(row) {
@@ -1941,6 +1967,7 @@ function renderStackedComparisonChart(items, selectedMetrics, note) {
 function renderPayments() {
   const totalsByType = paymentTotalsByType();
   els.paymentSchedule.innerHTML = "";
+  if (!rows.length) return;
   const printRows = [];
   Object.entries(totalsByType).forEach(([type, total]) => {
     const settings = paymentSettingFor(type);
@@ -2572,6 +2599,7 @@ els.pdfBtn.addEventListener("click", printReport);
 window.addEventListener("beforeprint", prepareReportPrint);
 window.addEventListener("afterprint", restoreReportPrint);
 els.resetBtn.addEventListener("click", async () => {
+  els.estimateYear.value = "2026";
   await fetchAndApplySeed();
   rows = structuredClone(seedRows);
   lookups = structuredClone(seedLookups);
@@ -2604,10 +2632,7 @@ async function init() {
     fetchAndApplySeed()
   ]);
   clientsList = Array.isArray(clientsRes) ? clientsRes : [];
-  rows = structuredClone(seedRows);
-  lookups = structuredClone(seedLookups);
-  expanded = new Set(seedRows.filter((row) => row.level !== "element").map((row) => row.id));
-  setProjectNumber(nextProjectNumber());
+  startBlankEstimate();
   els.estimateDate.textContent = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date());
   render();
 }
