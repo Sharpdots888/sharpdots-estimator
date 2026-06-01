@@ -38,8 +38,28 @@ function uid(prefix) {
   return `${prefix}-${crypto.randomUUID()}`;
 }
 
+function cloneRowsForNewProject(sourceRows) {
+  const idMap = new Map(sourceRows.map((row) => [row.id, uid(row.level)]));
+  return {
+    rows: sourceRows.map((row) => ({
+      ...row,
+      id: idMap.get(row.id),
+      parentId: row.parentId ? idMap.get(row.parentId) : row.parentId
+    })),
+    idMap
+  };
+}
+
 function uniqueValues(values) {
   return Array.from(new Set(values.map((value) => String(value || "").trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b));
+}
+
+function normalizeEstimateRow(row) {
+  return {
+    ...row,
+    source: row.source || "",
+    moq: asNumber(row.moq)
+  };
 }
 
 function buildSeedRows(sourceData) {
@@ -63,6 +83,8 @@ function buildSeedRows(sourceData) {
       sku: firstSource?.packageSku || "",
       description: `${packageName} package`,
       type: "",
+      source: "",
+      moq: 0,
       qty: 0,
       neededQty: 0,
       inventoryQty: 0,
@@ -97,6 +119,8 @@ function buildSeedRows(sourceData) {
         sku: source.productSku || source.sku || "",
         description: "",
         type: source.type,
+        source: "",
+        moq: 0,
         // For leaf products the product row itself carries the inventory/cost data
         qty: isLeafProduct ? source.qty : 0,
         neededQty: isLeafProduct ? source.neededQty : 0,
@@ -123,6 +147,8 @@ function buildSeedRows(sourceData) {
         sku: source.sku || "",
         description: "",
         type: source.type,
+        source: "",
+        moq: 0,
         qty: source.qty,
         neededQty: source.neededQty,
         inventoryQty: source.inventoryQty,
@@ -156,6 +182,7 @@ let lookups = structuredClone(seedLookups);
 let activePackage = "All";
 let activeTypes = new Set(Object.keys(typeLabels));
 let expanded = new Set();
+let previewBaseRows = null;
 let draggedRowId = null;
 let paymentDates = {};
 function defaultPaymentSettings() {
@@ -239,6 +266,8 @@ const els = {
   estimateYear: document.querySelector("#estimateYear"),
   lineItems: document.querySelector("#lineItems"),
   rowTemplate: document.querySelector("#rowTemplate"),
+  estimateViewMode: document.querySelector("#estimateViewMode"),
+  estimateViewModeButtons: document.querySelectorAll("[data-view-mode]"),
   searchInput: document.querySelector("#searchInput"),
   packageFilters: document.querySelector("#packageFilters"),
   typeFilters: document.querySelector("#typeFilters"),
@@ -246,10 +275,18 @@ const els = {
   globalMarkup: document.querySelector("#globalMarkup"),
   applyMarkupBtn: document.querySelector("#applyMarkupBtn"),
   tariffRate: document.querySelector("#tariffRate"),
+  simulationMode: document.querySelector("#simulationMode"),
+  simulationBasis: document.querySelector("#simulationBasis"),
+  simulationPercent: document.querySelector("#simulationPercent"),
+  simulationValueLabel: document.querySelector("#simulationValueLabel"),
+  simulationPreview: document.querySelector("#simulationPreview"),
+  simulationSummary: document.querySelector("#simulationSummary"),
+  applySimulationBtn: document.querySelector("#applySimulationBtn"),
   addPackageBtn: document.querySelector("#addPackageBtn"),
   addProductBtn: document.querySelector("#addProductBtn"),
   addElementBtn: document.querySelector("#addElementBtn"),
   saveEstimateBtn: document.querySelector("#saveEstimateBtn"),
+  duplicateEstimateBtn: document.querySelector("#duplicateEstimateBtn"),
   loadEstimateBtn: document.querySelector("#loadEstimateBtn"),
   estimateSaveStatus: document.querySelector("#estimateSaveStatus"),
   loadEstimateModal: document.querySelector("#loadEstimateModal"),
@@ -487,6 +524,7 @@ function startBlankEstimate() {
   paymentSettings = defaultPaymentSettings();
   proposal = defaultProposal();
   clearProjectNumber();
+  els.estimateViewMode.value = "detail";
 }
 
 function rowNeededQty(row) {
@@ -600,7 +638,7 @@ function rollupCalculate(row) {
       childCalcs.reduce((s, c) => s + c.qty, 0),
       childCalcs.reduce((s, c) => s + c.clientPrice, 0),
       childCalcs.reduce((s, c) => s + c.cost, 0),
-      childCalcs.reduce((s, c) => s + c.neededQty, 0),
+      neededQty,
       childCalcs.reduce((s, c) => s + c.qtyToOrder, 0),
       childCalcs.reduce((s, c) => s + c.priorPpp * c.qty, 0),
       childCalcs.reduce((s, c) => s + c.qty, 0)
@@ -744,6 +782,29 @@ function activeLeafRowsForProposal() {
     if (row.level === "element") return true;
     return row.level === "product" && !activeElementParentIds.has(row.id);
   });
+}
+
+function activeLeafDescendantsFor(row) {
+  if (!row.active) return [];
+  if (row.level === "element") return [row];
+  const activeElementParentIds = new Set(
+    rows.filter((candidate) => candidate.level === "element" && candidate.active).map((candidate) => candidate.parentId)
+  );
+  return descendantsOf(row).filter((candidate) => {
+    if (!candidate.active || !activeTypes.has(candidate.type)) return false;
+    if (candidate.level === "element") return true;
+    return candidate.level === "product" && !activeElementParentIds.has(candidate.id);
+  });
+}
+
+function activeLeafRowsForSimulation() {
+  const targets = new Map();
+  visibleRows()
+    .filter((row) => row.active)
+    .forEach((row) => {
+      activeLeafDescendantsFor(row).forEach((leaf) => targets.set(leaf.id, leaf));
+    });
+  return Array.from(targets.values());
 }
 
 function proposalTotals() {
@@ -1503,7 +1564,37 @@ function updateRow(id, patch) {
 function bindInput(input, row, key, numeric = false) {
   input.value = row[key] ?? "";
   input.title = row.description || row.element || row.product || row.packageName || "";
+  input.addEventListener("input", () => {
+    rows = rows.map((candidate) => (
+      candidate.id === row.id
+        ? { ...candidate, [key]: numeric ? asNumber(input.value) : input.value }
+        : candidate
+    ));
+  });
   input.addEventListener("change", () => updateRow(row.id, { [key]: numeric ? asNumber(input.value) : input.value }));
+}
+
+function bindClientOrderQtyInput(input, row, calc) {
+  input.value = row.level === "package" ? "" : Math.round(calc.qty);
+  input.title = "Editing this updates the needed quantity from Client QOH + Client Order Qty";
+  input.disabled = row.level === "package";
+  input.addEventListener("input", () => {
+    const clientOrderQty = Math.max(asNumber(input.value), 0);
+    const latest = rows.find((candidate) => candidate.id === row.id) || row;
+    const neededQty = clientOrderQty + Math.max(asNumber(latest.clientQoh), 0);
+    const neededInput = input.closest("tr")?.querySelector(".needed-input");
+    if (neededInput && !neededInput.readOnly) neededInput.value = Math.round(neededQty);
+    rows = rows.map((candidate) => (
+      candidate.id === row.id
+        ? { ...candidate, neededQty }
+        : candidate
+    ));
+  });
+  input.addEventListener("change", () => {
+    const latest = rows.find((candidate) => candidate.id === row.id) || row;
+    const clientOrderQty = Math.max(asNumber(input.value), 0);
+    updateRow(row.id, { neededQty: clientOrderQty + Math.max(asNumber(latest.clientQoh), 0) });
+  });
 }
 
 function nameKeyFor(row) {
@@ -1682,16 +1773,19 @@ function renderRows() {
     bindInput(fragment.querySelector(".sku-input"), row, "sku");
     bindInput(fragment.querySelector(".description-input"), row, "description");
     bindInput(fragment.querySelector(".type-input"), row, "type");
+    bindInput(fragment.querySelector(".source-input"), row, "source");
+    bindInput(fragment.querySelector(".moq-input"), row, "moq", true);
     bindInput(fragment.querySelector(".inventory-input"), row, "inventoryQty", true);
     bindInput(fragment.querySelector(".needed-input"), row, "neededQty", true);
     bindInput(fragment.querySelector(".cost-input"), row, "cost", true);
     bindInput(fragment.querySelector(".client-qoh-input"), row, "clientQoh", true);
+    bindClientOrderQtyInput(fragment.querySelector(".client-order-qty"), row, calc);
     bindInput(fragment.querySelector(".markup-input"), row, "markup", true);
     bindInput(fragment.querySelector(".margin-input"), row, "marginAdj", true);
     bindInput(fragment.querySelector(".prior-input"), row, "priorPpp", true);
 
     if (row.level !== "element" && childrenOf(row).some((child) => child.active)) {
-      ["inventory-input", "needed-input", "cost-input", "client-qoh-input", "markup-input", "margin-input", "prior-input"].forEach((className) => {
+      ["inventory-input", "needed-input", "cost-input", "client-qoh-input", "client-order-qty", "markup-input", "margin-input", "prior-input"].forEach((className) => {
         const input = fragment.querySelector(`.${className}`);
         input.readOnly = true;
         input.title = "Calculated from nested active rows";
@@ -1700,6 +1794,7 @@ function renderRows() {
       fragment.querySelector(".needed-input").value = Math.round(calc.neededQty);
       fragment.querySelector(".cost-input").value = decimal(calc.cost, 2);
       fragment.querySelector(".client-qoh-input").value = Math.round(calc.clientQoh);
+      fragment.querySelector(".client-order-qty").value = row.level === "package" ? "" : Math.round(calc.qty);
       fragment.querySelector(".markup-input").value = decimal(calc.markup, 3);
       fragment.querySelector(".margin-input").value = decimal(calc.marginAdj, 3);
       fragment.querySelector(".prior-input").value = decimal(calc.priorPpp, 3);
@@ -1713,7 +1808,6 @@ function renderRows() {
 
     fragment.querySelector(".cost-input").value = decimal(calc.cost, 2);
     fragment.querySelector(".qty-to-order").textContent = row.level === "package" ? "" : Math.round(calc.qtyToOrder).toLocaleString();
-    fragment.querySelector(".client-order-qty").textContent = row.level === "package" ? "" : Math.round(calc.qty).toLocaleString();
     fragment.querySelector(".per-piece-cost").textContent = money(calc.perPieceCost, 3);
     fragment.querySelector(".margin-dollars").textContent = money(calc.marginDollars, 2);
     fragment.querySelector(".standard-price").textContent = money(calc.standardPrice, 2);
@@ -1771,8 +1865,157 @@ function renderPrintTypeSubtotals() {
     ${Object.entries(totals)
       .filter(([, total]) => total)
       .map(([type, total]) => `<span>${type} - ${typeLabels[type]} ${money(total, 2)}</span>`)
-      .join("")}
+    .join("")}
   `;
+}
+
+function simulatedTotalsFor(sourceRows) {
+  const value = asNumber(els.simulationPercent.value);
+  const basis = els.simulationBasis.value;
+  return sourceRows.reduce(
+    (memo, row) => {
+      const calc = calculate(row);
+      const simulation = simulatedValuesFor(row, calc, value, basis);
+      memo.neededQty += simulation.neededQty;
+      memo.qty += simulation.qty;
+      memo.qtyToOrder += simulation.qtyToOrder;
+      memo.cost += simulation.cost;
+      memo.client += simulation.clientPrice;
+      memo.margin += simulation.clientPrice - simulation.cost;
+      return memo;
+    },
+    { cost: 0, client: 0, margin: 0, qty: 0, neededQty: 0, qtyToOrder: 0 }
+  );
+}
+
+function simulatedNeededQtyFor(row, calc, multiplier, basis) {
+  const clientQoh = Math.max(asNumber(row.clientQoh), 0);
+  if (els.simulationMode.value === "set") {
+    const targetQty = Math.max(multiplier, 0);
+    return basis === "neededQty" ? targetQty : targetQty + clientQoh;
+  }
+  const pctMultiplier = 1 + multiplier / 100;
+  if (basis === "neededQty") return calc.neededQty * pctMultiplier;
+  return (calc.qty * pctMultiplier) + clientQoh;
+}
+
+function marginAdjForPpp(cost, clientPrice, fallback) {
+  if (clientPrice <= 0) return fallback;
+  return Math.min(Math.max(1 - (cost / clientPrice), -0.95), 0.95);
+}
+
+function simulatedValuesFor(row, calc, multiplier, basis) {
+  const neededQty = Math.max(Math.round(simulatedNeededQtyFor(row, calc, multiplier, basis)), 0);
+  const clientQoh = Math.max(asNumber(row.clientQoh), 0);
+  const inventoryQty = Math.max(asNumber(row.inventoryQty), 0);
+  const qty = Math.max(neededQty - clientQoh, 0);
+  const qtyToOrder = Math.max(neededQty - inventoryQty, 0);
+  const cost = qtyToOrder * calc.perPieceCost;
+  const clientPrice = qty * calc.ppp;
+  return {
+    neededQty,
+    qty,
+    qtyToOrder,
+    cost,
+    clientPrice,
+    marginAdj: marginAdjForPpp(cost, clientPrice, row.marginAdj)
+  };
+}
+
+function simulationTargetIds() {
+  return new Set(activeLeafRowsForSimulation().map((row) => row.id));
+}
+
+function simulatedRowsSnapshot() {
+  const value = asNumber(els.simulationPercent.value);
+  const basis = els.simulationBasis.value;
+  const targetIds = simulationTargetIds();
+  return rows.map((row) => {
+    if (!targetIds.has(row.id)) return row;
+    const calc = calculate(row);
+    const simulation = simulatedValuesFor(row, calc, value, basis);
+    return {
+      ...row,
+      neededQty: simulation.neededQty,
+      cost: simulation.cost,
+      marginAdj: simulation.marginAdj
+    };
+  });
+}
+
+function withPreviewRows(callback) {
+  if (!els.simulationPreview.checked || (els.simulationMode.value === "percent" && asNumber(els.simulationPercent.value) === 0)) return callback();
+  const currentRows = rows;
+  previewBaseRows = currentRows;
+  rows = simulatedRowsSnapshot();
+  try {
+    return callback();
+  } finally {
+    rows = currentRows;
+    previewBaseRows = null;
+  }
+}
+
+function withRows(sourceRows, callback) {
+  const currentRows = rows;
+  rows = sourceRows;
+  try {
+    return callback();
+  } finally {
+    rows = currentRows;
+  }
+}
+
+function renderSimulationSummary() {
+  const sourceRows = previewBaseRows || rows;
+  const { baseTotals, simulated, targetCount } = withRows(sourceRows, () => ({
+    baseTotals: totalFor(visiblePackageRows()),
+    simulated: simulatedTotalsFor(activeLeafRowsForSimulation()),
+    targetCount: activeLeafRowsForSimulation().length
+  }));
+  const value = asNumber(els.simulationPercent.value);
+  const isSetMode = els.simulationMode.value === "set";
+  const basisLabel = els.simulationBasis.value === "neededQty" ? `${els.estimateYear.value || "Project"} Needed` : "Client Order Qty";
+  const previewLabel = els.simulationPreview.checked && (isSetMode || value !== 0) ? "Preview on" : "Preview off";
+  const scenarioLabel = isSetMode
+    ? `Set ${basisLabel} to ${Math.round(Math.max(value, 0)).toLocaleString()}`
+    : `${value > 0 ? "+" : ""}${decimal(value, 1)}% ${basisLabel}`;
+  els.simulationValueLabel.textContent = isSetMode ? "Qty" : "%";
+  els.simulationSummary.innerHTML = `
+    <div><span>Scenario</span><strong>${scenarioLabel}</strong><small>${previewLabel}</small></div>
+    <div><span>Cost</span><strong>${money(simulated.cost, 2)}</strong><small>${money(simulated.cost - baseTotals.cost, 2)}</small></div>
+    <div><span>Client Price</span><strong>${money(simulated.client, 2)}</strong><small>${money(simulated.client - baseTotals.client, 2)}</small></div>
+    <div><span>Margin $</span><strong>${money(simulated.margin, 2)}</strong><small>${money(simulated.margin - baseTotals.margin, 2)}</small></div>
+    <div><span>Needed / Order</span><strong>${Math.round(simulated.neededQty).toLocaleString()} / ${Math.round(simulated.qty).toLocaleString()}</strong></div>
+    <div><span>Applies to</span><strong>${targetCount} active row${targetCount === 1 ? "" : "s"}</strong></div>
+  `;
+}
+
+function applyQuantitySimulation() {
+  const value = asNumber(els.simulationPercent.value);
+  const basis = els.simulationBasis.value;
+  const targetIds = simulationTargetIds();
+  if (!targetIds.size) {
+    setSaveStatus("No active rows to update");
+    return;
+  }
+
+  rows = rows.map((row) => {
+    if (!targetIds.has(row.id)) return row;
+    const calc = calculate(row);
+    const simulation = simulatedValuesFor(row, calc, value, basis);
+    return {
+      ...row,
+      neededQty: simulation.neededQty,
+      cost: simulation.cost,
+      marginAdj: simulation.marginAdj
+    };
+  });
+
+  els.simulationPercent.value = "0";
+  els.simulationPreview.checked = false;
+  render();
+  setSaveStatus(`Simulation applied to ${targetIds.size} active row${targetIds.size === 1 ? "" : "s"}`);
 }
 
 function renderSummary() {
@@ -1781,6 +2024,7 @@ function renderSummary() {
   els.costTotal.textContent = money(totals.cost, 0);
   els.marginTotal.textContent = money(totals.margin, 0);
   els.weightedPpp.textContent = money(totals.qty ? totals.client / totals.qty : 0, 3);
+  renderSimulationSummary();
 }
 
 function renderRollup() {
@@ -2109,18 +2353,26 @@ function renderLookupList() {
 }
 
 function render() {
-  updateProjectHeader();
-  renderDatalists();
-  renderFilters();
-  renderRows();
-  renderSummary();
-  renderRollup();
-  renderTrackingItems();
-  renderTracking();
-  renderPayments();
-  renderPrintTypeSubtotals();
-  renderLookupList();
-  renderProposal();
+  withPreviewRows(() => {
+    document.body.classList.toggle("summary-view", els.estimateViewMode.value === "summary");
+    els.estimateViewModeButtons.forEach((button) => {
+      const isActive = button.dataset.viewMode === els.estimateViewMode.value;
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
+    });
+    updateProjectHeader();
+    renderDatalists();
+    renderFilters();
+    renderRows();
+    renderSummary();
+    renderRollup();
+    renderTrackingItems();
+    renderTracking();
+    renderPayments();
+    renderPrintTypeSubtotals();
+    renderLookupList();
+    renderProposal();
+  });
 }
 
 function estimateSearchText(estimate) {
@@ -2209,12 +2461,43 @@ async function saveCurrentEstimate() {
     if (estimate.estimateYear) lookups.years = uniqueValues([...(lookups.years || []), estimate.estimateYear]);
     render();
     setSaveStatus(`Saved ${projectNumber}`);
+    return true;
   } catch (err) {
     console.error("Save error:", err);
     setSaveStatus("Save failed");
+    return false;
   } finally {
     els.saveEstimateBtn.disabled = false;
     els.saveEstimateBtn.textContent = "Save";
+  }
+}
+
+async function duplicateCurrentEstimate() {
+  if (!rows.length) {
+    setSaveStatus("Nothing to duplicate");
+    return;
+  }
+
+  els.duplicateEstimateBtn.disabled = true;
+  els.duplicateEstimateBtn.textContent = "Duplicating…";
+  try {
+    await fetchEstimatesList();
+    const projectNumber = nextProjectNumber();
+    const baseName = els.projectName.value.trim() || "Untitled Estimate";
+    const clone = cloneRowsForNewProject(rows);
+    rows = clone.rows;
+    expanded = new Set(Array.from(expanded).map((id) => clone.idMap.get(id)).filter(Boolean));
+    els.projectName.value = `${baseName} Copy`;
+    clearProjectNumber();
+    setProjectNumber(projectNumber);
+    const saved = await saveCurrentEstimate();
+    if (saved) setSaveStatus(`Duplicated as ${projectNumber}`);
+  } catch (err) {
+    console.error("Duplicate error:", err);
+    setSaveStatus("Duplicate failed");
+  } finally {
+    els.duplicateEstimateBtn.disabled = false;
+    els.duplicateEstimateBtn.textContent = "Duplicate";
   }
 }
 
@@ -2236,7 +2519,7 @@ async function loadEstimate(summary) {
     els.projectName.value = estimate.projectName || "";
     els.clientName.value = estimate.clientName || "";
     els.estimateYear.value = estimate.estimateYear || "";
-    rows = structuredClone(estimate.rows || seedRows);
+    rows = structuredClone(estimate.rows || seedRows).map(normalizeEstimateRow);
     lookups = structuredClone({ ...seedLookups, ...(estimate.lookups || {}) });
     activePackage = estimate.activePackage || "All";
     activeTypes = new Set(estimate.activeTypes || Object.keys(typeLabels));
@@ -2277,6 +2560,8 @@ function addPackage(packageName = "New Package") {
     sku: "",
     description: "",
     type: "",
+    source: "",
+    moq: 0,
     qty: 0,
     neededQty: 0,
     inventoryQty: 0,
@@ -2311,6 +2596,8 @@ function addProduct() {
     sku: "",
     description: "",
     type: "MP",
+    source: "",
+    moq: 0,
     qty: 0,
     neededQty: 0,
     inventoryQty: 0,
@@ -2345,6 +2632,8 @@ function addElement() {
     sku: "",
     description: "",
     type: parent.type || "MP",
+    source: "",
+    moq: 0,
     qty: 0,
     neededQty: 0,
     inventoryQty: 0,
@@ -2373,12 +2662,61 @@ function downloadCsvInBrowser(csv, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+function rowsForExport() {
+  const orderedRows = [];
+  packageRows()
+    .sort((a, b) => a.sourceOrder - b.sourceOrder)
+    .forEach((packageRow) => {
+      orderedRows.push(packageRow);
+      childrenOf(packageRow)
+        .sort((a, b) => a.sourceOrder - b.sourceOrder)
+        .forEach((productRow) => {
+          orderedRows.push(productRow);
+          childrenOf(productRow)
+            .sort((a, b) => a.sourceOrder - b.sourceOrder)
+            .forEach((elementRow) => orderedRows.push(elementRow));
+        });
+    });
+  return orderedRows;
+}
+
+function csvExportRow(row) {
+  const calc = calculate(row);
+  const isPackage = row.level === "package";
+  return [
+    row.level,
+    row.active ? "TRUE" : "FALSE",
+    row.packageName,
+    row.product,
+    row.element,
+    row.sku || "",
+    row.description,
+    row.type,
+    row.source || "",
+    row.moq ? formatNumberForReport(row.moq, 0) : "",
+    isPackage ? "" : formatNumberForReport(calc.inventoryQty, 0),
+    isPackage ? "" : formatNumberForReport(calc.neededQty, 0),
+    isPackage ? "" : formatNumberForReport(calc.qtyToOrder, 0),
+    decimal(calc.cost, 2),
+    money(calc.perPieceCost, 3),
+    isPackage ? "" : formatNumberForReport(calc.clientQoh, 0),
+    isPackage ? "" : formatNumberForReport(calc.qty, 0),
+    decimal(calc.markup, 3),
+    money(calc.standardPrice, 2),
+    decimal(calc.marginAdj, 3),
+    money(calc.marginDollars, 2),
+    money(calc.clientPrice, 2),
+    money(calc.ppp, 3),
+    money(calc.priorPpp, 3),
+    money(calc.diff, 3)
+  ];
+}
+
 async function exportCsv() {
-  const headers = ["Level", "Active", "Package", "Product / Service", "Element", "SKU", "Description", "Production Type", "Inventory Qty", "Needed Qty", "Qty to Order", "Cost", "Per Piece Cost", "Client QOH", "Client Order Qty", "Markup", "Margin Adj", "Margin Dollars", "Client Price", "PPP", "Prior PPP", "Difference"];
+  const headers = ["Level", "Active", "Package", "Product / Service", "Element", "SKU", "Description", "Production Type", "Source", "MOQ", "Inventory Qty", "Needed Qty", "Qty to Order", "Cost", "Per Piece Cost", "Client QOH", "Client Order Qty", "Markup", "Std Markup Price", "Margin Adj", "Margin Dollars", "Client Price", "PPP", "Prior PPP", "Difference"];
   const lines = [headers];
-  visibleRows().forEach((row) => {
-    const calc = calculate(row);
-    lines.push([row.level, row.active, row.packageName, row.product, row.element, row.sku || "", row.description, row.type, calc.inventoryQty, calc.neededQty, calc.qtyToOrder, calc.cost, calc.perPieceCost, calc.clientQoh, calc.qty, calc.markup, calc.marginAdj, calc.marginDollars, calc.clientPrice, calc.ppp, calc.priorPpp, calc.diff]);
+  rowsForExport().forEach((row) => {
+    lines.push(csvExportRow(row));
   });
 
   const csv = lines.map((line) => line.map((value) => `"${String(value ?? "").replaceAll('"', '""')}"`).join(",")).join("\n");
@@ -2546,7 +2884,18 @@ if (els.serviceScenario) {
 });
 els.searchInput.addEventListener("input", render);
 els.includeInactive.addEventListener("change", render);
+els.estimateViewModeButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    els.estimateViewMode.value = button.dataset.viewMode;
+    render();
+  });
+});
 els.tariffRate.addEventListener("change", render);
+els.simulationMode.addEventListener("change", render);
+els.simulationBasis.addEventListener("change", render);
+els.simulationPercent.addEventListener("input", render);
+els.simulationPreview.addEventListener("change", render);
+els.applySimulationBtn.addEventListener("click", applyQuantitySimulation);
 els.estimateYear.addEventListener("change", render);
 els.clientName.addEventListener("input", renderProposalPreview);
 els.projectName.addEventListener("change", syncProjectAssociationFromName);
@@ -2582,6 +2931,7 @@ els.lookupTable.addEventListener("change", () => {
 });
 els.saveLookupBtn.addEventListener("click", saveLookup);
 els.saveEstimateBtn.addEventListener("click", saveCurrentEstimate);
+els.duplicateEstimateBtn.addEventListener("click", duplicateCurrentEstimate);
 els.loadEstimateBtn.addEventListener("click", openLoadEstimateDialog);
 els.closeLoadEstimateBtn.addEventListener("click", closeLoadEstimateDialog);
 els.loadEstimateSearch.addEventListener("input", renderLoadEstimateList);

@@ -21,6 +21,7 @@
         </div>
         <div class="top-actions">
           <button id="saveEstimateBtn" class="ghost-btn" type="button" title="Save current project estimate">Save</button>
+          <button id="duplicateEstimateBtn" class="ghost-btn" type="button" title="Save a copy under the next project number">Duplicate</button>
           <button id="loadEstimateBtn" class="ghost-btn" type="button" title="Load by project number or name">Load</button>
           <span id="estimateSaveStatus" class="estimate-save-status" aria-live="polite"></span>
           <button id="resetBtn" class="ghost-btn" type="button" title="Reset to sheet values">Reset</button>
@@ -113,6 +114,36 @@
             </label>
           </div>
 
+          <fieldset class="simulation-controls">
+            <legend>Quantity Edit</legend>
+            <label>
+              Method
+              <select id="simulationMode">
+                <option value="percent">Percent change</option>
+                <option value="set">Set quantity</option>
+              </select>
+            </label>
+            <div class="control-row">
+              <label>
+                Quantity
+                <select id="simulationBasis">
+                  <option value="clientQty">Client Order Qty</option>
+                  <option value="neededQty">Project Needed</option>
+                </select>
+              </label>
+              <label>
+                <span id="simulationValueLabel">%</span>
+                <input id="simulationPercent" type="number" step="1" value="0" />
+              </label>
+            </div>
+            <label class="toggle simulation-preview-toggle">
+              <input id="simulationPreview" type="checkbox" />
+              Preview simulation
+            </label>
+            <div id="simulationSummary" class="simulation-summary"></div>
+            <button id="applySimulationBtn" class="ghost-btn compact-btn" type="button">Apply Simulation</button>
+          </fieldset>
+
           <label class="toggle">
             <input id="includeInactive" type="checkbox" />
             Show inactive rows
@@ -126,6 +157,11 @@
               <p id="visibleCount">0 active rows</p>
             </div>
             <div class="button-group">
+              <input id="estimateViewMode" type="hidden" value="detail" />
+              <div class="view-mode-toggle" role="group" aria-label="Estimate table detail">
+                <button class="active" type="button" data-view-mode="detail" aria-pressed="true">Detailed</button>
+                <button type="button" data-view-mode="summary" aria-pressed="false">Summary</button>
+              </div>
               <button id="addPackageBtn" class="ghost-btn" type="button">Add Package</button>
               <button id="addProductBtn" class="ghost-btn" type="button">Add Product</button>
               <button id="addElementBtn" class="ghost-btn" type="button">Add Element</button>
@@ -139,9 +175,11 @@
                 <tr>
                   <th>Use</th>
                   <th>Name</th>
-                  <th>SKU</th>
-                  <th>Description</th>
+                  <th class="summary-hide">SKU</th>
+                  <th class="summary-hide">Description</th>
                   <th>Type</th>
+                  <th class="summary-hide">Source</th>
+                  <th class="summary-hide">MOQ</th>
                   <th>Inventory Qty</th>
                   <th id="neededQtyHead">2026 Needed</th>
                   <th>Qty to Order</th>
@@ -149,8 +187,8 @@
                   <th>Per Piece Cost</th>
                   <th>Client QOH</th>
                   <th>Client Order Qty</th>
-                  <th class="internal-col">Markup</th>
-                  <th class="internal-col">Std Markup Price</th>
+                  <th class="internal-col summary-hide">Markup</th>
+                  <th class="internal-col summary-hide">Std Markup Price</th>
                   <th class="internal-col">Margin Adj</th>
                   <th class="internal-col">Margin $</th>
                   <th>Client Price</th>
@@ -165,7 +203,10 @@
                 <tr>
                   <td></td>
                   <td>Visible Active Total</td>
-                  <td colspan="3"></td>
+                  <td class="summary-hide" colspan="2"></td>
+                  <td></td>
+                  <td class="summary-hide"></td>
+                  <td class="summary-hide"></td>
                   <td id="footerInventoryQty">0</td>
                   <td id="footerNeededQty">0</td>
                   <td id="footerQtyToOrder">0</td>
@@ -173,8 +214,8 @@
                   <td id="footerPerPieceCost">$0.000</td>
                   <td id="footerClientQoh">0</td>
                   <td id="footerQty">0</td>
-                  <td class="internal-col"></td>
-                  <td id="footerStdMarkup" class="internal-col">$0</td>
+                  <td class="internal-col summary-hide"></td>
+                  <td id="footerStdMarkup" class="internal-col summary-hide">$0</td>
                   <td class="internal-col"></td>
                   <td id="footerMargin" class="internal-col">$0</td>
                   <td id="footerClient">$0</td>
@@ -526,8 +567,8 @@
             <input class="name-input text-input" type="text" />
           </div>
         </td>
-        <td><input class="sku-input text-input" type="text" /></td>
-        <td><input class="description-input text-input" type="text" /></td>
+        <td class="summary-hide"><input class="sku-input text-input" type="text" /></td>
+        <td class="summary-hide"><input class="description-input text-input" type="text" /></td>
         <td>
           <select class="type-input">
             <option value=""></option>
@@ -537,15 +578,24 @@
             <option value="MP">MP</option>
           </select>
         </td>
+        <td class="summary-hide">
+          <select class="source-input">
+            <option value=""></option>
+            <option value="Sharpdots">Sharpdots</option>
+            <option value="vendor">vendor</option>
+            <option value="Manufacturer">Manufacturer</option>
+          </select>
+        </td>
+        <td class="summary-hide"><input class="moq-input number-input" type="number" min="0" step="1" /></td>
         <td><input class="inventory-input number-input" type="number" min="0" step="1" /></td>
         <td><input class="needed-input number-input" type="number" min="0" step="1" /></td>
         <td class="money-cell qty-to-order"></td>
         <td><input class="cost-input number-input" type="number" min="0" step="0.01" /></td>
         <td class="money-cell per-piece-cost"></td>
         <td><input class="client-qoh-input number-input" type="number" min="0" step="1" /></td>
-        <td class="money-cell client-order-qty"></td>
-        <td class="internal-col"><input class="markup-input number-input" type="number" min="0" max="0.95" step="0.01" /></td>
-        <td class="money-cell standard-price internal-col"></td>
+        <td><input class="client-order-qty number-input" type="number" min="0" step="1" /></td>
+        <td class="internal-col summary-hide"><input class="markup-input number-input" type="number" min="0" max="0.95" step="0.01" /></td>
+        <td class="money-cell standard-price internal-col summary-hide"></td>
         <td class="internal-col"><input class="margin-input number-input" type="number" min="-0.95" max="0.95" step="0.01" /></td>
         <td class="money-cell margin-dollars internal-col"></td>
         <td class="money-cell client-price"></td>

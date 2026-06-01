@@ -44,6 +44,8 @@ const migrations = [
   `ALTER TABLE sfpq_project_packages ADD COLUMN IF NOT EXISTS active BOOLEAN DEFAULT TRUE`,
   `ALTER TABLE sfpq_project_packages ADD COLUMN IF NOT EXISTS source_order NUMERIC DEFAULT 0`,
   `ALTER TABLE sfpq_project_packages ADD COLUMN IF NOT EXISTS description TEXT`,
+  `ALTER TABLE sfpq_project_packages ADD COLUMN IF NOT EXISTS source TEXT DEFAULT ''`,
+  `ALTER TABLE sfpq_project_packages ADD COLUMN IF NOT EXISTS moq NUMERIC DEFAULT 0`,
   `ALTER TABLE sfpq_project_packages ADD COLUMN IF NOT EXISTS needed_qty NUMERIC DEFAULT 0`,
   `ALTER TABLE sfpq_project_packages ADD COLUMN IF NOT EXISTS inventory_qty NUMERIC DEFAULT 0`,
   `ALTER TABLE sfpq_project_packages ADD COLUMN IF NOT EXISTS client_qoh NUMERIC DEFAULT 0`,
@@ -59,6 +61,8 @@ const migrations = [
   `ALTER TABLE sfpq_package_products ADD COLUMN IF NOT EXISTS source_order NUMERIC DEFAULT 0`,
   `ALTER TABLE sfpq_package_products ADD COLUMN IF NOT EXISTS description TEXT`,
   `ALTER TABLE sfpq_package_products ADD COLUMN IF NOT EXISTS type VARCHAR(10)`,
+  `ALTER TABLE sfpq_package_products ADD COLUMN IF NOT EXISTS source TEXT DEFAULT ''`,
+  `ALTER TABLE sfpq_package_products ADD COLUMN IF NOT EXISTS moq NUMERIC DEFAULT 0`,
   `ALTER TABLE sfpq_package_products ADD COLUMN IF NOT EXISTS needed_qty NUMERIC DEFAULT 0`,
   `ALTER TABLE sfpq_package_products ADD COLUMN IF NOT EXISTS inventory_qty NUMERIC DEFAULT 0`,
   `ALTER TABLE sfpq_package_products ADD COLUMN IF NOT EXISTS client_qoh NUMERIC DEFAULT 0`,
@@ -78,6 +82,8 @@ const migrations = [
   `ALTER TABLE sfpq_product_elements ADD COLUMN IF NOT EXISTS source_order NUMERIC DEFAULT 0`,
   `ALTER TABLE sfpq_product_elements ADD COLUMN IF NOT EXISTS description TEXT`,
   `ALTER TABLE sfpq_product_elements ADD COLUMN IF NOT EXISTS type VARCHAR(10)`,
+  `ALTER TABLE sfpq_product_elements ADD COLUMN IF NOT EXISTS source TEXT DEFAULT ''`,
+  `ALTER TABLE sfpq_product_elements ADD COLUMN IF NOT EXISTS moq NUMERIC DEFAULT 0`,
   `ALTER TABLE sfpq_product_elements ADD COLUMN IF NOT EXISTS needed_qty NUMERIC DEFAULT 0`,
   `ALTER TABLE sfpq_product_elements ADD COLUMN IF NOT EXISTS inventory_qty NUMERIC DEFAULT 0`,
   `ALTER TABLE sfpq_product_elements ADD COLUMN IF NOT EXISTS client_qoh NUMERIC DEFAULT 0`,
@@ -98,6 +104,39 @@ async function runMigrations() {
     await pool.query(sql);
   }
   console.log("Migrations complete.");
+}
+
+let schemaColumnsCache = null;
+
+async function tableColumns(client, tableName) {
+  if (!schemaColumnsCache) schemaColumnsCache = {};
+  if (!schemaColumnsCache[tableName]) {
+    const result = await client.query(
+      `SELECT column_name
+       FROM information_schema.columns
+       WHERE table_schema = current_schema()
+         AND table_name = $1`,
+      [tableName]
+    );
+    schemaColumnsCache[tableName] = new Set(result.rows.map((row) => row.column_name));
+  }
+  return schemaColumnsCache[tableName];
+}
+
+function optionalSelect(tableAlias, columns, columnName, aliasName, fallbackSql = "''") {
+  return columns.has(columnName)
+    ? `${tableAlias}.${columnName} AS "${aliasName}"`
+    : `${fallbackSql} AS "${aliasName}"`;
+}
+
+function insertRowSql(tableName, fields, conflict = "") {
+  const columns = fields.map(([column]) => column);
+  const values = fields.map(([, value]) => value);
+  const placeholders = values.map((_, index) => `$${index + 1}`).join(",");
+  return {
+    sql: `INSERT INTO ${tableName} (${columns.join(", ")}) VALUES (${placeholders})${conflict}`,
+    values
+  };
 }
 
 // Find existing catalog entry by name (case-insensitive) or insert a new one
@@ -340,12 +379,19 @@ async function handleGetEstimate(key, res) {
     return;
   }
   const p = projectResult.rows[0];
+  const [packageColumns, productColumns, elementColumns] = await Promise.all([
+    tableColumns(pool, "sfpq_project_packages"),
+    tableColumns(pool, "sfpq_package_products"),
+    tableColumns(pool, "sfpq_product_elements")
+  ]);
 
   const [pkgRes, prodRes, elRes] = await Promise.all([
     pool.query(
       `SELECT pp.row_id AS id, 'package' AS level, NULL::text AS "parentId",
               pkg.name AS "packageName", '' AS product, '' AS element,
               COALESCE(pp.sku, '') AS sku, pp.description, '' AS type,
+              ${optionalSelect("pp", packageColumns, "source", "source")},
+              ${optionalSelect("pp", packageColumns, "moq", "moq", "0")},
               pp.active, pp.source_order AS "sourceOrder",
               pp.needed_qty AS "neededQty", pp.needed_qty AS qty,
               pp.inventory_qty AS "inventoryQty", pp.client_qoh AS "clientQoh",
@@ -360,6 +406,8 @@ async function handleGetEstimate(key, res) {
       `SELECT bpp.row_id AS id, 'product' AS level, ppp.row_id AS "parentId",
               pkg.name AS "packageName", pr.name AS product, '' AS element,
               COALESCE(bpp.sku, '') AS sku, bpp.description, bpp.type,
+              ${optionalSelect("bpp", productColumns, "source", "source")},
+              ${optionalSelect("bpp", productColumns, "moq", "moq", "0")},
               bpp.active, bpp.source_order AS "sourceOrder",
               bpp.needed_qty AS "neededQty", bpp.needed_qty AS qty,
               bpp.inventory_qty AS "inventoryQty", bpp.client_qoh AS "clientQoh",
@@ -377,6 +425,8 @@ async function handleGetEstimate(key, res) {
       `SELECT pe.row_id AS id, 'element' AS level, bpp.row_id AS "parentId",
               pkg.name AS "packageName", pr.name AS product, e.name AS element,
               COALESCE(pe.sku, '') AS sku, pe.description, pe.type,
+              ${optionalSelect("pe", elementColumns, "source", "source")},
+              ${optionalSelect("pe", elementColumns, "moq", "moq", "0")},
               pe.active, pe.source_order AS "sourceOrder",
               pe.needed_qty AS "neededQty", pe.needed_qty AS qty,
               pe.inventory_qty AS "inventoryQty", pe.client_qoh AS "clientQoh",
@@ -416,40 +466,41 @@ async function handlePostEstimate(body, res) {
   try {
     await client.query("BEGIN");
 
+    const projectColumns = await tableColumns(client, "sfpq_projects");
+    const projectFields = [
+      ["project_number", estimate.projectNumber],
+      ["name", estimate.projectName],
+      ["client_name", estimate.clientName || ""],
+      ["season", estimate.estimateYear || null],
+      ["status", "draft"],
+      ["active_package", estimate.activePackage || "All"],
+      ["active_types", JSON.stringify(estimate.activeTypes || ["M", "VF", "FP", "MP"])],
+      ["expanded", JSON.stringify(estimate.expanded || [])],
+      ["lookups", JSON.stringify(estimate.lookups || {})],
+      ["payment_dates", JSON.stringify(estimate.paymentDates || {})],
+      ["payment_settings", JSON.stringify(estimate.paymentSettings || {})],
+      ["proposal", JSON.stringify(estimate.proposal || {})],
+      ["tariff_rate", estimate.tariffRate ?? 0.30],
+      ["global_markup", estimate.globalMarkup ?? 0.40],
+      ["updated_at", new Date()]
+    ].filter(([column]) => projectColumns.has(column));
+
+    const projectFieldNames = projectFields.map(([column]) => column);
+    const projectValues = projectFields.map(([, value]) => value);
+    const projectPlaceholders = projectValues.map((_, index) => `$${index + 1}`).join(",");
+    const projectUpdates = projectFieldNames
+      .filter((column) => column !== "project_number")
+      .map((column) => `${column} = EXCLUDED.${column}`)
+      .join(",\n         ");
+
     const projResult = await client.query(
       `INSERT INTO sfpq_projects
-         (project_number, name, client_name, season, status,
-          active_package, active_types, expanded, lookups,
-          payment_dates, payment_settings, proposal, tariff_rate, global_markup, updated_at)
-       VALUES ($1,$2,$3,$4,'draft',$5,$6,$7,$8,$9,$10,$11,$12,$13,NOW())
+         (${projectFieldNames.join(", ")})
+       VALUES (${projectPlaceholders})
        ON CONFLICT (project_number) DO UPDATE SET
-         name              = EXCLUDED.name,
-         client_name       = EXCLUDED.client_name,
-         season            = EXCLUDED.season,
-         active_package    = EXCLUDED.active_package,
-         active_types      = EXCLUDED.active_types,
-         expanded          = EXCLUDED.expanded,
-         lookups           = EXCLUDED.lookups,
-         payment_dates     = EXCLUDED.payment_dates,
-         payment_settings  = EXCLUDED.payment_settings,
-         proposal          = EXCLUDED.proposal,
-         tariff_rate       = EXCLUDED.tariff_rate,
-         global_markup     = EXCLUDED.global_markup,
-         updated_at        = NOW()
+         ${projectUpdates}
        RETURNING id`,
-      [
-        estimate.projectNumber, estimate.projectName, estimate.clientName || "",
-        estimate.estimateYear || null,
-        estimate.activePackage || "All",
-        JSON.stringify(estimate.activeTypes || ["M", "VF", "FP", "MP"]),
-        JSON.stringify(estimate.expanded || []),
-        JSON.stringify(estimate.lookups || {}),
-        JSON.stringify(estimate.paymentDates || {}),
-        JSON.stringify(estimate.paymentSettings || {}),
-        JSON.stringify(estimate.proposal || {}),
-        estimate.tariffRate ?? 0.30,
-        estimate.globalMarkup ?? 0.40
-      ]
+      projectValues
     );
     const projectId = projResult.rows[0].id;
 
@@ -460,38 +511,41 @@ async function handlePostEstimate(body, res) {
 
     const packageIds = new Map(); // packageName → sfpq_packages.id
     const productIds = new Map(); // product name → sfpq_products.id
+    const [packageColumns, productColumns, elementColumns] = await Promise.all([
+      tableColumns(client, "sfpq_project_packages"),
+      tableColumns(client, "sfpq_package_products"),
+      tableColumns(client, "sfpq_product_elements")
+    ]);
 
     for (const row of estimate.rows.filter(r => r.level === "package")) {
       const pkgId = await findOrCreate(client, "sfpq_packages", row.packageName, { markup_pct: row.markup || 0 });
       packageIds.set(row.packageName, pkgId);
-      await client.query(
-        `INSERT INTO sfpq_project_packages
-           (project_id, package_id, quantity, row_id, active, source_order, sku, description,
-            needed_qty, inventory_qty, client_qoh, cost, markup, margin_adj, prior_ppp)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,
-        [projectId, pkgId, Math.max(row.neededQty || 0, 1),
-         row.id, row.active !== false, row.sourceOrder || 0, row.sku || "", row.description || "",
-         row.neededQty || 0, row.inventoryQty || 0, row.clientQoh || 0,
-         row.cost || 0, row.markup || 0.4, row.marginAdj || 0.4, row.priorPpp || 0]
-      );
+      const fields = [
+        ["project_id", projectId], ["package_id", pkgId], ["quantity", Math.max(row.neededQty || 0, 1)],
+        ["row_id", row.id], ["active", row.active !== false], ["source_order", row.sourceOrder || 0],
+        ["sku", row.sku || ""], ["description", row.description || ""],
+        ["source", row.source || ""], ["moq", row.moq || 0],
+        ["needed_qty", row.neededQty || 0], ["inventory_qty", row.inventoryQty || 0], ["client_qoh", row.clientQoh || 0],
+        ["cost", row.cost || 0], ["markup", row.markup || 0.4], ["margin_adj", row.marginAdj || 0.4], ["prior_ppp", row.priorPpp || 0]
+      ].filter(([column]) => packageColumns.has(column));
+      const insert = insertRowSql("sfpq_project_packages", fields);
+      await client.query(insert.sql, insert.values);
     }
 
     for (const row of estimate.rows.filter(r => r.level === "product")) {
       const prId = await findOrCreate(client, "sfpq_products", row.product || "Product", { markup_pct: row.markup || 0 });
       productIds.set(row.product, prId);
       const pkgId = packageIds.get(row.packageName);
-      await client.query(
-        `INSERT INTO sfpq_package_products
-           (package_id, product_id, quantity, project_id, row_id, active, source_order,
-            sku, description, type, needed_qty, inventory_qty, client_qoh,
-            cost, markup, margin_adj, prior_ppp)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`,
-        [pkgId, prId, Math.max(row.neededQty || 0, 1),
-         projectId, row.id, row.active !== false, row.sourceOrder || 0,
-         row.sku || "", row.description || "", row.type || "",
-         row.neededQty || 0, row.inventoryQty || 0, row.clientQoh || 0,
-         row.cost || 0, row.markup || 0.4, row.marginAdj || 0.4, row.priorPpp || 0]
-      );
+      const fields = [
+        ["package_id", pkgId], ["product_id", prId], ["quantity", Math.max(row.neededQty || 0, 1)],
+        ["project_id", projectId], ["row_id", row.id], ["active", row.active !== false], ["source_order", row.sourceOrder || 0],
+        ["sku", row.sku || ""], ["description", row.description || ""], ["type", row.type || ""],
+        ["source", row.source || ""], ["moq", row.moq || 0],
+        ["needed_qty", row.neededQty || 0], ["inventory_qty", row.inventoryQty || 0], ["client_qoh", row.clientQoh || 0],
+        ["cost", row.cost || 0], ["markup", row.markup || 0.4], ["margin_adj", row.marginAdj || 0.4], ["prior_ppp", row.priorPpp || 0]
+      ].filter(([column]) => productColumns.has(column));
+      const insert = insertRowSql("sfpq_package_products", fields);
+      await client.query(insert.sql, insert.values);
     }
 
     for (const row of estimate.rows.filter(r => r.level === "element")) {
@@ -501,18 +555,16 @@ async function handlePostEstimate(body, res) {
       );
       const pkgId = packageIds.get(row.packageName);
       const prId = productIds.get(row.product);
-      await client.query(
-        `INSERT INTO sfpq_product_elements
-           (product_id, element_id, quantity, project_id, package_id, row_id, active, source_order,
-            sku, description, type, needed_qty, inventory_qty, client_qoh,
-            cost, markup, margin_adj, prior_ppp)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)`,
-        [prId, elId, Math.max(row.neededQty || 0, 1),
-         projectId, pkgId, row.id, row.active !== false, row.sourceOrder || 0,
-         row.sku || "", row.description || "", row.type || "",
-         row.neededQty || 0, row.inventoryQty || 0, row.clientQoh || 0,
-         row.cost || 0, row.markup || 0.4, row.marginAdj || 0.4, row.priorPpp || 0]
-      );
+      const fields = [
+        ["product_id", prId], ["element_id", elId], ["quantity", Math.max(row.neededQty || 0, 1)],
+        ["project_id", projectId], ["package_id", pkgId], ["row_id", row.id], ["active", row.active !== false], ["source_order", row.sourceOrder || 0],
+        ["sku", row.sku || ""], ["description", row.description || ""], ["type", row.type || ""],
+        ["source", row.source || ""], ["moq", row.moq || 0],
+        ["needed_qty", row.neededQty || 0], ["inventory_qty", row.inventoryQty || 0], ["client_qoh", row.clientQoh || 0],
+        ["cost", row.cost || 0], ["markup", row.markup || 0.4], ["margin_adj", row.marginAdj || 0.4], ["prior_ppp", row.priorPpp || 0]
+      ].filter(([column]) => elementColumns.has(column));
+      const insert = insertRowSql("sfpq_product_elements", fields);
+      await client.query(insert.sql, insert.values);
     }
 
     await client.query("COMMIT");
