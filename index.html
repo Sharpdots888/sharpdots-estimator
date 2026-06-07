@@ -4,44 +4,91 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sharpdots Estimator</title>
-    <link rel="stylesheet" href="styles.css?v=save-load3" />
+    <link rel="stylesheet" href="styles.css?v=proposal-export-qa2" />
   </head>
   <body>
     <main class="app-shell">
       <header class="topbar">
-        <div class="project-title-wrap">
-          <label class="project-title-label" for="projectName">Project Name</label>
-          <input id="projectName" class="project-title-input" list="projectNameLookup" type="text" value="" placeholder="New estimate" />
+        <div class="workspace-title-wrap">
+          <div class="workspace-title-row">
+            <label class="project-title-label" for="workspaceName">Workspace Name</label>
+            <span class="workspace-number-pill">Workspace # <output id="workspaceNumber" class="workspace-number-output"></output></span>
+          </div>
+          <input id="workspaceName" class="project-title-input" list="workspaceLookup" type="text" value="" placeholder="New workspace" />
           <span id="reportProjectTitle" class="report-project-title">Estimate</span>
-          <datalist id="projectNameLookup"></datalist>
+          <datalist id="workspaceLookup"></datalist>
         </div>
-        <div class="report-meta">
-          <span id="estimateDate" class="estimate-date"></span>
-          <span class="report-project-number">Project # <strong id="reportProjectNumber">Unassigned</strong></span>
+        <div class="workspace-controls">
+          <label class="workspace-client-control">
+            Client / Account
+            <input id="clientName" list="clientLookup" type="text" value="" placeholder="Enter or look up client" />
+          </label>
+          <datalist id="clientLookup">
+            <option value="North Pole Post Office"></option>
+            <option value="Portofino"></option>
+            <option value="Santa Direct"></option>
+          </datalist>
+          <div class="workspace-mode-control">
+            <span>Mode</span>
+            <select id="workspaceMode" class="workspace-mode-select" aria-label="Workspace mode">
+              <option value="full">All Tools</option>
+              <option value="proposal">Proposal / Services</option>
+              <option value="printEcomm">Print / Ecomm</option>
+            </select>
+            <div class="workspace-mode-buttons" role="group" aria-label="Workspace mode presets">
+              <button class="workspace-mode-option active" type="button" data-workspace-mode="full">All</button>
+              <button class="workspace-mode-option" type="button" data-workspace-mode="proposal">Proposal</button>
+              <button class="workspace-mode-option" type="button" data-workspace-mode="printEcomm">Print / Ecomm</button>
+            </div>
+            <small id="workspaceModeScope" class="workspace-mode-scope">All tabs available</small>
+          </div>
+          <div class="workspace-action-row">
+            <button id="newWorkspaceBtn" class="ghost-btn compact-btn" type="button" title="Start a new workspace">New Workspace</button>
+            <button id="saveWorkspaceBtn" class="ghost-btn compact-btn" type="button" title="Save changed workspace tabs">Save Workspace</button>
+            <button id="duplicateWorkspaceBtn" class="ghost-btn compact-btn" type="button" title="Copy this workspace">Copy Workspace</button>
+            <button id="loadWorkspaceBtn" class="ghost-btn compact-btn" type="button" title="Open a saved workspace">Open Workspace</button>
+          </div>
         </div>
-        <div class="top-actions">
-          <button id="saveEstimateBtn" class="ghost-btn" type="button" title="Save current project estimate">Save</button>
-          <button id="duplicateEstimateBtn" class="ghost-btn" type="button" title="Save a copy under the next project number">Duplicate</button>
-          <button id="loadEstimateBtn" class="ghost-btn" type="button" title="Load by project number or name">Load</button>
+        <div class="header-utility">
+          <div class="report-meta">
+            <span id="estimateDate" class="estimate-date"></span>
+            <span class="report-project-number">Estimate # <strong id="reportProjectNumber">Unassigned</strong></span>
+          </div>
           <span id="estimateSaveStatus" class="estimate-save-status" aria-live="polite"></span>
-          <button id="resetBtn" class="ghost-btn" type="button" title="Reset to sheet values">Reset</button>
-          <select id="pdfScope" class="pdf-scope" title="Choose report pages for PDF">
-            <option value="both">Both</option>
-            <option value="costs">Costing</option>
-            <option value="schedule">Schedule</option>
-          </select>
-          <button id="pdfBtn" class="ghost-btn" type="button" title="Generate PDF from current view">PDF</button>
-          <button id="exportBtn" type="button" title="Export current estimate">Export CSV</button>
+          <button id="resetBtn" class="ghost-btn compact-btn" type="button" title="Reset to sheet values">Reset</button>
+          <div class="header-output-controls" hidden>
+            <select id="pdfScope" class="pdf-scope" title="Choose report pages for PDF">
+              <option value="both">Both</option>
+              <option value="costs">Costing</option>
+              <option value="schedule">Schedule</option>
+            </select>
+            <button id="pdfBtn" class="ghost-btn" type="button" title="Generate PDF from current view">PDF</button>
+            <button id="exportBtn" type="button" title="Export current estimate">Export CSV</button>
+          </div>
         </div>
       </header>
 
       <nav class="app-tabs" aria-label="Estimating app sections">
-        <button class="app-tab active" type="button" data-view="estimateView">Estimate</button>
-        <button class="app-tab" type="button" data-view="proposalView">Proposal</button>
+        <button class="app-tab active" type="button" data-view="proposalView">Proposal</button>
+        <button class="app-tab" type="button" data-view="estimateView">Estimate</button>
         <button class="app-tab" type="button" data-view="servicesView">Services Calculator</button>
+        <button class="app-tab" type="button" data-view="sourcingView">Sourcing</button>
+        <button class="app-tab" type="button" data-view="printQuoteView">Print Quote</button>
+        <button class="app-tab" type="button" data-view="ecommView">Ecomm Pricing</button>
       </nav>
 
-      <section id="estimateView" class="app-view active-view">
+      <section id="estimateView" class="app-view" hidden>
+      <section class="tab-record-controls estimate-record-controls" data-record-type="estimates" aria-label="Estimate record controls">
+        <label class="inline-record-field estimate-name-field">
+          Name
+          <input id="projectName" list="projectNameLookup" type="text" placeholder="New estimate" />
+          <datalist id="projectNameLookup"></datalist>
+        </label>
+        <label class="inline-record-field estimate-version-field">
+          Version
+          <input id="estimateVersion" type="number" min="1" step="1" value="1" />
+        </label>
+      </section>
       <section class="summary-grid" aria-label="Estimate summary">
         <article class="metric">
           <span>Total Client Price</span>
@@ -64,20 +111,9 @@
       <section class="workspace">
         <aside class="control-panel" aria-label="Estimator controls">
           <label>
-            Project #
+            Estimate #
             <output id="projectNumber" class="project-number-input"></output>
           </label>
-
-          <label>
-            Client / Account
-            <input id="clientName" list="clientLookup" type="text" value="" placeholder="Enter or look up client" />
-          </label>
-          <datalist id="clientLookup">
-            <option value="North Pole Post Office"></option>
-            <option value="Portofino"></option>
-            <option value="Santa Direct"></option>
-          </datalist>
-
           <label>
             Year
             <input id="estimateYear" list="yearLookup" type="number" min="2020" max="2035" step="1" value="2026" />
@@ -321,7 +357,8 @@
       </section>
       </section>
 
-      <section id="proposalView" class="app-view proposal-view" hidden>
+      <section id="proposalView" class="app-view proposal-view active-view">
+        <section class="tab-record-controls" data-record-type="proposals" aria-label="Proposal record controls"></section>
         <section class="proposal-layout">
           <aside class="panel proposal-editor" aria-label="Proposal editor">
             <div class="section-head">
@@ -335,12 +372,12 @@
               <input id="proposalTitle" type="text" />
             </label>
             <label>
-              Campaign / Offering
+              Project
               <input id="proposalSubtitle" type="text" />
             </label>
             <label>
               Prepared For
-              <input id="proposalPreparedFor" type="text" />
+              <input id="proposalPreparedFor" type="text" placeholder="Client contact or recipient name" />
             </label>
             <label>
               Pricing View
@@ -350,30 +387,69 @@
                 <option value="type">Production type summary</option>
               </select>
             </label>
-            <label>
-              Overview
-              <textarea id="proposalOverview" rows="4"></textarea>
-            </label>
-            <label>
-              Audience / Scope
-              <textarea id="proposalAudience" rows="4"></textarea>
-            </label>
-            <label>
-              Deliverables
-              <textarea id="proposalDeliverables" rows="5"></textarea>
-            </label>
-            <label>
-              Value Narrative
-              <textarea id="proposalValueNarrative" rows="5"></textarea>
-            </label>
-            <label>
-              Next Steps
-              <textarea id="proposalNextSteps" rows="4"></textarea>
-            </label>
-            <label>
-              Terms Summary
-              <textarea id="proposalTerms" rows="5"></textarea>
-            </label>
+            <section class="proposal-publishing-panel" aria-label="Publishing setup">
+              <div class="section-head compact-head">
+                <div>
+                  <h2>Publishing</h2>
+                  <p>Client and internal output setup</p>
+                </div>
+              </div>
+              <div class="publishing-grid">
+                <label>
+                  Template
+                  <select id="proposalPublishingTemplate">
+                    <option value="directMail">Direct Mail Proposal</option>
+                    <option value="services">Services Proposal</option>
+                    <option value="printQuote">Print Quote Only</option>
+                    <option value="ecommPriceList">Ecomm Price List</option>
+                    <option value="internalReview">Internal Cost Review</option>
+                  </select>
+                </label>
+                <label>
+                  Audience
+                  <select id="proposalOutputAudience">
+                    <option value="client">Client</option>
+                    <option value="internal">Internal</option>
+                  </select>
+                </label>
+                <label>
+                  Output
+                  <select id="proposalOutputScope">
+                    <option value="both">Costs + Schedule</option>
+                    <option value="costs">Costs Only</option>
+                    <option value="schedule">Schedule Only</option>
+                  </select>
+                </label>
+              </div>
+              <div id="proposalPublishSummary" class="publishing-summary" aria-live="polite"></div>
+              <div id="proposalPublishReadiness" class="publishing-readiness" aria-live="polite"></div>
+              <div id="proposalPublishManifest" class="publishing-manifest" aria-live="polite"></div>
+              <div class="template-integrity-row">
+                <span id="proposalTemplateStatus">Matches template</span>
+                <button id="resetProposalTemplateBtn" class="ghost-btn compact-btn" type="button" disabled>Reset to Template</button>
+              </div>
+              <details class="publishing-section-details">
+                <summary>Choose included sections</summary>
+                <fieldset class="publishing-section-picker">
+                  <legend>Included Sections</legend>
+                  <div class="publishing-section-grid">
+                    <label><input class="proposal-section-toggle" type="checkbox" value="copy" checked /> Proposal copy</label>
+                    <label><input class="proposal-section-toggle" type="checkbox" value="estimate" checked /> Estimate pricing</label>
+                    <label><input class="proposal-section-toggle" type="checkbox" value="schedule" checked /> Payment schedule</label>
+                    <label><input class="proposal-section-toggle" type="checkbox" value="services" checked /> Services calc</label>
+                    <label><input class="proposal-section-toggle" type="checkbox" value="sourcing" checked /> Sourcing summary</label>
+                    <label><input class="proposal-section-toggle" type="checkbox" value="printQuote" /> Print quote</label>
+                    <label><input class="proposal-section-toggle" type="checkbox" value="ecomm" /> Ecomm list</label>
+                  </div>
+                </fieldset>
+              </details>
+              <div class="publishing-actions">
+                <button id="proposalPublishPdfBtn" type="button">Prepare PDF</button>
+                <button id="proposalPublishCsvBtn" class="ghost-btn" type="button">Export CSV</button>
+                <button id="proposalSignatureBtn" class="ghost-btn" type="button" disabled>Handoff later</button>
+                <span id="proposalPublishNote" class="publishing-action-note">Signature/payment handoff will be connected later.</span>
+              </div>
+            </section>
           </aside>
 
           <section class="proposal-preview-wrap" aria-label="Proposal preview">
@@ -429,6 +505,60 @@
                 <div id="proposalPricingLines" class="proposal-pricing-lines"></div>
               </section>
 
+              <section id="proposalScheduleSection" class="proposal-output-section">
+                <div class="proposal-section-title">
+                  <div>
+                    <h3>Payment Schedule</h3>
+                    <p id="proposalScheduleNote"></p>
+                  </div>
+                  <strong id="proposalScheduleTotal">$0</strong>
+                </div>
+                <div id="proposalScheduleLines" class="proposal-output-lines"></div>
+              </section>
+
+              <section id="proposalServicesSection" class="proposal-output-section">
+                <div class="proposal-section-title">
+                  <div>
+                    <h3>Services Calculator</h3>
+                    <p id="proposalServicesNote"></p>
+                  </div>
+                  <strong id="proposalServicesTotal">$0</strong>
+                </div>
+                <div id="proposalServicesSummary" class="proposal-output-summary"></div>
+                <div id="proposalServicesLines" class="proposal-output-lines"></div>
+              </section>
+
+              <section id="proposalSourcingSection" class="proposal-output-section">
+                <div class="proposal-section-title">
+                  <div>
+                    <h3>Sourcing Summary</h3>
+                    <p id="proposalSourcingNote"></p>
+                  </div>
+                  <strong id="proposalSourcingTotal">$0</strong>
+                </div>
+                <div id="proposalSourcingLines" class="proposal-output-lines"></div>
+              </section>
+
+              <section id="proposalPrintQuoteSection" class="proposal-output-section">
+                <div class="proposal-section-title">
+                  <div>
+                    <h3>Print Quote</h3>
+                    <p id="proposalPrintQuoteNote"></p>
+                  </div>
+                </div>
+                <div id="proposalPrintQuoteLines" class="proposal-output-lines"></div>
+              </section>
+
+              <section id="proposalEcommSection" class="proposal-output-section">
+                <div class="proposal-section-title">
+                  <div>
+                    <h3>Ecomm Price List</h3>
+                    <p id="proposalEcommNote"></p>
+                  </div>
+                </div>
+                <div id="proposalEcommLines" class="proposal-output-lines"></div>
+              </section>
+
               <section class="proposal-copy-grid closing-grid">
                 <article>
                   <h3>Next Steps</h3>
@@ -439,12 +569,15 @@
                   <p id="proposalPreviewTerms"></p>
                 </article>
               </section>
+
+              <footer id="proposalPublishFooter" class="proposal-publish-footer"></footer>
             </article>
           </section>
         </section>
       </section>
 
       <section id="servicesView" class="app-view services-view" hidden>
+        <section class="tab-record-controls" data-record-type="services" aria-label="Service calculation record controls"></section>
         <section class="services-layout">
           <aside class="panel services-controls" aria-label="SalesMachine controls">
             <div class="section-head">
@@ -551,6 +684,229 @@
           </section>
         </section>
       </section>
+
+      <section id="sourcingView" class="app-view sourcing-view" hidden>
+        <section class="tab-record-controls" data-record-type="sourcing" aria-label="Sourcing record controls"></section>
+        <section class="sourcing-layout">
+          <aside class="panel sourcing-controls" aria-label="Sourcing controls">
+            <div class="section-head">
+              <div>
+                <h2>Sourcing</h2>
+                <p>Manufacturer and vendor quote workbench</p>
+              </div>
+            </div>
+            <label>
+              Search
+              <input id="sourcingSearch" type="search" placeholder="Item, SKU, vendor, HTS" />
+            </label>
+            <label>
+              Source
+              <select id="sourcingSourceFilter">
+                <option value="all">All sourced items</option>
+                <option value="Manufacturer">Manufacturer</option>
+                <option value="vendor">vendor</option>
+                <option value="blank">Unassigned source</option>
+              </select>
+            </label>
+            <label>
+              Status
+              <select id="sourcingStatusFilter">
+                <option value="all">All statuses</option>
+                <option value="Needs Quote">Needs Quote</option>
+                <option value="Requested">Requested</option>
+                <option value="Received">Received</option>
+                <option value="Clarifying">Clarifying</option>
+                <option value="Selected">Selected</option>
+                <option value="Rejected">Rejected</option>
+                <option value="Expired">Expired</option>
+                <option value="PO Ready">PO Ready</option>
+                <option value="PO Exported">PO Exported</option>
+              </select>
+            </label>
+            <label>
+              View By
+              <select id="sourcingGroupBy">
+                <option value="item">Item</option>
+                <option value="manufacturer">Manufacturer</option>
+                <option value="forwarder">Freight Forwarder</option>
+              </select>
+            </label>
+            <label class="toggle">
+              <input id="sourcingShowAll" type="checkbox" />
+              Show all estimate items
+            </label>
+            <button id="populateSourcingSampleBtn" class="ghost-btn" type="button">Populate Sample Quotes</button>
+            <div class="sourcing-import-export">
+              <button id="selectVisibleSourcingBtn" class="ghost-btn" type="button">Select Visible</button>
+              <button id="exportSourcingTemplateBtn" class="ghost-btn" type="button">Export Quote Sheet</button>
+              <button id="importSourcingQuotesBtn" class="ghost-btn" type="button">Import Filled Sheet</button>
+              <input id="sourcingImportFile" type="file" accept=".csv,text/csv" hidden />
+              <small id="sourcingImportStatus" aria-live="polite"></small>
+              <div id="sourcingImportMapper" class="sourcing-import-mapper" hidden></div>
+            </div>
+            <div class="sourcing-help">
+              <strong>Prototype flow</strong>
+              <span>Quotes are scoped to the loaded estimate project. The sourcing item ID is used before a final SKU exists; later this should become a reusable sourcing item that can be assigned to multiple projects.</span>
+            </div>
+          </aside>
+
+          <section class="sourcing-workspace">
+            <section class="sourcing-summary" aria-label="Sourcing summary">
+              <article>
+                <span>Project</span>
+                <strong id="sourcingProjectScope">Current</strong>
+              </article>
+              <article>
+                <span>Items</span>
+                <strong id="sourcingItemCount">0</strong>
+              </article>
+              <article>
+                <span>Quotes</span>
+                <strong id="sourcingQuoteCount">0</strong>
+              </article>
+              <article>
+                <span>Selected</span>
+                <strong id="sourcingSelectedCount">0</strong>
+              </article>
+              <article>
+                <span>Selected Cost</span>
+                <strong id="sourcingSelectedCost">$0</strong>
+              </article>
+              <article>
+                <span>Latest Refresh</span>
+                <strong id="sourcingLatestRefresh">None</strong>
+              </article>
+            </section>
+
+            <section class="panel sourcing-panel">
+              <div class="section-head">
+                <div>
+                  <h2>Quote Board</h2>
+                  <p>Multiple suppliers and quantity breaks per item</p>
+                </div>
+                <div class="view-mode-toggle sourcing-view-toggle" role="group" aria-label="Sourcing board detail">
+                  <button class="active" type="button" data-sourcing-view-mode="summary" aria-pressed="true">Summary</button>
+                  <button type="button" data-sourcing-view-mode="detail" aria-pressed="false">Detailed</button>
+                  <button type="button" data-sourcing-view-mode="projects" aria-pressed="false">Projects</button>
+                  <button type="button" data-sourcing-view-mode="refresh" aria-pressed="false">Refresh</button>
+                  <button class="group-start" type="button" data-sourcing-view-mode="decision" aria-pressed="false">Decisions</button>
+                  <button type="button" data-sourcing-view-mode="readiness" aria-pressed="false">Ready</button>
+                  <button class="group-start" type="button" data-sourcing-view-mode="sync" aria-pressed="false">Sync</button>
+                  <button type="button" data-sourcing-view-mode="award" aria-pressed="false">Awards</button>
+                  <button class="group-start" type="button" data-sourcing-view-mode="forwarder" aria-pressed="false">Forwarders</button>
+                  <button type="button" data-sourcing-view-mode="poQueue" aria-pressed="false">PO Queue</button>
+                </div>
+              </div>
+              <div id="sourcingBoardContext" class="sourcing-board-context" aria-live="polite"></div>
+              <div id="sourcingItems" class="sourcing-items"></div>
+            </section>
+          </section>
+        </section>
+      </section>
+
+      <section id="printQuoteView" class="app-view placeholder-view" hidden>
+        <section class="tab-record-controls" data-record-type="printQuotes" aria-label="Print quote record controls"></section>
+        <section class="placeholder-panel panel">
+          <div class="section-head">
+            <div>
+              <h2>Print Quote</h2>
+              <p>Standalone print quote library with optional workspace attachment</p>
+            </div>
+          </div>
+          <div class="placeholder-grid">
+            <article>
+              <span>Record</span>
+              <strong id="printQuotePlaceholderNumber">PQ-000001</strong>
+            </article>
+            <article>
+              <span>Planned Use</span>
+              <strong>Save alone or attach to workspace</strong>
+            </article>
+            <article>
+              <span>Attachment</span>
+              <strong id="printQuoteAttachmentStatus">Standalone</strong>
+            </article>
+            <article>
+              <span>Source Ref</span>
+              <strong id="printQuoteSourceSummary">Not linked</strong>
+            </article>
+          </div>
+          <div class="placeholder-form" aria-label="Print quote draft fields">
+            <label>
+              Print Quote Name
+              <input id="printQuoteName" type="text" value="Print Quote Draft" />
+            </label>
+            <label>
+              Source
+              <input id="printQuoteSource" type="text" value="In-house / vendor print source" />
+            </label>
+            <label>
+              External Ref
+              <input id="printQuoteExternalRef" type="text" placeholder="Legacy quote id" />
+            </label>
+            <label>
+              Source URL
+              <input id="printQuoteSourceUrl" type="url" placeholder="https://..." />
+            </label>
+            <label class="wide-field">
+              Notes
+              <textarea id="printQuoteNotes" rows="4">Use this draft to hold print-specific scope, pricing source, and assumptions before the print quote calculator is built.</textarea>
+            </label>
+          </div>
+        </section>
+      </section>
+
+      <section id="ecommView" class="app-view placeholder-view" hidden>
+        <section class="tab-record-controls" data-record-type="ecomm" aria-label="Ecomm price list record controls"></section>
+        <section class="placeholder-panel panel">
+          <div class="section-head">
+            <div>
+              <h2>Ecomm Pricing</h2>
+              <p>Standalone ecommerce price lists with optional workspace attachment</p>
+            </div>
+          </div>
+          <div class="placeholder-grid">
+            <article>
+              <span>Record</span>
+              <strong id="ecommPlaceholderNumber">EPL-000001</strong>
+            </article>
+            <article>
+              <span>Planned Use</span>
+              <strong>Save alone or attach to workspace</strong>
+            </article>
+            <article>
+              <span>Attachment</span>
+              <strong id="ecommAttachmentStatus">Standalone</strong>
+            </article>
+            <article>
+              <span>Source Ref</span>
+              <strong id="ecommSourceSummary">Not linked</strong>
+            </article>
+          </div>
+          <div class="placeholder-form" aria-label="Ecomm price list draft fields">
+            <label>
+              Price List Name
+              <input id="ecommListName" type="text" value="Ecomm Price List Draft" />
+            </label>
+            <label>
+              Channel
+              <input id="ecommChannel" type="text" value="Catalog / storefront" />
+            </label>
+            <label>
+              External Ref
+              <input id="ecommExternalRef" type="text" placeholder="Legacy price list id" />
+            </label>
+            <label>
+              Source URL
+              <input id="ecommSourceUrl" type="url" placeholder="https://..." />
+            </label>
+            <label class="wide-field">
+              Notes
+              <textarea id="ecommNotes" rows="4">Use this draft to hold ecommerce list scope, channel assumptions, and selected products before the ecomm price list calculator is built.</textarea>
+            </label>
+          </div>
+        </section>
+      </section>
     </main>
 
     <template id="rowTemplate">
@@ -612,20 +968,70 @@
 
     <div id="invLookupDropdown" class="inv-lookup-dropdown" hidden></div>
 
+    <div id="dirtyRecordsModal" class="modal-backdrop" hidden>
+      <section class="dirty-record-dialog" role="dialog" aria-modal="true" aria-labelledby="dirtyRecordsTitle">
+        <header class="load-estimate-head">
+          <h2 id="dirtyRecordsTitle">Unsaved Changes</h2>
+          <button id="dirtyCancelBtn" class="ghost-btn" type="button" title="Cancel">×</button>
+        </header>
+        <p id="dirtyRecordsMessage" class="dirty-record-message"></p>
+        <ul id="dirtyRecordsList" class="dirty-record-list"></ul>
+        <div class="dirty-record-actions">
+          <button id="dirtySaveContinueBtn" type="button">Save and Continue</button>
+          <button id="dirtyDiscardContinueBtn" class="ghost-btn" type="button">Continue Without Saving</button>
+          <button id="dirtyCancelActionBtn" class="ghost-btn" type="button">Cancel</button>
+        </div>
+      </section>
+    </div>
+
     <div id="loadEstimateModal" class="modal-backdrop" hidden>
       <section class="load-estimate-dialog" role="dialog" aria-modal="true" aria-labelledby="loadEstimateTitle">
         <header class="load-estimate-head">
-          <h2 id="loadEstimateTitle">Load Project</h2>
+          <h2 id="loadEstimateTitle">Load Estimate</h2>
           <button id="closeLoadEstimateBtn" class="ghost-btn" type="button" title="Close">×</button>
         </header>
         <label class="load-search-label">
-          Search saved projects
-          <input id="loadEstimateSearch" type="search" placeholder="Project number, name, client, or year" />
+          Search saved estimates
+          <input id="loadEstimateSearch" type="search" placeholder="Estimate number, name, client, or year" />
         </label>
         <div id="loadEstimateList" class="load-estimate-list"></div>
       </section>
     </div>
 
-    <script src="app.js?v=save-load3"></script>
+    <div id="loadWorkspaceModal" class="modal-backdrop" hidden>
+      <section class="load-estimate-dialog" role="dialog" aria-modal="true" aria-labelledby="loadWorkspaceTitle">
+        <header class="load-estimate-head">
+          <h2 id="loadWorkspaceTitle">Load Workspace</h2>
+          <button id="closeLoadWorkspaceBtn" class="ghost-btn" type="button" title="Close">×</button>
+        </header>
+        <label class="load-search-label">
+          Search saved workspaces
+          <input id="loadWorkspaceSearch" type="search" placeholder="Workspace number, name, client, or record number" />
+        </label>
+        <div id="loadWorkspaceList" class="load-estimate-list"></div>
+      </section>
+    </div>
+
+    <div id="libraryRecordModal" class="modal-backdrop" hidden>
+      <section class="load-estimate-dialog library-record-dialog" role="dialog" aria-modal="true" aria-labelledby="libraryRecordTitle">
+        <header class="load-estimate-head">
+          <h2 id="libraryRecordTitle">Open Library</h2>
+          <button id="closeLibraryRecordBtn" class="ghost-btn" type="button" title="Close">×</button>
+        </header>
+        <label class="load-search-label">
+          Search library
+          <input id="libraryRecordSearch" type="search" placeholder="PQ, EPL, or workspace number" />
+        </label>
+        <div class="library-picker-filters" role="group" aria-label="Library record scope">
+          <button class="active" type="button" data-library-scope="all" aria-pressed="true">All</button>
+          <button type="button" data-library-scope="attached" aria-pressed="false">Attached</button>
+          <button type="button" data-library-scope="standalone" aria-pressed="false">Standalone</button>
+        </div>
+        <div id="libraryRecordSummary" class="library-record-summary" aria-live="polite"></div>
+        <div id="libraryRecordList" class="load-estimate-list library-record-list"></div>
+      </section>
+    </div>
+
+    <script src="app.js?v=proposal-export-qa2"></script>
   </body>
 </html>

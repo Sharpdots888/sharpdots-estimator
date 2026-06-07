@@ -25,9 +25,22 @@ const mimeTypes = {
   ".svg": "image/svg+xml"
 };
 
+function normalizeEstimateNumber(projectNumber) {
+  const match = String(projectNumber || "").trim().match(/^P-(\d{6})$/);
+  return match ? `E-${match[1]}` : String(projectNumber || "").trim();
+}
+
+function legacyEstimateNumber(projectNumber) {
+  const match = String(projectNumber || "").trim().match(/^E-(\d{6})$/);
+  return match ? `P-${match[1]}` : String(projectNumber || "").trim();
+}
+
 const migrations = [
   // sfpq_projects — estimator fields
   `ALTER TABLE sfpq_projects ADD COLUMN IF NOT EXISTS project_number VARCHAR(20) UNIQUE`,
+  `ALTER TABLE sfpq_projects ADD COLUMN IF NOT EXISTS workspace_number VARCHAR(20)`,
+  `ALTER TABLE sfpq_projects ADD COLUMN IF NOT EXISTS workspace_name TEXT DEFAULT ''`,
+  `ALTER TABLE sfpq_projects ADD COLUMN IF NOT EXISTS estimate_version INTEGER DEFAULT 1`,
   `ALTER TABLE sfpq_projects ADD COLUMN IF NOT EXISTS client_name TEXT DEFAULT ''`,
   `ALTER TABLE sfpq_projects ADD COLUMN IF NOT EXISTS active_package VARCHAR(255) DEFAULT 'All'`,
   `ALTER TABLE sfpq_projects ADD COLUMN IF NOT EXISTS active_types JSONB DEFAULT '["M","VF","FP","MP"]'`,
@@ -36,6 +49,7 @@ const migrations = [
   `ALTER TABLE sfpq_projects ADD COLUMN IF NOT EXISTS payment_dates JSONB DEFAULT '{}'`,
   `ALTER TABLE sfpq_projects ADD COLUMN IF NOT EXISTS payment_settings JSONB DEFAULT '{}'`,
   `ALTER TABLE sfpq_projects ADD COLUMN IF NOT EXISTS proposal JSONB DEFAULT '{}'`,
+  `ALTER TABLE sfpq_projects ADD COLUMN IF NOT EXISTS sourcing JSONB DEFAULT '{}'`,
   `ALTER TABLE sfpq_projects ADD COLUMN IF NOT EXISTS tariff_rate NUMERIC DEFAULT 0.30`,
   `ALTER TABLE sfpq_projects ADD COLUMN IF NOT EXISTS global_markup NUMERIC DEFAULT 0.40`,
   // sfpq_project_packages — per-estimate package data
@@ -205,7 +219,10 @@ async function handleGetEstimates(res) {
      WHERE project_number IS NOT NULL
      ORDER BY updated_at DESC`
   );
-  sendJson(res, 200, result.rows);
+  sendJson(res, 200, result.rows.map((row) => ({
+    ...row,
+    projectNumber: normalizeEstimateNumber(row.projectNumber)
+  })));
 }
 
 async function handleGetClients(res) {
@@ -370,9 +387,16 @@ async function handleGetManufacturers(res) {
 }
 
 async function handleGetEstimate(key, res) {
+  const normalizedKey = normalizeEstimateNumber(key);
+  const legacyKey = legacyEstimateNumber(normalizedKey);
+  const lookupKeys = Array.from(new Set([normalizedKey, legacyKey]));
   const projectResult = await pool.query(
-    `SELECT * FROM sfpq_projects WHERE project_number = $1 OR name = $1 LIMIT 1`,
-    [key]
+    `SELECT *
+     FROM sfpq_projects
+     WHERE project_number = ANY($1::text[]) OR name = $2
+     ORDER BY CASE WHEN project_number = $2 THEN 0 ELSE 1 END
+     LIMIT 1`,
+    [lookupKeys, key]
   );
   if (!projectResult.rows.length) {
     sendJson(res, 404, { error: "Not found" });
@@ -445,8 +469,11 @@ async function handleGetEstimate(key, res) {
   ]);
 
   sendJson(res, 200, {
-    projectNumber: p.project_number,
+    projectNumber: normalizeEstimateNumber(p.project_number),
     projectName: p.name,
+    workspaceNumber: p.workspace_number || "",
+    workspaceName: p.workspace_name || "",
+    estimateVersion: p.estimate_version || 1,
     clientName: p.client_name || "",
     estimateYear: p.season || "",
     activePackage: p.active_package || "All",
@@ -456,20 +483,35 @@ async function handleGetEstimate(key, res) {
     paymentDates: p.payment_dates || {},
     paymentSettings: p.payment_settings || {},
     proposal: p.proposal || {},
+    sourcing: p.sourcing || {},
     rows: [...pkgRes.rows, ...prodRes.rows, ...elRes.rows]
   });
 }
 
 async function handlePostEstimate(body, res) {
   const estimate = JSON.parse(body);
+  estimate.projectNumber = normalizeEstimateNumber(estimate.projectNumber);
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
+    const legacyProjectNumber = legacyEstimateNumber(estimate.projectNumber);
+    if (legacyProjectNumber !== estimate.projectNumber) {
+      await client.query(
+        `UPDATE sfpq_projects
+         SET project_number = $1
+         WHERE project_number = $2
+           AND NOT EXISTS (SELECT 1 FROM sfpq_projects WHERE project_number = $1)`,
+        [estimate.projectNumber, legacyProjectNumber]
+      );
+    }
 
     const projectColumns = await tableColumns(client, "sfpq_projects");
     const projectFields = [
       ["project_number", estimate.projectNumber],
       ["name", estimate.projectName],
+      ["workspace_number", estimate.workspaceNumber || ""],
+      ["workspace_name", estimate.workspaceName || ""],
+      ["estimate_version", estimate.estimateVersion || 1],
       ["client_name", estimate.clientName || ""],
       ["season", estimate.estimateYear || null],
       ["status", "draft"],
@@ -480,6 +522,7 @@ async function handlePostEstimate(body, res) {
       ["payment_dates", JSON.stringify(estimate.paymentDates || {})],
       ["payment_settings", JSON.stringify(estimate.paymentSettings || {})],
       ["proposal", JSON.stringify(estimate.proposal || {})],
+      ["sourcing", JSON.stringify(estimate.sourcing || {})],
       ["tariff_rate", estimate.tariffRate ?? 0.30],
       ["global_markup", estimate.globalMarkup ?? 0.40],
       ["updated_at", new Date()]
