@@ -2389,6 +2389,7 @@ function renderTabRecordControls() {
       duplicateLabel: "Copy",
       loadLabel: "Load"
     };
+    const loadRecordsEnabled = collection === "estimates" || records.length > 0;
     const libraryRecordIsAttached = isLibraryRecord && libraryRecordAttachedToWorkspace(activeRecord, currentWorkspaceNumber);
     const associationLabel = isLibraryRecord
       ? activeRecord
@@ -2448,7 +2449,7 @@ function renderTabRecordControls() {
         <button class="ghost-btn compact-btn" type="button" data-record-action="save" title="Save this ${escapeHtml(type.label)} record">${escapeHtml(actionLabels.saveLabel)}</button>
         <button class="ghost-btn compact-btn" type="button" data-record-action="version" title="Save as a new version">${escapeHtml(actionLabels.versionLabel)}</button>
         <button class="ghost-btn compact-btn" type="button" data-record-action="duplicate" title="Duplicate this ${escapeHtml(type.label)} record">${escapeHtml(actionLabels.duplicateLabel)}</button>
-        ${isLibraryRecord ? "" : `<button class="ghost-btn compact-btn" type="button" data-record-action="load" title="Load ${escapeHtml(type.label)} records" ${records.length ? "" : "disabled"}>${escapeHtml(actionLabels.loadLabel)}</button>`}
+        ${isLibraryRecord ? "" : `<button class="ghost-btn compact-btn" type="button" data-record-action="load" title="Load ${escapeHtml(type.label)} records" ${loadRecordsEnabled ? "" : "disabled"}>${escapeHtml(actionLabels.loadLabel)}</button>`}
         ${isLibraryRecord ? `<button class="ghost-btn compact-btn attach-record-btn" type="button" data-record-action="${escapeHtml(libraryAttachAction)}" title="${escapeHtml(libraryAttachTitle)}">${escapeHtml(libraryAttachLabel)}</button>` : ""}
       </div>
     `;
@@ -2529,7 +2530,10 @@ async function workspaceRecordAction(event) {
   if (action === "load") {
     if (isLibraryRecordCollection(collection)) openLibraryRecordDialog(collection);
     if (collection === "estimates" && selectedRecord) await loadWorkspaceRecord(collection, selectedRecord, selectedVersion);
-    else if (collection === "estimates") openLoadEstimateDialog();
+    else if (collection === "estimates") {
+      await fetchEstimatesList();
+      openLoadEstimateDialog();
+    }
     else if (!isLibraryRecordCollection(collection)) await loadWorkspaceRecord(collection, selectedRecord, selectedVersion);
   }
 }
