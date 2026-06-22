@@ -225,13 +225,29 @@ function defaultProposal() {
 
 let proposal = defaultProposal();
 
+function defaultPrintQuoteValidUntil() {
+  const date = new Date();
+  date.setDate(date.getDate() + 30);
+  return date.toISOString().slice(0, 10);
+}
+
 function defaultPrintQuote() {
   return {
     name: "Print Quote Draft",
     source: "In-house / vendor print source",
     externalRef: "",
     sourceUrl: "",
-    notes: "Use this draft to hold print-specific scope, pricing source, and assumptions before the print quote calculator is built."
+    notes: "Use this draft to hold print-specific scope, pricing source, and assumptions before the print quote calculator is built.",
+    validUntil: defaultPrintQuoteValidUntil(),
+    customerName: "",
+    customerCompany: "North Pole Post Office",
+    shipMethod: "",
+    shippingAmount: 0,
+    customerNote: "",
+    customerTerms: "All pricing is draft pending internal review and approval.",
+    internalNotes: "Classify any notes before relying on customer output. Do not include source/vendor/cost/markup/pricing-basis details in customer preview.",
+    outputMode: "builder",
+    lineItems: []
   };
 }
 
@@ -409,6 +425,24 @@ const els = {
   printQuoteExternalRef: document.querySelector("#printQuoteExternalRef"),
   printQuoteSourceUrl: document.querySelector("#printQuoteSourceUrl"),
   printQuoteNotes: document.querySelector("#printQuoteNotes"),
+  printQuoteValidUntil: document.querySelector("#printQuoteValidUntil"),
+  printQuoteCustomerName: document.querySelector("#printQuoteCustomerName"),
+  printQuoteCustomerCompany: document.querySelector("#printQuoteCustomerCompany"),
+  printQuoteShipMethod: document.querySelector("#printQuoteShipMethod"),
+  printQuoteShippingAmount: document.querySelector("#printQuoteShippingAmount"),
+  printQuoteCustomerNote: document.querySelector("#printQuoteCustomerNote"),
+  printQuoteCustomerTerms: document.querySelector("#printQuoteCustomerTerms"),
+  printQuoteInternalNotes: document.querySelector("#printQuoteInternalNotes"),
+  refreshPrintQuoteLinesBtn: document.querySelector("#refreshPrintQuoteLinesBtn"),
+  printQuoteOutputModeButtons: document.querySelectorAll("[data-print-quote-mode]"),
+  printQuoteOutputTitle: document.querySelector("#printQuoteOutputTitle"),
+  printQuoteOutputSubtitle: document.querySelector("#printQuoteOutputSubtitle"),
+  printQuotePreparedFor: document.querySelector("#printQuotePreparedFor"),
+  printQuotePreviewName: document.querySelector("#printQuotePreviewName"),
+  printQuotePreviewStatus: document.querySelector("#printQuotePreviewStatus"),
+  printQuoteLines: document.querySelector("#printQuoteLines"),
+  printQuoteTotals: document.querySelector("#printQuoteTotals"),
+  printQuoteMessage: document.querySelector("#printQuoteMessage"),
   ecommListName: document.querySelector("#ecommListName"),
   ecommChannel: document.querySelector("#ecommChannel"),
   ecommExternalRef: document.querySelector("#ecommExternalRef"),
@@ -1591,6 +1625,14 @@ function syncPlaceholderDraftsFromInputs() {
   if (els.printQuoteExternalRef) printQuote.externalRef = els.printQuoteExternalRef.value.trim();
   if (els.printQuoteSourceUrl) printQuote.sourceUrl = els.printQuoteSourceUrl.value.trim();
   if (els.printQuoteNotes) printQuote.notes = els.printQuoteNotes.value;
+  if (els.printQuoteValidUntil) printQuote.validUntil = els.printQuoteValidUntil.value || defaultPrintQuoteValidUntil();
+  if (els.printQuoteCustomerName) printQuote.customerName = els.printQuoteCustomerName.value.trim();
+  if (els.printQuoteCustomerCompany) printQuote.customerCompany = els.printQuoteCustomerCompany.value.trim();
+  if (els.printQuoteShipMethod) printQuote.shipMethod = els.printQuoteShipMethod.value.trim();
+  if (els.printQuoteShippingAmount) printQuote.shippingAmount = asNumber(els.printQuoteShippingAmount.value);
+  if (els.printQuoteCustomerNote) printQuote.customerNote = els.printQuoteCustomerNote.value.trim();
+  if (els.printQuoteCustomerTerms) printQuote.customerTerms = els.printQuoteCustomerTerms.value.trim();
+  if (els.printQuoteInternalNotes) printQuote.internalNotes = els.printQuoteInternalNotes.value.trim();
   if (els.ecommListName) ecommPriceList.name = els.ecommListName.value.trim() || "Ecomm Price List Draft";
   if (els.ecommChannel) ecommPriceList.channel = els.ecommChannel.value.trim();
   if (els.ecommExternalRef) ecommPriceList.externalRef = els.ecommExternalRef.value.trim();
@@ -1604,6 +1646,14 @@ function renderPlaceholderDrafts() {
   if (els.printQuoteExternalRef) els.printQuoteExternalRef.value = printQuote.externalRef || "";
   if (els.printQuoteSourceUrl) els.printQuoteSourceUrl.value = printQuote.sourceUrl || "";
   if (els.printQuoteNotes) els.printQuoteNotes.value = printQuote.notes || "";
+  if (els.printQuoteValidUntil) els.printQuoteValidUntil.value = printQuote.validUntil || defaultPrintQuoteValidUntil();
+  if (els.printQuoteCustomerName) els.printQuoteCustomerName.value = printQuote.customerName || "";
+  if (els.printQuoteCustomerCompany) els.printQuoteCustomerCompany.value = printQuote.customerCompany || "";
+  if (els.printQuoteShipMethod) els.printQuoteShipMethod.value = printQuote.shipMethod || "";
+  if (els.printQuoteShippingAmount) els.printQuoteShippingAmount.value = printQuote.shippingAmount || "";
+  if (els.printQuoteCustomerNote) els.printQuoteCustomerNote.value = printQuote.customerNote || "";
+  if (els.printQuoteCustomerTerms) els.printQuoteCustomerTerms.value = printQuote.customerTerms || "";
+  if (els.printQuoteInternalNotes) els.printQuoteInternalNotes.value = printQuote.internalNotes || "";
   if (els.ecommListName) els.ecommListName.value = ecommPriceList.name || "";
   if (els.ecommChannel) els.ecommChannel.value = ecommPriceList.channel || "";
   if (els.ecommExternalRef) els.ecommExternalRef.value = ecommPriceList.externalRef || "";
@@ -1633,6 +1683,119 @@ function renderPlaceholderSummaries() {
   if (els.printQuoteSourceSummary) els.printQuoteSourceSummary.textContent = placeholderSourceSummary(printQuote);
   if (els.ecommAttachmentStatus) els.ecommAttachmentStatus.textContent = placeholderAttachmentSummary("ecomm");
   if (els.ecommSourceSummary) els.ecommSourceSummary.textContent = placeholderSourceSummary(ecommPriceList);
+}
+
+function printQuoteCustomerLabel() {
+  return [printQuote.customerName, printQuote.customerCompany || els.clientName.value.trim()]
+    .filter(Boolean)
+    .join(" / ") || "Customer pending";
+}
+
+function printQuoteLineRows() {
+  return Array.isArray(printQuote.lineItems) ? printQuote.lineItems : [];
+}
+
+function printQuoteSubtotal() {
+  return printQuoteLineRows().reduce((sum, line) => sum + asNumber(line.customerTotal), 0);
+}
+
+function refreshPrintQuoteLinesFromEstimate() {
+  printQuote.lineItems = visiblePackageRows()
+    .map((row) => {
+      const calc = calculate(row);
+      const quantity = Math.max(Math.round(calc.qty || calc.qtyToOrder || 1), 1);
+      return {
+        id: row.id,
+        name: row.packageName || rowName(row) || "Package",
+        description: `${row.packageName || "Package"} estimate total`,
+        quantity,
+        customerTotal: calc.clientPrice,
+        sourceLabel: "Visible active package total"
+      };
+    })
+    .filter((line) => line.customerTotal > 0);
+  touchWorkspaceRecord("printQuotes");
+  renderPrintQuoteDraft();
+  renderTabRecordControls();
+  setSaveStatus("Print quote draft refreshed");
+}
+
+function renderPrintQuoteLines(isCustomerOutput) {
+  const lines = printQuoteLineRows();
+  if (!lines.length) {
+    return `<div class="print-quote-empty">No draft quote lines yet. Refresh lines from the active estimate to create a local draft.</div>`;
+  }
+
+  const header = isCustomerOutput
+    ? ["Item", "Description", "Qty", "Total"]
+    : ["Item", "Source", "Qty", "Customer total"];
+
+  return `
+    <div class="print-quote-line header">
+      ${header.map((label) => `<span>${label}</span>`).join("")}
+    </div>
+    ${lines.map((line) => `
+      <div class="print-quote-line">
+        <strong>${escapeHtml(line.name)}</strong>
+        <span>${escapeHtml(isCustomerOutput ? line.description : line.sourceLabel)}</span>
+        <span>${Math.round(asNumber(line.quantity)).toLocaleString()}</span>
+        <span>${money(line.customerTotal, 2)}</span>
+      </div>
+    `).join("")}
+  `;
+}
+
+function renderPrintQuoteTotals() {
+  const subtotal = printQuoteSubtotal();
+  const shipping = Math.max(asNumber(printQuote.shippingAmount), 0);
+  const shippingLabel = printQuote.shipMethod ? `Shipping (${escapeHtml(printQuote.shipMethod)})` : "Shipping";
+  return `
+    <div><span>Subtotal</span><strong>${money(subtotal, 2)}</strong></div>
+    <div><span>${shippingLabel}</span><strong>${money(shipping, 2)}</strong></div>
+    <div class="grand-total"><span>Draft total</span><strong>${money(subtotal + shipping, 2)}</strong></div>
+  `;
+}
+
+function renderPrintQuoteMessage(isCustomerOutput) {
+  if (!els.printQuoteMessage) return;
+  const blocks = isCustomerOutput
+    ? [
+        ["Message", printQuote.customerNote],
+        ["Terms", printQuote.customerTerms]
+      ].filter(([, value]) => value)
+    : [
+        ["Internal notes", printQuote.internalNotes || "No internal notes."],
+        ["Boundary", "Internal notes, source/vendor, cost, markup, margin, and pricing-basis details are intentionally excluded from customer preview."]
+      ];
+  els.printQuoteMessage.hidden = !blocks.length;
+  els.printQuoteMessage.innerHTML = blocks.map(([title, value]) => `
+    <div>
+      <strong>${escapeHtml(title)}</strong>
+      <p>${escapeHtml(value)}</p>
+    </div>
+  `).join("");
+}
+
+function renderPrintQuoteDraft() {
+  if (!els.printQuoteView || !els.printQuoteLines) return;
+  syncPlaceholderDraftsFromInputs();
+  const isCustomerOutput = printQuote.outputMode === "customer";
+  els.printQuoteView.dataset.outputMode = printQuote.outputMode;
+  els.printQuoteOutputTitle.textContent = isCustomerOutput ? "Customer Preview" : "Quote Builder";
+  els.printQuoteOutputSubtitle.textContent = isCustomerOutput
+    ? "Customer-safe draft view. Manual QA required before sending."
+    : "Internal draft built from customer-safe estimate totals.";
+  els.printQuoteOutputModeButtons.forEach((button) => {
+    const isActive = button.dataset.printQuoteMode === printQuote.outputMode;
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+  els.printQuotePreparedFor.textContent = printQuoteCustomerLabel();
+  els.printQuotePreviewName.textContent = printQuote.name || "Print Quote Draft";
+  els.printQuotePreviewStatus.textContent = isCustomerOutput ? "Customer draft / QA gated" : "Internal draft";
+  els.printQuoteLines.innerHTML = renderPrintQuoteLines(isCustomerOutput);
+  els.printQuoteTotals.innerHTML = renderPrintQuoteTotals();
+  renderPrintQuoteMessage(isCustomerOutput);
 }
 
 function workspaceRecordSnapshot(type) {
@@ -8366,6 +8529,7 @@ function render() {
     renderProposal();
     renderPlaceholderDrafts();
     renderPlaceholderSummaries();
+    renderPrintQuoteDraft();
     renderTabRecordControls();
     renderTabRecordIndicators();
     if (activeView === "sourcingView") renderSourcing();
@@ -9616,6 +9780,14 @@ els.proposalPublishSummary?.addEventListener("click", (event) => {
   els.printQuoteExternalRef,
   els.printQuoteSourceUrl,
   els.printQuoteNotes,
+  els.printQuoteValidUntil,
+  els.printQuoteCustomerName,
+  els.printQuoteCustomerCompany,
+  els.printQuoteShipMethod,
+  els.printQuoteShippingAmount,
+  els.printQuoteCustomerNote,
+  els.printQuoteCustomerTerms,
+  els.printQuoteInternalNotes,
   els.ecommListName,
   els.ecommChannel,
   els.ecommExternalRef,
@@ -9624,15 +9796,25 @@ els.proposalPublishSummary?.addEventListener("click", (event) => {
 ].filter(Boolean).forEach((input) => {
   input.addEventListener("input", () => {
     syncPlaceholderDraftsFromInputs();
-    if ([els.printQuoteName, els.printQuoteSource, els.printQuoteExternalRef, els.printQuoteSourceUrl, els.printQuoteNotes].includes(input)) {
+    if ([els.printQuoteName, els.printQuoteSource, els.printQuoteExternalRef, els.printQuoteSourceUrl, els.printQuoteNotes, els.printQuoteValidUntil, els.printQuoteCustomerName, els.printQuoteCustomerCompany, els.printQuoteShipMethod, els.printQuoteShippingAmount, els.printQuoteCustomerNote, els.printQuoteCustomerTerms, els.printQuoteInternalNotes].includes(input)) {
       touchWorkspaceRecord("printQuotes");
     }
     if ([els.ecommListName, els.ecommChannel, els.ecommExternalRef, els.ecommSourceUrl, els.ecommNotes].includes(input)) {
       touchWorkspaceRecord("ecomm");
     }
     renderPlaceholderSummaries();
+    renderPrintQuoteDraft();
     renderTabRecordControls();
     renderProposalPreview();
+  });
+});
+els.refreshPrintQuoteLinesBtn?.addEventListener("click", refreshPrintQuoteLinesFromEstimate);
+els.printQuoteOutputModeButtons?.forEach((button) => {
+  button.addEventListener("click", () => {
+    printQuote.outputMode = button.dataset.printQuoteMode === "customer" ? "customer" : "builder";
+    touchWorkspaceRecord("printQuotes");
+    renderPrintQuoteDraft();
+    renderTabRecordControls();
   });
 });
 els.searchInput.addEventListener("input", render);

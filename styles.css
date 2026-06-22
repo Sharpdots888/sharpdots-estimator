@@ -994,6 +994,168 @@ body[data-workspace-mode="printEcomm"] .placeholder-view .placeholder-panel {
   resize: vertical;
 }
 
+.print-quote-workspace {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.75fr) minmax(0, 1.25fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.draft-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  border: 1px solid #f0c36d;
+  border-radius: 999px;
+  padding: 0 10px;
+  color: #6d4d00;
+  background: #fff7d6;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.print-quote-form-grid {
+  margin-top: 12px;
+}
+
+.internal-note-field textarea {
+  border-color: #f0c36d;
+  background: #fffdf3;
+}
+
+.print-quote-output {
+  min-width: 0;
+  margin-top: 12px;
+}
+
+.print-quote-boundary {
+  margin-bottom: 10px;
+  border: 1px solid #f0c36d;
+  border-radius: 8px;
+  padding: 9px 10px;
+  color: #5f4700;
+  background: #fff7d6;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.print-quote-mode.active {
+  color: #ffffff;
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+.print-quote-preview {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.print-quote-preview-head {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 10px;
+}
+
+.preview-label {
+  display: block;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.print-quote-lines {
+  display: grid;
+  gap: 6px;
+}
+
+.print-quote-line {
+  display: grid;
+  grid-template-columns: minmax(140px, 1.1fr) minmax(180px, 1.4fr) 88px 120px;
+  gap: 8px;
+  align-items: center;
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 7px 9px;
+  background: var(--soft);
+  font-size: 0.86rem;
+}
+
+.print-quote-line.header {
+  color: #ffffff;
+  border-color: #333333;
+  background: #333333;
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.print-quote-line span:last-child,
+.print-quote-line strong:last-child {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.print-quote-empty {
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  color: var(--muted);
+  background: var(--soft);
+  text-align: center;
+}
+
+.print-quote-totals {
+  display: grid;
+  gap: 6px;
+  margin-left: auto;
+  width: min(360px, 100%);
+}
+
+.print-quote-totals div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--line);
+  padding: 5px 0;
+}
+
+.print-quote-totals .grand-total {
+  border-bottom: 0;
+  color: var(--primary-dark);
+  font-size: 1.08rem;
+  font-weight: 900;
+}
+
+.print-quote-message {
+  display: grid;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+
+.print-quote-message p {
+  margin: 2px 0 0;
+  color: var(--muted);
+}
+
+#printQuoteView[data-output-mode="customer"] .internal-note-field,
+#printQuoteView[data-output-mode="customer"] .print-quote-boundary {
+  display: none;
+}
+
+#printQuoteView[data-output-mode="customer"] .print-quote-preview {
+  padding: 18px;
+}
+
 .pdf-scope {
   flex: 0 0 auto;
   width: auto;
@@ -5593,6 +5755,7 @@ button.sourcing-health-pill:focus-visible {
   .summary-grid,
   .lower-grid,
   .workspace,
+  .print-quote-workspace,
   .proposal-layout {
     grid-template-columns: 1fr;
   }

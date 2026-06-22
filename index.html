@@ -804,14 +804,15 @@
         </section>
       </section>
 
-      <section id="printQuoteView" class="app-view placeholder-view" hidden>
+      <section id="printQuoteView" class="app-view placeholder-view print-quote-view" hidden>
         <section class="tab-record-controls" data-record-type="printQuotes" aria-label="Print quote record controls"></section>
         <section class="placeholder-panel panel">
           <div class="section-head">
             <div>
-              <h2>Print Quote</h2>
-              <p>Standalone print quote library with optional workspace attachment</p>
+              <h2>Print Quote Draft</h2>
+              <p>Standalone draft library with optional workspace attachment. Customer output remains QA-gated.</p>
             </div>
+            <span class="draft-badge">Draft only</span>
           </div>
           <div class="placeholder-grid">
             <article>
@@ -831,27 +832,96 @@
               <strong id="printQuoteSourceSummary">Not linked</strong>
             </article>
           </div>
-          <div class="placeholder-form" aria-label="Print quote draft fields">
-            <label>
-              Print Quote Name
-              <input id="printQuoteName" type="text" value="Print Quote Draft" />
-            </label>
-            <label>
-              Source
-              <input id="printQuoteSource" type="text" value="In-house / vendor print source" />
-            </label>
-            <label>
-              External Ref
-              <input id="printQuoteExternalRef" type="text" placeholder="Legacy quote id" />
-            </label>
-            <label>
-              Source URL
-              <input id="printQuoteSourceUrl" type="url" placeholder="https://..." />
-            </label>
-            <label class="wide-field">
-              Notes
-              <textarea id="printQuoteNotes" rows="4">Use this draft to hold print-specific scope, pricing source, and assumptions before the print quote calculator is built.</textarea>
-            </label>
+          <div class="print-quote-workspace">
+            <div class="placeholder-form print-quote-form-grid" aria-label="Print quote draft fields">
+              <label>
+                Print Quote Name
+                <input id="printQuoteName" type="text" value="Print Quote Draft" />
+              </label>
+              <label>
+                Valid until
+                <input id="printQuoteValidUntil" type="date" />
+              </label>
+              <label>
+                Customer contact
+                <input id="printQuoteCustomerName" type="text" placeholder="Customer contact" />
+              </label>
+              <label>
+                Customer company
+                <input id="printQuoteCustomerCompany" type="text" />
+              </label>
+              <label>
+                Ship method
+                <input id="printQuoteShipMethod" type="text" placeholder="FedEx, Van Delivery, Pickup" />
+              </label>
+              <label>
+                Shipping amount
+                <input id="printQuoteShippingAmount" type="number" min="0" step="0.01" />
+              </label>
+              <label>
+                Source
+                <input id="printQuoteSource" type="text" value="In-house / vendor print source" />
+              </label>
+              <label>
+                External Ref
+                <input id="printQuoteExternalRef" type="text" placeholder="Legacy quote id" />
+              </label>
+              <label class="wide-field">
+                Source URL
+                <input id="printQuoteSourceUrl" type="url" placeholder="https://..." />
+              </label>
+              <label class="wide-field">
+                Customer note
+                <textarea id="printQuoteCustomerNote" rows="3" placeholder="Customer-safe note only"></textarea>
+              </label>
+              <label class="wide-field">
+                Customer terms
+                <textarea id="printQuoteCustomerTerms" rows="3">All pricing is draft pending internal review and approval.</textarea>
+              </label>
+              <label class="wide-field internal-note-field">
+                Internal notes - not shown in customer preview
+                <textarea id="printQuoteInternalNotes" rows="3">Classify any notes before relying on customer output. Do not include source/vendor/cost/markup/pricing-basis details in customer preview.</textarea>
+              </label>
+              <label class="wide-field">
+                Source / scope notes
+                <textarea id="printQuoteNotes" rows="4">Use this draft to hold print-specific scope, pricing source, and assumptions before the print quote calculator is built.</textarea>
+              </label>
+            </div>
+            <article class="print-quote-output">
+              <div class="section-head">
+                <div>
+                  <h2 id="printQuoteOutputTitle">Quote Builder</h2>
+                  <p id="printQuoteOutputSubtitle">Internal draft built from customer-safe estimate totals.</p>
+                </div>
+                <div class="button-group">
+                  <button id="refreshPrintQuoteLinesBtn" class="ghost-btn" type="button">Refresh Lines From Estimate</button>
+                  <button class="ghost-btn print-quote-mode active" type="button" data-print-quote-mode="builder" aria-pressed="true">Builder</button>
+                  <button class="ghost-btn print-quote-mode" type="button" data-print-quote-mode="customer" aria-pressed="false">Customer Preview</button>
+                </div>
+              </div>
+              <div class="print-quote-boundary">
+                Customer preview intentionally hides source/vendor, cost, markup, margin, pricing basis, and internal notes. Do not send this output until manual QA approves customer/internal separation.
+              </div>
+              <div class="print-quote-preview">
+                <header class="print-quote-preview-head">
+                  <div>
+                    <span class="preview-label">Prepared for</span>
+                    <strong id="printQuotePreparedFor">Customer pending</strong>
+                  </div>
+                  <div>
+                    <span class="preview-label">Quote</span>
+                    <strong id="printQuotePreviewName">Print Quote Draft</strong>
+                  </div>
+                  <div>
+                    <span class="preview-label">Status</span>
+                    <strong id="printQuotePreviewStatus">Draft / QA gated</strong>
+                  </div>
+                </header>
+                <div id="printQuoteLines" class="print-quote-lines"></div>
+                <div id="printQuoteTotals" class="print-quote-totals"></div>
+                <div id="printQuoteMessage" class="print-quote-message" hidden></div>
+              </div>
+            </article>
           </div>
         </section>
       </section>
