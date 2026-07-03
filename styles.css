@@ -1014,6 +1014,12 @@ body[data-workspace-mode="printEcomm"] .placeholder-view .placeholder-panel {
   font-weight: 800;
 }
 
+.warning-badge {
+  border-color: #d97706;
+  color: #7c2d12;
+  background: #ffedd5;
+}
+
 .print-quote-form-grid {
   margin-top: 12px;
 }
@@ -1145,6 +1151,179 @@ body[data-workspace-mode="printEcomm"] .placeholder-view .placeholder-panel {
 .print-quote-message p {
   margin: 2px 0 0;
   color: var(--muted);
+}
+
+.signing-handoff-panel {
+  display: grid;
+  gap: 12px;
+  border: 1px solid #b8d7ff;
+  border-radius: 10px;
+  padding: 14px;
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+}
+
+.signing-handoff-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.signing-handoff-controls label,
+.handoff-approval-check {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.handoff-approval-check {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 9px 10px;
+  color: #1e3a8a;
+  background: #eff6ff;
+}
+
+.handoff-approval-check input {
+  width: 16px;
+  height: 16px;
+}
+
+.handoff-validation {
+  border: 1px solid #f0c36d;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #6d4d00;
+  background: #fff7d6;
+}
+
+.handoff-validation.passed {
+  border-color: #86d39a;
+  color: #0f5132;
+  background: #eaf8ee;
+}
+
+.handoff-validation strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.handoff-validation ul,
+.handoff-risk-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.handoff-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.handoff-preview-grid article {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 11px;
+  background: #ffffff;
+}
+
+.handoff-preview-grid h3 {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.handoff-preview-box {
+  display: grid;
+  gap: 8px;
+}
+
+.handoff-preview-metric {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 6px;
+}
+
+.handoff-preview-metric span,
+.handoff-audit-lines p,
+.handoff-preview-list span {
+  color: var(--muted);
+}
+
+.handoff-preview-list {
+  display: grid;
+  gap: 7px;
+}
+
+.handoff-preview-list div {
+  display: grid;
+  gap: 3px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 8px;
+  background: var(--soft);
+}
+
+.handoff-preview-list b {
+  font-variant-numeric: tabular-nums;
+}
+
+.handoff-audit-lines {
+  display: grid;
+  gap: 4px;
+}
+
+.handoff-audit-lines p {
+  margin: 0;
+}
+
+.handoff-json-details {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.handoff-json-details summary {
+  cursor: pointer;
+  padding: 9px 11px;
+  color: var(--ink);
+  font-weight: 900;
+}
+
+#handoffPackageJson {
+  max-height: 320px;
+  overflow: auto;
+  margin: 0;
+  border-top: 1px solid var(--line);
+  padding: 12px;
+  color: #17324d;
+  background: #f7fafc;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.handoff-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.provider-send-disabled {
+  border-color: #f0c36d;
+  color: #6d4d00;
+  background: #fff7d6;
+}
+
+.handoff-export-status {
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 700;
 }
 
 #printQuoteView[data-output-mode="customer"] .internal-note-field,
@@ -5756,6 +5935,8 @@ button.sourcing-health-pill:focus-visible {
   .lower-grid,
   .workspace,
   .print-quote-workspace,
+  .signing-handoff-controls,
+  .handoff-preview-grid,
   .proposal-layout {
     grid-template-columns: 1fr;
   }
