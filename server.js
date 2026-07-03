@@ -2,11 +2,29 @@ const http = require("http");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
+const { createHmac, randomBytes, timingSafeEqual } = require("crypto");
 const { Pool } = require("pg");
 
 const port = process.env.PORT || 3000;
 const host = process.env.HOST || (process.env.PORT ? "0.0.0.0" : "127.0.0.1");
 const root = __dirname;
+const portalBaseUrl = (process.env.SPACEFOLD_PORTAL_URL || "https://portal.space-fold.com").replace(/\/+$/, "");
+const configuredAuthMode = process.env.ESTIMATOR_AUTH_MODE || "portal-token-preferred";
+const authMode = ["disabled", "portal-token-preferred", "portal-token-required"].includes(configuredAuthMode)
+  ? configuredAuthMode
+  : "portal-token-required";
+const sessionCookieName = process.env.ESTIMATOR_SESSION_COOKIE || "sfpq_estimator_session";
+const sessionTtlMs = Math.max(Number(process.env.ESTIMATOR_SESSION_TTL_HOURS || 8), 1) * 60 * 60 * 1000;
+const sessionSecret = process.env.ESTIMATOR_SESSION_SECRET || process.env.SESSION_SECRET || randomBytes(32).toString("hex");
+const secureCookies = process.env.ESTIMATOR_SECURE_COOKIES !== "false";
+
+if (!process.env.ESTIMATOR_SESSION_SECRET && !process.env.SESSION_SECRET) {
+  console.warn("Estimator portal SSO is using an ephemeral session secret. Set ESTIMATOR_SESSION_SECRET before production enforcement.");
+}
+
+if (authMode !== configuredAuthMode) {
+  console.warn(`Unknown ESTIMATOR_AUTH_MODE "${configuredAuthMode}". Falling back to portal-token-required.`);
+}
 
 // Strip sslmode from connection string — pg Pool's ssl config handles this explicitly
 const pool = new Pool({
@@ -178,6 +196,164 @@ function collectBody(req) {
     req.on("end", () => resolve(Buffer.concat(chunks).toString()));
     req.on("error", reject);
   });
+}
+
+function base64UrlEncode(value) {
+  return Buffer.from(value)
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+}
+
+function base64UrlDecode(value) {
+  const normalized = String(value || "").replace(/-/g, "+").replace(/_/g, "/");
+  const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+  return Buffer.from(padded, "base64").toString("utf8");
+}
+
+function signSessionPayload(encodedPayload) {
+  return createHmac("sha256", sessionSecret).update(encodedPayload).digest("base64url");
+}
+
+function parseCookies(req) {
+  return String(req.headers.cookie || "")
+    .split(";")
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .reduce((cookies, entry) => {
+      const splitAt = entry.indexOf("=");
+      if (splitAt === -1) return cookies;
+      const key = decodeURIComponent(entry.slice(0, splitAt));
+      const value = entry.slice(splitAt + 1);
+      cookies[key] = value;
+      return cookies;
+    }, {});
+}
+
+function sanitizePortalUser(user) {
+  return {
+    id: user?.id ?? null,
+    username: String(user?.username || ""),
+    email: String(user?.email || ""),
+    isAdmin: Boolean(user?.is_admin ?? user?.isAdmin)
+  };
+}
+
+function createSessionCookie(req, user) {
+  const payload = base64UrlEncode(JSON.stringify({
+    user: sanitizePortalUser(user),
+    issuedAt: Date.now(),
+    expiresAt: Date.now() + sessionTtlMs
+  }));
+  const signature = signSessionPayload(payload);
+  const maxAge = Math.floor(sessionTtlMs / 1000);
+  const forwardedProto = String(req.headers["x-forwarded-proto"] || "");
+  const secure = secureCookies && (forwardedProto.includes("https") || process.env.NODE_ENV === "production");
+  return [
+    `${sessionCookieName}=${payload}.${signature}`,
+    "HttpOnly",
+    "Path=/",
+    "SameSite=Lax",
+    `Max-Age=${maxAge}`,
+    secure ? "Secure" : ""
+  ].filter(Boolean).join("; ");
+}
+
+function clearSessionCookie() {
+  return `${sessionCookieName}=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0`;
+}
+
+function readSession(req) {
+  const raw = parseCookies(req)[sessionCookieName];
+  if (!raw || !raw.includes(".")) return null;
+  const [payload, signature] = raw.split(".");
+  const expected = signSessionPayload(payload);
+  const signatureBuffer = Buffer.from(signature || "");
+  const expectedBuffer = Buffer.from(expected);
+  if (signatureBuffer.length !== expectedBuffer.length || !timingSafeEqual(signatureBuffer, expectedBuffer)) {
+    return null;
+  }
+  try {
+    const session = JSON.parse(base64UrlDecode(payload));
+    if (!session.expiresAt || Date.now() > Number(session.expiresAt)) return null;
+    return session;
+  } catch {
+    return null;
+  }
+}
+
+async function validatePortalToken(token) {
+  const response = await fetch(`${portalBaseUrl}/api/auth/validate-token/${encodeURIComponent(token)}`, {
+    headers: { Accept: "application/json" }
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.valid || !data.user) {
+    const message = data.message || `Portal token validation failed with HTTP ${response.status}`;
+    throw new Error(message);
+  }
+  return data.user;
+}
+
+function cleanUrlWithoutSsoToken(reqUrl) {
+  const parsed = new URL(`http://estimator.local${reqUrl || "/"}`);
+  parsed.searchParams.delete("sso_token");
+  const query = parsed.searchParams.toString();
+  return `${parsed.pathname}${query ? `?${query}` : ""}`;
+}
+
+async function handlePortalSso(req, res, token) {
+  try {
+    const user = await validatePortalToken(token);
+    res.writeHead(302, {
+      "Set-Cookie": createSessionCookie(req, user),
+      "Location": cleanUrlWithoutSsoToken(req.url || "/"),
+      "Cache-Control": "no-store"
+    });
+    res.end();
+  } catch (error) {
+    console.error("Portal SSO error:", error.message);
+    res.writeHead(401, {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "no-store"
+    });
+    res.end(`<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Estimator access unavailable</title></head>
+<body>
+  <h1>Estimator access unavailable</h1>
+  <p>The portal sign-in link could not be validated. Return to Space-Fold Portal and launch Estimator again.</p>
+</body>
+</html>`);
+  }
+}
+
+function authRequiredFor(url) {
+  if (authMode === "disabled" || authMode === "portal-token-preferred") return false;
+  if (url === "/api/auth/me" || url === "/api/auth/logout" || url === "/favicon.ico") return false;
+  return authMode === "portal-token-required";
+}
+
+function sendUnauthorized(res) {
+  sendJson(res, 401, {
+    error: "Authentication required",
+    message: "Launch Estimator from Space-Fold Portal to continue."
+  });
+}
+
+function sendAuthPage(res) {
+  res.writeHead(401, {
+    "Content-Type": "text/html; charset=utf-8",
+    "Cache-Control": "no-store"
+  });
+  res.end(`<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Estimator sign-in required</title></head>
+<body>
+  <h1>Estimator sign-in required</h1>
+  <p>Launch Estimator from Space-Fold Portal to start an internal session.</p>
+</body>
+</html>`);
 }
 
 function sendJson(res, status, data) {
@@ -631,9 +807,35 @@ function safePath(urlPath) {
 const server = http.createServer(async (req, res) => {
   const url = (req.url || "/").split("?")[0];
   const method = req.method || "GET";
+  const reqUrl = new URL(`http://estimator.local${req.url || "/"}`);
+  const ssoToken = reqUrl.searchParams.get("sso_token");
+  const session = readSession(req);
 
   try {
-    if (url === "/api/estimates" && method === "GET") {
+    if (ssoToken) {
+      await handlePortalSso(req, res, ssoToken);
+    } else if (url === "/api/auth/me" && method === "GET") {
+      if (!session) {
+        sendJson(res, 401, { authenticated: false });
+      } else {
+        sendJson(res, 200, {
+          authenticated: true,
+          user: session.user,
+          authMode
+        });
+      }
+    } else if (url === "/api/auth/logout" && (method === "GET" || method === "POST")) {
+      res.writeHead(200, {
+        "Content-Type": "application/json",
+        "Set-Cookie": clearSessionCookie(),
+        "Cache-Control": "no-store"
+      });
+      res.end(JSON.stringify({ success: true }));
+    } else if (url.startsWith("/api/") && authRequiredFor(url) && !session) {
+      sendUnauthorized(res);
+    } else if (authRequiredFor(url) && !session) {
+      sendAuthPage(res);
+    } else if (url === "/api/estimates" && method === "GET") {
       await handleGetEstimates(res);
     } else if (url === "/api/estimates" && method === "POST") {
       const body = await collectBody(req);
