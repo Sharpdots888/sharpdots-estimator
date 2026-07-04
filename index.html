@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sharpdots Estimator</title>
-    <link rel="stylesheet" href="styles.css?v=client-vendor-context-ui" />
+    <link rel="stylesheet" href="styles.css?v=proposal-export-qa2" />
   </head>
   <body>
     <main class="app-shell">
@@ -921,117 +921,6 @@
                 <div id="printQuoteTotals" class="print-quote-totals"></div>
                 <div id="printQuoteMessage" class="print-quote-message" hidden></div>
               </div>
-              <section class="client-vendor-context-panel" aria-label="Client vendor context">
-                <div class="section-head">
-                  <div>
-                    <h2>Client / Vendor Context</h2>
-                    <p>Internal context for client, vendor, and handoff review. Customer-safe and internal-only fields stay separate.</p>
-                  </div>
-                  <span class="draft-badge internal-only-badge">internal-only</span>
-                </div>
-                <div class="client-vendor-context-grid">
-                  <fieldset class="context-fieldset">
-                    <legend>Client / Account</legend>
-                    <label>
-                      Context state
-                      <select id="clientContextState">
-                        <option value="draft">Draft</option>
-                        <option value="review">Needs review</option>
-                        <option value="ready">Ready for handoff</option>
-                      </select>
-                    </label>
-                    <label>
-                      Account label
-                      <input id="clientContextDisplayName" type="text" placeholder="Client or account display label" />
-                    </label>
-                    <label>
-                      Contact label
-                      <input id="clientContextContactLabel" type="text" placeholder="Primary contact or buying group" />
-                    </label>
-                    <label>
-                      Project / proposal label
-                      <input id="clientContextProjectLabel" type="text" placeholder="Proposal, job, or engagement cue" />
-                    </label>
-                    <label>
-                      Internal owner
-                      <input id="clientContextInternalOwner" type="text" placeholder="Owner for follow-up" />
-                    </label>
-                    <label class="wide-field">
-                      Customer-safe context
-                      <textarea id="clientContextCustomerSafeNotes" rows="3" placeholder="Only notes that may appear in supervised customer context."></textarea>
-                    </label>
-                    <label class="wide-field internal-note-field">
-                      Internal-only client notes
-                      <textarea id="clientContextInternalNotes" rows="3" placeholder="Internal/client context that must not appear in customer output."></textarea>
-                    </label>
-                  </fieldset>
-                  <fieldset class="context-fieldset">
-                    <legend>Vendor / Source Assumption</legend>
-                    <label>
-                      Source state
-                      <select id="vendorSourceState">
-                        <option value="unreviewed">Unreviewed</option>
-                        <option value="needs_vendor_review">Needs vendor review</option>
-                        <option value="ready_for_internal_review">Ready for internal review</option>
-                        <option value="approved_for_draft">Approved for draft</option>
-                      </select>
-                    </label>
-                    <label>
-                      Source type
-                      <select id="vendorSourceType">
-                        <option value="in_house">In-house</option>
-                        <option value="vendor">Vendor</option>
-                        <option value="mixed">Mixed</option>
-                        <option value="unknown">Unknown</option>
-                      </select>
-                    </label>
-                    <label>
-                      Vendor / source label
-                      <input id="vendorSourceDisplayName" type="text" placeholder="Internal vendor/source name" />
-                    </label>
-                    <label>
-                      Confidence
-                      <select id="vendorSourceConfidence">
-                        <option value="low">Low</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">High</option>
-                      </select>
-                    </label>
-                    <label>
-                      Related quote line / cue
-                      <input id="vendorSourceRelatedLine" type="text" placeholder="Line, estimate package, or sourcing cue" />
-                    </label>
-                    <label>
-                      Customer-visible source label
-                      <input id="vendorSourceCustomerVisibleName" type="text" placeholder="Optional customer-safe source label" />
-                    </label>
-                    <label class="wide-field internal-note-field">
-                      Internal-only source notes
-                      <textarea id="vendorSourceInternalNotes" rows="4" placeholder="Vendor/source assumptions, cost basis, and sourcing notes."></textarea>
-                    </label>
-                  </fieldset>
-                  <fieldset class="context-fieldset review-cues-fieldset">
-                    <legend>Review / Handoff Cues</legend>
-                    <label class="context-check">
-                      <input id="reviewCustomerSafeContextChecked" type="checkbox" />
-                      Customer-safe context checked
-                    </label>
-                    <label class="context-check">
-                      <input id="reviewInternalOnlyNotesPresent" type="checkbox" />
-                      Internal-only source notes present
-                    </label>
-                    <label class="context-check">
-                      <input id="reviewVendorReviewNeeded" type="checkbox" />
-                      Vendor/source review needed
-                    </label>
-                    <label class="context-check">
-                      <input id="reviewReadyForSigningHandoffReview" type="checkbox" />
-                      Ready for signing/audit handoff review
-                    </label>
-                    <div id="clientVendorContextSummary" class="client-vendor-context-summary" aria-live="polite"></div>
-                  </fieldset>
-                </div>
-              </section>
               <section class="signing-handoff-panel" aria-label="Signing handoff review">
                 <div class="section-head">
                   <div>
@@ -1261,6 +1150,6 @@
       </section>
     </div>
 
-    <script src="app.js?v=client-vendor-context-ui"></script>
+    <script src="app.js?v=proposal-export-qa2"></script>
   </body>
 </html>
