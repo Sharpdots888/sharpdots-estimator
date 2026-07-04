@@ -1045,6 +1045,12 @@ body[data-workspace-mode="printEcomm"] .placeholder-view .placeholder-panel {
   background: var(--primary);
 }
 
+.primary-action {
+  color: #ffffff;
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
 .print-quote-preview {
   display: grid;
   gap: 10px;
@@ -1087,6 +1093,42 @@ body[data-workspace-mode="printEcomm"] .placeholder-view .placeholder-panel {
   padding: 7px 9px;
   background: var(--soft);
   font-size: 0.86rem;
+}
+
+.print-quote-line.builder-line {
+  grid-template-columns: minmax(130px, 1fr) minmax(190px, 1.35fr) 84px 126px auto;
+  align-items: end;
+}
+
+.print-quote-line.builder-line label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.print-quote-line-input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 7px 8px;
+  color: var(--ink);
+  background: #ffffff;
+  font: inherit;
+  font-size: 0.82rem;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.compact-btn {
+  min-height: 32px;
+  padding: 6px 10px;
+  white-space: nowrap;
 }
 
 .print-quote-line.header {

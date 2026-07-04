@@ -433,6 +433,7 @@ const els = {
   printQuoteCustomerNote: document.querySelector("#printQuoteCustomerNote"),
   printQuoteCustomerTerms: document.querySelector("#printQuoteCustomerTerms"),
   printQuoteInternalNotes: document.querySelector("#printQuoteInternalNotes"),
+  addPrintQuoteLineBtn: document.querySelector("#addPrintQuoteLineBtn"),
   refreshPrintQuoteLinesBtn: document.querySelector("#refreshPrintQuoteLinesBtn"),
   printQuoteOutputModeButtons: document.querySelectorAll("[data-print-quote-mode]"),
   printQuoteOutputTitle: document.querySelector("#printQuoteOutputTitle"),
@@ -1699,6 +1700,53 @@ function printQuoteSubtotal() {
   return printQuoteLineRows().reduce((sum, line) => sum + asNumber(line.customerTotal), 0);
 }
 
+function nextPrintQuoteLineId() {
+  return `quote-line-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function addPrintQuoteLine() {
+  printQuote.lineItems = [
+    ...printQuoteLineRows(),
+    {
+      id: nextPrintQuoteLineId(),
+      name: "New print quote line",
+      description: "",
+      quantity: 1,
+      customerTotal: 0,
+      sourceLabel: "Manual quote line"
+    }
+  ];
+  printQuote.outputMode = "builder";
+  touchWorkspaceRecord("printQuotes");
+  renderPrintQuoteDraft();
+  renderTabRecordControls();
+  setSaveStatus("Quote line added");
+}
+
+function updatePrintQuoteLine(lineId, field, value) {
+  const numericFields = new Set(["quantity", "customerTotal"]);
+  printQuote.lineItems = printQuoteLineRows().map((line) => {
+    if (line.id !== lineId) return line;
+    return {
+      ...line,
+      [field]: numericFields.has(field) ? Math.max(asNumber(value), 0) : String(value || "")
+    };
+  });
+  touchWorkspaceRecord("printQuotes");
+  renderPrintQuoteDraft();
+  renderTabRecordControls();
+  renderProposalPreview();
+}
+
+function removePrintQuoteLine(lineId) {
+  printQuote.lineItems = printQuoteLineRows().filter((line) => line.id !== lineId);
+  touchWorkspaceRecord("printQuotes");
+  renderPrintQuoteDraft();
+  renderTabRecordControls();
+  renderProposalPreview();
+  setSaveStatus("Quote line removed");
+}
+
 function refreshPrintQuoteLinesFromEstimate() {
   printQuote.lineItems = visiblePackageRows()
     .map((row) => {
@@ -1723,23 +1771,43 @@ function refreshPrintQuoteLinesFromEstimate() {
 function renderPrintQuoteLines(isCustomerOutput) {
   const lines = printQuoteLineRows();
   if (!lines.length) {
-    return `<div class="print-quote-empty">No draft quote lines yet. Refresh lines from the active estimate to create a local draft.</div>`;
+    return `<div class="print-quote-empty">No draft quote lines yet. Add a quote line or refresh lines from the active estimate.</div>`;
   }
 
   const header = isCustomerOutput
     ? ["Item", "Description", "Qty", "Total"]
-    : ["Item", "Source", "Qty", "Customer total"];
+    : ["Item", "Description", "Qty", "Customer total", ""];
 
   return `
-    <div class="print-quote-line header">
+    <div class="print-quote-line header${isCustomerOutput ? "" : " builder-line"}">
       ${header.map((label) => `<span>${label}</span>`).join("")}
     </div>
-    ${lines.map((line) => `
+    ${lines.map((line) => isCustomerOutput ? `
       <div class="print-quote-line">
         <strong>${escapeHtml(line.name)}</strong>
-        <span>${escapeHtml(isCustomerOutput ? line.description : line.sourceLabel)}</span>
+        <span>${escapeHtml(line.description)}</span>
         <span>${Math.round(asNumber(line.quantity)).toLocaleString()}</span>
         <span>${money(line.customerTotal, 2)}</span>
+      </div>
+    ` : `
+      <div class="print-quote-line builder-line" data-print-quote-line-id="${escapeHtml(line.id)}">
+        <label>
+          Item
+          <input class="print-quote-line-input" type="text" data-print-quote-line-field="name" value="${escapeHtml(line.name)}" />
+        </label>
+        <label>
+          Description
+          <input class="print-quote-line-input" type="text" data-print-quote-line-field="description" value="${escapeHtml(line.description)}" />
+        </label>
+        <label>
+          Qty
+          <input class="print-quote-line-input" type="number" min="0" step="1" data-print-quote-line-field="quantity" value="${escapeHtml(line.quantity)}" />
+        </label>
+        <label>
+          Customer total
+          <input class="print-quote-line-input" type="number" min="0" step="0.01" data-print-quote-line-field="customerTotal" value="${escapeHtml(line.customerTotal)}" />
+        </label>
+        <button class="ghost-btn compact-btn" type="button" data-print-quote-line-remove>Remove</button>
       </div>
     `).join("")}
   `;
@@ -9808,7 +9876,22 @@ els.proposalPublishSummary?.addEventListener("click", (event) => {
     renderProposalPreview();
   });
 });
+els.addPrintQuoteLineBtn?.addEventListener("click", addPrintQuoteLine);
 els.refreshPrintQuoteLinesBtn?.addEventListener("click", refreshPrintQuoteLinesFromEstimate);
+els.printQuoteLines?.addEventListener("change", (event) => {
+  const input = event.target.closest("[data-print-quote-line-field]");
+  if (!input) return;
+  const row = input.closest("[data-print-quote-line-id]");
+  if (!row) return;
+  updatePrintQuoteLine(row.dataset.printQuoteLineId, input.dataset.printQuoteLineField, input.value);
+});
+els.printQuoteLines?.addEventListener("click", (event) => {
+  const removeButton = event.target.closest("[data-print-quote-line-remove]");
+  if (!removeButton) return;
+  const row = removeButton.closest("[data-print-quote-line-id]");
+  if (!row) return;
+  removePrintQuoteLine(row.dataset.printQuoteLineId);
+});
 els.printQuoteOutputModeButtons?.forEach((button) => {
   button.addEventListener("click", () => {
     printQuote.outputMode = button.dataset.printQuoteMode === "customer" ? "customer" : "builder";
