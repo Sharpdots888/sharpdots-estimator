@@ -231,6 +231,35 @@ function defaultPrintQuoteValidUntil() {
   return date.toISOString().slice(0, 10);
 }
 
+function defaultClientVendorContext() {
+  return {
+    client: {
+      state: "draft",
+      accountLabel: "",
+      contactLabel: "",
+      projectLabel: "",
+      internalOwner: "John",
+      customerSafeNotes: "",
+      internalNotes: ""
+    },
+    vendor: {
+      state: "unreviewed",
+      sourceType: "mixed",
+      displayName: "",
+      confidence: "medium",
+      relatedLine: "",
+      customerVisibleName: "",
+      internalNotes: ""
+    },
+    review: {
+      customerSafeContextChecked: false,
+      internalOnlyNotesPresent: false,
+      vendorReviewNeeded: false,
+      readyForSigningHandoffReview: false
+    }
+  };
+}
+
 function defaultPrintQuote() {
   return {
     name: "Print Quote Draft",
@@ -252,6 +281,7 @@ function defaultPrintQuote() {
       approvalConfirmed: false,
       approvalNotes: ""
     },
+    clientVendorContext: defaultClientVendorContext(),
     outputMode: "builder",
     lineItems: []
   };
@@ -439,6 +469,25 @@ const els = {
   printQuoteCustomerNote: document.querySelector("#printQuoteCustomerNote"),
   printQuoteCustomerTerms: document.querySelector("#printQuoteCustomerTerms"),
   printQuoteInternalNotes: document.querySelector("#printQuoteInternalNotes"),
+  clientContextState: document.querySelector("#clientContextState"),
+  clientContextDisplayName: document.querySelector("#clientContextDisplayName"),
+  clientContextContactLabel: document.querySelector("#clientContextContactLabel"),
+  clientContextProjectLabel: document.querySelector("#clientContextProjectLabel"),
+  clientContextInternalOwner: document.querySelector("#clientContextInternalOwner"),
+  clientContextCustomerSafeNotes: document.querySelector("#clientContextCustomerSafeNotes"),
+  clientContextInternalNotes: document.querySelector("#clientContextInternalNotes"),
+  vendorSourceState: document.querySelector("#vendorSourceState"),
+  vendorSourceType: document.querySelector("#vendorSourceType"),
+  vendorSourceDisplayName: document.querySelector("#vendorSourceDisplayName"),
+  vendorSourceConfidence: document.querySelector("#vendorSourceConfidence"),
+  vendorSourceRelatedLine: document.querySelector("#vendorSourceRelatedLine"),
+  vendorSourceCustomerVisibleName: document.querySelector("#vendorSourceCustomerVisibleName"),
+  vendorSourceInternalNotes: document.querySelector("#vendorSourceInternalNotes"),
+  reviewCustomerSafeContextChecked: document.querySelector("#reviewCustomerSafeContextChecked"),
+  reviewInternalOnlyNotesPresent: document.querySelector("#reviewInternalOnlyNotesPresent"),
+  reviewVendorReviewNeeded: document.querySelector("#reviewVendorReviewNeeded"),
+  reviewReadyForSigningHandoffReview: document.querySelector("#reviewReadyForSigningHandoffReview"),
+  clientVendorContextSummary: document.querySelector("#clientVendorContextSummary"),
   refreshPrintQuoteLinesBtn: document.querySelector("#refreshPrintQuoteLinesBtn"),
   printQuoteOutputModeButtons: document.querySelectorAll("[data-print-quote-mode]"),
   printQuoteOutputTitle: document.querySelector("#printQuoteOutputTitle"),
@@ -1644,6 +1693,106 @@ function ensurePrintQuoteHandoff() {
   return printQuote.handoff;
 }
 
+function normalizeClientVendorContext(context = {}) {
+  const defaults = defaultClientVendorContext();
+  return {
+    client: {
+      ...defaults.client,
+      ...(context.client || {})
+    },
+    vendor: {
+      ...defaults.vendor,
+      ...(context.vendor || {})
+    },
+    review: {
+      ...defaults.review,
+      ...(context.review || {})
+    }
+  };
+}
+
+function ensureClientVendorContext() {
+  printQuote.clientVendorContext = normalizeClientVendorContext(printQuote.clientVendorContext);
+  return printQuote.clientVendorContext;
+}
+
+function syncClientVendorContextFromInputs() {
+  const context = ensureClientVendorContext();
+  if (els.clientContextState) context.client.state = els.clientContextState.value || "draft";
+  if (els.clientContextDisplayName) context.client.accountLabel = els.clientContextDisplayName.value.trim();
+  if (els.clientContextContactLabel) context.client.contactLabel = els.clientContextContactLabel.value.trim();
+  if (els.clientContextProjectLabel) context.client.projectLabel = els.clientContextProjectLabel.value.trim();
+  if (els.clientContextInternalOwner) context.client.internalOwner = els.clientContextInternalOwner.value.trim();
+  if (els.clientContextCustomerSafeNotes) context.client.customerSafeNotes = els.clientContextCustomerSafeNotes.value.trim();
+  if (els.clientContextInternalNotes) context.client.internalNotes = els.clientContextInternalNotes.value.trim();
+  if (els.vendorSourceState) context.vendor.state = els.vendorSourceState.value || "unreviewed";
+  if (els.vendorSourceType) context.vendor.sourceType = els.vendorSourceType.value || "mixed";
+  if (els.vendorSourceDisplayName) context.vendor.displayName = els.vendorSourceDisplayName.value.trim();
+  if (els.vendorSourceConfidence) context.vendor.confidence = els.vendorSourceConfidence.value || "medium";
+  if (els.vendorSourceRelatedLine) context.vendor.relatedLine = els.vendorSourceRelatedLine.value.trim();
+  if (els.vendorSourceCustomerVisibleName) context.vendor.customerVisibleName = els.vendorSourceCustomerVisibleName.value.trim();
+  if (els.vendorSourceInternalNotes) context.vendor.internalNotes = els.vendorSourceInternalNotes.value.trim();
+  if (els.reviewCustomerSafeContextChecked) context.review.customerSafeContextChecked = els.reviewCustomerSafeContextChecked.checked;
+  if (els.reviewInternalOnlyNotesPresent) context.review.internalOnlyNotesPresent = els.reviewInternalOnlyNotesPresent.checked;
+  if (els.reviewVendorReviewNeeded) context.review.vendorReviewNeeded = els.reviewVendorReviewNeeded.checked;
+  if (els.reviewReadyForSigningHandoffReview) context.review.readyForSigningHandoffReview = els.reviewReadyForSigningHandoffReview.checked;
+}
+
+function renderClientVendorContextForm() {
+  const context = ensureClientVendorContext();
+  if (els.clientContextState) els.clientContextState.value = context.client.state || "draft";
+  if (els.clientContextDisplayName) els.clientContextDisplayName.value = context.client.accountLabel || "";
+  if (els.clientContextContactLabel) els.clientContextContactLabel.value = context.client.contactLabel || "";
+  if (els.clientContextProjectLabel) els.clientContextProjectLabel.value = context.client.projectLabel || "";
+  if (els.clientContextInternalOwner) els.clientContextInternalOwner.value = context.client.internalOwner || "";
+  if (els.clientContextCustomerSafeNotes) els.clientContextCustomerSafeNotes.value = context.client.customerSafeNotes || "";
+  if (els.clientContextInternalNotes) els.clientContextInternalNotes.value = context.client.internalNotes || "";
+  if (els.vendorSourceState) els.vendorSourceState.value = context.vendor.state || "unreviewed";
+  if (els.vendorSourceType) els.vendorSourceType.value = context.vendor.sourceType || "mixed";
+  if (els.vendorSourceDisplayName) els.vendorSourceDisplayName.value = context.vendor.displayName || "";
+  if (els.vendorSourceConfidence) els.vendorSourceConfidence.value = context.vendor.confidence || "medium";
+  if (els.vendorSourceRelatedLine) els.vendorSourceRelatedLine.value = context.vendor.relatedLine || "";
+  if (els.vendorSourceCustomerVisibleName) els.vendorSourceCustomerVisibleName.value = context.vendor.customerVisibleName || "";
+  if (els.vendorSourceInternalNotes) els.vendorSourceInternalNotes.value = context.vendor.internalNotes || "";
+  if (els.reviewCustomerSafeContextChecked) els.reviewCustomerSafeContextChecked.checked = Boolean(context.review.customerSafeContextChecked);
+  if (els.reviewInternalOnlyNotesPresent) els.reviewInternalOnlyNotesPresent.checked = Boolean(context.review.internalOnlyNotesPresent);
+  if (els.reviewVendorReviewNeeded) els.reviewVendorReviewNeeded.checked = Boolean(context.review.vendorReviewNeeded);
+  if (els.reviewReadyForSigningHandoffReview) els.reviewReadyForSigningHandoffReview.checked = Boolean(context.review.readyForSigningHandoffReview);
+  renderClientVendorContextSummary();
+}
+
+function clientVendorContextSummaryItems(context) {
+  return [
+    ["Client", context.client.accountLabel || printQuote.customerCompany || els.clientName?.value.trim() || "Client pending"],
+    ["Contact", context.client.contactLabel || printQuote.customerName || "Contact pending"],
+    ["Source", context.vendor.displayName || printQuote.source || "Source pending"],
+    ["Review", context.review.readyForSigningHandoffReview ? "ready for signing/audit review" : context.vendor.state || "unreviewed"]
+  ];
+}
+
+function renderClientVendorContextSummary() {
+  if (!els.clientVendorContextSummary) return;
+  const context = ensureClientVendorContext();
+  const reviewBadges = [
+    context.review.customerSafeContextChecked && "customer-safe checked",
+    context.review.internalOnlyNotesPresent && "internal-only notes present",
+    context.review.vendorReviewNeeded && "vendor review needed",
+    context.review.readyForSigningHandoffReview && "handoff review ready"
+  ].filter(Boolean);
+  els.clientVendorContextSummary.innerHTML = `
+    <strong>Context summary</strong>
+    <div class="context-summary-list">
+      ${clientVendorContextSummaryItems(context).map(([label, value]) => `
+        <span><b>${escapeHtml(label)}</b>${escapeHtml(value)}</span>
+      `).join("")}
+    </div>
+    <p>Customer-safe context is kept separate from internal-only vendor/source notes.</p>
+    <div class="context-review-badges">
+      ${(reviewBadges.length ? reviewBadges : ["review cues pending"]).map((badge) => `<span>${escapeHtml(badge)}</span>`).join("")}
+    </div>
+  `;
+}
+
 function syncPlaceholderDraftsFromInputs() {
   const handoff = ensurePrintQuoteHandoff();
   if (els.printQuoteName) printQuote.name = els.printQuoteName.value.trim() || "Print Quote Draft";
@@ -1659,6 +1808,7 @@ function syncPlaceholderDraftsFromInputs() {
   if (els.printQuoteCustomerNote) printQuote.customerNote = els.printQuoteCustomerNote.value.trim();
   if (els.printQuoteCustomerTerms) printQuote.customerTerms = els.printQuoteCustomerTerms.value.trim();
   if (els.printQuoteInternalNotes) printQuote.internalNotes = els.printQuoteInternalNotes.value.trim();
+  syncClientVendorContextFromInputs();
   if (els.handoffPreparedBy) handoff.preparedBy = els.handoffPreparedBy.value.trim() || "John";
   if (els.handoffApprovedBy) handoff.approvedBy = els.handoffApprovedBy.value.trim();
   if (els.handoffNotes) handoff.approvalNotes = els.handoffNotes.value.trim();
@@ -1685,6 +1835,7 @@ function renderPlaceholderDrafts() {
   if (els.printQuoteCustomerNote) els.printQuoteCustomerNote.value = printQuote.customerNote || "";
   if (els.printQuoteCustomerTerms) els.printQuoteCustomerTerms.value = printQuote.customerTerms || "";
   if (els.printQuoteInternalNotes) els.printQuoteInternalNotes.value = printQuote.internalNotes || "";
+  renderClientVendorContextForm();
   if (els.handoffPreparedBy) els.handoffPreparedBy.value = handoff.preparedBy || "John";
   if (els.handoffApprovedBy) els.handoffApprovedBy.value = handoff.approvedBy || "";
   if (els.handoffNotes) els.handoffNotes.value = handoff.approvalNotes || "";
@@ -1898,6 +2049,7 @@ function collectObjectKeys(value, memo = []) {
 function buildSigningHandoffPackage() {
   syncPlaceholderDraftsFromInputs();
   const handoff = ensurePrintQuoteHandoff();
+  const clientVendorContext = ensureClientVendorContext();
   const estimateId = handoffSourceRecord("estimates", currentEstimateNumber());
   const proposalId = handoffSourceRecord("proposals", "");
   const revisionId = handoffSourceRecord("printQuotes", "");
@@ -1981,6 +2133,28 @@ function buildSigningHandoffPackage() {
     internalOnly: {
       excludedFieldsStatement: "Internal costs, margin, vendor/source references, pricing-basis internals, sourcing notes, workflow/debug metadata, and internal notes must not be present in customerSnapshot.",
       handoffNotes: handoff.approvalNotes || "",
+      clientVendorContext: {
+        clientState: clientVendorContext.client.state,
+        clientAccountLabel: clientVendorContext.client.accountLabel,
+        clientContactLabel: clientVendorContext.client.contactLabel,
+        clientProjectLabel: clientVendorContext.client.projectLabel,
+        internalOwner: clientVendorContext.client.internalOwner,
+        customerSafeContext: clientVendorContext.client.customerSafeNotes,
+        internalClientNotes: clientVendorContext.client.internalNotes,
+        sourceState: clientVendorContext.vendor.state,
+        sourceType: clientVendorContext.vendor.sourceType,
+        sourceDisplayName: clientVendorContext.vendor.displayName,
+        sourceConfidence: clientVendorContext.vendor.confidence,
+        sourceRelatedLine: clientVendorContext.vendor.relatedLine,
+        customerVisibleSourceName: clientVendorContext.vendor.customerVisibleName,
+        internalSourceNotes: clientVendorContext.vendor.internalNotes,
+        reviewCues: {
+          customerSafeContextChecked: clientVendorContext.review.customerSafeContextChecked,
+          internalOnlyNotesPresent: clientVendorContext.review.internalOnlyNotesPresent,
+          vendorReviewNeeded: clientVendorContext.review.vendorReviewNeeded,
+          readyForSigningHandoffReview: clientVendorContext.review.readyForSigningHandoffReview
+        }
+      },
       riskFlags: []
     }
   };
@@ -2043,6 +2217,7 @@ function renderHandoffCustomerPreview(packageDraft) {
 function renderHandoffAuditPreview(packageDraft) {
   const audit = packageDraft.auditMetadata;
   const providerInactive = "Provider send inactive in Phase 1.";
+  const context = packageDraft.internalOnly?.clientVendorContext || {};
   return `
     <div class="handoff-preview-metric"><span>State</span><strong>${escapeHtml(packageDraft.packageState)}</strong></div>
     <div class="handoff-preview-metric"><span>Validation</span><strong>${escapeHtml(audit.validationResult)}</strong></div>
@@ -2050,6 +2225,8 @@ function renderHandoffAuditPreview(packageDraft) {
     <div class="handoff-audit-lines">
       <p><strong>Package</strong> ${escapeHtml(packageDraft.packageId)}</p>
       <p><strong>Source</strong> ${escapeHtml([packageDraft.source.estimateId, packageDraft.source.proposalId, packageDraft.source.revisionId].filter(Boolean).join(" / ") || "Draft source")}</p>
+      <p><strong>Client context</strong> ${escapeHtml(context.clientAccountLabel || packageDraft.customer.displayName || "Client pending")}</p>
+      <p><strong>Vendor/source context</strong> ${escapeHtml([context.sourceDisplayName, context.sourceState].filter(Boolean).join(" / ") || "Source review pending")}</p>
       <p><strong>Prepared by</strong> ${escapeHtml(packageDraft.preparedBy.name || "John")}</p>
       <p><strong>Approved by</strong> ${escapeHtml(packageDraft.review.approvedBy || "Not approved yet")}</p>
       <p><strong>Boundary</strong> ${escapeHtml(providerInactive)}</p>
@@ -2161,6 +2338,7 @@ function renderPrintQuoteDraft() {
   els.printQuoteLines.innerHTML = renderPrintQuoteLines(isCustomerOutput);
   els.printQuoteTotals.innerHTML = renderPrintQuoteTotals();
   renderPrintQuoteMessage(isCustomerOutput);
+  renderClientVendorContextSummary();
   renderSigningHandoffPackage();
 }
 
@@ -10153,7 +10331,7 @@ els.proposalPublishSummary?.addEventListener("click", (event) => {
   if (!sourceButton) return;
   openWorkspaceRecordCollection(sourceButton.dataset.publishingSource);
 });
-[
+const printQuoteDraftInputs = [
   els.printQuoteName,
   els.printQuoteSource,
   els.printQuoteExternalRef,
@@ -10167,21 +10345,49 @@ els.proposalPublishSummary?.addEventListener("click", (event) => {
   els.printQuoteCustomerNote,
   els.printQuoteCustomerTerms,
   els.printQuoteInternalNotes,
+  els.clientContextState,
+  els.clientContextDisplayName,
+  els.clientContextContactLabel,
+  els.clientContextProjectLabel,
+  els.clientContextInternalOwner,
+  els.clientContextCustomerSafeNotes,
+  els.clientContextInternalNotes,
+  els.vendorSourceState,
+  els.vendorSourceType,
+  els.vendorSourceDisplayName,
+  els.vendorSourceConfidence,
+  els.vendorSourceRelatedLine,
+  els.vendorSourceCustomerVisibleName,
+  els.vendorSourceInternalNotes,
   els.handoffPreparedBy,
   els.handoffApprovedBy,
-  els.handoffNotes,
+  els.handoffNotes
+];
+const printQuoteDraftChecks = [
+  els.reviewCustomerSafeContextChecked,
+  els.reviewInternalOnlyNotesPresent,
+  els.reviewVendorReviewNeeded,
+  els.reviewReadyForSigningHandoffReview,
+  els.handoffApprovalConfirmed
+];
+const ecommDraftInputs = [
   els.ecommListName,
   els.ecommChannel,
   els.ecommExternalRef,
   els.ecommSourceUrl,
   els.ecommNotes
+];
+
+[
+  ...printQuoteDraftInputs,
+  ...ecommDraftInputs
 ].filter(Boolean).forEach((input) => {
   input.addEventListener("input", () => {
     syncPlaceholderDraftsFromInputs();
-    if ([els.printQuoteName, els.printQuoteSource, els.printQuoteExternalRef, els.printQuoteSourceUrl, els.printQuoteNotes, els.printQuoteValidUntil, els.printQuoteCustomerName, els.printQuoteCustomerCompany, els.printQuoteShipMethod, els.printQuoteShippingAmount, els.printQuoteCustomerNote, els.printQuoteCustomerTerms, els.printQuoteInternalNotes, els.handoffPreparedBy, els.handoffApprovedBy, els.handoffNotes].includes(input)) {
+    if (printQuoteDraftInputs.includes(input)) {
       touchWorkspaceRecord("printQuotes");
     }
-    if ([els.ecommListName, els.ecommChannel, els.ecommExternalRef, els.ecommSourceUrl, els.ecommNotes].includes(input)) {
+    if (ecommDraftInputs.includes(input)) {
       touchWorkspaceRecord("ecomm");
     }
     renderPlaceholderSummaries();
@@ -10190,12 +10396,16 @@ els.proposalPublishSummary?.addEventListener("click", (event) => {
     renderProposalPreview();
   });
 });
-els.handoffApprovalConfirmed?.addEventListener("change", () => {
-  syncPlaceholderDraftsFromInputs();
-  touchWorkspaceRecord("printQuotes");
-  renderPrintQuoteDraft();
-  renderTabRecordControls();
+
+printQuoteDraftChecks.filter(Boolean).forEach((input) => {
+  input.addEventListener("change", () => {
+    syncPlaceholderDraftsFromInputs();
+    touchWorkspaceRecord("printQuotes");
+    renderPrintQuoteDraft();
+    renderTabRecordControls();
+  });
 });
+
 els.refreshPrintQuoteLinesBtn?.addEventListener("click", refreshPrintQuoteLinesFromEstimate);
 els.printQuoteOutputModeButtons?.forEach((button) => {
   button.addEventListener("click", () => {
