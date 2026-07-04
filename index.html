@@ -921,54 +921,6 @@
                 <div id="printQuoteTotals" class="print-quote-totals"></div>
                 <div id="printQuoteMessage" class="print-quote-message" hidden></div>
               </div>
-              <section class="signing-handoff-panel" aria-label="Signing handoff review">
-                <div class="section-head">
-                  <div>
-                    <h2>Signing Handoff Review</h2>
-                    <p>Provider-neutral package preview for internal review. Provider send remains inactive.</p>
-                  </div>
-                  <span id="handoffProviderStatus" class="draft-badge warning-badge">Provider send inactive</span>
-                </div>
-                <div class="signing-handoff-controls">
-                  <label>
-                    Prepared by
-                    <input id="handoffPreparedBy" type="text" value="John" />
-                  </label>
-                  <label>
-                    Approved by
-                    <input id="handoffApprovedBy" type="text" placeholder="Reviewer name before approved export" />
-                  </label>
-                  <label class="wide-field">
-                    Handoff notes
-                    <textarea id="handoffNotes" rows="2" placeholder="Internal handoff notes. Do not include provider credentials or customer-private details."></textarea>
-                  </label>
-                  <label class="handoff-approval-check wide-field">
-                    <input id="handoffApprovalConfirmed" type="checkbox" />
-                    Customer snapshot and internal/audit preview have been reviewed for this export.
-                  </label>
-                </div>
-                <div id="handoffValidation" class="handoff-validation" aria-live="polite"></div>
-                <div class="handoff-preview-grid">
-                  <article>
-                    <h3>Customer Snapshot</h3>
-                    <div id="handoffCustomerPreview" class="handoff-preview-box"></div>
-                  </article>
-                  <article>
-                    <h3>Internal / Audit Preview</h3>
-                    <div id="handoffAuditPreview" class="handoff-preview-box"></div>
-                  </article>
-                </div>
-                <details class="handoff-json-details">
-                  <summary>Review package JSON</summary>
-                  <pre id="handoffPackageJson"></pre>
-                </details>
-                <div class="handoff-actions">
-                  <button id="copyHandoffPackageBtn" class="ghost-btn" type="button" disabled>Copy Package JSON</button>
-                  <button id="downloadHandoffPackageBtn" class="ghost-btn" type="button" disabled>Download Package JSON</button>
-                  <button class="ghost-btn provider-send-disabled" type="button" disabled>Send To Provider Inactive</button>
-                  <span id="handoffExportStatus" class="handoff-export-status" aria-live="polite"></span>
-                </div>
-              </section>
             </article>
           </div>
         </section>
