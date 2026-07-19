@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>P003-W037 Proposal Template Pull Request Review</title>
+  <style>
+    :root {
+      --bg:#1f1d1a; --shell:#161512; --chrome:#28231f; --panel:#2b2724;
+      --panel-strong:#302b27; --panel-soft:#211f1c; --panel-raised:#2f2a26;
+      --item:#24211e; --border:#554c46; --border-soft:#3f3934;
+      --text:#f4fbf6; --muted:#b8ada6; --faint:#8a817b;
+      --highlight:#00d46a; --highlight-strong:#19f07a; --highlight-soft:#8df3ad;
+      --highlight-fill:#123f22; --blue:#9bc7ff; --blue-strong:#5aa2ff;
+      --blue-soft:#18293d; --amber:#d89642; --radius:8px; --radius-lg:10px;
+      --max:1120px; --font:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      --display:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      --mono:"SF Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text); line-height:1.55; }
+    body::before { content:""; position:fixed; inset:0; pointer-events:none; background:linear-gradient(180deg,rgba(0,212,106,.07),transparent 260px); }
+    header { position:relative; background:var(--chrome); border-bottom:1px solid var(--border); padding:28px 32px; }
+    header > div, main { width:min(var(--max),calc(100% - 32px)); margin:0 auto; }
+    h1,h2,h3 { margin:0; line-height:1.08; letter-spacing:0; }
+    h1 { max-width:940px; font-size:clamp(36px,6vw,64px); font-weight:850; }
+    h2 { font-size:clamp(24px,3vw,36px); }
+    h3 { font-size:18px; }
+    p { margin:0; }
+    .kicker { color:var(--highlight); font-size:12px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
+    .deck { max-width:850px; margin-top:10px; color:var(--muted); font-size:clamp(17px,2vw,21px); }
+    .pills { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+    .pill { display:inline-flex; border:1px solid var(--highlight); border-radius:999px; background:var(--highlight-fill); color:var(--highlight-soft); padding:5px 10px; font-size:12px; font-weight:800; }
+    .pill.blue { border-color:var(--blue-strong); background:var(--blue-soft); color:var(--blue); }
+    main { position:relative; padding:22px 0 44px; display:grid; gap:18px; }
+    section { padding:18px; border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--panel); }
+    .metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+    .metric,.card { min-width:0; padding:14px; border:1px solid var(--border-soft); border-radius:var(--radius); background:var(--panel-raised); }
+    .metric span { display:block; color:var(--faint); font-size:11px; font-weight:800; text-transform:uppercase; }
+    .metric strong { display:block; margin-top:5px; color:var(--highlight-soft); font-size:20px; overflow-wrap:anywhere; }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .card p { margin-top:7px; color:var(--muted); }
+    ul { margin:10px 0 0; padding-left:20px; color:var(--muted); }
+    li { margin:6px 0; }
+    a { color:var(--blue); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    code { padding:2px 5px; border-radius:4px; background:var(--blue-soft); color:var(--blue); font-family:var(--mono); overflow-wrap:anywhere; }
+    .ok { border-left:4px solid var(--highlight); }
+    .gate { border-left:4px solid var(--amber); }
+    .action { display:inline-flex; align-items:center; margin-top:14px; padding:10px 14px; border:1px solid var(--blue-strong); border-radius:var(--radius); background:var(--blue-soft); color:var(--blue); font-weight:800; }
+    @media (max-width:760px) { header { padding:22px 16px; } .metrics,.grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <div class="kicker">SharpDots Estimator / P003-W037 / repository review</div>
+      <h1>The verified Proposal-template work is preserved in PR #20.</h1>
+      <p class="deck">The exact W035 implementation and W036 responsive correction are committed on one isolated branch. The pull request is open for review and remains unmerged and undeployed.</p>
+      <div class="pills">
+        <span class="pill">PR open</span>
+        <span class="pill">19 / 19 browser checks</span>
+        <span class="pill blue">No database change</span>
+        <span class="pill blue">No deployment</span>
+      </div>
+    </div>
+  </header>
+  <main>
+    <section class="metrics" aria-label="Pull request summary">
+      <div class="metric"><span>Pull request</span><strong>#20</strong></div>
+      <div class="metric"><span>Preservation commit</span><strong>18c3d01</strong></div>
+      <div class="metric"><span>Catalog</span><strong>30 entries</strong></div>
+      <div class="metric"><span>Loadable starters</span><strong>3 sanitized</strong></div>
+    </section>
+
+    <section class="ok">
+      <div class="kicker">Result</div>
+      <h2>W037 has completed its publication boundary.</h2>
+      <div class="grid">
+        <article class="card"><h3>What the PR adds</h3><p>A Proposal Template Library, three reviewed starters, source-preserving load/rename/reset behavior, nine editable narrative fields, and current Proposal save/load support.</p></article>
+        <article class="card"><h3>What was verified</h3><p>Desktop and 390px mobile rendering, all 19 focused interactions, 30 catalog entries, three starters, source identity, reset, rename, save, and load.</p></article>
+        <article class="card"><h3>Exact source scope</h3><p><code>app.js</code>, <code>index.html</code>, <code>styles.css</code>, the focused validator, and repo-local synthetic QA evidence.</p></article>
+        <article class="card"><h3>Rollback</h3><p>Revert <code>18c3d01</code> before merge, or revert the eventual merge commit. No data rollback is required.</p></article>
+      </div>
+      <a class="action" href="https://github.com/Sharpdots888/sharpdots-estimator/pull/20">Open Estimator PR #20</a>
+    </section>
+
+    <section>
+      <div class="kicker">Validation</div>
+      <h2>The focused checks are recorded and passing.</h2>
+      <ul>
+        <li>JavaScript syntax checks passed for the application, server, and focused validator.</li>
+        <li>The Proposal-template validator passed all 30 catalog entries, three starters, and nine editable fields.</li>
+        <li>Desktop and mobile browser QA passed with no overflow, console errors, or page errors.</li>
+        <li>The staged diff and publication scan passed without credentials or machine-local paths.</li>
+        <li>The branch was refreshed against current <code>origin/main</code> before preservation.</li>
+      </ul>
+    </section>
+
+    <section class="gate">
+      <div class="kicker">Still gated</div>
+      <h2>Reviewing this PR does not authorize merge or release.</h2>
+      <div class="grid">
+        <article class="card"><h3>P003-W038</h3><p>Requires separate approval to review and merge this exact pull request into Estimator main.</p></article>
+        <article class="card"><h3>P003-W039</h3><p>Requires separate approval to deploy the exact merged revision and run supervised live acceptance.</p></article>
+      </div>
+      <ul>
+        <li>No Heroku action was performed.</li>
+        <li>No schema, migration, auth, startup, lockfile, configuration, credential, production-data, or customer-data change was made.</li>
+        <li>The pull request remains unmerged.</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
