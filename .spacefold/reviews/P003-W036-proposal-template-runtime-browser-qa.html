@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>P003-W036 Proposal Template Browser QA</title>
+  <style>
+    :root {
+      --bg:#1f1d1a; --chrome:#28231f; --panel:#2b2724; --raised:#302b27;
+      --border:#554c46; --border-soft:#403934; --text:#f4fbf6; --muted:#c1b6ae;
+      --faint:#948a83; --green:#19f07a; --green-soft:#9af4b5; --green-fill:#123f22;
+      --blue:#9bc7ff; --blue-fill:#18293d; --amber:#d89642; --amber-fill:#3c2a16;
+      --max:1160px; --radius:8px; --font:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      --mono:"SF Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--text); background:var(--bg); font:15px/1.5 var(--font); }
+    header { padding:28px 24px; border-bottom:1px solid var(--border); background:var(--chrome); }
+    header > div, main { width:min(var(--max), calc(100% - 32px)); margin:auto; }
+    h1,h2,h3 { margin:0; line-height:1.08; letter-spacing:0; }
+    h1 { max-width:920px; font-size:clamp(36px,6vw,64px); }
+    h2 { font-size:clamp(24px,3vw,36px); }
+    h3 { font-size:17px; }
+    p { margin:0; }
+    .kicker { color:var(--green); font-size:12px; font-weight:900; text-transform:uppercase; }
+    .deck { max-width:880px; margin-top:12px; color:var(--muted); font-size:clamp(17px,2vw,21px); }
+    .pills { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+    .pill { padding:5px 10px; border:1px solid var(--green); border-radius:999px; color:var(--green-soft); background:var(--green-fill); font-size:12px; font-weight:800; }
+    .pill.hold { border-color:var(--amber); color:#ffd39c; background:var(--amber-fill); }
+    main { display:grid; gap:16px; padding:22px 0 44px; }
+    section { padding:18px; border:1px solid var(--border); border-radius:10px; background:var(--panel); }
+    .metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+    .metric,.card { min-width:0; padding:14px; border:1px solid var(--border-soft); border-radius:var(--radius); background:var(--raised); }
+    .metric span { display:block; color:var(--faint); font-size:11px; font-weight:900; text-transform:uppercase; }
+    .metric strong { display:block; margin-top:4px; color:var(--green-soft); font-size:20px; }
+    .metric.hold strong { color:#ffd39c; }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+    .card p { margin-top:7px; color:var(--muted); }
+    ul { margin:10px 0 0; padding-left:20px; color:var(--muted); }
+    li { margin:6px 0; }
+    code { padding:1px 4px; color:var(--blue); background:var(--blue-fill); border-radius:4px; font-family:var(--mono); overflow-wrap:anywhere; }
+    .ok { border-left:4px solid var(--green); }
+    .hold { border-left:4px solid var(--amber); }
+    .shots { display:grid; grid-template-columns:1.35fr .65fr; gap:12px; margin-top:14px; align-items:start; }
+    figure { margin:0; padding:10px; border:1px solid var(--border-soft); border-radius:var(--radius); background:#171614; }
+    img { display:block; width:100%; height:auto; border-radius:5px; background:#eef3f0; }
+    figcaption { margin-top:8px; color:var(--muted); font-size:13px; }
+    .decision { display:block; margin-top:12px; padding:12px; border:1px solid var(--amber); border-radius:var(--radius); color:#ffe0b7; background:var(--amber-fill); font-family:var(--mono); font-weight:800; }
+    @media (max-width:820px) { .metrics,.grid,.shots { grid-template-columns:1fr; } header { padding:24px 16px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <div class="kicker">P003 Estimator / W036 / Browser QA continuation</div>
+      <h1>The mobile-shell correction passed the full W036 browser recheck.</h1>
+      <p class="deck">John's approved CSS-only correction was applied to the shared workspace header and generic record controls in <code>styles.css</code>. The same disposable PostgreSQL, desktop/mobile visual, and interaction checks were then rerun successfully from a browser-capable runtime.</p>
+      <div class="pills">
+        <span class="pill">30 catalog entries passed</span>
+        <span class="pill">3 starters passed</span>
+        <span class="pill">19 interaction checks passed</span>
+        <span class="pill">mobile overflow cleared</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="metrics" aria-label="QA result counts">
+      <div class="metric"><span>Bounded source edit</span><strong>styles.css</strong></div>
+      <div class="metric"><span>Interaction checks</span><strong>19 / 19</strong></div>
+      <div class="metric"><span>Mobile width</span><strong>390 / 390px</strong></div>
+      <div class="metric"><span>Runtime recheck</span><strong>passed</strong></div>
+    </section>
+
+    <section class="ok">
+      <div class="kicker">Final continuation result</div>
+      <h2>W036 now passes its bounded QA objective</h2>
+      <ul>
+        <li>The desktop visual pass rendered at <code>1440 x 900</code> with no overflow, console errors, or page errors.</li>
+        <li>The mobile visual pass rendered at <code>390 x 844</code>; document width remained exactly <code>390px</code>.</li>
+        <li>The unchanged interaction harness passed all 19 assertions, including the 30-entry catalog, three starters, editing, rename/reset, save/load, and mobile geometry.</li>
+        <li>The recheck used one disposable local PostgreSQL database with the synthetic client <code>W036 Synthetic Client</code>.</li>
+      </ul>
+      <p class="deck">W036 is ready for human acceptance. Pull-request preparation, deployment, live database use, and any further Estimator change remain separately gated.</p>
+    </section>
+
+    <section class="ok">
+      <div class="kicker">Verified behavior</div>
+      <h2>What previously passed and remains preserved</h2>
+      <div class="grid">
+        <article class="card"><h3>Catalog and starters</h3><p>All 30 entries rendered. The three sanitized starters, <code>314224</code>, <code>329536</code>, and <code>603333</code>, each loaded their expected proposal.</p></article>
+        <article class="card"><h3>Narrative editing</h3><p>All nine narrative fields updated the preview. Computed pricing and operational sections stayed locked.</p></article>
+        <article class="card"><h3>Identity and reset</h3><p>A working copy was renamed while source id <code>314224</code> remained intact. Reset restored the source starter.</p></article>
+        <article class="card"><h3>Existing save/load</h3><p>Synthetic Proposal <code>P-000010</code> saved and loaded with its title, narrative, working name, and source identity preserved.</p></article>
+      </div>
+    </section>
+
+    <section>
+      <div class="kicker">Visual evidence</div>
+      <h2>The feature at both tested sizes</h2>
+      <div class="shots">
+        <figure>
+          <img src="../qa/P003-W036/p003-w036-interaction-desktop.png" alt="Desktop Proposal-template interaction result" />
+          <figcaption>Desktop: no clipping, overlap, horizontal overflow, console error, or page error.</figcaption>
+        </figure>
+        <figure>
+          <img src="../qa/P003-W036/p003-w036-interaction-mobile.png" alt="Mobile Proposal-template interaction result" />
+          <figcaption>Mobile: the shared header, record controls, Template Library, and proposal preview all remain inside the 390-pixel viewport.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="ok">
+      <div class="kicker">Applied correction</div>
+      <h2>The previously approved shell repair is now in <code>styles.css</code>.</h2>
+      <div class="grid">
+        <article class="card"><h3>Shared header</h3><p>Mobile rules now allow the workspace title, controls, mode switcher, and action row to shrink and stack within the shell.</p></article>
+        <article class="card"><h3>Record controls</h3><p>Mobile rules now stack generic record-control grids and allow their action buttons to wrap instead of forcing desktop width.</p></article>
+      </div>
+    </section>
+
+    <section>
+      <div class="kicker">Boundaries</div>
+      <h2>What did not happen</h2>
+      <ul>
+        <li>Only <code>styles.css</code> was changed by this continuation.</li>
+        <li>No push, pull request, merge, Heroku action, deployment, or live activation occurred.</li>
+        <li>No package lock, startup, migration source, schema source, auth, credential, or committed configuration changed.</li>
+        <li>No live, persistent, staging, production, customer, or external database was used.</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

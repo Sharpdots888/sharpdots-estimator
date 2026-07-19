@@ -2283,6 +2283,71 @@ body.summary-view .summary-hide {
   background: var(--soft);
 }
 
+.proposal-template-library {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid rgba(66, 139, 202, 0.22);
+  border-radius: 8px;
+  background: #f8fbfd;
+}
+
+.template-library-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 8px;
+}
+
+.template-source-summary {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 7px 8px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #ffffff;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.template-source-summary strong {
+  color: var(--primary-dark);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.template-source-summary span,
+.template-source-summary small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.template-library-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.template-library-actions button {
+  min-height: 28px;
+  padding: 0 9px;
+  font-size: 0.74rem;
+}
+
+.template-working-status {
+  flex: 1 1 150px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
 .compact-head {
   margin-bottom: 0;
 }
@@ -2833,6 +2898,26 @@ body.summary-view .summary-hide {
   box-shadow: var(--shadow);
 }
 
+.proposal-preview-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-height: 38px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.proposal-preview-toolbar span {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
 .proposal-page {
   width: min(980px, calc(100vw - 468px));
   min-width: 640px;
@@ -2840,6 +2925,18 @@ body.summary-view .summary-hide {
   padding: 34px;
   background: #ffffff;
   box-shadow: 0 16px 36px rgba(20, 24, 26, 0.12);
+}
+
+.proposal-page.editing-copy .editable-copy-field {
+  outline: 1px dashed rgba(66, 139, 202, 0.48);
+  outline-offset: 3px;
+  border-radius: 4px;
+  cursor: text;
+}
+
+.proposal-page.editing-copy .editable-copy-field:focus {
+  outline: 2px solid var(--primary);
+  background: rgba(66, 139, 202, 0.08);
 }
 
 .proposal-hero {
@@ -5838,6 +5935,64 @@ button.sourcing-health-pill:focus-visible {
   .app-shell {
     width: min(100vw - 20px, 1480px);
     padding-top: 12px;
+  }
+
+  .workspace-title-wrap,
+  .workspace-controls,
+  .workspace-mode-control,
+  .workspace-action-row,
+  .tab-record-controls,
+  .record-actions,
+  .record-state {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .workspace-title-row,
+  .workspace-controls,
+  .workspace-mode-control,
+  .workspace-action-row,
+  .tab-record-controls {
+    width: 100%;
+  }
+
+  .workspace-controls,
+  .workspace-mode-control,
+  .tab-record-controls,
+  .tab-record-controls.estimate-record-controls,
+  .tab-record-controls.library-record-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .workspace-mode-control {
+    justify-items: stretch;
+    white-space: normal;
+  }
+
+  .workspace-mode-buttons,
+  .record-actions {
+    flex-wrap: wrap;
+  }
+
+  .workspace-mode-option {
+    min-width: 0;
+    padding-inline: 6px;
+    white-space: normal;
+  }
+
+  .workspace-action-row,
+  .record-actions {
+    justify-content: flex-start;
+    justify-self: stretch;
+  }
+
+  .record-actions {
+    display: flex;
+    overflow: visible;
+  }
+
+  .record-actions .compact-btn {
+    flex: 1 1 58px;
   }
 
   .summary-grid {

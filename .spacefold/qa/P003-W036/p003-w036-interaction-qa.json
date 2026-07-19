@@ -1,0 +1,191 @@
+{
+  "generatedAt": "2026-07-19T02:07:02.733Z",
+  "url": "http://127.0.0.1:4316/",
+  "branch": "codex/p003-w036-proposal-template-runtime-browser-qa",
+  "syntheticDataOnly": true,
+  "desktop": {
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "libraryCount": "30 catalog entries / 3 sanitized starters",
+    "optionCount": 30,
+    "starterOptionCount": 3,
+    "starterLoads": [
+      {
+        "id": "314224",
+        "enabled": true,
+        "title": "Sales Machine Services Proposal",
+        "expectedTitle": "Sales Machine Services Proposal",
+        "workingStatus": "Working copy from 314224; source identity preserved"
+      },
+      {
+        "id": "329536",
+        "enabled": true,
+        "title": "Omni Mail Campaign Proposal",
+        "expectedTitle": "Omni Mail Campaign Proposal",
+        "workingStatus": "Working copy from 329536; source identity preserved"
+      },
+      {
+        "id": "603333",
+        "enabled": true,
+        "title": "Sharpdots Services Overview",
+        "expectedTitle": "Sharpdots Services Overview",
+        "workingStatus": "Working copy from 603333; source identity preserved"
+      }
+    ],
+    "storedProposal": {
+      "number": "P-000010",
+      "title": "W036 Browser QA Proposal",
+      "overview": "Synthetic W036 browser QA overview.",
+      "displayName": "W036 QA Working Copy",
+      "sourceTemplateId": "314224"
+    },
+    "overflow": {
+      "viewportWidth": 1440,
+      "bodyScrollWidth": 1440,
+      "documentScrollWidth": 1440,
+      "offenders": []
+    },
+    "consoleErrors": [],
+    "pageErrors": [],
+    "checks": [
+      {
+        "name": "Catalog count",
+        "passed": true,
+        "detail": "30 catalog entries / 3 sanitized starters"
+      },
+      {
+        "name": "Catalog options",
+        "passed": true,
+        "detail": "30 options"
+      },
+      {
+        "name": "Starter options",
+        "passed": true,
+        "detail": "3 starter options"
+      },
+      {
+        "name": "Starter 314224 loads",
+        "passed": true,
+        "detail": "Sales Machine Services Proposal; Working copy from 314224; source identity preserved"
+      },
+      {
+        "name": "Starter 329536 loads",
+        "passed": true,
+        "detail": "Omni Mail Campaign Proposal; Working copy from 329536; source identity preserved"
+      },
+      {
+        "name": "Starter 603333 loads",
+        "passed": true,
+        "detail": "Sharpdots Services Overview; Working copy from 603333; source identity preserved"
+      },
+      {
+        "name": "Rename preserves source identity",
+        "passed": true,
+        "detail": "Working copy from 314224; source identity preserved; Sanitized starter proposal / 12 pages / source 314224 Sanitized sales/services starter available."
+      },
+      {
+        "name": "Nine narrative fields edit and render",
+        "passed": true,
+        "detail": "preview title: W036 Browser QA Proposal"
+      },
+      {
+        "name": "Existing Proposal save path",
+        "passed": true,
+        "detail": "P-000010; Saved P-000010; {\"number\":\"P-000010\",\"title\":\"W036 Browser QA Proposal\",\"overview\":\"Synthetic W036 browser QA overview.\",\"displayName\":\"W036 QA Working Copy\",\"sourceTemplateId\":\"314224\"}"
+      },
+      {
+        "name": "Existing Proposal load path",
+        "passed": true,
+        "detail": "W036 Browser QA Proposal; W036 QA Working Copy"
+      },
+      {
+        "name": "Reset restores source starter",
+        "passed": true,
+        "detail": "Sales Machine Services Proposal; Sales Machine Services Starter; Working copy from 314224; source identity preserved"
+      },
+      {
+        "name": "Desktop has no horizontal overflow",
+        "passed": true,
+        "detail": "{\"viewportWidth\":1440,\"bodyScrollWidth\":1440,\"documentScrollWidth\":1440,\"offenders\":[]}"
+      },
+      {
+        "name": "No desktop console errors",
+        "passed": true,
+        "detail": "none"
+      },
+      {
+        "name": "No desktop page errors",
+        "passed": true,
+        "detail": "none"
+      }
+    ]
+  },
+  "mobile": {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "title": "Omni Mail Campaign Proposal",
+    "displayName": "W036 Mobile QA Copy",
+    "templateGeometry": {
+      "library": {
+        "left": 32,
+        "right": 358,
+        "width": 326
+      },
+      "controls": {
+        "left": 43,
+        "right": 347,
+        "width": 304
+      },
+      "preview": {
+        "left": 19,
+        "right": 371,
+        "width": 352
+      }
+    },
+    "overflow": {
+      "viewportWidth": 390,
+      "bodyScrollWidth": 390,
+      "documentScrollWidth": 390,
+      "offenders": []
+    },
+    "consoleErrors": [],
+    "pageErrors": [],
+    "checks": [
+      {
+        "name": "Mobile starter, rename, and narrative interaction",
+        "passed": true,
+        "detail": "Omni Mail Campaign Proposal; W036 Mobile QA Copy"
+      },
+      {
+        "name": "W035 template library stays inside its proposal editor",
+        "passed": true,
+        "detail": "{\"library\":{\"left\":32,\"right\":358,\"width\":326},\"controls\":{\"left\":43,\"right\":347,\"width\":304},\"preview\":{\"left\":19,\"right\":371,\"width\":352}}"
+      },
+      {
+        "name": "Mobile document has no horizontal overflow",
+        "passed": true,
+        "detail": "390px document for 390px viewport"
+      },
+      {
+        "name": "No mobile console errors",
+        "passed": true,
+        "detail": "none"
+      },
+      {
+        "name": "No mobile page errors",
+        "passed": true,
+        "detail": "none"
+      }
+    ]
+  },
+  "summary": {
+    "passed": 19,
+    "failed": 0,
+    "featureBehaviorPassed": true,
+    "overallPassed": true
+  }
+}
