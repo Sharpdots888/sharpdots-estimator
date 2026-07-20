@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-19T02:06:16.767Z",
+  "target": "http://127.0.0.1:4316/",
+  "playwrightSource": "Codex bundled Playwright runtime",
+  "browserPath": "Codex bundled Chromium runtime",
+  "passed": true,
+  "results": [
+    {
+      "profile": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "requestedUrl": "http://127.0.0.1:4316/",
+      "finalUrl": "http://127.0.0.1:4316/",
+      "httpStatus": 200,
+      "screenshot": ".spacefold/qa/P003-W036/p003-w036-proposal-template-desktop.png",
+      "screenshotBytes": 283059,
+      "visualMetrics": {
+        "width": 1440,
+        "height": 1012,
+        "sampledWidth": 128,
+        "sampledHeight": 90,
+        "distinctColorBuckets": 87,
+        "minimumLuma": 43,
+        "maximumLuma": 255,
+        "lumaRange": 212,
+        "painted": true
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "metrics": {
+        "title": "Sharpdots Estimator",
+        "bodyTextCharacters": 4562,
+        "bodyTextSample": "WORKSPACE NAME\nWORKSPACE #\nW-000001\nCLIENT / ACCOUNT\nMODE\nAll Tools\nProposal / Services\nPrint / Ecomm\nAll\nProposal\nPrint / Ecomm\nAll tools workspace · Proposal, Estimate, Services Calculator, Sourcing, Print Quote, Ecomm Pricing\nNew Workspa",
+        "bodyWidth": 1440,
+        "bodyHeight": 1012,
+        "scrollWidth": 1440,
+        "scrollHeight": 1012,
+        "viewportWidth": 1440,
+        "viewportHeight": 900,
+        "horizontalOverflow": false,
+        "visibleVisualElements": 0,
+        "interactiveElements": 215,
+        "blank": false
+      },
+      "embeddedFrames": [],
+      "passed": true,
+      "warnings": []
+    },
+    {
+      "profile": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "requestedUrl": "http://127.0.0.1:4316/",
+      "finalUrl": "http://127.0.0.1:4316/",
+      "httpStatus": 200,
+      "screenshot": ".spacefold/qa/P003-W036/p003-w036-proposal-template-mobile.png",
+      "screenshotBytes": 317477,
+      "visualMetrics": {
+        "width": 390,
+        "height": 3250,
+        "sampledWidth": 15,
+        "sampledHeight": 128,
+        "distinctColorBuckets": 55,
+        "minimumLuma": 43,
+        "maximumLuma": 255,
+        "lumaRange": 212,
+        "painted": true
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "metrics": {
+        "title": "Sharpdots Estimator",
+        "bodyTextCharacters": 4562,
+        "bodyTextSample": "WORKSPACE NAME\nWORKSPACE #\nW-000001\nCLIENT / ACCOUNT\nMODE\nAll Tools\nProposal / Services\nPrint / Ecomm\nAll\nProposal\nPrint / Ecomm\nAll tools workspace · Proposal, Estimate, Services Calculator, Sourcing, Print Quote, Ecomm Pricing\nNew Workspa",
+        "bodyWidth": 390,
+        "bodyHeight": 3250,
+        "scrollWidth": 390,
+        "scrollHeight": 3250,
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "horizontalOverflow": false,
+        "visibleVisualElements": 0,
+        "interactiveElements": 215,
+        "blank": false
+      },
+      "embeddedFrames": [],
+      "passed": true,
+      "warnings": []
+    }
+  ]
+}

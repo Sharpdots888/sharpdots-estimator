@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-18T18:48:14-07:00",
+  "queueCardId": "queue-p003-estimator-supervised-pilot--proposal-template-runtime-browser-verifi",
+  "workOrder": "P003-W036",
+  "branch": "codex/p003-w036-proposal-template-runtime-browser-qa",
+  "result": "blocked",
+  "boundedChangeApplied": {
+    "file": "styles.css",
+    "scope": "mobile rules for shared workspace header and generic record controls",
+    "selectors": [
+      ".workspace-title-wrap",
+      ".workspace-controls",
+      ".workspace-mode-control",
+      ".workspace-action-row",
+      ".tab-record-controls",
+      ".record-actions",
+      ".record-state"
+    ]
+  },
+  "passedChecks": [
+    "npm ci completed against existing lockfile",
+    "package-lock.json SHA-256 remained 31c4fa40928165fe303523ea40ace592503ef61038e5e289e11f5b88b74c6704",
+    "node --check app.js",
+    "node --check server.js",
+    "node --check scripts/validate-proposal-template-library.js",
+    "node scripts/validate-proposal-template-library.js",
+    "git diff --check"
+  ],
+  "warnings": [
+    "npm ci reported EBADENGINE because this runtime used Node v26.0.0 while package.json declares Node 22.x"
+  ],
+  "blockedChecks": [
+    {
+      "check": "disposable local PostgreSQL startup",
+      "command": "pg_ctl -D <temp> -o \"-k <temp> -p 55436 -h 127.0.0.1\" -w start",
+      "error": "FATAL: could not create shared memory segment: Operation not permitted"
+    },
+    {
+      "check": "disposable local PostgreSQL startup with mmap shared memory options",
+      "command": "pg_ctl -D <temp> -o \"-k <temp> -p 55436 -h 127.0.0.1 -c shared_memory_type=mmap -c dynamic_shared_memory_type=mmap\" -w start",
+      "error": "FATAL: could not create shared memory segment: Operation not permitted"
+    },
+    {
+      "check": "local Estimator runtime listen",
+      "command": "ESTIMATOR_AUTH_MODE=disabled PORT=4316 HOST=127.0.0.1 DATABASE_URL=postgres://postgres@127.0.0.1:55436/p003_w036_qa npm start",
+      "error": "listen EPERM: operation not permitted 127.0.0.1:4316"
+    },
+    {
+      "check": "file-based Playwright CSS recheck",
+      "command": "chromium.launch({ headless: true })",
+      "error": "bootstrap_check_in org.chromium.Chromium.MachPortRendezvousServer: Permission denied"
+    }
+  ],
+  "cleanup": [
+    "Removed temporary /private/tmp/p003-w036-pg.* directories created by failed PostgreSQL startup attempts"
+  ],
+  "prohibitedSurfacesUnchangedByThisContinuation": [
+    "app.js",
+    "index.html",
+    "package-lock.json",
+    "server.js",
+    "package.json"
+  ]
+}

@@ -213,6 +213,7 @@ function defaultProposal() {
     outputAudience: "client",
     outputScope: "both",
     includedSections: ["copy", "estimate", "schedule", "services", "sourcing"],
+    templateMeta: null,
     sourceRecords: {},
     overview: "This campaign is designed to replace guesswork with a clear, trackable plan. The estimate below turns the selected package structure into proposal-ready pricing.",
     audience: "Target audience, geography, quantity assumptions, and campaign scope can be summarized here before final production counts are locked.",
@@ -552,6 +553,16 @@ const els = {
   proposalSubtitle: document.querySelector("#proposalSubtitle"),
   proposalPreparedFor: document.querySelector("#proposalPreparedFor"),
   proposalPricingMode: document.querySelector("#proposalPricingMode"),
+  proposalTemplateSearch: document.querySelector("#proposalTemplateSearch"),
+  proposalTemplateCategory: document.querySelector("#proposalTemplateCategory"),
+  proposalTemplateSelect: document.querySelector("#proposalTemplateSelect"),
+  proposalTemplateLibraryCount: document.querySelector("#proposalTemplateLibraryCount"),
+  proposalTemplateSourceSummary: document.querySelector("#proposalTemplateSourceSummary"),
+  loadProposalTemplateBtn: document.querySelector("#loadProposalTemplateBtn"),
+  resetProposalSourceBtn: document.querySelector("#resetProposalSourceBtn"),
+  proposalTemplateDisplayName: document.querySelector("#proposalTemplateDisplayName"),
+  renameProposalTemplateCopyBtn: document.querySelector("#renameProposalTemplateCopyBtn"),
+  proposalTemplateWorkingStatus: document.querySelector("#proposalTemplateWorkingStatus"),
   proposalPublishingTemplate: document.querySelector("#proposalPublishingTemplate"),
   proposalOutputAudience: document.querySelector("#proposalOutputAudience"),
   proposalOutputScope: document.querySelector("#proposalOutputScope"),
@@ -576,6 +587,8 @@ const els = {
   proposalPreviewPreparedFor: document.querySelector("#proposalPreviewPreparedFor"),
   proposalPreviewProject: document.querySelector("#proposalPreviewProject"),
   proposalPreviewDate: document.querySelector("#proposalPreviewDate"),
+  proposalPreviewEditStatus: document.querySelector("#proposalPreviewEditStatus"),
+  proposalEditPreviewBtn: document.querySelector("#proposalEditPreviewBtn"),
   proposalDraftBanner: document.querySelector("#proposalDraftBanner"),
   proposalSourceSnapshot: document.querySelector("#proposalSourceSnapshot"),
   proposalPublishFooter: document.querySelector("#proposalPublishFooter"),
@@ -3001,6 +3014,236 @@ const proposalAudienceLabels = {
   internal: "Internal output"
 };
 
+const proposalTemplateCatalog = [
+  { id: "122606", category: "addendum", name: "Marketing Automation Platform Addendum", file: "001-122606-addendum-marketing-automation-platform-native.pdf", pages: 10, checksum: "13db671853149f3ca4121cc479ae959625cc326dbcd0a92dd2d3b164871fbc75", status: "cataloged", qualityNotes: "Source metadata only; not loadable in this run." },
+  { id: "158076", category: "agreement", name: "Agency Services Agreement", file: "002-158076-agreement-agency-services.pdf", pages: 10, checksum: "18ec090ee41ae07bd8713c7d537919810199b006d39bd4542791cc12b6a5adfc", status: "cataloged", qualityNotes: "Legal-first source; requires separate review before reuse." },
+  { id: "190931", category: "agreement", name: "Mutual Non-Disclosure Agreement", file: "003-190931-agreement-mutual-non-disclosure.pdf", pages: 6, checksum: "984d3f6f1cb8c8b1d5283b0ed4e1f221cad9a15bae310c199cfbb64b4a33cedb", status: "cataloged", qualityNotes: "Legal-first source; requires separate review before reuse." },
+  { id: "236848", category: "agreement", name: "Regulation 1541.5 Printed Sales Messages Agreement", file: "004-236848-agreement-regulation-1541-5-printed-sales-messages.pdf", pages: 10, checksum: "4e0ba9f805d18e2476a4974c1788d74fea644af34a26e071d3e5916e1c77fed2", status: "cataloged", qualityNotes: "Legal/tax-oriented source; metadata only." },
+  { id: "268059", category: "brochure", name: "AWV Reverse Append Brochure", file: "005-268059-brochure-awv-reverse-append.pdf", pages: 3, checksum: "bb3cb4098464ca7667557500a35c043b516845c74a7e1292ce8f5b7cfa7ff589", status: "cataloged", qualityNotes: "Marketing-module source; metadata only." },
+  { id: "400100", category: "brochure", name: "Granular Advertising Agencies V2 Brochure", file: "006-400100-brochure-granular-advertising-agencies-v2.pdf", pages: 19, checksum: "e22426a6edb09f31298d01e351e05bb461da6c5950f640ca59a0457aab2f0605", status: "cataloged", qualityNotes: "Marketing-module source; metadata only." },
+  { id: "167688", category: "brochure", name: "Granular Advertising Aggregated Audience Brochure", file: "007-167688-brochure-granular-advertising-aggregated-audience.pdf", pages: 5, checksum: "bb88dbef9877df94de81bfb7f92fde23cc2fcd9d64ae704cf923e722bb6dea66", status: "cataloged", qualityNotes: "Marketing-module source; metadata only." },
+  { id: "268077", category: "brochure", name: "OTT Brochure", file: "008-268077-brochure-ott.pdf", pages: 5, checksum: "85856589efe124d6494bf3e1ea2c6e23d25fdf85eebddccd35f14fd833732113", status: "cataloged", qualityNotes: "Marketing-module source; metadata only." },
+  { id: "420259", category: "brochure", name: "Audience Targeting Technologies Brochure", file: "009-420259-brochure-audience-targeting-technologies.pdf", pages: 19, checksum: "157d92edcae0cad2ba2b438c076451e3e1587ab1c57ec4b096ab51ac73adde27", status: "cataloged", qualityNotes: "Marketing-module source; metadata only." },
+  { id: "151844", category: "brochure", name: "Experiential Agencies Brochure", file: "010-151844-brochure-experiential-agencies.pdf", pages: 8, checksum: "d50435331bf9a608b269a4e99fe0592edc5e866f5b30e07d3a9dd09ab6cd2c32", status: "cataloged", qualityNotes: "Marketing-module source; metadata only." },
+  { id: "603333", category: "brochure", name: "Sharpdots Services Brochure", file: "011-603333-brochure-sharpdots-services.pdf", pages: 18, checksum: "60b1385ec1e8a82e570497f4cede088f587f794febba1d115859a70894ab96c3", status: "starter", qualityNotes: "Sanitized services starter available." },
+  { id: "734472", category: "proposal", name: "Capture Audience Proposal", file: "012-734472-proposals-capture-audience.pdf", pages: 13, checksum: "9a428c8366743fe8869d9733c6984a49087d6538c7491fb0ac975f06c8825369", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
+  { id: "131263", category: "proposal", name: "Aggregated Audience Proposal", file: "013-131263-proposals-aggregated-audience.pdf", pages: 16, checksum: "f9e9e32216ea6922a0f8a6461f1b1da05e55df1267fab661fdfd50ecc123d8d6", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
+  { id: "314145", category: "proposal", name: "Capture Pixel Proposal", file: "014-314145-proposals-capture-pixel.pdf", pages: 14, checksum: "66c2f09930caf02a9012a602b1ba157fb37abddda4619db7e4ca554d89c2f585", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
+  { id: "272773", category: "proposal", name: "Data Services Proposal", file: "015-272773-proposals-data-services.pdf", pages: 12, checksum: "284d2b1a306d1b8e56f8c1ec2a283b285e0cd1c77e6caf04c52887d1f35db713", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
+  { id: "487336", category: "proposal", name: "Facebook Ad Campaign Proposal", file: "016-487336-proposals-facebook-ad-campaign.pdf", pages: 9, checksum: "8427255b7a3e5d5d68b4372a0d356ea5cb4ae8acf458df8d4dd487f136cf7dab", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
+  { id: "140631", category: "proposal", name: "Location-Based Ads Proposal", file: "017-140631-proposals-location-based-ads.pdf", pages: 17, checksum: "915cb903f27402a4cf6a216766a449889b0d67ee30ba47451ce80576b00c916b", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
+  { id: "556333", category: "proposal", name: "Machine Learning Project Proposal", file: "018-556333-proposals-machine-learning-project.pdf", pages: 14, checksum: "ee4dbc657c08019f718b2889710cc252dfa5acc0fa8c7e3eb306f0bb9ff7574b", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
+  { id: "182333", category: "proposal", name: "Marketing Automation Tier 1 Proposal", file: "019-182333-proposals-marketing-automation-tier-1.pdf", pages: 18, checksum: "ab744411923a67d0e8e5771b775cce8e9adbb568471ff69ff9f15a3f35c9dddd", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
+  { id: "155858", category: "proposal", name: "Marketing Automation Tier 2 Proposal", file: "020-155858-proposals-marketing-automation-tier-2.pdf", pages: 20, checksum: "fcb42ecd2b7d114ef7138d937d353229cc99288b689de24f14a013845d182fc9", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
+  { id: "170605", category: "proposal", name: "Neighbor Targeting Proposal", file: "021-170605-proposals-neighbor-targeting.pdf", pages: 16, checksum: "644643f12cea693fee419eddd99fd1b2f1589d34cff4d7d12fd7bbf416776a21", status: "cataloged", qualityNotes: "Known clipped-heading defect; not a visual baseline." },
+  { id: "329536", category: "proposal", name: "Omni Mail Proposal", file: "022-329536-proposals-omni-mail.pdf", pages: 16, checksum: "1039028b5b6df32c936245cc4a3384bd3aa4ef53aa798ef2c6d033849299df03", status: "starter", qualityNotes: "Sanitized direct-mail starter available." },
+  { id: "169895", category: "proposal", name: "RTM Proposal", file: "023-169895-proposals-rtm.pdf", pages: 16, checksum: "75ceacae97b6f3d08edc70b25692532ea30e5b3e0f614b6654e07ff7d3f09e27", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
+  { id: "314224", category: "proposal", name: "Sales Machine Proposal", file: "024-314224-proposals-sales-machine.pdf", pages: 12, checksum: "5c279311b326969c21fc58896c85e1b896420d46deda73ef6fdc9ab09872c2df", status: "starter", qualityNotes: "Sanitized sales/services starter available." },
+  { id: "138958", category: "proposal", name: "Virtual Venue Proposal", file: "025-138958-proposals-virtual-venue.pdf", pages: 17, checksum: "5135fbb8cc36a2bfc156eb716a4e6173a0864fd368d9639c39c2990d879bb6ad", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
+  { id: "509122", category: "statement-of-work", name: "Development Statement of Work", file: "026-509122-statement-of-work-development.pdf", pages: 16, checksum: "5273338ae8df6ac579124ef9cb454e31a86e8c2b4779e062e417e80bf1a5ed33", status: "cataloged", qualityNotes: "Statement-of-work source; metadata only." },
+  { id: "154100", category: "statement-of-work", name: "E-Commerce Website Statement of Work", file: "027-154100-statement-of-work-e-commerce-website.pdf", pages: 20, checksum: "46ac4bb82b07ba91b43e927d7b1c1badd666e14fe73a8ed4e71c22a1e4893e59", status: "cataloged", qualityNotes: "Statement-of-work source; metadata only." },
+  { id: "171207", category: "statement-of-work", name: "Informational Website Statement of Work", file: "028-171207-statement-of-work-informational-website.pdf", pages: 17, checksum: "87a860740c5d3e663913b29e1489fc55cfe36c0fb8191901efabe9002b51ce60", status: "cataloged", qualityNotes: "Statement-of-work source; metadata only." },
+  { id: "573546", category: "statement-of-work", name: "IT Services Statement of Work", file: "029-573546-statement-of-work-it-services.pdf", pages: 8, checksum: "0f1425317cb5e2f3ace1e101233461d5cdc767c32a22228aea02f6d58d4ec7c2", status: "cataloged", qualityNotes: "Statement-of-work source; metadata only." },
+  { id: "406423", category: "statement-of-work", name: "Print Editing and Marketing Platform Statement of Work", file: "030-406423-statement-of-work-print-editing-and-marketing-platform.pdf", pages: 10, checksum: "66b8011fe8c9be49b0c171c081f5f3b3e8239b50d90265e75da801f9de00ca61", status: "cataloged", qualityNotes: "Statement-of-work source; metadata only." }
+];
+
+const proposalStarterTemplates = {
+  "329536": {
+    basePreset: "directMail",
+    displayName: "Omni Mail Campaign Starter",
+    fields: {
+      title: "Omni Mail Campaign Proposal",
+      subtitle: "Audience, print, mail, and follow-up activation",
+      overview: "This proposal frames a direct-mail campaign as a coordinated acquisition program: audience definition, production-ready print, mailing logistics, and measurable next steps. It is intentionally generic and should be tailored to the current workspace before client use.",
+      audience: "Use this section to define the intended recipients, geography, quantity assumptions, segmentation criteria, and suppression requirements. Replace these placeholders with the current estimate and approved campaign scope.",
+      deliverables: "Audience planning, print-ready production coordination, mail preparation, campaign launch support, and reporting handoff are included as narrative modules. Pricing and quantities remain sourced from the current Estimator records.",
+      valueNarrative: "The useful comparison is not only piece cost; it is the cost to reach the right recipient with a clear offer and a trackable response path.",
+      nextSteps: "1. Confirm audience and mail quantity assumptions.\n2. Review estimate pricing, schedule, and selected services.\n3. Approve the working proposal so production details can be finalized.",
+      terms: "Final pricing, schedule, and deliverables depend on the approved scope, current estimate records, and any production changes requested after review."
+    }
+  },
+  "314224": {
+    basePreset: "services",
+    displayName: "Sales Machine Services Starter",
+    fields: {
+      title: "Sales Machine Services Proposal",
+      subtitle: "Outreach operations and execution support",
+      overview: "This proposal outlines a services-led growth program that combines strategy, campaign assets, outbound execution, and operating review. It is sanitized starter copy and does not include historical customers, prices, or legal terms.",
+      audience: "Describe the target account profile, buying committee, market segment, channel mix, and qualification criteria for the current project.",
+      deliverables: "Program setup, message development, campaign operations, platform coordination, reporting, and review cadence can be described here. Calculated service pricing remains read-only from the Services Calculator.",
+      valueNarrative: "The program should be evaluated by the quality and repeatability of sales conversations created, not by activity volume alone.",
+      nextSteps: "1. Confirm target profile and channel assumptions.\n2. Review services calculator outputs and any connected estimate records.\n3. Approve the services scope for launch planning.",
+      terms: "Service scope, activation timing, and recurring support are subject to current workspace records and separate approval of any material changes."
+    }
+  },
+  "603333": {
+    basePreset: "internalReview",
+    displayName: "Sharpdots Services Overview Starter",
+    fields: {
+      title: "Sharpdots Services Overview",
+      subtitle: "Internal review draft for connected proposal output",
+      overview: "This starter gives the team a neutral overview format for reviewing how Sharpdots services, estimate pricing, sourcing, and operational sections fit together before external use.",
+      audience: "Summarize the internal review audience, intended decision, open assumptions, and any sections that should remain internal-only.",
+      deliverables: "Use this area to describe the proposed service modules and connected operational records that need review. It should point reviewers to current calculated sections instead of restating prices manually.",
+      valueNarrative: "Internal review should test whether the proposal tells a coherent business story and whether each computed section is sourced from the right current record.",
+      nextSteps: "1. Review source record readiness.\n2. Resolve missing estimates, services, sourcing, print quote, or ecomm records.\n3. Decide whether the draft is ready for a client-facing template.",
+      terms: "This internal starter is not client-ready legal language. Replace it with reviewed terms before any external reliance."
+    }
+  }
+};
+
+const proposalNarrativeFields = ["title", "subtitle", "preparedFor", "overview", "audience", "deliverables", "valueNarrative", "nextSteps", "terms"];
+let proposalPreviewEditMode = false;
+
+function proposalCatalogEntry(id) {
+  return proposalTemplateCatalog.find((entry) => entry.id === String(id || "")) || null;
+}
+
+function proposalStarterEntry(id) {
+  return proposalStarterTemplates[String(id || "")] || null;
+}
+
+function proposalTemplateCategories() {
+  return uniqueValues(proposalTemplateCatalog.map((entry) => entry.category));
+}
+
+function proposalFilteredTemplateCatalog() {
+  const query = String(els.proposalTemplateSearch?.value || "").trim().toLowerCase();
+  const category = els.proposalTemplateCategory?.value || "all";
+  return proposalTemplateCatalog.filter((entry) => {
+    if (category !== "all" && entry.category !== category) return false;
+    if (!query) return true;
+    return [entry.id, entry.name, entry.category, entry.file, entry.status]
+      .join(" ")
+      .toLowerCase()
+      .includes(query);
+  });
+}
+
+function proposalTemplateMetaFor(sourceId, displayName) {
+  const source = proposalCatalogEntry(sourceId);
+  const starter = proposalStarterEntry(sourceId);
+  if (!source || !starter) return null;
+  return {
+    sourceTemplateId: source.id,
+    sourceName: source.name,
+    sourceFile: source.file,
+    sourceChecksum: source.checksum,
+    displayName: String(displayName || starter.displayName || source.name).trim() || source.name,
+    category: source.category,
+    basePreset: starter.basePreset,
+    sourceRevision: 1,
+    starterStatus: "sanitized-starter"
+  };
+}
+
+function applyProposalStarter(sourceId, options = {}) {
+  const source = proposalCatalogEntry(sourceId);
+  const starter = proposalStarterEntry(sourceId);
+  if (!source || !starter) return false;
+  const displayName = options.displayName || starter.displayName || source.name;
+  applyProposalTemplatePreset(starter.basePreset || "directMail");
+  proposal.templateMeta = proposalTemplateMetaFor(source.id, displayName);
+  Object.entries(starter.fields || {}).forEach(([key, value]) => {
+    if (proposalNarrativeFields.includes(key)) proposal[key] = value;
+  });
+  return true;
+}
+
+function loadSelectedProposalTemplate() {
+  const sourceId = els.proposalTemplateSelect?.value || "";
+  if (!applyProposalStarter(sourceId)) {
+    setSaveStatus("Selected catalog entry is metadata-only in this run");
+    renderProposalTemplateLibrary();
+    return;
+  }
+  setProposalEditorValues();
+  touchWorkspaceRecord("proposals");
+  renderProposalPreview();
+  setSaveStatus(`Loaded starter: ${proposal.templateMeta.displayName}`);
+}
+
+function renameProposalTemplateCopy() {
+  if (!proposal.templateMeta?.sourceTemplateId) return;
+  const nextName = String(els.proposalTemplateDisplayName?.value || "").trim();
+  if (!nextName) {
+    setSaveStatus("Enter a working copy name");
+    return;
+  }
+  proposal.templateMeta = {
+    ...proposal.templateMeta,
+    displayName: nextName
+  };
+  touchWorkspaceRecord("proposals");
+  renderProposalTemplateLibrary();
+  renderProposalPreview();
+  setSaveStatus(`Renamed working copy: ${nextName}`);
+}
+
+function resetProposalStarterToSource() {
+  const sourceId = proposal.templateMeta?.sourceTemplateId || els.proposalTemplateSelect?.value || "";
+  if (!applyProposalStarter(sourceId)) {
+    setSaveStatus("No loadable starter selected");
+    renderProposalTemplateLibrary();
+    return;
+  }
+  setProposalEditorValues();
+  touchWorkspaceRecord("proposals");
+  renderProposalPreview();
+  setSaveStatus(`Reset to source starter: ${proposal.templateMeta.sourceName}`);
+}
+
+function renderProposalTemplateLibrary() {
+  if (!els.proposalTemplateSelect) return;
+  const starterCount = Object.keys(proposalStarterTemplates).length;
+  if (els.proposalTemplateLibraryCount) {
+    els.proposalTemplateLibraryCount.textContent = `${proposalTemplateCatalog.length} catalog entries / ${starterCount} sanitized starters`;
+  }
+  if (els.proposalTemplateCategory && !els.proposalTemplateCategory.dataset.loaded) {
+    proposalTemplateCategories().forEach((category) => {
+      const option = document.createElement("option");
+      option.value = category;
+      option.textContent = category.replaceAll("-", " ");
+      els.proposalTemplateCategory.append(option);
+    });
+    els.proposalTemplateCategory.dataset.loaded = "true";
+  }
+
+  const previous = els.proposalTemplateSelect.value || proposal.templateMeta?.sourceTemplateId || "329536";
+  const entries = proposalFilteredTemplateCatalog();
+  els.proposalTemplateSelect.innerHTML = "";
+  entries.forEach((entry) => {
+    const option = document.createElement("option");
+    option.value = entry.id;
+    option.textContent = `${entry.id} - ${entry.name}${proposalStarterEntry(entry.id) ? " (starter)" : " (metadata)"}`;
+    els.proposalTemplateSelect.append(option);
+  });
+  if (entries.some((entry) => entry.id === previous)) els.proposalTemplateSelect.value = previous;
+
+  const selected = proposalCatalogEntry(els.proposalTemplateSelect.value);
+  const selectedStarter = proposalStarterEntry(selected?.id);
+  if (els.proposalTemplateSourceSummary) {
+    els.proposalTemplateSourceSummary.innerHTML = selected
+      ? `
+        <strong>${escapeHtml(selected.status === "starter" ? "Sanitized starter" : "Metadata only")}</strong>
+        <span>${escapeHtml(selected.category)} / ${selected.pages} pages / source ${selected.id}</span>
+        <small>${escapeHtml(selected.qualityNotes)}</small>
+      `
+      : "<span>No catalog entries match the current filter.</span>";
+  }
+  if (els.loadProposalTemplateBtn) els.loadProposalTemplateBtn.disabled = !selectedStarter;
+  if (els.resetProposalSourceBtn) els.resetProposalSourceBtn.disabled = !proposal.templateMeta?.sourceTemplateId || !proposalStarterEntry(proposal.templateMeta.sourceTemplateId);
+  if (els.renameProposalTemplateCopyBtn) els.renameProposalTemplateCopyBtn.disabled = !proposal.templateMeta?.sourceTemplateId;
+  if (els.proposalTemplateDisplayName && document.activeElement !== els.proposalTemplateDisplayName) {
+    els.proposalTemplateDisplayName.value = proposal.templateMeta?.displayName || "";
+  }
+  if (els.proposalTemplateWorkingStatus) {
+    els.proposalTemplateWorkingStatus.textContent = proposal.templateMeta?.sourceTemplateId
+      ? `Working copy from ${proposal.templateMeta.sourceTemplateId}; source identity preserved`
+      : "No starter loaded";
+  }
+}
+
 function proposalIncludedSections() {
   const sections = Array.isArray(proposal.includedSections) ? proposal.includedSections : [];
   return new Set(sections.length ? sections : defaultProposal().includedSections);
@@ -3177,8 +3420,26 @@ function normalizeProposalRecord(value = {}) {
   if (!proposalAudienceLabels[next.outputAudience]) next.outputAudience = "client";
   if (!proposalOutputScopeLabels[next.outputScope]) next.outputScope = "both";
   if (!["package", "detail", "type"].includes(next.pricingMode)) next.pricingMode = "package";
+  next.templateMeta = normalizeProposalTemplateMeta(next.templateMeta);
   next.sourceRecords = normalizeProposalSourceRecords(next.sourceRecords);
   return next;
+}
+
+function normalizeProposalTemplateMeta(value = null) {
+  if (!value || typeof value !== "object") return null;
+  const source = proposalCatalogEntry(value.sourceTemplateId);
+  if (!source) return null;
+  return {
+    sourceTemplateId: source.id,
+    sourceName: source.name,
+    sourceFile: source.file,
+    sourceChecksum: source.checksum,
+    displayName: String(value.displayName || source.name).trim() || source.name,
+    category: source.category,
+    basePreset: value.basePreset || proposalStarterEntry(source.id)?.basePreset || "directMail",
+    sourceRevision: asNumber(value.sourceRevision || 1) || 1,
+    starterStatus: value.starterStatus || (proposalStarterEntry(source.id) ? "sanitized-starter" : "catalog-metadata")
+  };
 }
 
 function normalizeProposalSourceRecords(value = {}) {
@@ -3497,6 +3758,7 @@ function setProposalEditorValues() {
   els.proposalSectionToggles.forEach((input) => {
     input.checked = included.has(input.value);
   });
+  renderProposalTemplateLibrary();
   renderProposalPublishingActions();
 }
 
@@ -3972,21 +4234,75 @@ function renderProposalOutputs() {
   renderProposalPlaceholderOutput();
 }
 
+function proposalPreviewEditableMap() {
+  return [
+    [els.proposalPreviewTitle, "title"],
+    [els.proposalPreviewSubtitle, "subtitle"],
+    [els.proposalPreviewPreparedFor, "preparedFor"],
+    [els.proposalPreviewOverview, "overview"],
+    [els.proposalPreviewAudience, "audience"],
+    [els.proposalPreviewDeliverables, "deliverables"],
+    [els.proposalPreviewValueNarrative, "valueNarrative"],
+    [els.proposalPreviewNextSteps, "nextSteps"],
+    [els.proposalPreviewTerms, "terms"]
+  ].filter(([element]) => element);
+}
+
+function syncProposalPreviewEditableState() {
+  proposalPreviewEditableMap().forEach(([element, key]) => {
+    element.toggleAttribute("contenteditable", proposalPreviewEditMode);
+    element.classList.toggle("editable-copy-field", proposalPreviewEditMode);
+    element.dataset.proposalField = key;
+    element.setAttribute("spellcheck", "true");
+    element.setAttribute("aria-label", `Edit ${key}`);
+  });
+  document.querySelector(".proposal-page")?.classList.toggle("editing-copy", proposalPreviewEditMode);
+  if (els.proposalEditPreviewBtn) {
+    els.proposalEditPreviewBtn.setAttribute("aria-pressed", String(proposalPreviewEditMode));
+    els.proposalEditPreviewBtn.textContent = proposalPreviewEditMode ? "Lock Copy" : "Edit Copy";
+  }
+  if (els.proposalPreviewEditStatus) {
+    els.proposalPreviewEditStatus.textContent = proposalPreviewEditMode
+      ? "Narrative fields editable"
+      : "Pricing and operational sections locked";
+  }
+}
+
+function setProposalPreviewText(element, key, value) {
+  if (!element || document.activeElement === element) return;
+  if (["overview", "audience", "deliverables", "valueNarrative", "nextSteps", "terms"].includes(key)) {
+    element.innerHTML = textWithBreaks(value);
+  } else {
+    element.textContent = value || "";
+  }
+}
+
+function updateProposalFromPreviewField(element) {
+  const key = element?.dataset?.proposalField;
+  if (!proposalNarrativeFields.includes(key)) return;
+  proposal[key] = String(element.innerText || element.textContent || "").replace(/\n{3,}/g, "\n\n").trim();
+  setProposalEditorValues();
+  touchWorkspaceRecord("proposals");
+  renderProposalPublishingActions();
+  renderProposalPublishFooter();
+}
+
 function renderProposalPreview() {
   if (!els.proposalView) return;
   ensureProposalDefaults();
   renderProposalPublishingActions();
-  els.proposalPreviewTitle.textContent = proposal.title || "Proposal";
-  els.proposalPreviewSubtitle.textContent = proposal.subtitle || els.projectName.value || "";
-  els.proposalPreviewPreparedFor.textContent = proposal.preparedFor || els.clientName.value || "Client";
+  setProposalPreviewText(els.proposalPreviewTitle, "title", proposal.title || "Proposal");
+  setProposalPreviewText(els.proposalPreviewSubtitle, "subtitle", proposal.subtitle || els.projectName.value || "");
+  setProposalPreviewText(els.proposalPreviewPreparedFor, "preparedFor", proposal.preparedFor || els.clientName.value || "Client");
   els.proposalPreviewProject.textContent = els.projectName.value || "Untitled Project";
   els.proposalPreviewDate.textContent = els.estimateDate.textContent || new Date().toLocaleDateString();
-  els.proposalPreviewOverview.innerHTML = textWithBreaks(proposal.overview);
-  els.proposalPreviewAudience.innerHTML = textWithBreaks(proposal.audience);
-  els.proposalPreviewDeliverables.innerHTML = textWithBreaks(proposal.deliverables);
-  els.proposalPreviewValueNarrative.innerHTML = textWithBreaks(proposal.valueNarrative);
-  els.proposalPreviewNextSteps.innerHTML = textWithBreaks(proposal.nextSteps);
-  els.proposalPreviewTerms.innerHTML = textWithBreaks(proposal.terms);
+  setProposalPreviewText(els.proposalPreviewOverview, "overview", proposal.overview);
+  setProposalPreviewText(els.proposalPreviewAudience, "audience", proposal.audience);
+  setProposalPreviewText(els.proposalPreviewDeliverables, "deliverables", proposal.deliverables);
+  setProposalPreviewText(els.proposalPreviewValueNarrative, "valueNarrative", proposal.valueNarrative);
+  setProposalPreviewText(els.proposalPreviewNextSteps, "nextSteps", proposal.nextSteps);
+  setProposalPreviewText(els.proposalPreviewTerms, "terms", proposal.terms);
+  syncProposalPreviewEditableState();
   renderProposalDraftBanner();
   renderProposalSourceSnapshot();
   renderProposalPublishFooter();
@@ -9756,6 +10072,33 @@ if (els.sourcingItems) {
     }
   });
 }
+[
+  els.proposalTemplateSearch,
+  els.proposalTemplateCategory,
+  els.proposalTemplateSelect
+].filter(Boolean).forEach((input) => {
+  input.addEventListener("input", renderProposalTemplateLibrary);
+  input.addEventListener("change", renderProposalTemplateLibrary);
+});
+els.loadProposalTemplateBtn?.addEventListener("click", loadSelectedProposalTemplate);
+els.renameProposalTemplateCopyBtn?.addEventListener("click", renameProposalTemplateCopy);
+els.resetProposalSourceBtn?.addEventListener("click", resetProposalStarterToSource);
+els.proposalEditPreviewBtn?.addEventListener("click", () => {
+  proposalPreviewEditMode = !proposalPreviewEditMode;
+  syncProposalPreviewEditableState();
+});
+document.querySelector(".proposal-page")?.addEventListener("input", (event) => {
+  const field = event.target.closest("[data-proposal-field]");
+  if (!field || !proposalPreviewEditMode) return;
+  updateProposalFromPreviewField(field);
+});
+document.querySelector(".proposal-page")?.addEventListener("blur", (event) => {
+  const field = event.target.closest("[data-proposal-field]");
+  if (!field || !proposalPreviewEditMode) return;
+  updateProposalFromPreviewField(field);
+  renderProposalPreview();
+}, true);
+
 [
   [els.proposalTitle, "title"],
   [els.proposalSubtitle, "subtitle"],

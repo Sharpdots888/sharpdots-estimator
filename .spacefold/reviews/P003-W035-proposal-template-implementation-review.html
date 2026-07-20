@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>P003-W035 Proposal Template Implementation Review</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1f2528;
+      --muted: #647078;
+      --line: #d9e0e4;
+      --soft: #f5f8fa;
+      --primary: #2f6f9f;
+      --green: #1f7657;
+      --warning: #9a5b00;
+    }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: var(--ink);
+      background: #ffffff;
+      line-height: 1.45;
+    }
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 20px 44px;
+    }
+    h1, h2 {
+      margin: 0;
+      line-height: 1.12;
+    }
+    h1 {
+      font-size: 2rem;
+    }
+    h2 {
+      margin-top: 26px;
+      font-size: 1.1rem;
+    }
+    p {
+      margin: 8px 0 0;
+      color: var(--muted);
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .summary div,
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: var(--soft);
+    }
+    .summary span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .summary strong {
+      display: block;
+      margin-top: 4px;
+      color: var(--primary);
+      font-size: 1.2rem;
+    }
+    ul {
+      margin: 8px 0 0;
+      padding-left: 20px;
+    }
+    li {
+      margin: 5px 0;
+    }
+    code {
+      padding: 1px 4px;
+      border-radius: 4px;
+      background: #eef3f6;
+    }
+    .ok {
+      color: var(--green);
+      font-weight: 700;
+    }
+    .warn {
+      color: var(--warning);
+      font-weight: 700;
+    }
+    table {
+      width: 100%;
+      margin-top: 10px;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+    }
+    @media (max-width: 700px) {
+      .summary {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>P003-W035 Proposal Template Implementation Review</h1>
+    <p>Local Proposal-tab implementation completed for John review. This is not deployed, published, merged, or connected to production data.</p>
+
+    <section class="summary" aria-label="Implementation summary">
+      <div><span>Catalog</span><strong>30 entries</strong></div>
+      <div><span>Loadable starters</span><strong>3 only</strong></div>
+      <div><span>Database changes</span><strong>None</strong></div>
+    </section>
+
+    <h2>What Changed</h2>
+    <div class="panel">
+      <ul>
+        <li>Added a Template Library section to the Proposal tab with search, category filter, source selector, load, rename, and reset controls.</li>
+        <li>Added all 30 W034 cataloged PDF exports as stable metadata in the app: source ID, category, file, pages, checksum, status, and quality note.</li>
+        <li>Added exactly three sanitized starter templates: Omni Mail, Sales Machine Services, and Sharpdots Services Overview.</li>
+        <li>Added an Edit Copy mode in the right-side preview for narrative fields only.</li>
+        <li>Preserved the existing Proposal JSON save/load path by storing template identity under <code>proposal.templateMeta</code>.</li>
+      </ul>
+    </div>
+
+    <h2>30 Versus 3</h2>
+    <table>
+      <thead>
+        <tr><th>Set</th><th>Behavior</th><th>Reason</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>30 catalog entries</td>
+          <td>Visible and searchable as source-library metadata.</td>
+          <td>Reconciles the full W034 inventory without importing historical source content.</td>
+        </tr>
+        <tr>
+          <td>3 starters</td>
+          <td>Only these can load structured copy into the working proposal record.</td>
+          <td>Proves the workflow while avoiding unreviewed pricing, legal, customer, or private text.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>How The Workflow Works</h2>
+    <div class="panel">
+      <ul>
+        <li><strong>Load:</strong> selecting a starter and pressing Load Starter applies sanitized narrative fields and the matching publishing preset.</li>
+        <li><strong>Source identity:</strong> the working proposal stores the original source template ID, source file, checksum, category, base preset, and source revision.</li>
+        <li><strong>Rename:</strong> Rename Copy changes only the working copy display name. It does not change source ID, file, checksum, category, or preset identity.</li>
+        <li><strong>Reset:</strong> Reset to Source reloads the selected source starter's reviewed narrative defaults.</li>
+        <li><strong>Edit preview:</strong> Edit Copy makes title, subtitle, prepared for, overview, audience, deliverables, value narrative, next steps, and terms editable in the preview.</li>
+        <li><strong>Locked sections:</strong> pricing, payment schedule, services, sourcing, print quote, and ecomm output remain calculated/read-only rendered sections.</li>
+      </ul>
+    </div>
+
+    <h2>Validation</h2>
+    <div class="panel">
+      <p class="ok">Passed: <code>node --check app.js</code>, <code>node --check server.js</code>, <code>node --check scripts/validate-proposal-template-library.js</code>, <code>node scripts/validate-proposal-template-library.js</code>, <code>git diff --check</code>.</p>
+      <p>The focused validation confirmed 30 catalog entries, 3 starter templates, stable source identity fields, rename/reset behavior checks, editable narrative allow-list, locked computed sections, and starter-copy blocked-token checks.</p>
+      <p class="warn">Browser automation limitation: the app served over a temporary static server, but the available browser automation path failed before user code ran. <code>node server.js</code> also could not start because <code>pg</code> is not installed in this checkout; package installation was not authorized.</p>
+    </div>
+
+    <h2>Next Gate</h2>
+    <div class="panel">
+      <p>John should review this local implementation. Any Postgres template table, full 30-template content conversion, production migration, PR, merge, deployment, or client-visible activation remains a separate explicit gate.</p>
+    </div>
+  </main>
+</body>
+</html>
