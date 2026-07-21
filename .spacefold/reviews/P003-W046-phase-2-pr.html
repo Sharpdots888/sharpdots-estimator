@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>P003-W046 - Phase 2 Estimator Pull Request</title>
+  <style>
+    :root {
+      --bg:#1f1d1a; --chrome:#28231f; --panel:#2b2724; --panel-raised:#2f2a26;
+      --border:#554c46; --text:#f4fbf6; --muted:#b8ada6; --highlight:#00d46a;
+      --highlight-soft:#8df3ad; --highlight-fill:#123f22; --blue:#9bc7ff;
+      --blue-strong:#5aa2ff; --blue-soft:#18293d; --amber:#d89642; --radius:8px;
+      --max:1080px; --font:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      --mono:"SF Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text); line-height:1.5; }
+    header { padding:28px 32px; background:var(--chrome); border-bottom:1px solid var(--border); }
+    main { width:min(var(--max),calc(100% - 32px)); margin:0 auto; padding:22px 0 40px; display:grid; gap:16px; }
+    h1,h2,h3 { margin:0; line-height:1.1; letter-spacing:0; }
+    h1 { max-width:900px; font-size:clamp(36px,6vw,64px); }
+    h2 { font-size:clamp(23px,3vw,34px); }
+    p { margin:0; }
+    .deck { max-width:820px; margin-top:10px; color:var(--muted); font-size:clamp(17px,2vw,20px); }
+    .kicker { color:var(--highlight); font-size:12px; font-weight:800; text-transform:uppercase; }
+    .pills,.links { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .pill { border:1px solid var(--highlight); border-radius:999px; background:var(--highlight-fill); color:var(--highlight-soft); padding:5px 10px; font-size:12px; font-weight:800; }
+    .pill.blue { border-color:var(--blue-strong); background:var(--blue-soft); color:var(--blue); }
+    section,.card { border:1px solid var(--border); border-radius:var(--radius); background:var(--panel); }
+    section { padding:18px; }
+    .grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-top:14px; }
+    .card { padding:14px; background:var(--panel-raised); }
+    .card strong { display:block; color:var(--highlight-soft); font-size:24px; }
+    .card span,.muted { color:var(--muted); }
+    ul { margin:12px 0 0; padding-left:20px; }
+    li + li { margin-top:6px; }
+    a { display:inline-flex; align-items:center; min-height:36px; padding:7px 11px; border:1px solid var(--blue-strong); border-radius:var(--radius); background:var(--blue-soft); color:var(--blue); text-decoration:none; font-weight:750; }
+    code { font-family:var(--mono); overflow-wrap:anywhere; }
+    .next { border-left:4px solid var(--amber); }
+    @media (max-width:760px) { header { padding:24px 18px; } .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="kicker">P003-W046 / Phase 2 / pull request published</div>
+    <h1>The verified 30-template Publishing change is ready for independent review.</h1>
+    <p class="deck">A focused Estimator pull request now contains the completed Phase-2 implementation and its local QA evidence. It is open and unmerged; this step did not authorize merge or deployment.</p>
+    <div class="pills">
+      <span class="pill">PR #21 open</span>
+      <span class="pill">Mergeable</span>
+      <span class="pill blue">Draft for independent review</span>
+      <span class="pill blue">No deployment</span>
+    </div>
+  </header>
+  <main>
+    <section>
+      <div class="kicker">Published scope</div>
+      <h2>One Publishing workflow, all 30 reviewed sources.</h2>
+      <div class="grid">
+        <div class="card"><strong>30</strong><span>sanitized starters</span></div>
+        <div class="card"><strong>42/42</strong><span>interaction checks passed</span></div>
+        <div class="card"><strong>4</strong><span>implementation files</span></div>
+        <div class="card"><strong>0</strong><span>live data or deploy actions</span></div>
+      </div>
+      <ul>
+        <li>The separate Template Library controls are folded into the existing Proposal Publishing section.</li>
+        <li>All Proposal, collateral, Agreement, and Statement-of-Work sources are loadable and source-traceable.</li>
+        <li>Desktop and mobile verification, screenshots, and machine-readable reports are included.</li>
+        <li>Machine-local QA paths were removed from the published evidence.</li>
+      </ul>
+    </section>
+
+    <section>
+      <div class="kicker">Pull request</div>
+      <h2>P003-W046: Complete Phase 2 proposal templates</h2>
+      <p class="muted">Branch: <code>codex/p003-w046-phase-2-proposal-templates</code><br>Verified implementation commit: <code>1c9cde9a74f978328db94d1ad690fc4546397dc8</code></p>
+      <div class="links">
+        <a href="https://github.com/Sharpdots888/sharpdots-estimator/pull/21">Open Estimator PR #21</a>
+        <a href="P003-W045-all-30-runtime-browser-qa.html">Open W045 verification</a>
+      </div>
+    </section>
+
+    <section class="next">
+      <div class="kicker">Next controlled step</div>
+      <h2>An independent non-builder agent reviews the exact final PR head.</h2>
+      <p class="deck">John is not being asked to inspect or rubber-stamp GitHub. Control Room should return the agent's plain-language findings and product implications before any merge authorization is requested.</p>
+      <ul>
+        <li>No merge, deployment, database, schema, migration, authentication, or production-data authority was granted.</li>
+        <li>The final PR head SHA is recorded in the W046 Control Room receipt and on PR #21.</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
