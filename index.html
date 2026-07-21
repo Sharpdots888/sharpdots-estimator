@@ -387,53 +387,48 @@
                 <option value="type">Production type summary</option>
               </select>
             </label>
-            <section class="proposal-template-library" aria-label="Proposal template library">
-              <div class="section-head compact-head">
-                <div>
-                  <h2>Template Library</h2>
-                  <p id="proposalTemplateLibraryCount">30 catalog entries / 3 starters</p>
-                </div>
-              </div>
-              <div class="template-library-controls">
-                <label>
-                  Search
-                  <input id="proposalTemplateSearch" type="search" placeholder="Name, ID, category" />
-                </label>
-                <label>
-                  Category
-                  <select id="proposalTemplateCategory">
-                    <option value="all">All categories</option>
-                  </select>
-                </label>
-              </div>
-              <label>
-                Source entry
-                <select id="proposalTemplateSelect"></select>
-              </label>
-              <div id="proposalTemplateSourceSummary" class="template-source-summary" aria-live="polite"></div>
-              <div class="template-library-actions">
-                <button id="loadProposalTemplateBtn" type="button">Load Starter</button>
-                <button id="resetProposalSourceBtn" class="ghost-btn compact-btn" type="button" disabled>Reset to Source</button>
-              </div>
-              <label>
-                Working copy name
-                <input id="proposalTemplateDisplayName" type="text" placeholder="Name this proposal copy" />
-              </label>
-              <div class="template-library-actions">
-                <button id="renameProposalTemplateCopyBtn" class="ghost-btn compact-btn" type="button" disabled>Rename Copy</button>
-                <span id="proposalTemplateWorkingStatus" class="template-working-status">No starter loaded</span>
-              </div>
-            </section>
             <section class="proposal-publishing-panel" aria-label="Publishing setup">
               <div class="section-head compact-head">
                 <div>
                   <h2>Publishing</h2>
-                  <p>Client and internal output setup</p>
+                  <p>Source template, working copy, and output setup</p>
                 </div>
+                <span id="proposalTemplateLibraryCount" class="publishing-template-count">30 catalog entries / 30 sanitized starters</span>
               </div>
+              <section class="publishing-template-workflow" aria-label="Publishing source template workflow">
+                <div class="template-library-controls">
+                  <label>
+                    Search sources
+                    <input id="proposalTemplateSearch" type="search" placeholder="Name, ID, category" />
+                  </label>
+                  <label>
+                    Category
+                    <select id="proposalTemplateCategory">
+                      <option value="all">All categories</option>
+                    </select>
+                  </label>
+                </div>
+                <label>
+                  Source template
+                  <select id="proposalTemplateSelect"></select>
+                </label>
+                <div id="proposalTemplateSourceSummary" class="template-source-summary" aria-live="polite"></div>
+                <div class="template-library-actions">
+                  <button id="loadProposalTemplateBtn" type="button">Load Starter</button>
+                  <button id="resetProposalSourceBtn" class="ghost-btn compact-btn" type="button" disabled>Reset to Source</button>
+                </div>
+                <label>
+                  Working copy name
+                  <input id="proposalTemplateDisplayName" type="text" placeholder="Name this proposal copy" />
+                </label>
+                <div class="template-library-actions">
+                  <button id="renameProposalTemplateCopyBtn" class="ghost-btn compact-btn" type="button" disabled>Rename Copy</button>
+                  <span id="proposalTemplateWorkingStatus" class="template-working-status">No starter loaded</span>
+                </div>
+              </section>
               <div class="publishing-grid">
                 <label>
-                  Template
+                  Output preset
                   <select id="proposalPublishingTemplate">
                     <option value="directMail">Direct Mail Proposal</option>
                     <option value="services">Services Proposal</option>

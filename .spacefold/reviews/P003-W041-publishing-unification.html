@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>P003-W041 Publishing template unification</title>
+  <style>
+    :root {
+      --bg:#1f1d1a; --chrome:#28231f; --panel:#2b2724; --panel-raised:#302b27;
+      --item:#24211e; --border:#554c46; --border-soft:#3f3934; --text:#f4fbf6;
+      --muted:#b8ada6; --faint:#8a817b; --green:#00d46a; --green-soft:#8df3ad;
+      --green-fill:#123f22; --blue:#9bc7ff; --blue-fill:#18293d; --amber:#D89642;
+      --red:#ff9f86; --font:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      --mono:"SF Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font-family:var(--font); line-height:1.55; }
+    header { padding:28px 32px; border-bottom:1px solid var(--border); background:var(--chrome); }
+    main { width:min(1040px, calc(100% - 32px)); margin:0 auto; padding:22px 0 40px; display:grid; gap:16px; }
+    h1, h2, h3, p { margin:0; }
+    h1 { max-width:920px; font-size:clamp(32px, 5vw, 58px); line-height:1.08; }
+    h2 { font-size:clamp(22px, 3vw, 32px); line-height:1.12; }
+    h3 { font-size:17px; }
+    .deck { max-width:860px; margin-top:10px; color:var(--muted); font-size:clamp(16px, 2vw, 20px); }
+    section, .card { border:1px solid var(--border); border-radius:8px; background:var(--panel); }
+    section { padding:18px; }
+    .card { padding:14px; background:var(--panel-raised); }
+    .kicker { color:var(--green); font-size:12px; font-weight:850; letter-spacing:.04em; text-transform:uppercase; }
+    .pillrow { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+    .pill { display:inline-flex; align-items:center; min-height:28px; padding:5px 10px; border:1px solid var(--green); border-radius:999px; background:var(--green-fill); color:var(--green-soft); font-size:12px; font-weight:850; }
+    .pill.amber { border-color:var(--amber); background:#3a2a17; color:#ffd29a; }
+    .pill.red { border-color:var(--red); background:#3c1f19; color:#ffd0c4; }
+    .grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; }
+    .checks { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:10px; }
+    .check { border-left:3px solid var(--green); }
+    .blocked { border-left:3px solid var(--amber); }
+    .muted { color:var(--muted); }
+    code, pre { font-family:var(--mono); }
+    pre { margin:12px 0 0; padding:12px; overflow:auto; border:1px solid var(--border-soft); border-radius:7px; background:var(--item); color:var(--muted); font-size:12px; }
+    ul { margin:10px 0 0; padding-left:20px; color:var(--muted); }
+    li + li { margin-top:6px; }
+    a { color:var(--blue); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    @media (max-width:760px) {
+      header { padding:24px 18px; }
+      .grid, .checks { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="kicker">SharpDots Estimator / P003-W041</div>
+    <h1>Publishing now owns the proposal template workflow.</h1>
+    <p class="deck">The implementation moved source search, category filtering, source selection, starter loading, working-copy naming, rename, and reset into the existing Publishing section. The run is blocked from DONE only because this runtime could not produce the required browser evidence.</p>
+    <div class="pillrow">
+      <span class="pill">Implementation complete locally</span>
+      <span class="pill">Static checks passed</span>
+      <span class="pill amber">Browser evidence blocked</span>
+    </div>
+  </header>
+  <main>
+    <section>
+      <div class="kicker">What changed</div>
+      <div class="grid" style="margin-top:12px">
+        <article class="card">
+          <h3>Before</h3>
+          <p class="muted">Proposal showed a separate Template Library module above Publishing, creating two visible workflow areas for template setup and output setup.</p>
+        </article>
+        <article class="card">
+          <h3>After</h3>
+          <p class="muted">Proposal has one Publishing section. Source template controls sit inside it, and the old fixed publishing selector is labeled as an Output preset.</p>
+        </article>
+      </div>
+    </section>
+    <section>
+      <div class="kicker">Conversion status structure</div>
+      <div class="checks" style="margin-top:12px">
+        <article class="card check"><h3>24 cataloged sources</h3><p class="muted">Known source entries that are inventoried but not loadable in this child.</p></article>
+        <article class="card check"><h3>3 sanitized starters</h3><p class="muted">The existing loadable starters remain <code>314224</code>, <code>329536</code>, and <code>603333</code>.</p></article>
+        <article class="card check"><h3>3 review-held sources</h3><p class="muted">Agreement/legal-first entries are marked review-required before reuse.</p></article>
+      </div>
+    </section>
+    <section>
+      <div class="kicker">Preserved behavior</div>
+      <ul>
+        <li>Proposal JSON save/load path remains unchanged.</li>
+        <li>Working-copy rename updates display name only and preserves source identity.</li>
+        <li>Reset reloads the selected source starter.</li>
+        <li>Preview editing remains limited to narrative fields.</li>
+        <li>Pricing, schedule, services, sourcing, print quote, and ecomm sections remain computed/read-only.</li>
+      </ul>
+    </section>
+    <section>
+      <div class="kicker">Validation</div>
+      <p class="muted">Focused local checks passed.</p>
+      <pre>node --check app.js
+node --check server.js
+node --check scripts/validate-proposal-template-library.js
+node scripts/validate-proposal-template-library.js
+git diff --check</pre>
+      <pre>{
+  "catalogEntries": 30,
+  "starterTemplates": 3,
+  "starterIds": ["314224", "329536", "603333"],
+  "sourceCataloged": 24,
+  "reviewHeld": 3,
+  "sanitizedStarters": 3,
+  "editableNarrativeFields": 9,
+  "checks": "passed"
+}</pre>
+    </section>
+    <section class="blocked">
+      <div class="kicker">Blocked evidence</div>
+      <h2>Desktop/mobile browser proof still needs a browser-capable runtime.</h2>
+      <ul>
+        <li><code>npm start</code> failed to bind <code>127.0.0.1:3000</code> with <code>EPERM</code>.</li>
+        <li>Browser plugin control failed before user code ran with <code>sandboxCwd must be an absolute file URI</code>.</li>
+        <li>No local Playwright, Puppeteer, Chromium, or browser harness package was available in this repo.</li>
+      </ul>
+      <p class="deck">Because the packet requires actual browser evidence and says source inspection alone is not sufficient for visual claims, this child should resume in a browser-capable runtime before being marked Done.</p>
+    </section>
+    <section>
+      <div class="kicker">Audit links</div>
+      <p class="muted">Evidence index: <a href="../../evidence-index/P003/P003-W041.md">evidence-index/P003/P003-W041.md</a></p>
+    </section>
+  </main>
+</body>
+</html>

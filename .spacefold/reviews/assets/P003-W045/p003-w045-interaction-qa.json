@@ -1,0 +1,1299 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-20T22:04:43.404Z",
+  "url": "http://127.0.0.1:4345/",
+  "branch": "codex/p003-w036-proposal-template-runtime-browser-qa",
+  "syntheticDataOnly": true,
+  "templatesExercised": 60,
+  "uniqueTemplateIds": [
+    "122606",
+    "158076",
+    "190931",
+    "236848",
+    "268059",
+    "400100",
+    "167688",
+    "268077",
+    "420259",
+    "151844",
+    "603333",
+    "734472",
+    "131263",
+    "314145",
+    "272773",
+    "487336",
+    "140631",
+    "556333",
+    "182333",
+    "155858",
+    "170605",
+    "329536",
+    "169895",
+    "314224",
+    "138958",
+    "509122",
+    "154100",
+    "171207",
+    "573546",
+    "406423"
+  ],
+  "results": [
+    {
+      "name": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "libraryCount": "30 catalog entries / 30 sanitized starters",
+      "entries": [
+        {
+          "id": "122606",
+          "text": "122606 - Marketing Automation Platform Addendum (Sanitized starter)"
+        },
+        {
+          "id": "158076",
+          "text": "158076 - Agency Services Agreement (Sanitized starter)"
+        },
+        {
+          "id": "190931",
+          "text": "190931 - Mutual Non-Disclosure Agreement (Sanitized starter)"
+        },
+        {
+          "id": "236848",
+          "text": "236848 - Regulation 1541.5 Printed Sales Messages Agreement (Sanitized starter)"
+        },
+        {
+          "id": "268059",
+          "text": "268059 - AWV Reverse Append Brochure (Sanitized starter)"
+        },
+        {
+          "id": "400100",
+          "text": "400100 - Granular Advertising Agencies V2 Brochure (Sanitized starter)"
+        },
+        {
+          "id": "167688",
+          "text": "167688 - Granular Advertising Aggregated Audience Brochure (Sanitized starter)"
+        },
+        {
+          "id": "268077",
+          "text": "268077 - OTT Brochure (Sanitized starter)"
+        },
+        {
+          "id": "420259",
+          "text": "420259 - Audience Targeting Technologies Brochure (Sanitized starter)"
+        },
+        {
+          "id": "151844",
+          "text": "151844 - Experiential Agencies Brochure (Sanitized starter)"
+        },
+        {
+          "id": "603333",
+          "text": "603333 - Sharpdots Services Brochure (Sanitized starter)"
+        },
+        {
+          "id": "734472",
+          "text": "734472 - Capture Audience Proposal (Sanitized starter)"
+        },
+        {
+          "id": "131263",
+          "text": "131263 - Aggregated Audience Proposal (Sanitized starter)"
+        },
+        {
+          "id": "314145",
+          "text": "314145 - Capture Pixel Proposal (Sanitized starter)"
+        },
+        {
+          "id": "272773",
+          "text": "272773 - Data Services Proposal (Sanitized starter)"
+        },
+        {
+          "id": "487336",
+          "text": "487336 - Facebook Ad Campaign Proposal (Sanitized starter)"
+        },
+        {
+          "id": "140631",
+          "text": "140631 - Location-Based Ads Proposal (Sanitized starter)"
+        },
+        {
+          "id": "556333",
+          "text": "556333 - Machine Learning Project Proposal (Sanitized starter)"
+        },
+        {
+          "id": "182333",
+          "text": "182333 - Marketing Automation Tier 1 Proposal (Sanitized starter)"
+        },
+        {
+          "id": "155858",
+          "text": "155858 - Marketing Automation Tier 2 Proposal (Sanitized starter)"
+        },
+        {
+          "id": "170605",
+          "text": "170605 - Neighbor Targeting Proposal (Sanitized starter)"
+        },
+        {
+          "id": "329536",
+          "text": "329536 - Omni Mail Proposal (Sanitized starter)"
+        },
+        {
+          "id": "169895",
+          "text": "169895 - RTM Proposal (Sanitized starter)"
+        },
+        {
+          "id": "314224",
+          "text": "314224 - Sales Machine Proposal (Sanitized starter)"
+        },
+        {
+          "id": "138958",
+          "text": "138958 - Virtual Venue Proposal (Sanitized starter)"
+        },
+        {
+          "id": "509122",
+          "text": "509122 - Development Statement of Work (Sanitized starter)"
+        },
+        {
+          "id": "154100",
+          "text": "154100 - E-Commerce Website Statement of Work (Sanitized starter)"
+        },
+        {
+          "id": "171207",
+          "text": "171207 - Informational Website Statement of Work (Sanitized starter)"
+        },
+        {
+          "id": "573546",
+          "text": "573546 - IT Services Statement of Work (Sanitized starter)"
+        },
+        {
+          "id": "406423",
+          "text": "406423 - Print Editing and Marketing Platform Statement of Work (Sanitized starter)"
+        }
+      ],
+      "templateLoads": [
+        {
+          "label": "desktop",
+          "id": "122606",
+          "optionText": "122606 - Marketing Automation Platform Addendum (Sanitized starter)",
+          "enabled": true,
+          "title": "Marketing Automation Platform Addendum",
+          "displayName": "Marketing Automation Platform Addendum Starter",
+          "sourceSummary": "Sanitized starter addendum / 10 pages / source 122606 Sanitized addendum starter; platform scope, claims, pricing, and terms require current review.",
+          "workingStatus": "Working copy from 122606; source identity preserved",
+          "terms": "This starter is not approved legal language. Platform claims, data handling, access responsibilities, fees, renewal obligations, and service boundaries require current review.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "158076",
+          "optionText": "158076 - Agency Services Agreement (Sanitized starter)",
+          "enabled": true,
+          "title": "Agency Services Agreement Draft",
+          "displayName": "Agency Services Agreement Draft Starter",
+          "sourceSummary": "Sanitized starter agreement / 10 pages / source 158076 Sanitized agreement drafting starter; legal terms, scope, payment, IP, confidentiality, and signatures require current review.",
+          "workingStatus": "Working copy from 158076; source identity preserved",
+          "terms": "Legal/commercial review required. Do not treat historical agency-services terms, payment provisions, ownership language, confidentiality terms, warranties, limitations, signatures, or party details as current truth.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "190931",
+          "optionText": "190931 - Mutual Non-Disclosure Agreement (Sanitized starter)",
+          "enabled": true,
+          "title": "Mutual Non-Disclosure Agreement Draft",
+          "displayName": "Mutual NDA Draft Starter",
+          "sourceSummary": "Sanitized starter agreement / 6 pages / source 190931 Sanitized mutual NDA drafting starter; confidentiality terms, exclusions, duration, remedies, party identity, and business-purpose limits require current legal/commercial review.",
+          "workingStatus": "Working copy from 190931; source identity preserved",
+          "terms": "Legal/commercial review required. Confidentiality scope, exclusions, residual knowledge, injunctive relief, governing law, term, survival, signatures, party identity, and business-purpose limits must come from current approved language.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "236848",
+          "optionText": "236848 - Regulation 1541.5 Printed Sales Messages Agreement (Sanitized starter)",
+          "enabled": true,
+          "title": "Printed Sales Messages Agreement Draft",
+          "displayName": "Regulation 1541.5 Printed Sales Messages Draft Starter",
+          "sourceSummary": "Sanitized starter agreement / 10 pages / source 236848 Sanitized tax/compliance drafting starter; Regulation 1541.5 handling, resale claims, tax treatment, and signatures require qualified review.",
+          "workingStatus": "Working copy from 236848; source identity preserved",
+          "terms": "Tax/legal/commercial review required. Regulation 1541.5 applicability, exemption or resale language, customer certifications, allocation of tax responsibility, pricing, signatures, and production obligations must be currently approved.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "268059",
+          "optionText": "268059 - AWV Reverse Append Brochure (Sanitized starter)",
+          "enabled": true,
+          "title": "Reverse Append Audience Enrichment",
+          "displayName": "AWV Reverse Append Starter",
+          "sourceSummary": "Sanitized starter brochure / 3 pages / source 268059 Sanitized append/enrichment brochure starter; match methods, privacy, and deliverability claims require current review.",
+          "workingStatus": "Working copy from 268059; source identity preserved",
+          "terms": "Match rates, available fields, data-license rights, usage limits, delivery format, and pricing require current review before client reliance.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "400100",
+          "optionText": "400100 - Granular Advertising Agencies V2 Brochure (Sanitized starter)",
+          "enabled": true,
+          "title": "Granular Advertising for Agencies",
+          "displayName": "Granular Advertising Agencies Starter",
+          "sourceSummary": "Sanitized starter brochure / 19 pages / source 400100 Sanitized agency brochure starter; capabilities and campaign claims require current review.",
+          "workingStatus": "Working copy from 400100; source identity preserved",
+          "terms": "Agency responsibilities, permitted claims, channel availability, reporting commitments, and pricing must come from current approved records.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "167688",
+          "optionText": "167688 - Granular Advertising Aggregated Audience Brochure (Sanitized starter)",
+          "enabled": true,
+          "title": "Aggregated Audience Activation",
+          "displayName": "Aggregated Audience Brochure Starter",
+          "sourceSummary": "Sanitized starter brochure / 5 pages / source 167688 Sanitized aggregated-audience brochure starter; source claims and use constraints require current review.",
+          "workingStatus": "Working copy from 167688; source identity preserved",
+          "terms": "Audience availability, data rights, matching methods, measurements, and fees require current review. Do not treat historical source claims as current truth.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "268077",
+          "optionText": "268077 - OTT Brochure (Sanitized starter)",
+          "enabled": true,
+          "title": "OTT Campaign Planning",
+          "displayName": "OTT Campaign Brochure Starter",
+          "sourceSummary": "Sanitized starter brochure / 5 pages / source 268077 Sanitized OTT brochure starter; channel availability, measurements, and media claims require current review.",
+          "workingStatus": "Working copy from 268077; source identity preserved",
+          "terms": "Inventory availability, targeting criteria, reporting metrics, media spend handling, and service fees must be supplied by current approved records.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "420259",
+          "optionText": "420259 - Audience Targeting Technologies Brochure (Sanitized starter)",
+          "enabled": true,
+          "title": "Audience Targeting Technologies",
+          "displayName": "Audience Targeting Technologies Starter",
+          "sourceSummary": "Sanitized starter brochure / 19 pages / source 420259 Sanitized targeting-technologies brochure starter; data sources and performance claims require current review.",
+          "workingStatus": "Working copy from 420259; source identity preserved",
+          "terms": "Data sources, targeting eligibility, privacy obligations, platform availability, performance claims, and fees require current review before external use.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "151844",
+          "optionText": "151844 - Experiential Agencies Brochure (Sanitized starter)",
+          "enabled": true,
+          "title": "Experiential Agency Audience Activation",
+          "displayName": "Experiential Agencies Starter",
+          "sourceSummary": "Sanitized starter brochure / 8 pages / source 151844 Sanitized experiential-agency brochure starter; event-data rights and activation claims require current review.",
+          "workingStatus": "Working copy from 151844; source identity preserved",
+          "terms": "Event-data rights, venue permissions, channel availability, measurement methods, and fees must come from current approved records.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "603333",
+          "optionText": "603333 - Sharpdots Services Brochure (Sanitized starter)",
+          "enabled": true,
+          "title": "Sharpdots Services Overview",
+          "displayName": "Sharpdots Services Brochure Starter",
+          "sourceSummary": "Sanitized starter brochure / 18 pages / source 603333 Sanitized services brochure starter; product packaging and service descriptions require current review.",
+          "workingStatus": "Working copy from 603333; source identity preserved",
+          "terms": "Service descriptions, availability, fees, turnaround, vendor dependencies, and client responsibilities require current review before external reliance.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "734472",
+          "optionText": "734472 - Capture Audience Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Capture Audience Proposal",
+          "displayName": "Capture Audience Starter",
+          "sourceSummary": "Sanitized starter proposal / 13 pages / source 734472 Sanitized proposal starter; historical pricing, legal terms, contact details, and customer-specific values removed.",
+          "workingStatus": "Working copy from 734472; source identity preserved",
+          "terms": "This starter does not include reviewed legal language or fixed historical pricing. Final scope, compliance assumptions, and investment must come from current approved records.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "131263",
+          "optionText": "131263 - Aggregated Audience Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Aggregated Audience Proposal",
+          "displayName": "Aggregated Audience Starter",
+          "sourceSummary": "Sanitized starter proposal / 16 pages / source 131263 Sanitized proposal starter; source pricing and legacy terms removed for current-estimate sourcing.",
+          "workingStatus": "Working copy from 131263; source identity preserved",
+          "terms": "Location data availability, campaign feasibility, pricing, and matchback handling require current review. Do not rely on legacy source terms or sample fees.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "314145",
+          "optionText": "314145 - Capture Pixel Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Capture Pixel Proposal",
+          "displayName": "Capture Pixel Starter",
+          "sourceSummary": "Sanitized starter proposal / 14 pages / source 314145 Sanitized proposal starter; quantitative claims require review before client reliance.",
+          "workingStatus": "Working copy from 314145; source identity preserved",
+          "terms": "Identification rates, personal-data handling, channel eligibility, and legal notices require current review. This starter excludes fixed source percentages and legacy terms.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "272773",
+          "optionText": "272773 - Data Services Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Data Services Proposal",
+          "displayName": "Data Services Starter",
+          "sourceSummary": "Sanitized starter proposal / 12 pages / source 272773 Sanitized proposal starter; historical line-item pricing removed.",
+          "workingStatus": "Working copy from 272773; source identity preserved",
+          "terms": "Final data availability, usage rights, turnaround, and pricing depend on current source records and approved vendor terms.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "487336",
+          "optionText": "487336 - Facebook Ad Campaign Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Social Ad Campaign Proposal",
+          "displayName": "Social Ad Campaign Starter",
+          "sourceSummary": "Sanitized starter proposal / 9 pages / source 487336 Sanitized proposal starter; legacy fixed campaign fee and legal language removed.",
+          "workingStatus": "Working copy from 487336; source identity preserved",
+          "terms": "Ad spend, recurring services, cancellation terms, and platform responsibilities must be supplied by current approved records, not the historical source.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "140631",
+          "optionText": "140631 - Location-Based Ads Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Location-Based Ads Proposal",
+          "displayName": "Location-Based Ads Starter",
+          "sourceSummary": "Sanitized starter proposal / 17 pages / source 140631 Sanitized proposal starter; pricing and legal terms remain sourced from current records.",
+          "workingStatus": "Working copy from 140631; source identity preserved",
+          "terms": "Match rates, channel availability, data-use rights, pricing, and service terms must be reviewed against current records.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "556333",
+          "optionText": "556333 - Machine Learning Project Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Machine Learning Project Proposal",
+          "displayName": "Machine Learning Project Starter",
+          "sourceSummary": "Sanitized starter proposal / 14 pages / source 556333 Sanitized proposal starter; client/project-specific scenario, rates, and staff claims generalized.",
+          "workingStatus": "Working copy from 556333; source identity preserved",
+          "terms": "This starter excludes historical client names, rate tables, and staffing claims. Final scope, acceptance criteria, and fees require a current technical review.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "182333",
+          "optionText": "182333 - Marketing Automation Tier 1 Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Marketing Automation Tier 1 Proposal",
+          "displayName": "Marketing Automation Tier 1 Starter",
+          "sourceSummary": "Sanitized starter proposal / 18 pages / source 182333 Sanitized proposal starter; tier scope must be checked against current product packaging.",
+          "workingStatus": "Working copy from 182333; source identity preserved",
+          "terms": "Tier names, platform obligations, service boundaries, and pricing must be reviewed against current approved packages.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "155858",
+          "optionText": "155858 - Marketing Automation Tier 2 Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Marketing Automation Tier 2 Proposal",
+          "displayName": "Marketing Automation Tier 2 Starter",
+          "sourceSummary": "Sanitized starter proposal / 20 pages / source 155858 Sanitized proposal starter; tier scope must be checked against current product packaging.",
+          "workingStatus": "Working copy from 155858; source identity preserved",
+          "terms": "This starter excludes historical package pricing and unreviewed performance claims. Final terms must come from current service records.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "170605",
+          "optionText": "170605 - Neighbor Targeting Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Neighbor Targeting Proposal",
+          "displayName": "Neighbor Targeting Starter",
+          "sourceSummary": "Sanitized starter proposal / 16 pages / source 170605 Sanitized proposal starter; source has a clipped page-1 heading and must not be used as a visual baseline.",
+          "workingStatus": "Working copy from 170605; source identity preserved",
+          "terms": "Subscription length, data availability, timing, pricing, and legal terms require current approval. The clipped source heading should not be reproduced.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "329536",
+          "optionText": "329536 - Omni Mail Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Omni Mail Campaign Proposal",
+          "displayName": "Omni Mail Campaign Starter",
+          "sourceSummary": "Sanitized starter proposal / 16 pages / source 329536 Sanitized direct-mail starter available.",
+          "workingStatus": "Working copy from 329536; source identity preserved",
+          "terms": "Final pricing, schedule, and deliverables depend on the approved scope, current estimate records, and any production changes requested after review.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "169895",
+          "optionText": "169895 - RTM Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Real Time Movers Proposal",
+          "displayName": "Real Time Movers Starter",
+          "sourceSummary": "Sanitized starter proposal / 16 pages / source 169895 Sanitized proposal starter; historical pricing and legal terms removed.",
+          "workingStatus": "Working copy from 169895; source identity preserved",
+          "terms": "Data timing, segment availability, subscription terms, pricing, and legal language must come from current reviewed records.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "314224",
+          "optionText": "314224 - Sales Machine Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Sales Machine Services Proposal",
+          "displayName": "Sales Machine Services Starter",
+          "sourceSummary": "Sanitized starter proposal / 12 pages / source 314224 Sanitized sales/services starter available.",
+          "workingStatus": "Working copy from 314224; source identity preserved",
+          "terms": "Service scope, activation timing, and recurring support are subject to current workspace records and separate approval of any material changes.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "138958",
+          "optionText": "138958 - Virtual Venue Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Virtual Venue Proposal",
+          "displayName": "Virtual Venue Starter",
+          "sourceSummary": "Sanitized starter proposal / 17 pages / source 138958 Sanitized proposal starter; source claims and location-data assumptions require review before client reliance.",
+          "workingStatus": "Working copy from 138958; source identity preserved",
+          "terms": "Historical-location data availability, targeting eligibility, privacy requirements, pricing, and usage rights require current review before client reliance.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "509122",
+          "optionText": "509122 - Development Statement of Work (Sanitized starter)",
+          "enabled": true,
+          "title": "Development Statement of Work",
+          "displayName": "Development Statement of Work Starter",
+          "sourceSummary": "Sanitized starter statement-of-work / 16 pages / source 509122 Sanitized development SOW starter; deliverables, acceptance, timeline, fees, IP, warranty, and change control require current review.",
+          "workingStatus": "Working copy from 509122; source identity preserved",
+          "terms": "Legal/commercial review required. Fees, milestone timing, acceptance standards, intellectual-property ownership, warranties, support, security duties, and change-order terms must come from current approved records.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "154100",
+          "optionText": "154100 - E-Commerce Website Statement of Work (Sanitized starter)",
+          "enabled": true,
+          "title": "E-Commerce Website Statement of Work",
+          "displayName": "E-Commerce Website SOW Starter",
+          "sourceSummary": "Sanitized starter statement-of-work / 20 pages / source 154100 Sanitized e-commerce SOW starter; platform, payment, integrations, content, launch, support, and fees require current review.",
+          "workingStatus": "Working copy from 154100; source identity preserved",
+          "terms": "Legal/commercial review required. Payment processing, taxes, shipping, third-party apps, data handling, accessibility, support levels, fees, timeline, and acceptance terms require current approval.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "171207",
+          "optionText": "171207 - Informational Website Statement of Work (Sanitized starter)",
+          "enabled": true,
+          "title": "Informational Website Statement of Work",
+          "displayName": "Informational Website SOW Starter",
+          "sourceSummary": "Sanitized starter statement-of-work / 17 pages / source 171207 Sanitized informational website SOW starter; pages, content, accessibility, hosting, timeline, acceptance, and fees require current review.",
+          "workingStatus": "Working copy from 171207; source identity preserved",
+          "terms": "Legal/commercial review required. Content ownership, accessibility obligations, hosting, third-party services, launch acceptance, fees, timeline, warranty, and support terms must come from current approved records.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "573546",
+          "optionText": "573546 - IT Services Statement of Work (Sanitized starter)",
+          "enabled": true,
+          "title": "IT Services Statement of Work",
+          "displayName": "IT Services SOW Starter",
+          "sourceSummary": "Sanitized starter statement-of-work / 8 pages / source 573546 Sanitized IT services SOW starter; access, security, service levels, exclusions, fees, and support responsibilities require current review.",
+          "workingStatus": "Working copy from 573546; source identity preserved",
+          "terms": "Legal/commercial/security review required. Access controls, credentials, service levels, data handling, exclusions, emergency response, fees, term, cancellation, and liability language require current approval.",
+          "passed": true
+        },
+        {
+          "label": "desktop",
+          "id": "406423",
+          "optionText": "406423 - Print Editing and Marketing Platform Statement of Work (Sanitized starter)",
+          "enabled": true,
+          "title": "Print Editing and Marketing Platform Statement of Work",
+          "displayName": "Print Editing and Marketing Platform SOW Starter",
+          "sourceSummary": "Sanitized starter statement-of-work / 10 pages / source 406423 Sanitized print-editing/platform SOW starter; print scope, data flows, platform work, approvals, fees, and terms require current review.",
+          "workingStatus": "Working copy from 406423; source identity preserved",
+          "terms": "Legal/commercial review required. Print production obligations, platform access, data handling, proof approvals, fees, turnaround, change control, signatures, and service terms must come from current approved records.",
+          "passed": true
+        }
+      ],
+      "geometry": {
+        "publishing": {
+          "left": 34,
+          "right": 396,
+          "width": 362
+        },
+        "workflow": {
+          "left": 45,
+          "right": 385,
+          "width": 340
+        },
+        "preview": {
+          "left": 417,
+          "right": 1415,
+          "width": 998
+        }
+      },
+      "overflow": {
+        "viewportWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "documentScrollWidth": 1440,
+        "offenders": []
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshotPath": "/private/tmp/p003-w045-browser/p003-w045-desktop.png",
+      "checks": [
+        {
+          "name": "Catalog reports 30 loadable starters",
+          "passed": true,
+          "detail": "30 catalog entries / 30 sanitized starters"
+        },
+        {
+          "name": "Catalog contains exactly 30 options",
+          "passed": true,
+          "detail": "30 unique options"
+        },
+        {
+          "name": "Search narrows by exact source ID",
+          "passed": true,
+          "detail": "[\"190931\"]"
+        },
+        {
+          "name": "All expected template categories are available",
+          "passed": true,
+          "detail": "[\"all\",\"addendum\",\"agreement\",\"brochure\",\"proposal\",\"statement-of-work\"]"
+        },
+        {
+          "name": "Category filter: addendum",
+          "passed": true,
+          "detail": "1 visible source(s)"
+        },
+        {
+          "name": "Category filter: agreement",
+          "passed": true,
+          "detail": "3 visible source(s)"
+        },
+        {
+          "name": "Category filter: brochure",
+          "passed": true,
+          "detail": "7 visible source(s)"
+        },
+        {
+          "name": "Category filter: proposal",
+          "passed": true,
+          "detail": "14 visible source(s)"
+        },
+        {
+          "name": "Category filter: statement-of-work",
+          "passed": true,
+          "detail": "5 visible source(s)"
+        },
+        {
+          "name": "All 30 templates load at desktop viewport",
+          "passed": true,
+          "detail": "30/30 passed"
+        },
+        {
+          "name": "Rename preserves source identity",
+          "passed": true,
+          "detail": "Working copy from 314224; source identity preserved; Sanitized starter proposal / 12 pages / source 314224 Sanitized sales/services starter available."
+        },
+        {
+          "name": "Nine narrative fields edit and render",
+          "passed": true,
+          "detail": "missing rendered fields: none"
+        },
+        {
+          "name": "Existing Publishing output controls remain available",
+          "passed": true,
+          "detail": "{\"publishingTemplate\":\"services\",\"audience\":\"client\",\"scope\":\"both\",\"pdfEnabled\":true,\"csvEnabled\":true}"
+        },
+        {
+          "name": "Existing Proposal save path retains working copy and source identity",
+          "passed": true,
+          "detail": "{\"title\":\"W045 Browser QA Proposal\",\"displayName\":\"W045 QA Working Copy\",\"sourceTemplateId\":\"314224\",\"terms\":\"Synthetic W045 terms for disposable QA only.\"}"
+        },
+        {
+          "name": "Existing Proposal load path restores saved copy",
+          "passed": true,
+          "detail": "W045 QA Working Copy"
+        },
+        {
+          "name": "Reset restores source starter while retaining source identity",
+          "passed": true,
+          "detail": "Sales Machine Services Starter; Working copy from 314224; source identity preserved"
+        },
+        {
+          "name": "Template controls remain inside Publishing",
+          "passed": true,
+          "detail": "{\"publishing\":{\"left\":34,\"right\":396,\"width\":362},\"workflow\":{\"left\":45,\"right\":385,\"width\":340},\"preview\":{\"left\":417,\"right\":1415,\"width\":998}}"
+        },
+        {
+          "name": "desktop has no horizontal overflow",
+          "passed": true,
+          "detail": "{\"viewportWidth\":1440,\"bodyScrollWidth\":1440,\"documentScrollWidth\":1440,\"offenders\":[]}"
+        },
+        {
+          "name": "No desktop console errors",
+          "passed": true,
+          "detail": "none"
+        },
+        {
+          "name": "No desktop page errors",
+          "passed": true,
+          "detail": "none"
+        },
+        {
+          "name": "No desktop failed requests",
+          "passed": true,
+          "detail": "none"
+        }
+      ]
+    },
+    {
+      "name": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "libraryCount": "30 catalog entries / 30 sanitized starters",
+      "entries": [
+        {
+          "id": "122606",
+          "text": "122606 - Marketing Automation Platform Addendum (Sanitized starter)"
+        },
+        {
+          "id": "158076",
+          "text": "158076 - Agency Services Agreement (Sanitized starter)"
+        },
+        {
+          "id": "190931",
+          "text": "190931 - Mutual Non-Disclosure Agreement (Sanitized starter)"
+        },
+        {
+          "id": "236848",
+          "text": "236848 - Regulation 1541.5 Printed Sales Messages Agreement (Sanitized starter)"
+        },
+        {
+          "id": "268059",
+          "text": "268059 - AWV Reverse Append Brochure (Sanitized starter)"
+        },
+        {
+          "id": "400100",
+          "text": "400100 - Granular Advertising Agencies V2 Brochure (Sanitized starter)"
+        },
+        {
+          "id": "167688",
+          "text": "167688 - Granular Advertising Aggregated Audience Brochure (Sanitized starter)"
+        },
+        {
+          "id": "268077",
+          "text": "268077 - OTT Brochure (Sanitized starter)"
+        },
+        {
+          "id": "420259",
+          "text": "420259 - Audience Targeting Technologies Brochure (Sanitized starter)"
+        },
+        {
+          "id": "151844",
+          "text": "151844 - Experiential Agencies Brochure (Sanitized starter)"
+        },
+        {
+          "id": "603333",
+          "text": "603333 - Sharpdots Services Brochure (Sanitized starter)"
+        },
+        {
+          "id": "734472",
+          "text": "734472 - Capture Audience Proposal (Sanitized starter)"
+        },
+        {
+          "id": "131263",
+          "text": "131263 - Aggregated Audience Proposal (Sanitized starter)"
+        },
+        {
+          "id": "314145",
+          "text": "314145 - Capture Pixel Proposal (Sanitized starter)"
+        },
+        {
+          "id": "272773",
+          "text": "272773 - Data Services Proposal (Sanitized starter)"
+        },
+        {
+          "id": "487336",
+          "text": "487336 - Facebook Ad Campaign Proposal (Sanitized starter)"
+        },
+        {
+          "id": "140631",
+          "text": "140631 - Location-Based Ads Proposal (Sanitized starter)"
+        },
+        {
+          "id": "556333",
+          "text": "556333 - Machine Learning Project Proposal (Sanitized starter)"
+        },
+        {
+          "id": "182333",
+          "text": "182333 - Marketing Automation Tier 1 Proposal (Sanitized starter)"
+        },
+        {
+          "id": "155858",
+          "text": "155858 - Marketing Automation Tier 2 Proposal (Sanitized starter)"
+        },
+        {
+          "id": "170605",
+          "text": "170605 - Neighbor Targeting Proposal (Sanitized starter)"
+        },
+        {
+          "id": "329536",
+          "text": "329536 - Omni Mail Proposal (Sanitized starter)"
+        },
+        {
+          "id": "169895",
+          "text": "169895 - RTM Proposal (Sanitized starter)"
+        },
+        {
+          "id": "314224",
+          "text": "314224 - Sales Machine Proposal (Sanitized starter)"
+        },
+        {
+          "id": "138958",
+          "text": "138958 - Virtual Venue Proposal (Sanitized starter)"
+        },
+        {
+          "id": "509122",
+          "text": "509122 - Development Statement of Work (Sanitized starter)"
+        },
+        {
+          "id": "154100",
+          "text": "154100 - E-Commerce Website Statement of Work (Sanitized starter)"
+        },
+        {
+          "id": "171207",
+          "text": "171207 - Informational Website Statement of Work (Sanitized starter)"
+        },
+        {
+          "id": "573546",
+          "text": "573546 - IT Services Statement of Work (Sanitized starter)"
+        },
+        {
+          "id": "406423",
+          "text": "406423 - Print Editing and Marketing Platform Statement of Work (Sanitized starter)"
+        }
+      ],
+      "templateLoads": [
+        {
+          "label": "mobile",
+          "id": "122606",
+          "optionText": "122606 - Marketing Automation Platform Addendum (Sanitized starter)",
+          "enabled": true,
+          "title": "Marketing Automation Platform Addendum",
+          "displayName": "Marketing Automation Platform Addendum Starter",
+          "sourceSummary": "Sanitized starter addendum / 10 pages / source 122606 Sanitized addendum starter; platform scope, claims, pricing, and terms require current review.",
+          "workingStatus": "Working copy from 122606; source identity preserved",
+          "terms": "This starter is not approved legal language. Platform claims, data handling, access responsibilities, fees, renewal obligations, and service boundaries require current review.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "158076",
+          "optionText": "158076 - Agency Services Agreement (Sanitized starter)",
+          "enabled": true,
+          "title": "Agency Services Agreement Draft",
+          "displayName": "Agency Services Agreement Draft Starter",
+          "sourceSummary": "Sanitized starter agreement / 10 pages / source 158076 Sanitized agreement drafting starter; legal terms, scope, payment, IP, confidentiality, and signatures require current review.",
+          "workingStatus": "Working copy from 158076; source identity preserved",
+          "terms": "Legal/commercial review required. Do not treat historical agency-services terms, payment provisions, ownership language, confidentiality terms, warranties, limitations, signatures, or party details as current truth.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "190931",
+          "optionText": "190931 - Mutual Non-Disclosure Agreement (Sanitized starter)",
+          "enabled": true,
+          "title": "Mutual Non-Disclosure Agreement Draft",
+          "displayName": "Mutual NDA Draft Starter",
+          "sourceSummary": "Sanitized starter agreement / 6 pages / source 190931 Sanitized mutual NDA drafting starter; confidentiality terms, exclusions, duration, remedies, party identity, and business-purpose limits require current legal/commercial review.",
+          "workingStatus": "Working copy from 190931; source identity preserved",
+          "terms": "Legal/commercial review required. Confidentiality scope, exclusions, residual knowledge, injunctive relief, governing law, term, survival, signatures, party identity, and business-purpose limits must come from current approved language.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "236848",
+          "optionText": "236848 - Regulation 1541.5 Printed Sales Messages Agreement (Sanitized starter)",
+          "enabled": true,
+          "title": "Printed Sales Messages Agreement Draft",
+          "displayName": "Regulation 1541.5 Printed Sales Messages Draft Starter",
+          "sourceSummary": "Sanitized starter agreement / 10 pages / source 236848 Sanitized tax/compliance drafting starter; Regulation 1541.5 handling, resale claims, tax treatment, and signatures require qualified review.",
+          "workingStatus": "Working copy from 236848; source identity preserved",
+          "terms": "Tax/legal/commercial review required. Regulation 1541.5 applicability, exemption or resale language, customer certifications, allocation of tax responsibility, pricing, signatures, and production obligations must be currently approved.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "268059",
+          "optionText": "268059 - AWV Reverse Append Brochure (Sanitized starter)",
+          "enabled": true,
+          "title": "Reverse Append Audience Enrichment",
+          "displayName": "AWV Reverse Append Starter",
+          "sourceSummary": "Sanitized starter brochure / 3 pages / source 268059 Sanitized append/enrichment brochure starter; match methods, privacy, and deliverability claims require current review.",
+          "workingStatus": "Working copy from 268059; source identity preserved",
+          "terms": "Match rates, available fields, data-license rights, usage limits, delivery format, and pricing require current review before client reliance.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "400100",
+          "optionText": "400100 - Granular Advertising Agencies V2 Brochure (Sanitized starter)",
+          "enabled": true,
+          "title": "Granular Advertising for Agencies",
+          "displayName": "Granular Advertising Agencies Starter",
+          "sourceSummary": "Sanitized starter brochure / 19 pages / source 400100 Sanitized agency brochure starter; capabilities and campaign claims require current review.",
+          "workingStatus": "Working copy from 400100; source identity preserved",
+          "terms": "Agency responsibilities, permitted claims, channel availability, reporting commitments, and pricing must come from current approved records.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "167688",
+          "optionText": "167688 - Granular Advertising Aggregated Audience Brochure (Sanitized starter)",
+          "enabled": true,
+          "title": "Aggregated Audience Activation",
+          "displayName": "Aggregated Audience Brochure Starter",
+          "sourceSummary": "Sanitized starter brochure / 5 pages / source 167688 Sanitized aggregated-audience brochure starter; source claims and use constraints require current review.",
+          "workingStatus": "Working copy from 167688; source identity preserved",
+          "terms": "Audience availability, data rights, matching methods, measurements, and fees require current review. Do not treat historical source claims as current truth.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "268077",
+          "optionText": "268077 - OTT Brochure (Sanitized starter)",
+          "enabled": true,
+          "title": "OTT Campaign Planning",
+          "displayName": "OTT Campaign Brochure Starter",
+          "sourceSummary": "Sanitized starter brochure / 5 pages / source 268077 Sanitized OTT brochure starter; channel availability, measurements, and media claims require current review.",
+          "workingStatus": "Working copy from 268077; source identity preserved",
+          "terms": "Inventory availability, targeting criteria, reporting metrics, media spend handling, and service fees must be supplied by current approved records.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "420259",
+          "optionText": "420259 - Audience Targeting Technologies Brochure (Sanitized starter)",
+          "enabled": true,
+          "title": "Audience Targeting Technologies",
+          "displayName": "Audience Targeting Technologies Starter",
+          "sourceSummary": "Sanitized starter brochure / 19 pages / source 420259 Sanitized targeting-technologies brochure starter; data sources and performance claims require current review.",
+          "workingStatus": "Working copy from 420259; source identity preserved",
+          "terms": "Data sources, targeting eligibility, privacy obligations, platform availability, performance claims, and fees require current review before external use.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "151844",
+          "optionText": "151844 - Experiential Agencies Brochure (Sanitized starter)",
+          "enabled": true,
+          "title": "Experiential Agency Audience Activation",
+          "displayName": "Experiential Agencies Starter",
+          "sourceSummary": "Sanitized starter brochure / 8 pages / source 151844 Sanitized experiential-agency brochure starter; event-data rights and activation claims require current review.",
+          "workingStatus": "Working copy from 151844; source identity preserved",
+          "terms": "Event-data rights, venue permissions, channel availability, measurement methods, and fees must come from current approved records.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "603333",
+          "optionText": "603333 - Sharpdots Services Brochure (Sanitized starter)",
+          "enabled": true,
+          "title": "Sharpdots Services Overview",
+          "displayName": "Sharpdots Services Brochure Starter",
+          "sourceSummary": "Sanitized starter brochure / 18 pages / source 603333 Sanitized services brochure starter; product packaging and service descriptions require current review.",
+          "workingStatus": "Working copy from 603333; source identity preserved",
+          "terms": "Service descriptions, availability, fees, turnaround, vendor dependencies, and client responsibilities require current review before external reliance.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "734472",
+          "optionText": "734472 - Capture Audience Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Capture Audience Proposal",
+          "displayName": "Capture Audience Starter",
+          "sourceSummary": "Sanitized starter proposal / 13 pages / source 734472 Sanitized proposal starter; historical pricing, legal terms, contact details, and customer-specific values removed.",
+          "workingStatus": "Working copy from 734472; source identity preserved",
+          "terms": "This starter does not include reviewed legal language or fixed historical pricing. Final scope, compliance assumptions, and investment must come from current approved records.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "131263",
+          "optionText": "131263 - Aggregated Audience Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Aggregated Audience Proposal",
+          "displayName": "Aggregated Audience Starter",
+          "sourceSummary": "Sanitized starter proposal / 16 pages / source 131263 Sanitized proposal starter; source pricing and legacy terms removed for current-estimate sourcing.",
+          "workingStatus": "Working copy from 131263; source identity preserved",
+          "terms": "Location data availability, campaign feasibility, pricing, and matchback handling require current review. Do not rely on legacy source terms or sample fees.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "314145",
+          "optionText": "314145 - Capture Pixel Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Capture Pixel Proposal",
+          "displayName": "Capture Pixel Starter",
+          "sourceSummary": "Sanitized starter proposal / 14 pages / source 314145 Sanitized proposal starter; quantitative claims require review before client reliance.",
+          "workingStatus": "Working copy from 314145; source identity preserved",
+          "terms": "Identification rates, personal-data handling, channel eligibility, and legal notices require current review. This starter excludes fixed source percentages and legacy terms.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "272773",
+          "optionText": "272773 - Data Services Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Data Services Proposal",
+          "displayName": "Data Services Starter",
+          "sourceSummary": "Sanitized starter proposal / 12 pages / source 272773 Sanitized proposal starter; historical line-item pricing removed.",
+          "workingStatus": "Working copy from 272773; source identity preserved",
+          "terms": "Final data availability, usage rights, turnaround, and pricing depend on current source records and approved vendor terms.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "487336",
+          "optionText": "487336 - Facebook Ad Campaign Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Social Ad Campaign Proposal",
+          "displayName": "Social Ad Campaign Starter",
+          "sourceSummary": "Sanitized starter proposal / 9 pages / source 487336 Sanitized proposal starter; legacy fixed campaign fee and legal language removed.",
+          "workingStatus": "Working copy from 487336; source identity preserved",
+          "terms": "Ad spend, recurring services, cancellation terms, and platform responsibilities must be supplied by current approved records, not the historical source.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "140631",
+          "optionText": "140631 - Location-Based Ads Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Location-Based Ads Proposal",
+          "displayName": "Location-Based Ads Starter",
+          "sourceSummary": "Sanitized starter proposal / 17 pages / source 140631 Sanitized proposal starter; pricing and legal terms remain sourced from current records.",
+          "workingStatus": "Working copy from 140631; source identity preserved",
+          "terms": "Match rates, channel availability, data-use rights, pricing, and service terms must be reviewed against current records.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "556333",
+          "optionText": "556333 - Machine Learning Project Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Machine Learning Project Proposal",
+          "displayName": "Machine Learning Project Starter",
+          "sourceSummary": "Sanitized starter proposal / 14 pages / source 556333 Sanitized proposal starter; client/project-specific scenario, rates, and staff claims generalized.",
+          "workingStatus": "Working copy from 556333; source identity preserved",
+          "terms": "This starter excludes historical client names, rate tables, and staffing claims. Final scope, acceptance criteria, and fees require a current technical review.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "182333",
+          "optionText": "182333 - Marketing Automation Tier 1 Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Marketing Automation Tier 1 Proposal",
+          "displayName": "Marketing Automation Tier 1 Starter",
+          "sourceSummary": "Sanitized starter proposal / 18 pages / source 182333 Sanitized proposal starter; tier scope must be checked against current product packaging.",
+          "workingStatus": "Working copy from 182333; source identity preserved",
+          "terms": "Tier names, platform obligations, service boundaries, and pricing must be reviewed against current approved packages.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "155858",
+          "optionText": "155858 - Marketing Automation Tier 2 Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Marketing Automation Tier 2 Proposal",
+          "displayName": "Marketing Automation Tier 2 Starter",
+          "sourceSummary": "Sanitized starter proposal / 20 pages / source 155858 Sanitized proposal starter; tier scope must be checked against current product packaging.",
+          "workingStatus": "Working copy from 155858; source identity preserved",
+          "terms": "This starter excludes historical package pricing and unreviewed performance claims. Final terms must come from current service records.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "170605",
+          "optionText": "170605 - Neighbor Targeting Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Neighbor Targeting Proposal",
+          "displayName": "Neighbor Targeting Starter",
+          "sourceSummary": "Sanitized starter proposal / 16 pages / source 170605 Sanitized proposal starter; source has a clipped page-1 heading and must not be used as a visual baseline.",
+          "workingStatus": "Working copy from 170605; source identity preserved",
+          "terms": "Subscription length, data availability, timing, pricing, and legal terms require current approval. The clipped source heading should not be reproduced.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "329536",
+          "optionText": "329536 - Omni Mail Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Omni Mail Campaign Proposal",
+          "displayName": "Omni Mail Campaign Starter",
+          "sourceSummary": "Sanitized starter proposal / 16 pages / source 329536 Sanitized direct-mail starter available.",
+          "workingStatus": "Working copy from 329536; source identity preserved",
+          "terms": "Final pricing, schedule, and deliverables depend on the approved scope, current estimate records, and any production changes requested after review.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "169895",
+          "optionText": "169895 - RTM Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Real Time Movers Proposal",
+          "displayName": "Real Time Movers Starter",
+          "sourceSummary": "Sanitized starter proposal / 16 pages / source 169895 Sanitized proposal starter; historical pricing and legal terms removed.",
+          "workingStatus": "Working copy from 169895; source identity preserved",
+          "terms": "Data timing, segment availability, subscription terms, pricing, and legal language must come from current reviewed records.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "314224",
+          "optionText": "314224 - Sales Machine Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Sales Machine Services Proposal",
+          "displayName": "Sales Machine Services Starter",
+          "sourceSummary": "Sanitized starter proposal / 12 pages / source 314224 Sanitized sales/services starter available.",
+          "workingStatus": "Working copy from 314224; source identity preserved",
+          "terms": "Service scope, activation timing, and recurring support are subject to current workspace records and separate approval of any material changes.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "138958",
+          "optionText": "138958 - Virtual Venue Proposal (Sanitized starter)",
+          "enabled": true,
+          "title": "Virtual Venue Proposal",
+          "displayName": "Virtual Venue Starter",
+          "sourceSummary": "Sanitized starter proposal / 17 pages / source 138958 Sanitized proposal starter; source claims and location-data assumptions require review before client reliance.",
+          "workingStatus": "Working copy from 138958; source identity preserved",
+          "terms": "Historical-location data availability, targeting eligibility, privacy requirements, pricing, and usage rights require current review before client reliance.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "509122",
+          "optionText": "509122 - Development Statement of Work (Sanitized starter)",
+          "enabled": true,
+          "title": "Development Statement of Work",
+          "displayName": "Development Statement of Work Starter",
+          "sourceSummary": "Sanitized starter statement-of-work / 16 pages / source 509122 Sanitized development SOW starter; deliverables, acceptance, timeline, fees, IP, warranty, and change control require current review.",
+          "workingStatus": "Working copy from 509122; source identity preserved",
+          "terms": "Legal/commercial review required. Fees, milestone timing, acceptance standards, intellectual-property ownership, warranties, support, security duties, and change-order terms must come from current approved records.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "154100",
+          "optionText": "154100 - E-Commerce Website Statement of Work (Sanitized starter)",
+          "enabled": true,
+          "title": "E-Commerce Website Statement of Work",
+          "displayName": "E-Commerce Website SOW Starter",
+          "sourceSummary": "Sanitized starter statement-of-work / 20 pages / source 154100 Sanitized e-commerce SOW starter; platform, payment, integrations, content, launch, support, and fees require current review.",
+          "workingStatus": "Working copy from 154100; source identity preserved",
+          "terms": "Legal/commercial review required. Payment processing, taxes, shipping, third-party apps, data handling, accessibility, support levels, fees, timeline, and acceptance terms require current approval.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "171207",
+          "optionText": "171207 - Informational Website Statement of Work (Sanitized starter)",
+          "enabled": true,
+          "title": "Informational Website Statement of Work",
+          "displayName": "Informational Website SOW Starter",
+          "sourceSummary": "Sanitized starter statement-of-work / 17 pages / source 171207 Sanitized informational website SOW starter; pages, content, accessibility, hosting, timeline, acceptance, and fees require current review.",
+          "workingStatus": "Working copy from 171207; source identity preserved",
+          "terms": "Legal/commercial review required. Content ownership, accessibility obligations, hosting, third-party services, launch acceptance, fees, timeline, warranty, and support terms must come from current approved records.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "573546",
+          "optionText": "573546 - IT Services Statement of Work (Sanitized starter)",
+          "enabled": true,
+          "title": "IT Services Statement of Work",
+          "displayName": "IT Services SOW Starter",
+          "sourceSummary": "Sanitized starter statement-of-work / 8 pages / source 573546 Sanitized IT services SOW starter; access, security, service levels, exclusions, fees, and support responsibilities require current review.",
+          "workingStatus": "Working copy from 573546; source identity preserved",
+          "terms": "Legal/commercial/security review required. Access controls, credentials, service levels, data handling, exclusions, emergency response, fees, term, cancellation, and liability language require current approval.",
+          "passed": true
+        },
+        {
+          "label": "mobile",
+          "id": "406423",
+          "optionText": "406423 - Print Editing and Marketing Platform Statement of Work (Sanitized starter)",
+          "enabled": true,
+          "title": "Print Editing and Marketing Platform Statement of Work",
+          "displayName": "Print Editing and Marketing Platform SOW Starter",
+          "sourceSummary": "Sanitized starter statement-of-work / 10 pages / source 406423 Sanitized print-editing/platform SOW starter; print scope, data flows, platform work, approvals, fees, and terms require current review.",
+          "workingStatus": "Working copy from 406423; source identity preserved",
+          "terms": "Legal/commercial review required. Print production obligations, platform access, data handling, proof approvals, fees, turnaround, change control, signatures, and service terms must come from current approved records.",
+          "passed": true
+        }
+      ],
+      "geometry": {
+        "publishing": {
+          "left": 32,
+          "right": 358,
+          "width": 326
+        },
+        "workflow": {
+          "left": 43,
+          "right": 347,
+          "width": 304
+        },
+        "preview": {
+          "left": 19,
+          "right": 371,
+          "width": 352
+        }
+      },
+      "overflow": {
+        "viewportWidth": 390,
+        "bodyScrollWidth": 390,
+        "documentScrollWidth": 390,
+        "offenders": []
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshotPath": "/private/tmp/p003-w045-browser/p003-w045-mobile.png",
+      "checks": [
+        {
+          "name": "Catalog reports 30 loadable starters",
+          "passed": true,
+          "detail": "30 catalog entries / 30 sanitized starters"
+        },
+        {
+          "name": "Catalog contains exactly 30 options",
+          "passed": true,
+          "detail": "30 unique options"
+        },
+        {
+          "name": "Search narrows by exact source ID",
+          "passed": true,
+          "detail": "[\"190931\"]"
+        },
+        {
+          "name": "All expected template categories are available",
+          "passed": true,
+          "detail": "[\"all\",\"addendum\",\"agreement\",\"brochure\",\"proposal\",\"statement-of-work\"]"
+        },
+        {
+          "name": "Category filter: addendum",
+          "passed": true,
+          "detail": "1 visible source(s)"
+        },
+        {
+          "name": "Category filter: agreement",
+          "passed": true,
+          "detail": "3 visible source(s)"
+        },
+        {
+          "name": "Category filter: brochure",
+          "passed": true,
+          "detail": "7 visible source(s)"
+        },
+        {
+          "name": "Category filter: proposal",
+          "passed": true,
+          "detail": "14 visible source(s)"
+        },
+        {
+          "name": "Category filter: statement-of-work",
+          "passed": true,
+          "detail": "5 visible source(s)"
+        },
+        {
+          "name": "All 30 templates load at mobile viewport",
+          "passed": true,
+          "detail": "30/30 passed"
+        },
+        {
+          "name": "Rename preserves source identity",
+          "passed": true,
+          "detail": "Working copy from 314224; source identity preserved; Sanitized starter proposal / 12 pages / source 314224 Sanitized sales/services starter available."
+        },
+        {
+          "name": "Nine narrative fields edit and render",
+          "passed": true,
+          "detail": "missing rendered fields: none"
+        },
+        {
+          "name": "Existing Publishing output controls remain available",
+          "passed": true,
+          "detail": "{\"publishingTemplate\":\"services\",\"audience\":\"client\",\"scope\":\"both\",\"pdfEnabled\":true,\"csvEnabled\":true}"
+        },
+        {
+          "name": "Existing Proposal save path retains working copy and source identity",
+          "passed": true,
+          "detail": "{\"title\":\"W045 Browser QA Proposal\",\"displayName\":\"W045 QA Working Copy\",\"sourceTemplateId\":\"314224\",\"terms\":\"Synthetic W045 terms for disposable QA only.\"}"
+        },
+        {
+          "name": "Existing Proposal load path restores saved copy",
+          "passed": true,
+          "detail": "W045 QA Working Copy"
+        },
+        {
+          "name": "Reset restores source starter while retaining source identity",
+          "passed": true,
+          "detail": "Sales Machine Services Starter; Working copy from 314224; source identity preserved"
+        },
+        {
+          "name": "Template controls remain inside Publishing",
+          "passed": true,
+          "detail": "{\"publishing\":{\"left\":32,\"right\":358,\"width\":326},\"workflow\":{\"left\":43,\"right\":347,\"width\":304},\"preview\":{\"left\":19,\"right\":371,\"width\":352}}"
+        },
+        {
+          "name": "mobile has no horizontal overflow",
+          "passed": true,
+          "detail": "{\"viewportWidth\":390,\"bodyScrollWidth\":390,\"documentScrollWidth\":390,\"offenders\":[]}"
+        },
+        {
+          "name": "No mobile console errors",
+          "passed": true,
+          "detail": "none"
+        },
+        {
+          "name": "No mobile page errors",
+          "passed": true,
+          "detail": "none"
+        },
+        {
+          "name": "No mobile failed requests",
+          "passed": true,
+          "detail": "none"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "passed": 42,
+    "failed": 0,
+    "overallPassed": true
+  }
+}

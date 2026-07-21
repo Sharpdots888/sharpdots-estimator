@@ -3015,39 +3015,319 @@ const proposalAudienceLabels = {
 };
 
 const proposalTemplateCatalog = [
-  { id: "122606", category: "addendum", name: "Marketing Automation Platform Addendum", file: "001-122606-addendum-marketing-automation-platform-native.pdf", pages: 10, checksum: "13db671853149f3ca4121cc479ae959625cc326dbcd0a92dd2d3b164871fbc75", status: "cataloged", qualityNotes: "Source metadata only; not loadable in this run." },
-  { id: "158076", category: "agreement", name: "Agency Services Agreement", file: "002-158076-agreement-agency-services.pdf", pages: 10, checksum: "18ec090ee41ae07bd8713c7d537919810199b006d39bd4542791cc12b6a5adfc", status: "cataloged", qualityNotes: "Legal-first source; requires separate review before reuse." },
-  { id: "190931", category: "agreement", name: "Mutual Non-Disclosure Agreement", file: "003-190931-agreement-mutual-non-disclosure.pdf", pages: 6, checksum: "984d3f6f1cb8c8b1d5283b0ed4e1f221cad9a15bae310c199cfbb64b4a33cedb", status: "cataloged", qualityNotes: "Legal-first source; requires separate review before reuse." },
-  { id: "236848", category: "agreement", name: "Regulation 1541.5 Printed Sales Messages Agreement", file: "004-236848-agreement-regulation-1541-5-printed-sales-messages.pdf", pages: 10, checksum: "4e0ba9f805d18e2476a4974c1788d74fea644af34a26e071d3e5916e1c77fed2", status: "cataloged", qualityNotes: "Legal/tax-oriented source; metadata only." },
-  { id: "268059", category: "brochure", name: "AWV Reverse Append Brochure", file: "005-268059-brochure-awv-reverse-append.pdf", pages: 3, checksum: "bb3cb4098464ca7667557500a35c043b516845c74a7e1292ce8f5b7cfa7ff589", status: "cataloged", qualityNotes: "Marketing-module source; metadata only." },
-  { id: "400100", category: "brochure", name: "Granular Advertising Agencies V2 Brochure", file: "006-400100-brochure-granular-advertising-agencies-v2.pdf", pages: 19, checksum: "e22426a6edb09f31298d01e351e05bb461da6c5950f640ca59a0457aab2f0605", status: "cataloged", qualityNotes: "Marketing-module source; metadata only." },
-  { id: "167688", category: "brochure", name: "Granular Advertising Aggregated Audience Brochure", file: "007-167688-brochure-granular-advertising-aggregated-audience.pdf", pages: 5, checksum: "bb88dbef9877df94de81bfb7f92fde23cc2fcd9d64ae704cf923e722bb6dea66", status: "cataloged", qualityNotes: "Marketing-module source; metadata only." },
-  { id: "268077", category: "brochure", name: "OTT Brochure", file: "008-268077-brochure-ott.pdf", pages: 5, checksum: "85856589efe124d6494bf3e1ea2c6e23d25fdf85eebddccd35f14fd833732113", status: "cataloged", qualityNotes: "Marketing-module source; metadata only." },
-  { id: "420259", category: "brochure", name: "Audience Targeting Technologies Brochure", file: "009-420259-brochure-audience-targeting-technologies.pdf", pages: 19, checksum: "157d92edcae0cad2ba2b438c076451e3e1587ab1c57ec4b096ab51ac73adde27", status: "cataloged", qualityNotes: "Marketing-module source; metadata only." },
-  { id: "151844", category: "brochure", name: "Experiential Agencies Brochure", file: "010-151844-brochure-experiential-agencies.pdf", pages: 8, checksum: "d50435331bf9a608b269a4e99fe0592edc5e866f5b30e07d3a9dd09ab6cd2c32", status: "cataloged", qualityNotes: "Marketing-module source; metadata only." },
-  { id: "603333", category: "brochure", name: "Sharpdots Services Brochure", file: "011-603333-brochure-sharpdots-services.pdf", pages: 18, checksum: "60b1385ec1e8a82e570497f4cede088f587f794febba1d115859a70894ab96c3", status: "starter", qualityNotes: "Sanitized services starter available." },
-  { id: "734472", category: "proposal", name: "Capture Audience Proposal", file: "012-734472-proposals-capture-audience.pdf", pages: 13, checksum: "9a428c8366743fe8869d9733c6984a49087d6538c7491fb0ac975f06c8825369", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
-  { id: "131263", category: "proposal", name: "Aggregated Audience Proposal", file: "013-131263-proposals-aggregated-audience.pdf", pages: 16, checksum: "f9e9e32216ea6922a0f8a6461f1b1da05e55df1267fab661fdfd50ecc123d8d6", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
-  { id: "314145", category: "proposal", name: "Capture Pixel Proposal", file: "014-314145-proposals-capture-pixel.pdf", pages: 14, checksum: "66c2f09930caf02a9012a602b1ba157fb37abddda4619db7e4ca554d89c2f585", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
-  { id: "272773", category: "proposal", name: "Data Services Proposal", file: "015-272773-proposals-data-services.pdf", pages: 12, checksum: "284d2b1a306d1b8e56f8c1ec2a283b285e0cd1c77e6caf04c52887d1f35db713", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
-  { id: "487336", category: "proposal", name: "Facebook Ad Campaign Proposal", file: "016-487336-proposals-facebook-ad-campaign.pdf", pages: 9, checksum: "8427255b7a3e5d5d68b4372a0d356ea5cb4ae8acf458df8d4dd487f136cf7dab", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
-  { id: "140631", category: "proposal", name: "Location-Based Ads Proposal", file: "017-140631-proposals-location-based-ads.pdf", pages: 17, checksum: "915cb903f27402a4cf6a216766a449889b0d67ee30ba47451ce80576b00c916b", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
-  { id: "556333", category: "proposal", name: "Machine Learning Project Proposal", file: "018-556333-proposals-machine-learning-project.pdf", pages: 14, checksum: "ee4dbc657c08019f718b2889710cc252dfa5acc0fa8c7e3eb306f0bb9ff7574b", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
-  { id: "182333", category: "proposal", name: "Marketing Automation Tier 1 Proposal", file: "019-182333-proposals-marketing-automation-tier-1.pdf", pages: 18, checksum: "ab744411923a67d0e8e5771b775cce8e9adbb568471ff69ff9f15a3f35c9dddd", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
-  { id: "155858", category: "proposal", name: "Marketing Automation Tier 2 Proposal", file: "020-155858-proposals-marketing-automation-tier-2.pdf", pages: 20, checksum: "fcb42ecd2b7d114ef7138d937d353229cc99288b689de24f14a013845d182fc9", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
-  { id: "170605", category: "proposal", name: "Neighbor Targeting Proposal", file: "021-170605-proposals-neighbor-targeting.pdf", pages: 16, checksum: "644643f12cea693fee419eddd99fd1b2f1589d34cff4d7d12fd7bbf416776a21", status: "cataloged", qualityNotes: "Known clipped-heading defect; not a visual baseline." },
-  { id: "329536", category: "proposal", name: "Omni Mail Proposal", file: "022-329536-proposals-omni-mail.pdf", pages: 16, checksum: "1039028b5b6df32c936245cc4a3384bd3aa4ef53aa798ef2c6d033849299df03", status: "starter", qualityNotes: "Sanitized direct-mail starter available." },
-  { id: "169895", category: "proposal", name: "RTM Proposal", file: "023-169895-proposals-rtm.pdf", pages: 16, checksum: "75ceacae97b6f3d08edc70b25692532ea30e5b3e0f614b6654e07ff7d3f09e27", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
-  { id: "314224", category: "proposal", name: "Sales Machine Proposal", file: "024-314224-proposals-sales-machine.pdf", pages: 12, checksum: "5c279311b326969c21fc58896c85e1b896420d46deda73ef6fdc9ab09872c2df", status: "starter", qualityNotes: "Sanitized sales/services starter available." },
-  { id: "138958", category: "proposal", name: "Virtual Venue Proposal", file: "025-138958-proposals-virtual-venue.pdf", pages: 17, checksum: "5135fbb8cc36a2bfc156eb716a4e6173a0864fd368d9639c39c2990d879bb6ad", status: "cataloged", qualityNotes: "Proposal source; metadata only." },
-  { id: "509122", category: "statement-of-work", name: "Development Statement of Work", file: "026-509122-statement-of-work-development.pdf", pages: 16, checksum: "5273338ae8df6ac579124ef9cb454e31a86e8c2b4779e062e417e80bf1a5ed33", status: "cataloged", qualityNotes: "Statement-of-work source; metadata only." },
-  { id: "154100", category: "statement-of-work", name: "E-Commerce Website Statement of Work", file: "027-154100-statement-of-work-e-commerce-website.pdf", pages: 20, checksum: "46ac4bb82b07ba91b43e927d7b1c1badd666e14fe73a8ed4e71c22a1e4893e59", status: "cataloged", qualityNotes: "Statement-of-work source; metadata only." },
-  { id: "171207", category: "statement-of-work", name: "Informational Website Statement of Work", file: "028-171207-statement-of-work-informational-website.pdf", pages: 17, checksum: "87a860740c5d3e663913b29e1489fc55cfe36c0fb8191901efabe9002b51ce60", status: "cataloged", qualityNotes: "Statement-of-work source; metadata only." },
-  { id: "573546", category: "statement-of-work", name: "IT Services Statement of Work", file: "029-573546-statement-of-work-it-services.pdf", pages: 8, checksum: "0f1425317cb5e2f3ace1e101233461d5cdc767c32a22228aea02f6d58d4ec7c2", status: "cataloged", qualityNotes: "Statement-of-work source; metadata only." },
-  { id: "406423", category: "statement-of-work", name: "Print Editing and Marketing Platform Statement of Work", file: "030-406423-statement-of-work-print-editing-and-marketing-platform.pdf", pages: 10, checksum: "66b8011fe8c9be49b0c171c081f5f3b3e8239b50d90265e75da801f9de00ca61", status: "cataloged", qualityNotes: "Statement-of-work source; metadata only." }
+  { id: "122606", category: "addendum", name: "Marketing Automation Platform Addendum", file: "001-122606-addendum-marketing-automation-platform-native.pdf", pages: 10, checksum: "13db671853149f3ca4121cc479ae959625cc326dbcd0a92dd2d3b164871fbc75", status: "sanitized-starter", qualityNotes: "Sanitized addendum starter; platform scope, claims, pricing, and terms require current review." },
+  { id: "158076", category: "agreement", name: "Agency Services Agreement", file: "002-158076-agreement-agency-services.pdf", pages: 10, checksum: "18ec090ee41ae07bd8713c7d537919810199b006d39bd4542791cc12b6a5adfc", status: "sanitized-starter", qualityNotes: "Sanitized agreement drafting starter; legal terms, scope, payment, IP, confidentiality, and signatures require current review." },
+  { id: "190931", category: "agreement", name: "Mutual Non-Disclosure Agreement", file: "003-190931-agreement-mutual-non-disclosure.pdf", pages: 6, checksum: "984d3f6f1cb8c8b1d5283b0ed4e1f221cad9a15bae310c199cfbb64b4a33cedb", status: "sanitized-starter", qualityNotes: "Sanitized mutual NDA drafting starter; confidentiality terms, exclusions, duration, remedies, party identity, and business-purpose limits require current legal/commercial review." },
+  { id: "236848", category: "agreement", name: "Regulation 1541.5 Printed Sales Messages Agreement", file: "004-236848-agreement-regulation-1541-5-printed-sales-messages.pdf", pages: 10, checksum: "4e0ba9f805d18e2476a4974c1788d74fea644af34a26e071d3e5916e1c77fed2", status: "sanitized-starter", qualityNotes: "Sanitized tax/compliance drafting starter; Regulation 1541.5 handling, resale claims, tax treatment, and signatures require qualified review." },
+  { id: "268059", category: "brochure", name: "AWV Reverse Append Brochure", file: "005-268059-brochure-awv-reverse-append.pdf", pages: 3, checksum: "bb3cb4098464ca7667557500a35c043b516845c74a7e1292ce8f5b7cfa7ff589", status: "sanitized-starter", qualityNotes: "Sanitized append/enrichment brochure starter; match methods, privacy, and deliverability claims require current review." },
+  { id: "400100", category: "brochure", name: "Granular Advertising Agencies V2 Brochure", file: "006-400100-brochure-granular-advertising-agencies-v2.pdf", pages: 19, checksum: "e22426a6edb09f31298d01e351e05bb461da6c5950f640ca59a0457aab2f0605", status: "sanitized-starter", qualityNotes: "Sanitized agency brochure starter; capabilities and campaign claims require current review." },
+  { id: "167688", category: "brochure", name: "Granular Advertising Aggregated Audience Brochure", file: "007-167688-brochure-granular-advertising-aggregated-audience.pdf", pages: 5, checksum: "bb88dbef9877df94de81bfb7f92fde23cc2fcd9d64ae704cf923e722bb6dea66", status: "sanitized-starter", qualityNotes: "Sanitized aggregated-audience brochure starter; source claims and use constraints require current review." },
+  { id: "268077", category: "brochure", name: "OTT Brochure", file: "008-268077-brochure-ott.pdf", pages: 5, checksum: "85856589efe124d6494bf3e1ea2c6e23d25fdf85eebddccd35f14fd833732113", status: "sanitized-starter", qualityNotes: "Sanitized OTT brochure starter; channel availability, measurements, and media claims require current review." },
+  { id: "420259", category: "brochure", name: "Audience Targeting Technologies Brochure", file: "009-420259-brochure-audience-targeting-technologies.pdf", pages: 19, checksum: "157d92edcae0cad2ba2b438c076451e3e1587ab1c57ec4b096ab51ac73adde27", status: "sanitized-starter", qualityNotes: "Sanitized targeting-technologies brochure starter; data sources and performance claims require current review." },
+  { id: "151844", category: "brochure", name: "Experiential Agencies Brochure", file: "010-151844-brochure-experiential-agencies.pdf", pages: 8, checksum: "d50435331bf9a608b269a4e99fe0592edc5e866f5b30e07d3a9dd09ab6cd2c32", status: "sanitized-starter", qualityNotes: "Sanitized experiential-agency brochure starter; event-data rights and activation claims require current review." },
+  { id: "603333", category: "brochure", name: "Sharpdots Services Brochure", file: "011-603333-brochure-sharpdots-services.pdf", pages: 18, checksum: "60b1385ec1e8a82e570497f4cede088f587f794febba1d115859a70894ab96c3", status: "sanitized-starter", qualityNotes: "Sanitized services brochure starter; product packaging and service descriptions require current review." },
+  { id: "734472", category: "proposal", name: "Capture Audience Proposal", file: "012-734472-proposals-capture-audience.pdf", pages: 13, checksum: "9a428c8366743fe8869d9733c6984a49087d6538c7491fb0ac975f06c8825369", status: "sanitized-starter", qualityNotes: "Sanitized proposal starter; historical pricing, legal terms, contact details, and customer-specific values removed." },
+  { id: "131263", category: "proposal", name: "Aggregated Audience Proposal", file: "013-131263-proposals-aggregated-audience.pdf", pages: 16, checksum: "f9e9e32216ea6922a0f8a6461f1b1da05e55df1267fab661fdfd50ecc123d8d6", status: "sanitized-starter", qualityNotes: "Sanitized proposal starter; source pricing and legacy terms removed for current-estimate sourcing." },
+  { id: "314145", category: "proposal", name: "Capture Pixel Proposal", file: "014-314145-proposals-capture-pixel.pdf", pages: 14, checksum: "66c2f09930caf02a9012a602b1ba157fb37abddda4619db7e4ca554d89c2f585", status: "sanitized-starter", qualityNotes: "Sanitized proposal starter; quantitative claims require review before client reliance." },
+  { id: "272773", category: "proposal", name: "Data Services Proposal", file: "015-272773-proposals-data-services.pdf", pages: 12, checksum: "284d2b1a306d1b8e56f8c1ec2a283b285e0cd1c77e6caf04c52887d1f35db713", status: "sanitized-starter", qualityNotes: "Sanitized proposal starter; historical line-item pricing removed." },
+  { id: "487336", category: "proposal", name: "Facebook Ad Campaign Proposal", file: "016-487336-proposals-facebook-ad-campaign.pdf", pages: 9, checksum: "8427255b7a3e5d5d68b4372a0d356ea5cb4ae8acf458df8d4dd487f136cf7dab", status: "sanitized-starter", qualityNotes: "Sanitized proposal starter; legacy fixed campaign fee and legal language removed." },
+  { id: "140631", category: "proposal", name: "Location-Based Ads Proposal", file: "017-140631-proposals-location-based-ads.pdf", pages: 17, checksum: "915cb903f27402a4cf6a216766a449889b0d67ee30ba47451ce80576b00c916b", status: "sanitized-starter", qualityNotes: "Sanitized proposal starter; pricing and legal terms remain sourced from current records." },
+  { id: "556333", category: "proposal", name: "Machine Learning Project Proposal", file: "018-556333-proposals-machine-learning-project.pdf", pages: 14, checksum: "ee4dbc657c08019f718b2889710cc252dfa5acc0fa8c7e3eb306f0bb9ff7574b", status: "sanitized-starter", qualityNotes: "Sanitized proposal starter; client/project-specific scenario, rates, and staff claims generalized." },
+  { id: "182333", category: "proposal", name: "Marketing Automation Tier 1 Proposal", file: "019-182333-proposals-marketing-automation-tier-1.pdf", pages: 18, checksum: "ab744411923a67d0e8e5771b775cce8e9adbb568471ff69ff9f15a3f35c9dddd", status: "sanitized-starter", qualityNotes: "Sanitized proposal starter; tier scope must be checked against current product packaging." },
+  { id: "155858", category: "proposal", name: "Marketing Automation Tier 2 Proposal", file: "020-155858-proposals-marketing-automation-tier-2.pdf", pages: 20, checksum: "fcb42ecd2b7d114ef7138d937d353229cc99288b689de24f14a013845d182fc9", status: "sanitized-starter", qualityNotes: "Sanitized proposal starter; tier scope must be checked against current product packaging." },
+  { id: "170605", category: "proposal", name: "Neighbor Targeting Proposal", file: "021-170605-proposals-neighbor-targeting.pdf", pages: 16, checksum: "644643f12cea693fee419eddd99fd1b2f1589d34cff4d7d12fd7bbf416776a21", status: "sanitized-starter", qualityNotes: "Sanitized proposal starter; source has a clipped page-1 heading and must not be used as a visual baseline." },
+  { id: "329536", category: "proposal", name: "Omni Mail Proposal", file: "022-329536-proposals-omni-mail.pdf", pages: 16, checksum: "1039028b5b6df32c936245cc4a3384bd3aa4ef53aa798ef2c6d033849299df03", status: "sanitized-starter", qualityNotes: "Sanitized direct-mail starter available." },
+  { id: "169895", category: "proposal", name: "RTM Proposal", file: "023-169895-proposals-rtm.pdf", pages: 16, checksum: "75ceacae97b6f3d08edc70b25692532ea30e5b3e0f614b6654e07ff7d3f09e27", status: "sanitized-starter", qualityNotes: "Sanitized proposal starter; historical pricing and legal terms removed." },
+  { id: "314224", category: "proposal", name: "Sales Machine Proposal", file: "024-314224-proposals-sales-machine.pdf", pages: 12, checksum: "5c279311b326969c21fc58896c85e1b896420d46deda73ef6fdc9ab09872c2df", status: "sanitized-starter", qualityNotes: "Sanitized sales/services starter available." },
+  { id: "138958", category: "proposal", name: "Virtual Venue Proposal", file: "025-138958-proposals-virtual-venue.pdf", pages: 17, checksum: "5135fbb8cc36a2bfc156eb716a4e6173a0864fd368d9639c39c2990d879bb6ad", status: "sanitized-starter", qualityNotes: "Sanitized proposal starter; source claims and location-data assumptions require review before client reliance." },
+  { id: "509122", category: "statement-of-work", name: "Development Statement of Work", file: "026-509122-statement-of-work-development.pdf", pages: 16, checksum: "5273338ae8df6ac579124ef9cb454e31a86e8c2b4779e062e417e80bf1a5ed33", status: "sanitized-starter", qualityNotes: "Sanitized development SOW starter; deliverables, acceptance, timeline, fees, IP, warranty, and change control require current review." },
+  { id: "154100", category: "statement-of-work", name: "E-Commerce Website Statement of Work", file: "027-154100-statement-of-work-e-commerce-website.pdf", pages: 20, checksum: "46ac4bb82b07ba91b43e927d7b1c1badd666e14fe73a8ed4e71c22a1e4893e59", status: "sanitized-starter", qualityNotes: "Sanitized e-commerce SOW starter; platform, payment, integrations, content, launch, support, and fees require current review." },
+  { id: "171207", category: "statement-of-work", name: "Informational Website Statement of Work", file: "028-171207-statement-of-work-informational-website.pdf", pages: 17, checksum: "87a860740c5d3e663913b29e1489fc55cfe36c0fb8191901efabe9002b51ce60", status: "sanitized-starter", qualityNotes: "Sanitized informational website SOW starter; pages, content, accessibility, hosting, timeline, acceptance, and fees require current review." },
+  { id: "573546", category: "statement-of-work", name: "IT Services Statement of Work", file: "029-573546-statement-of-work-it-services.pdf", pages: 8, checksum: "0f1425317cb5e2f3ace1e101233461d5cdc767c32a22228aea02f6d58d4ec7c2", status: "sanitized-starter", qualityNotes: "Sanitized IT services SOW starter; access, security, service levels, exclusions, fees, and support responsibilities require current review." },
+  { id: "406423", category: "statement-of-work", name: "Print Editing and Marketing Platform Statement of Work", file: "030-406423-statement-of-work-print-editing-and-marketing-platform.pdf", pages: 10, checksum: "66b8011fe8c9be49b0c171c081f5f3b3e8239b50d90265e75da801f9de00ca61", status: "sanitized-starter", qualityNotes: "Sanitized print-editing/platform SOW starter; print scope, data flows, platform work, approvals, fees, and terms require current review." }
 ];
 
 const proposalStarterTemplates = {
+  "122606": {
+    basePreset: "services",
+    displayName: "Marketing Automation Platform Addendum Starter",
+    fields: {
+      title: "Marketing Automation Platform Addendum",
+      subtitle: "Scope update for platform setup, campaign workflow, and managed automation",
+      overview: "This addendum frames a marketing automation platform update as a controlled scope change to an existing proposal or services plan. It is sanitized starter copy; confirm current platform availability, responsibilities, claims, and commercial terms before client use.",
+      audience: "Define the current account, platform environment, approved users, connected data sources, required integrations, campaign goals, and any compliance-sensitive assumptions for this addendum.",
+      deliverables: "Platform setup, contact-field review, workflow mapping, campaign configuration, handoff notes, and reporting checkpoints can be described here. Current Estimator records remain the source for pricing, timing, and assigned services.",
+      valueNarrative: "The value story is operational control: clear data inputs, repeatable campaign steps, and a reviewable handoff reduce ambiguity around marketing automation work.",
+      nextSteps: "1. Confirm the active proposal or services record this addendum modifies.\n2. Review current platform scope, estimate pricing, service records, and schedule.\n3. Approve the addendum only after product, privacy, and terms language is checked.",
+      terms: "This starter is not approved legal language. Platform claims, data handling, access responsibilities, fees, renewal obligations, and service boundaries require current review."
+    }
+  },
+  "158076": {
+    basePreset: "internalReview",
+    displayName: "Agency Services Agreement Draft Starter",
+    fields: {
+      title: "Agency Services Agreement Draft",
+      subtitle: "Review-required framework for service scope, responsibilities, fees, and acceptance",
+      overview: "This agreement starter converts a legal-first source into a neutral drafting framework. It is not approved legal language; use it only to organize current scope, responsibilities, commercial terms, and review questions before qualified approval.",
+      audience: "Identify the current contracting parties, business relationship, project records, authorized reviewers, service categories, effective date, and any dependencies that must be confirmed before this agreement can be used.",
+      deliverables: "Describe the service categories, statements of work, review cycles, client obligations, reporting cadence, acceptance process, and change-control path. Current Estimator and services records remain the source for active fees and schedules.",
+      valueNarrative: "The value of this draft is alignment: it gives legal, commercial, and delivery reviewers a single outline for what work is being authorized and what still needs decision-grade review.",
+      nextSteps: "1. Attach the current proposal, estimate, services, and SOW records that define scope.\n2. Replace all placeholders with approved party, term, fee, IP, confidentiality, and payment language.\n3. Route to qualified legal and commercial reviewers before any signature or customer-facing use.",
+      terms: "Legal/commercial review required. Do not treat historical agency-services terms, payment provisions, ownership language, confidentiality terms, warranties, limitations, signatures, or party details as current truth."
+    }
+  },
+  "190931": {
+    basePreset: "internalReview",
+    displayName: "Mutual NDA Draft Starter",
+    fields: {
+      title: "Mutual Non-Disclosure Agreement Draft",
+      subtitle: "Review-required confidentiality framework for early project or partner discussions",
+      overview: "This NDA starter provides a sanitized structure for documenting confidential-information exchange. It is not approved legal or commercial language and must be reviewed for the current parties, purpose, jurisdiction, duration, exclusions, and remedies.",
+      audience: "Define the disclosing and receiving parties, discussion purpose, covered information types, representatives, permitted use, return or destruction expectations, and any information that should be excluded from the exchange.",
+      deliverables: "Use this draft to capture the confidentiality purpose, mutual obligations, exclusions, compelled-disclosure process, term, survival period, and review owners. It does not set final obligations until approved.",
+      valueNarrative: "The value of this draft is controlled disclosure: teams can identify what information may be shared and what terms need review before sensitive project, data, or partner conversations proceed.",
+      nextSteps: "1. Confirm the parties and purpose of the confidential exchange.\n2. Review exclusions, duration, jurisdiction, remedies, representative access, and commercial relationship context with qualified reviewers.\n3. Approve only the reviewed version before sending or signing.",
+      terms: "Legal/commercial review required. Confidentiality scope, exclusions, residual knowledge, injunctive relief, governing law, term, survival, signatures, party identity, and business-purpose limits must come from current approved language."
+    }
+  },
+  "236848": {
+    basePreset: "internalReview",
+    displayName: "Regulation 1541.5 Printed Sales Messages Draft Starter",
+    fields: {
+      title: "Printed Sales Messages Agreement Draft",
+      subtitle: "Review-required tax and production framework for printed-sales-message work",
+      overview: "This starter converts the Regulation 1541.5 source into a neutral review checklist for printed sales message projects. It does not approve tax treatment, resale handling, exemption claims, or customer certification language.",
+      audience: "Identify the buyer, print campaign, mail or distribution plan, claimed tax treatment, resale or exemption assumptions, required certificates, production records, and the reviewer responsible for tax/compliance approval.",
+      deliverables: "Document the printed materials, production services, mailing or distribution responsibilities, proofing process, acceptance checkpoints, certificate requirements, and source records that support the current tax/commercial position.",
+      valueNarrative: "The value of this draft is control around a compliance-sensitive print workflow: the team can separate production scope from tax determinations that need qualified review.",
+      nextSteps: "1. Confirm whether the current project involves printed sales messages and which records support that classification.\n2. Obtain current tax/compliance and commercial review before relying on any Regulation 1541.5 language.\n3. Attach approved certificates, estimate pricing, and production scope before customer use.",
+      terms: "Tax/legal/commercial review required. Regulation 1541.5 applicability, exemption or resale language, customer certifications, allocation of tax responsibility, pricing, signatures, and production obligations must be currently approved."
+    }
+  },
+  "268059": {
+    basePreset: "services",
+    displayName: "AWV Reverse Append Starter",
+    fields: {
+      title: "Reverse Append Audience Enrichment",
+      subtitle: "Data enhancement starter for converting partial audience records into usable campaign inputs",
+      overview: "This brochure starter describes reverse append or audience enrichment as a reviewable data-service module. It keeps the promise generic: improve incomplete audience records where approved sources and match rules allow.",
+      audience: "Describe the starting records, missing fields, geography, suppression rules, intended campaign use, and data-quality thresholds that must be checked for the current project.",
+      deliverables: "Input-file review, field mapping, enrichment request, match-quality summary, exception handling, and campaign-readiness notes can be included when those services are in scope.",
+      valueNarrative: "The value story is making audience data more actionable without overstating match rates or implying that every record can be completed.",
+      nextSteps: "1. Confirm allowed data inputs and desired output fields.\n2. Review vendor/source permissions, current estimate pricing, and delivery timing.\n3. Approve the working copy after privacy and claims language is checked.",
+      terms: "Match rates, available fields, data-license rights, usage limits, delivery format, and pricing require current review before client reliance."
+    }
+  },
+  "400100": {
+    basePreset: "services",
+    displayName: "Granular Advertising Agencies Starter",
+    fields: {
+      title: "Granular Advertising for Agencies",
+      subtitle: "Reusable agency-facing module for audience planning, activation, and reporting",
+      overview: "This brochure starter gives agencies a neutral way to frame Sharpdots as an audience and campaign execution partner. It avoids legacy proof claims and leaves each capability subject to current review.",
+      audience: "Define the agency role, end-client category, audience source, geography, media channels, reporting needs, approval path, and any white-label or confidentiality expectations.",
+      deliverables: "Audience strategy, data sourcing or enhancement, campaign planning, production coordination, activation support, and reporting handoff can be described based on current scope.",
+      valueNarrative: "The value story is practical leverage for agencies: sharpen audience definition, connect campaign operations, and provide a clearer review trail for client work.",
+      nextSteps: "1. Confirm agency/end-client responsibilities and approval flow.\n2. Review available channels, current service records, and pricing.\n3. Approve the copy after claims, privacy, and product packaging are checked.",
+      terms: "Agency responsibilities, permitted claims, channel availability, reporting commitments, and pricing must come from current approved records."
+    }
+  },
+  "167688": {
+    basePreset: "directMail",
+    displayName: "Aggregated Audience Brochure Starter",
+    fields: {
+      title: "Aggregated Audience Activation",
+      subtitle: "Location-and-time audience module for focused campaign planning",
+      overview: "This brochure starter explains aggregated audience work as a method for building campaign segments around approved location or time-window inputs. It stays generic so current privacy, feasibility, and product review can set final claims.",
+      audience: "Document the relevant locations, event windows, comparable places, audience assumptions, exclusions, campaign geography, and intended activation channels.",
+      deliverables: "Location review, audience feasibility assessment, segment definition, campaign activation planning, reporting notes, and optional learning summary can be included as current scope allows.",
+      valueNarrative: "The value story is context: location and timing can help define a more relevant audience than a broad demographic list when the use case is reviewed and approved.",
+      nextSteps: "1. Confirm locations, time windows, and campaign objective.\n2. Review data-use assumptions, selected channels, and current pricing.\n3. Approve the starter only after source claims and compliance language are checked.",
+      terms: "Audience availability, data rights, matching methods, measurements, and fees require current review. Do not treat historical source claims as current truth."
+    }
+  },
+  "268077": {
+    basePreset: "services",
+    displayName: "OTT Campaign Brochure Starter",
+    fields: {
+      title: "OTT Campaign Planning",
+      subtitle: "Streaming media audience module for campaign proposals",
+      overview: "This brochure starter frames OTT as a possible media channel within a broader campaign plan. It avoids fixed media claims and requires current review of availability, targeting options, measurement, and buying responsibilities.",
+      audience: "Define the target audience, geography, viewing context, creative assets, flight dates, budget ownership, frequency goals, and measurement expectations for the current campaign.",
+      deliverables: "Audience planning, media-channel review, creative handoff, campaign setup coordination, launch review, and performance summary can be included when approved for the project.",
+      valueNarrative: "The value story is extending campaign reach into streaming environments while keeping targeting and measurement expectations tied to current channel rules.",
+      nextSteps: "1. Confirm campaign audience, creative readiness, and media responsibilities.\n2. Review current channel availability, estimate pricing, and schedule.\n3. Approve the copy after media claims and measurement language are checked.",
+      terms: "Inventory availability, targeting criteria, reporting metrics, media spend handling, and service fees must be supplied by current approved records."
+    }
+  },
+  "420259": {
+    basePreset: "services",
+    displayName: "Audience Targeting Technologies Starter",
+    fields: {
+      title: "Audience Targeting Technologies",
+      subtitle: "Capability overview for reviewed data, media, and campaign targeting options",
+      overview: "This brochure starter turns the targeting-technologies source into a reusable overview of audience strategy, data inputs, and activation options. It is intentionally claim-light until the current product stack is reviewed.",
+      audience: "Summarize the buyer profile, data inputs, geography, channel mix, suppression rules, privacy assumptions, and campaign outcomes the current project needs to support.",
+      deliverables: "Audience discovery, data review, targeting recommendation, activation planning, production coordination, measurement outline, and optimization notes can be included based on selected services.",
+      valueNarrative: "The value story is choosing targeting inputs deliberately so campaign spend is connected to a defined audience and a measurable business goal.",
+      nextSteps: "1. Confirm the audience strategy and available source records.\n2. Review current targeting methods, service packaging, and pricing.\n3. Approve only after product claims and data-use language are checked.",
+      terms: "Data sources, targeting eligibility, privacy obligations, platform availability, performance claims, and fees require current review before external use."
+    }
+  },
+  "151844": {
+    basePreset: "services",
+    displayName: "Experiential Agencies Starter",
+    fields: {
+      title: "Experiential Agency Audience Activation",
+      subtitle: "Event-centered audience and follow-up module for agency programs",
+      overview: "This brochure starter frames experiential work around turning event context into a reviewed follow-up campaign plan. It removes historical examples and leaves event-data rights, channels, and claims for current review.",
+      audience: "Define the event type, venue or footprint, active dates, audience assumptions, sponsor or agency role, creative assets, follow-up channels, and approval responsibilities.",
+      deliverables: "Event-audience planning, location or attendance-data review, campaign segment setup, creative coordination, activation support, and post-event reporting notes can be described here.",
+      valueNarrative: "The value story is extending the useful life of an event by creating a reviewed audience and follow-up path for relevant offers or messages.",
+      nextSteps: "1. Confirm event scope, permissions, and activation goals.\n2. Review data rights, current pricing, services, and schedule.\n3. Approve the copy after event claims and privacy assumptions are checked.",
+      terms: "Event-data rights, venue permissions, channel availability, measurement methods, and fees must come from current approved records."
+    }
+  },
+  "734472": {
+    basePreset: "services",
+    displayName: "Capture Audience Starter",
+    fields: {
+      title: "Capture Audience Proposal",
+      subtitle: "Intent-informed audience targeting and cross-channel activation",
+      overview: "This proposal frames Capture Audience as a coordinated advertising program that starts with audience intelligence, then connects campaign assets, channel activation, and performance review. It is sanitized starter copy; confirm any claims, channels, and eligibility before client use.",
+      audience: "Define the ideal buyer signals, geography, segment rules, exclusions, first-party data inputs, and campaign channels for the current project. Replace this placeholder with approved audience criteria and current privacy/compliance assumptions.",
+      deliverables: "Audience intelligence build, campaign planning, creative and landing-page coordination, cross-channel activation, dashboard review, and optimization cadence can be described here. Pricing and quantities remain sourced from current Estimator records.",
+      valueNarrative: "The value story is sharper targeting: spend should be tied to people showing relevant buying signals instead of broad demographic assumptions.",
+      nextSteps: "1. Confirm audience inputs, channels, and conversion goal.\n2. Review current estimate, service, and schedule records.\n3. Approve the working proposal for campaign planning and client review.",
+      terms: "This starter does not include reviewed legal language or fixed historical pricing. Final scope, compliance assumptions, and investment must come from current approved records."
+    }
+  },
+  "131263": {
+    basePreset: "directMail",
+    displayName: "Aggregated Audience Starter",
+    fields: {
+      title: "Aggregated Audience Proposal",
+      subtitle: "Location-and-time audience activation for defined places or events",
+      overview: "This proposal outlines a campaign built around people present at a meaningful location or event window. It converts the source structure into a neutral workflow for location definition, campaign build, activation, and matchback review.",
+      audience: "Document the target venue, event dates, physical boundaries, comparable locations, audience assumptions, and any exclusions. Keep examples generic until the current client confirms the use case.",
+      deliverables: "Location assessment, audience definition, campaign asset collection, ad activation, reporting handoff, and optional matchback review can be included as narrative modules. Historical CPMs and fixed build fees are intentionally omitted.",
+      valueNarrative: "This template should explain how location context can focus campaign spend and make post-campaign learning more specific than a broad awareness buy.",
+      nextSteps: "1. Confirm the location, time window, and campaign goal.\n2. Attach approved creative, offer, and landing-page assumptions.\n3. Review current pricing and schedule records before client delivery.",
+      terms: "Location data availability, campaign feasibility, pricing, and matchback handling require current review. Do not rely on legacy source terms or sample fees."
+    }
+  },
+  "314145": {
+    basePreset: "services",
+    displayName: "Capture Pixel Starter",
+    fields: {
+      title: "Capture Pixel Proposal",
+      subtitle: "Anonymous visitor identification and follow-up activation",
+      overview: "This proposal describes a website-visitor capture workflow that can identify and nurture a portion of otherwise anonymous traffic. It keeps source claims generalized so current product, consent, and compliance review can set the final language.",
+      audience: "Define the website sections, geography, filtering rules, eligible visitor signals, suppression requirements, and follow-up audiences for the current project.",
+      deliverables: "Pixel placement coordination, visitor-signal filtering, audience export or activation setup, direct follow-up campaign planning, and performance review can be described here. Current systems determine which channels are available.",
+      valueNarrative: "The value story is turning otherwise anonymous interest into a reviewed follow-up audience that can receive relevant offers through approved channels.",
+      nextSteps: "1. Confirm website access, tracking assumptions, and data-use approvals.\n2. Review current service scope, estimate pricing, and campaign channels.\n3. Approve the proposal only after compliance-sensitive language is checked.",
+      terms: "Identification rates, personal-data handling, channel eligibility, and legal notices require current review. This starter excludes fixed source percentages and legacy terms."
+    }
+  },
+  "272773": {
+    basePreset: "services",
+    displayName: "Data Services Starter",
+    fields: {
+      title: "Data Services Proposal",
+      subtitle: "Audience discovery, data enhancement, cleanup, and analysis",
+      overview: "This proposal frames data services as the foundation for better campaign targeting. It supports list enhancement, data hygiene, audience acquisition, and customer analysis without carrying forward historical pricing.",
+      audience: "Summarize the current database, missing fields, desired customer profile, geography, campaign goal, and data-quality concerns that need review.",
+      deliverables: "Data append, hygiene review, duplicate consolidation, audience sourcing, customer-profile analysis, and campaign-readiness recommendations can be included based on current scope.",
+      valueNarrative: "The value story is replacing guesswork with a cleaner, better understood audience so campaign investment is aimed at the right targets.",
+      nextSteps: "1. Confirm source data, desired fields, and intended campaign use.\n2. Review data handling requirements and current estimate pricing.\n3. Approve the working proposal after any data-license assumptions are checked.",
+      terms: "Final data availability, usage rights, turnaround, and pricing depend on current source records and approved vendor terms."
+    }
+  },
+  "487336": {
+    basePreset: "services",
+    displayName: "Social Ad Campaign Starter",
+    fields: {
+      title: "Social Ad Campaign Proposal",
+      subtitle: "Paid social campaign setup, landing-page coordination, and optimization",
+      overview: "This proposal outlines a paid social campaign workflow for reaching a defined audience and routing responses back to a conversion path. The legacy fixed fee and source legal language have been removed.",
+      audience: "Define the target audience, platforms, lookalike or retargeting assumptions, offer, budget ownership, and landing-page requirements for the current campaign.",
+      deliverables: "Campaign setup, ad creative coordination, landing-page or form setup, testing plan, performance monitoring, and reporting cadence can be described here.",
+      valueNarrative: "The value story is a managed campaign loop: audience selection, offer testing, response capture, and measured improvement over the campaign window.",
+      nextSteps: "1. Confirm platform access, audience assumptions, and offer.\n2. Review ad spend ownership, service pricing, and schedule records.\n3. Approve the proposal after current platform and compliance requirements are checked.",
+      terms: "Ad spend, recurring services, cancellation terms, and platform responsibilities must be supplied by current approved records, not the historical source."
+    }
+  },
+  "140631": {
+    basePreset: "directMail",
+    displayName: "Location-Based Ads Starter",
+    fields: {
+      title: "Location-Based Ads Proposal",
+      subtitle: "Digital ads delivered to households or addresses from a selected list",
+      overview: "This proposal describes a location-based advertising workflow that starts with an address or household list, then coordinates digital ad delivery and lead capture around that selected audience.",
+      audience: "Define the list source, geography, household criteria, campaign duration, creative requirements, and any suppression or eligibility rules.",
+      deliverables: "List review, audience matching, ad build coordination, campaign activation, lead-capture planning, reporting, and optimization review can be included as current scope allows.",
+      valueNarrative: "The value story is using a qualified physical-address audience to create repeated digital touches and a measurable response path.",
+      nextSteps: "1. Confirm list source and audience criteria.\n2. Review current campaign pricing, selected sections, and timing.\n3. Approve the working proposal after data-use assumptions are checked.",
+      terms: "Match rates, channel availability, data-use rights, pricing, and service terms must be reviewed against current records."
+    }
+  },
+  "556333": {
+    basePreset: "internalReview",
+    displayName: "Machine Learning Project Starter",
+    fields: {
+      title: "Machine Learning Project Proposal",
+      subtitle: "Discovery, data preparation, model development, validation, and handoff",
+      overview: "This proposal converts a client-specific machine-learning example into a generic project framework. It should be treated as an internal drafting starter until technical scope, roles, and pricing are reviewed.",
+      audience: "Define the business question, data sources, success measures, stakeholders, operational constraints, and model users for the current project.",
+      deliverables: "Requirements discovery, data collection review, data staging, model development, testing, quality assurance, deployment handoff, and post-handoff tuning can be described here.",
+      valueNarrative: "The value story is a staged path from unclear data signals to a tested model or analytical workflow that can support a specific business decision.",
+      nextSteps: "1. Confirm data availability and project objective.\n2. Review technical roles, milestones, assumptions, and current pricing.\n3. Hold for technical review before any client-facing reliance.",
+      terms: "This starter excludes historical client names, rate tables, and staffing claims. Final scope, acceptance criteria, and fees require a current technical review."
+    }
+  },
+  "182333": {
+    basePreset: "services",
+    displayName: "Marketing Automation Tier 1 Starter",
+    fields: {
+      title: "Marketing Automation Tier 1 Proposal",
+      subtitle: "Centralized marketing data, workflow strategy, and first-stage automation",
+      overview: "This proposal frames a first-tier marketing automation engagement around data clarity, channel integration, and a practical workflow foundation. Source statistics and tier packaging should be reviewed before client use.",
+      audience: "Describe the current marketing database, channels, lead sources, reporting gaps, sales handoff, and first workflows that need to be centralized.",
+      deliverables: "Strategy session, data-needs review, workflow map, initial tracking plan, platform coordination, campaign-content recommendations, and reporting setup can be included.",
+      valueNarrative: "The value story is moving from scattered marketing activity to a system that can track behavior, support segmentation, and guide spend with more confidence.",
+      nextSteps: "1. Confirm current tools, data inputs, and first automation goal.\n2. Review tier scope against current Sharpdots packaging.\n3. Approve the working proposal after pricing and platform responsibilities are checked.",
+      terms: "Tier names, platform obligations, service boundaries, and pricing must be reviewed against current approved packages."
+    }
+  },
+  "155858": {
+    basePreset: "services",
+    displayName: "Marketing Automation Tier 2 Starter",
+    fields: {
+      title: "Marketing Automation Tier 2 Proposal",
+      subtitle: "Lead-generation system, content workflow, and nurture automation",
+      overview: "This proposal frames a broader marketing automation engagement around lead generation, helpful content, email nurture, and sales-ready qualification. It keeps legacy claims and package details out of the default copy.",
+      audience: "Define the target audience, lead magnet or offer, content themes, qualification signals, sales handoff rules, and current marketing platform constraints.",
+      deliverables: "Lead-generation workflow design, content and email campaign planning, tracking setup, segmentation, response handling, reporting, and optimization cadence can be described here.",
+      valueNarrative: "The value story is building a repeatable path for interested prospects to identify themselves, receive useful follow-up, and move toward a sales conversation.",
+      nextSteps: "1. Confirm offer, channels, and qualification criteria.\n2. Review tier scope, current estimate pricing, and platform responsibilities.\n3. Approve the proposal only after current package language is checked.",
+      terms: "This starter excludes historical package pricing and unreviewed performance claims. Final terms must come from current service records."
+    }
+  },
+  "170605": {
+    basePreset: "directMail",
+    displayName: "Neighbor Targeting Starter",
+    fields: {
+      title: "Neighbor Targeting Proposal",
+      subtitle: "New-mover audience targeting and local campaign activation",
+      overview: "This proposal describes a new-mover targeting campaign that identifies a defined mover segment and activates advertising around a chosen geography and period. The source has a clipped heading defect and is not a visual baseline.",
+      audience: "Define the mover segment, geography, campaign period, asset requirements, and any exclusions or compliance constraints for the current project.",
+      deliverables: "Audience segment setup, geography definition, creative collection, campaign build, ad activation, reporting, and optimization review can be included as current scope allows.",
+      valueNarrative: "The value story is timing: the campaign reaches households during a period when needs and buying decisions may be changing.",
+      nextSteps: "1. Confirm mover segment, geography, and campaign window.\n2. Review current pricing, schedule, and campaign sections.\n3. Approve the working proposal after source-defect and claims language are reviewed.",
+      terms: "Subscription length, data availability, timing, pricing, and legal terms require current approval. The clipped source heading should not be reproduced."
+    }
+  },
   "329536": {
     basePreset: "directMail",
     displayName: "Omni Mail Campaign Starter",
@@ -3060,6 +3340,20 @@ const proposalStarterTemplates = {
       valueNarrative: "The useful comparison is not only piece cost; it is the cost to reach the right recipient with a clear offer and a trackable response path.",
       nextSteps: "1. Confirm audience and mail quantity assumptions.\n2. Review estimate pricing, schedule, and selected services.\n3. Approve the working proposal so production details can be finalized.",
       terms: "Final pricing, schedule, and deliverables depend on the approved scope, current estimate records, and any production changes requested after review."
+    }
+  },
+  "169895": {
+    basePreset: "directMail",
+    displayName: "Real Time Movers Starter",
+    fields: {
+      title: "Real Time Movers Proposal",
+      subtitle: "Mover-segment targeting with rapid audience updates",
+      overview: "This proposal outlines a real-time mover campaign for reaching people around listing, sale, escrow, or move-in events. It preserves the source workflow shape while removing legacy pricing and legal language.",
+      audience: "Define the mover status, geography, duration, campaign objective, creative assets, and response path for the current project.",
+      deliverables: "Mover-segment definition, audience refresh setup, campaign build, ad activation, reporting, and optimization recommendations can be described here.",
+      valueNarrative: "The value story is reaching a local audience when buying needs may be active and before competitors own the conversation.",
+      nextSteps: "1. Confirm mover segment and geography.\n2. Review current estimate pricing, campaign duration, and reporting requirements.\n3. Approve the working proposal after data-source assumptions are checked.",
+      terms: "Data timing, segment availability, subscription terms, pricing, and legal language must come from current reviewed records."
     }
   },
   "314224": {
@@ -3076,23 +3370,112 @@ const proposalStarterTemplates = {
       terms: "Service scope, activation timing, and recurring support are subject to current workspace records and separate approval of any material changes."
     }
   },
-  "603333": {
+  "138958": {
+    basePreset: "directMail",
+    displayName: "Virtual Venue Starter",
+    fields: {
+      title: "Virtual Venue Proposal",
+      subtitle: "Historical-location audience building and campaign activation",
+      overview: "This proposal describes a Virtual Venue campaign that maps one or more meaningful locations, identifies eligible audience segments from an approved time window, and activates advertising against that audience.",
+      audience: "Define the venue or venue set, relevant time window, comparable locations, campaign geography, household or device assumptions, and exclusions for the current project.",
+      deliverables: "Location mapping, audience feasibility review, campaign build, creative coordination, ad activation, reporting, and learning recommendations can be included.",
+      valueNarrative: "The value story is using real-world location context to build a focused audience that can be reused for relevant campaign offers.",
+      nextSteps: "1. Confirm locations, time windows, and campaign objective.\n2. Review data-use assumptions, current pricing, and campaign schedule.\n3. Approve the working proposal after claims and compliance-sensitive language are reviewed.",
+      terms: "Historical-location data availability, targeting eligibility, privacy requirements, pricing, and usage rights require current review before client reliance."
+    }
+  },
+  "509122": {
     basePreset: "internalReview",
-    displayName: "Sharpdots Services Overview Starter",
+    displayName: "Development Statement of Work Starter",
+    fields: {
+      title: "Development Statement of Work",
+      subtitle: "Review-required scope framework for discovery, build, validation, and handoff",
+      overview: "This SOW starter frames a development project without carrying forward historical parties, fixed fees, or legacy legal terms. It is a drafting aid only; scope, acceptance, IP, warranties, timeline, and commercial terms require current review.",
+      audience: "Define the current client, project sponsor, technical owner, users, systems, dependencies, access needs, data assumptions, and decision makers for the development effort.",
+      deliverables: "Discovery notes, requirements summary, implementation plan, configured or developed components, review environments, testing support, documentation, deployment handoff, and acceptance checkpoints can be described here when current scope supports them.",
+      valueNarrative: "The value story is reducing delivery ambiguity by turning a requested build into phased work, named responsibilities, review points, and source-traceable acceptance criteria.",
+      nextSteps: "1. Confirm functional scope, exclusions, technical dependencies, and approval owners.\n2. Review current estimate pricing, services records, schedule, acceptance criteria, and change-control path.\n3. Approve the SOW only after legal and commercial terms are reviewed.",
+      terms: "Legal/commercial review required. Fees, milestone timing, acceptance standards, intellectual-property ownership, warranties, support, security duties, and change-order terms must come from current approved records."
+    }
+  },
+  "154100": {
+    basePreset: "services",
+    displayName: "E-Commerce Website SOW Starter",
+    fields: {
+      title: "E-Commerce Website Statement of Work",
+      subtitle: "Review-required framework for storefront build, integrations, launch, and support",
+      overview: "This SOW starter structures e-commerce website work as a reviewed project plan. It removes historical commercial specifics and leaves platform commitments, payment handling, launch obligations, support, and legal terms for current approval.",
+      audience: "Document the current store owner, platform, product catalog, payment processor, tax/shipping assumptions, content owners, integration needs, launch date, training users, and approval process.",
+      deliverables: "Storefront setup, theme or page configuration, product/catalog import support, checkout and payment configuration, shipping/tax settings, content placement, testing, launch support, and training can be included when approved.",
+      valueNarrative: "The value story is a cleaner buying path: product information, checkout, fulfillment assumptions, and launch readiness are coordinated in one reviewed SOW.",
+      nextSteps: "1. Confirm platform, catalog, payment, fulfillment, and content responsibilities.\n2. Review current estimate pricing, services scope, integrations, launch timeline, and post-launch support.\n3. Route legal/commercial language for review before client reliance.",
+      terms: "Legal/commercial review required. Payment processing, taxes, shipping, third-party apps, data handling, accessibility, support levels, fees, timeline, and acceptance terms require current approval."
+    }
+  },
+  "171207": {
+    basePreset: "services",
+    displayName: "Informational Website SOW Starter",
+    fields: {
+      title: "Informational Website Statement of Work",
+      subtitle: "Review-required framework for content, design, build, launch, and handoff",
+      overview: "This SOW starter describes an informational website project as a controlled scope with content, page structure, review cycles, launch tasks, and handoff. It does not preserve historical pricing or legacy legal terms.",
+      audience: "Define the current organization, site goals, audience segments, sitemap, content owners, brand assets, integrations, hosting assumptions, launch dependencies, and review owners.",
+      deliverables: "Site planning, page templates, content placement, responsive build, forms or basic integrations, review rounds, launch checklist, analytics handoff, and training notes can be described based on current scope.",
+      valueNarrative: "The value story is a professional web presence with clear messaging, maintainable content, and a documented path from draft pages to launch approval.",
+      nextSteps: "1. Confirm sitemap, content readiness, brand assets, integrations, and launch owner.\n2. Review active estimate pricing, timeline, approval rounds, hosting, accessibility, and support assumptions.\n3. Approve the working SOW only after legal/commercial terms are reviewed.",
+      terms: "Legal/commercial review required. Content ownership, accessibility obligations, hosting, third-party services, launch acceptance, fees, timeline, warranty, and support terms must come from current approved records."
+    }
+  },
+  "573546": {
+    basePreset: "internalReview",
+    displayName: "IT Services SOW Starter",
+    fields: {
+      title: "IT Services Statement of Work",
+      subtitle: "Review-required framework for technical support, access, service levels, and exclusions",
+      overview: "This SOW starter organizes IT services around current systems, access, responsibilities, service boundaries, and support expectations. It is not approved managed-service or security language and must be reviewed before use.",
+      audience: "Identify the current client environment, systems in scope, administrators, access method, security constraints, support contacts, service windows, excluded systems, and escalation path.",
+      deliverables: "Assessment, configuration support, user or device support, maintenance tasks, documentation, escalation handling, reporting, and handoff notes can be described only where current services records authorize them.",
+      valueNarrative: "The value story is operational clarity: who can request support, what systems are covered, how work is prioritized, and what remains outside the service boundary.",
+      nextSteps: "1. Confirm systems, credentials/access approach, service hours, response expectations, and exclusions.\n2. Review current services pricing, support coverage, security obligations, and escalation path.\n3. Obtain legal/commercial approval before customer-facing use.",
+      terms: "Legal/commercial/security review required. Access controls, credentials, service levels, data handling, exclusions, emergency response, fees, term, cancellation, and liability language require current approval."
+    }
+  },
+  "406423": {
+    basePreset: "services",
+    displayName: "Print Editing and Marketing Platform SOW Starter",
+    fields: {
+      title: "Print Editing and Marketing Platform Statement of Work",
+      subtitle: "Review-required framework for print workflow, platform configuration, approvals, and campaign support",
+      overview: "This SOW starter combines print-editing workflow and marketing-platform work into a neutral drafting structure. It avoids preserving historical parties, account details, fixed prices, signatures, or legacy legal/commercial commitments.",
+      audience: "Define the current campaign owner, print assets, editable templates, data inputs, approval users, platform environment, production dependencies, compliance assumptions, and delivery channels.",
+      deliverables: "Template review, copy or artwork editing, platform configuration, data-field mapping, proofing workflow, approval checkpoints, production handoff, campaign support, and reporting notes can be included when current records support them.",
+      valueNarrative: "The value story is a controlled production workflow: campaign teams can revise, approve, and hand off print or platform materials with clearer source records and fewer undocumented assumptions.",
+      nextSteps: "1. Confirm print assets, platform scope, user roles, data flows, and proofing responsibilities.\n2. Review estimate pricing, services records, production schedule, approvals, and compliance-sensitive language.\n3. Approve the SOW only after legal and commercial review.",
+      terms: "Legal/commercial review required. Print production obligations, platform access, data handling, proof approvals, fees, turnaround, change control, signatures, and service terms must come from current approved records."
+    }
+  },
+  "603333": {
+    basePreset: "services",
+    displayName: "Sharpdots Services Brochure Starter",
     fields: {
       title: "Sharpdots Services Overview",
-      subtitle: "Internal review draft for connected proposal output",
-      overview: "This starter gives the team a neutral overview format for reviewing how Sharpdots services, estimate pricing, sourcing, and operational sections fit together before external use.",
-      audience: "Summarize the internal review audience, intended decision, open assumptions, and any sections that should remain internal-only.",
-      deliverables: "Use this area to describe the proposed service modules and connected operational records that need review. It should point reviewers to current calculated sections instead of restating prices manually.",
-      valueNarrative: "Internal review should test whether the proposal tells a coherent business story and whether each computed section is sourced from the right current record.",
-      nextSteps: "1. Review source record readiness.\n2. Resolve missing estimates, services, sourcing, print quote, or ecomm records.\n3. Decide whether the draft is ready for a client-facing template.",
-      terms: "This internal starter is not client-ready legal language. Replace it with reviewed terms before any external reliance."
+      subtitle: "Service-capability collateral for campaign, print, data, and operations discussions",
+      overview: "This brochure starter gives the team a neutral services overview that can be tailored to the current opportunity. It avoids treating legacy service descriptions as current product truth and points pricing back to active Estimator records.",
+      audience: "Summarize the buyer context, campaign goal, operational needs, relevant service areas, existing records, and open assumptions that need review before this overview is shared.",
+      deliverables: "Service strategy, estimating support, production coordination, data or audience work, campaign operations, sourcing support, and reporting handoff can be described when current records support those modules.",
+      valueNarrative: "The value story is coordination: connect planning, production, data, and campaign execution so the client can review one coherent service plan.",
+      nextSteps: "1. Confirm the service modules relevant to the current opportunity.\n2. Review estimate pricing, services calculator records, sourcing, and schedule.\n3. Approve the working copy after current product packaging and claims are checked.",
+      terms: "Service descriptions, availability, fees, turnaround, vendor dependencies, and client responsibilities require current review before external reliance."
     }
   }
 };
 
 const proposalNarrativeFields = ["title", "subtitle", "preparedFor", "overview", "audience", "deliverables", "valueNarrative", "nextSteps", "terms"];
+const proposalTemplateStatusLabels = {
+  "source-cataloged": "Cataloged source",
+  "sanitized-starter": "Sanitized starter",
+  "review-held": "Review required"
+};
 let proposalPreviewEditMode = false;
 
 function proposalCatalogEntry(id) {
@@ -3101,6 +3484,10 @@ function proposalCatalogEntry(id) {
 
 function proposalStarterEntry(id) {
   return proposalStarterTemplates[String(id || "")] || null;
+}
+
+function proposalTemplateStatusLabel(status) {
+  return proposalTemplateStatusLabels[status] || "Cataloged source";
 }
 
 function proposalTemplateCategories() {
@@ -3215,7 +3602,7 @@ function renderProposalTemplateLibrary() {
   entries.forEach((entry) => {
     const option = document.createElement("option");
     option.value = entry.id;
-    option.textContent = `${entry.id} - ${entry.name}${proposalStarterEntry(entry.id) ? " (starter)" : " (metadata)"}`;
+    option.textContent = `${entry.id} - ${entry.name} (${proposalTemplateStatusLabel(entry.status)})`;
     els.proposalTemplateSelect.append(option);
   });
   if (entries.some((entry) => entry.id === previous)) els.proposalTemplateSelect.value = previous;
@@ -3225,7 +3612,7 @@ function renderProposalTemplateLibrary() {
   if (els.proposalTemplateSourceSummary) {
     els.proposalTemplateSourceSummary.innerHTML = selected
       ? `
-        <strong>${escapeHtml(selected.status === "starter" ? "Sanitized starter" : "Metadata only")}</strong>
+        <strong>${escapeHtml(proposalTemplateStatusLabel(selected.status))}</strong>
         <span>${escapeHtml(selected.category)} / ${selected.pages} pages / source ${selected.id}</span>
         <small>${escapeHtml(selected.qualityNotes)}</small>
       `
@@ -3438,7 +3825,7 @@ function normalizeProposalTemplateMeta(value = null) {
     category: source.category,
     basePreset: value.basePreset || proposalStarterEntry(source.id)?.basePreset || "directMail",
     sourceRevision: asNumber(value.sourceRevision || 1) || 1,
-    starterStatus: value.starterStatus || (proposalStarterEntry(source.id) ? "sanitized-starter" : "catalog-metadata")
+    starterStatus: value.starterStatus || (proposalStarterEntry(source.id) ? "sanitized-starter" : source.status || "source-cataloged")
   };
 }
 
@@ -3806,14 +4193,14 @@ function renderProposalPublishingActions() {
   renderProposalPublishingReadiness();
   renderProposalPublishingManifestReadout();
   if (els.proposalTemplateStatus) {
-    els.proposalTemplateStatus.textContent = matchesTemplate ? "Matches fixed template" : "Modified from fixed template";
+    els.proposalTemplateStatus.textContent = matchesTemplate ? "Matches output preset" : "Modified from output preset";
     els.proposalTemplateStatus.classList.toggle("modified", !matchesTemplate);
   }
   if (els.resetProposalTemplateBtn) {
     els.resetProposalTemplateBtn.disabled = matchesTemplate;
     els.resetProposalTemplateBtn.title = matchesTemplate
-      ? "Current publishing setup already matches the selected fixed template."
-      : "Restore the selected fixed template's pricing view, audience, output, and included sections.";
+      ? "Current publishing setup already matches the selected output preset."
+      : "Restore the selected output preset's pricing view, audience, output, and included sections.";
   }
   if (els.proposalPublishPdfBtn) {
     els.proposalPublishPdfBtn.classList.remove("ghost-btn");

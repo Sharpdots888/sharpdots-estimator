@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>P003-W044 Agreement and SOW Content Batch</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #171a1f;
+      --panel: #222831;
+      --panel-2: #28313b;
+      --text: #f5f7fb;
+      --muted: #bac4d1;
+      --line: #44505f;
+      --green: #45d483;
+      --amber: #f0b85a;
+      --blue: #89bfff;
+      --radius: 8px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.5; }
+    header { padding: 32px 24px; border-bottom: 1px solid var(--line); background: #20262e; }
+    main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 22px 0 40px; display: grid; gap: 16px; }
+    h1, h2, h3 { margin: 0; line-height: 1.1; letter-spacing: 0; }
+    h1 { font-size: clamp(32px, 5vw, 54px); max-width: 980px; }
+    h2 { font-size: clamp(22px, 3vw, 32px); }
+    h3 { font-size: 18px; }
+    p { margin: 0; color: var(--muted); }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #d8e8ff; }
+    section { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); padding: 18px; }
+    ul { margin: 10px 0 0; padding-left: 20px; color: var(--muted); }
+    li + li { margin-top: 6px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; min-width: 860px; }
+    th, td { padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: #d9e7ff; font-size: 12px; text-transform: uppercase; background: var(--panel-2); }
+    td { color: var(--muted); font-size: 13px; }
+    .wrap { overflow: auto; border: 1px solid var(--line); border-radius: var(--radius); }
+    .kicker { color: var(--green); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+    .deck { max-width: 840px; margin-top: 10px; font-size: 18px; }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .pill { border: 1px solid var(--green); border-radius: 999px; padding: 5px 10px; color: #c8f8d8; background: #173827; font-size: 12px; font-weight: 800; }
+    .pill.amber { border-color: var(--amber); background: #3a2d18; color: #ffe0ad; }
+    .pill.blue { border-color: var(--blue); background: #1d3047; color: #d8e8ff; }
+    .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .metric { border: 1px solid var(--line); background: var(--panel-2); border-radius: var(--radius); padding: 14px; }
+    .metric strong { display: block; font-size: 30px; color: var(--green); line-height: 1; }
+    .metric span { display: block; margin-top: 6px; color: var(--muted); font-size: 13px; }
+    .status { border-left: 4px solid var(--green); }
+    .warn { border-left: 4px solid var(--amber); }
+    .checks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .check { background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; color: var(--muted); }
+    .check strong { display: block; color: var(--text); }
+    @media (max-width: 800px) {
+      .grid, .checks { grid-template-columns: 1fr; }
+      header { padding: 24px 18px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="kicker">P003-W044 / SharpDots Estimator / Agreement and statement-of-work content batch</div>
+    <h1>The Agreement and SOW sources are now loadable sanitized starters.</h1>
+    <p class="deck">This bounded run converted the three Agreement and five Statement-of-work records from the reviewed 30-source inventory into structured starter templates inside the existing Publishing workflow. Historical parties, account details, signatures, fixed fees, legacy legal terms, and customer-specific commercial facts were not carried forward.</p>
+    <div class="pill-row">
+      <span class="pill">8 Agreement/SOW starters</span>
+      <span class="pill blue">30 of 30 sources loadable</span>
+      <span class="pill amber">Legal/commercial review warnings retained</span>
+      <span class="pill amber">No database or live work</span>
+    </div>
+  </header>
+  <main>
+    <section class="status">
+      <h2>Result</h2>
+      <div class="grid" style="margin-top:14px">
+        <div class="metric"><strong>30</strong><span>source catalog records remain traceable</span></div>
+        <div class="metric"><strong>8</strong><span>Agreement/SOW sources now load as starters</span></div>
+        <div class="metric"><strong>30</strong><span>total sanitized starters in Publishing</span></div>
+        <div class="metric"><strong>0</strong><span>schema, auth, config, deploy, or external writes</span></div>
+      </div>
+      <ul>
+        <li>Updated all three Agreement entries and all five Statement-of-work entries to <code>sanitized-starter</code>.</li>
+        <li>Added starter copy for service-agreement, NDA, tax/compliance print agreement, development SOW, e-commerce website SOW, informational website SOW, IT services SOW, and print/platform SOW use cases.</li>
+        <li>Updated the Publishing source count to show <code>30 catalog entries / 30 sanitized starters</code>.</li>
+        <li>Kept source IDs, filenames, page counts, checksums, category, and source identity metadata in the existing catalog.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Converted Sources</h2>
+      <p>Every row below has a corresponding loadable starter in <code>proposalStarterTemplates</code> and a <code>sanitized-starter</code> catalog status in <code>app.js</code>.</p>
+      <div class="wrap">
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Category</th><th>Starter</th><th>Source shape retained</th><th>Review warning</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>158076</td><td>Agreement</td><td>Agency Services Agreement Draft</td><td>Framework for service scope, responsibilities, fees, acceptance, IP, confidentiality, and signatures.</td><td>Legal/commercial review required before use; historical parties, fees, terms, and signatures are not current truth.</td></tr>
+            <tr><td>190931</td><td>Agreement</td><td>Mutual Non-Disclosure Agreement Draft</td><td>Confidentiality framework for parties, purpose, covered information, exclusions, duration, and remedies.</td><td>Legal/commercial review required before sharing or signing; party identity, business purpose, and all confidentiality terms require current approval.</td></tr>
+            <tr><td>236848</td><td>Agreement</td><td>Printed Sales Messages Agreement Draft</td><td>Tax/compliance review checklist for printed-sales-message production and related certification assumptions.</td><td>Tax/legal/commercial review required; Regulation 1541.5 applicability and certificates are not approved by this starter.</td></tr>
+            <tr><td>509122</td><td>Statement of work</td><td>Development Statement of Work</td><td>Discovery, build, validation, handoff, acceptance, support, and change-control framework.</td><td>Legal/commercial review required for acceptance, IP, warranty, support, fees, and timeline language.</td></tr>
+            <tr><td>154100</td><td>Statement of work</td><td>E-Commerce Website Statement of Work</td><td>Storefront build, catalog, checkout, integrations, launch, training, and support framework.</td><td>Legal/commercial review required for payment, tax, shipping, apps, data, support, fees, and acceptance terms.</td></tr>
+            <tr><td>171207</td><td>Statement of work</td><td>Informational Website Statement of Work</td><td>Content, sitemap, responsive build, forms, launch, analytics, and handoff framework.</td><td>Legal/commercial review required for content ownership, accessibility, hosting, fees, timeline, warranty, and support terms.</td></tr>
+            <tr><td>573546</td><td>Statement of work</td><td>IT Services Statement of Work</td><td>Systems, access, support contacts, service windows, maintenance, escalation, and exclusions framework.</td><td>Legal/commercial/security review required for access, credentials, service levels, data, fees, and liability language.</td></tr>
+            <tr><td>406423</td><td>Statement of work</td><td>Print Editing and Marketing Platform SOW</td><td>Print workflow, template editing, platform configuration, proofing, approvals, and production handoff framework.</td><td>Legal/commercial review required for print obligations, data flows, platform access, approvals, fees, and change control.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="warn">
+      <h2>Safety Notes</h2>
+      <ul>
+        <li>These are drafting starters for the Publishing workflow, not approved legal documents, SOWs, pricing, or customer-facing terms.</li>
+        <li>Pricing, schedule, services, sourcing, print quote, and ecomm sections remain computed/read-only from current Estimator records.</li>
+        <li>Each Agreement/SOW starter includes legal/commercial review language so historical language is not treated as current policy.</li>
+        <li>No database, schema, migration, startup, auth, secret, configuration, production data, remote write, PR, merge, deploy, or live environment work was performed.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Validation</h2>
+      <div class="checks">
+        <div class="check"><strong>Syntax</strong><code>node --check app.js</code>, <code>node --check server.js</code>, and validator syntax passed.</div>
+        <div class="check"><strong>Focused validator</strong>Passed with 30 catalog entries, 30 sanitized starters, 3 Agreement starters, 5 Statement-of-work starters, and 9 editable narrative fields.</div>
+        <div class="check"><strong>Whitespace</strong><code>git diff --check</code> passed.</div>
+        <div class="check"><strong>Content safety</strong>The validator requires Agreement/SOW starters to carry legal/commercial review language and keeps blocked historical/source-token checks in place.</div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
