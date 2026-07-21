@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>P003-W043 Collateral Content Batch</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #171a1f;
+      --panel: #222831;
+      --panel-2: #28313b;
+      --text: #f5f7fb;
+      --muted: #bac4d1;
+      --line: #44505f;
+      --green: #45d483;
+      --amber: #f0b85a;
+      --blue: #89bfff;
+      --radius: 8px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.5; }
+    header { padding: 32px 24px; border-bottom: 1px solid var(--line); background: #20262e; }
+    main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 22px 0 40px; display: grid; gap: 16px; }
+    h1, h2, h3 { margin: 0; line-height: 1.1; letter-spacing: 0; }
+    h1 { font-size: clamp(32px, 5vw, 54px); max-width: 980px; }
+    h2 { font-size: clamp(22px, 3vw, 32px); }
+    h3 { font-size: 18px; }
+    p { margin: 0; color: var(--muted); }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #d8e8ff; }
+    section { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); padding: 18px; }
+    ul { margin: 10px 0 0; padding-left: 20px; color: var(--muted); }
+    li + li { margin-top: 6px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; min-width: 820px; }
+    th, td { padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: #d9e7ff; font-size: 12px; text-transform: uppercase; background: var(--panel-2); }
+    td { color: var(--muted); font-size: 13px; }
+    .wrap { overflow: auto; border: 1px solid var(--line); border-radius: var(--radius); }
+    .kicker { color: var(--green); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+    .deck { max-width: 820px; margin-top: 10px; font-size: 18px; }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .pill { border: 1px solid var(--green); border-radius: 999px; padding: 5px 10px; color: #c8f8d8; background: #173827; font-size: 12px; font-weight: 800; }
+    .pill.amber { border-color: var(--amber); background: #3a2d18; color: #ffe0ad; }
+    .pill.blue { border-color: var(--blue); background: #1d3047; color: #d8e8ff; }
+    .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .metric { border: 1px solid var(--line); background: var(--panel-2); border-radius: var(--radius); padding: 14px; }
+    .metric strong { display: block; font-size: 30px; color: var(--green); line-height: 1; }
+    .metric span { display: block; margin-top: 6px; color: var(--muted); font-size: 13px; }
+    .status { border-left: 4px solid var(--green); }
+    .warn { border-left: 4px solid var(--amber); }
+    .checks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .check { background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; color: var(--muted); }
+    .check strong { display: block; color: var(--text); }
+    @media (max-width: 800px) {
+      .grid, .checks { grid-template-columns: 1fr; }
+      header { padding: 24px 18px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="kicker">P003-W043 / SharpDots Estimator / Addendum and brochure content batch</div>
+    <h1>The Addendum and Brochure sources are now loadable sanitized starters.</h1>
+    <p class="deck">This bounded run converted the one Addendum and seven Brochure records from the reviewed 30-source inventory into structured starter templates inside the existing Publishing workflow. Historical customer specifics, fixed prices, contact details, legacy legal language, and unreviewed claims were not carried forward.</p>
+    <div class="pill-row">
+      <span class="pill">8 collateral starters</span>
+      <span class="pill blue">30 catalog entries preserved</span>
+      <span class="pill amber">Review warnings retained</span>
+      <span class="pill amber">No database or live work</span>
+    </div>
+  </header>
+  <main>
+    <section class="status">
+      <h2>Result</h2>
+      <div class="grid" style="margin-top:14px">
+        <div class="metric"><strong>30</strong><span>source catalog records remain traceable</span></div>
+        <div class="metric"><strong>8</strong><span>Addendum/Brochure sources now load as starters</span></div>
+        <div class="metric"><strong>22</strong><span>total sanitized starters in Publishing</span></div>
+        <div class="metric"><strong>0</strong><span>schema, auth, config, deploy, or external writes</span></div>
+      </div>
+      <ul>
+        <li>Added sanitized starter content for the Marketing Automation Platform Addendum and six brochure entries that were metadata-only before this run.</li>
+        <li>Converted the existing Sharpdots Services brochure starter from an internal-only overview into a review-flagged services brochure starter.</li>
+        <li>Updated the Publishing source count to show <code>30 catalog entries / 22 sanitized starters</code>.</li>
+        <li>Kept source IDs, filenames, page counts, checksums, category, and source identity metadata in the existing catalog.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Converted Sources</h2>
+      <p>Every row below has a corresponding loadable starter in <code>proposalStarterTemplates</code> and a <code>sanitized-starter</code> catalog status in <code>app.js</code>.</p>
+      <div class="wrap">
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Category</th><th>Starter</th><th>Source shape retained</th><th>Review warning</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>122606</td><td>Addendum</td><td>Marketing Automation Platform Addendum</td><td>Scope update for platform setup, campaign workflow, and managed automation.</td><td>Platform scope, claims, pricing, data handling, access responsibilities, and terms require current review.</td></tr>
+            <tr><td>268059</td><td>Brochure</td><td>Reverse Append Audience Enrichment</td><td>Data enhancement module for partial audience records and campaign readiness.</td><td>Match methods, privacy, deliverability claims, source permissions, and usage limits require current review.</td></tr>
+            <tr><td>400100</td><td>Brochure</td><td>Granular Advertising for Agencies</td><td>Agency-facing audience planning, activation, production coordination, and reporting.</td><td>Capabilities, campaign claims, white-label responsibilities, channels, and pricing require current review.</td></tr>
+            <tr><td>167688</td><td>Brochure</td><td>Aggregated Audience Activation</td><td>Location-and-time audience module for focused campaign planning.</td><td>Source claims, data rights, matching methods, measurements, and fees require current review.</td></tr>
+            <tr><td>268077</td><td>Brochure</td><td>OTT Campaign Planning</td><td>Streaming media audience, creative, flighting, and performance summary module.</td><td>Channel availability, targeting options, media spend handling, and measurement claims require current review.</td></tr>
+            <tr><td>420259</td><td>Brochure</td><td>Audience Targeting Technologies</td><td>Capability overview for data inputs, targeting choices, activation, and optimization.</td><td>Data sources, targeting eligibility, privacy obligations, platform availability, and performance claims require current review.</td></tr>
+            <tr><td>151844</td><td>Brochure</td><td>Experiential Agency Audience Activation</td><td>Event-centered audience and follow-up module for agency programs.</td><td>Event-data rights, venue permissions, activation channels, and measurement methods require current review.</td></tr>
+            <tr><td>603333</td><td>Brochure</td><td>Sharpdots Services Overview</td><td>Service-capability collateral for campaign, print, data, and operations discussions.</td><td>Product packaging, service descriptions, fees, turnaround, vendor dependencies, and client responsibilities require current review.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="warn">
+      <h2>Safety Notes</h2>
+      <ul>
+        <li>These are drafting starters for the Publishing workflow, not approved customer-facing copy.</li>
+        <li>Pricing, schedule, services, sourcing, print quote, and ecomm sections remain computed/read-only from current Estimator records.</li>
+        <li>Each collateral starter includes review-required language so historical product, data, pricing, legal, and performance claims are not treated as current truth.</li>
+        <li>No Proposal, Agreement, Statement-of-work, database, schema, migration, auth, configuration, production data, remote write, PR, merge, deploy, or live environment work was performed.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Validation</h2>
+      <div class="checks">
+        <div class="check"><strong>Syntax</strong><code>node --check app.js</code>, <code>node --check server.js</code>, and validator syntax passed.</div>
+        <div class="check"><strong>Focused validator</strong>Passed with 30 catalog entries, 22 sanitized starters, 8 collateral catalog entries, 8 collateral starters, and 9 editable narrative fields.</div>
+        <div class="check"><strong>Whitespace</strong><code>git diff --check</code> passed.</div>
+        <div class="check"><strong>Content safety</strong>The validator requires every collateral starter to carry review language and keeps blocked historical/source-token checks in place.</div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

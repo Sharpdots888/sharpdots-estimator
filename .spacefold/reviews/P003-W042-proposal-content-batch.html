@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>P003-W042 Proposal Content Batch</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #171a1f;
+      --panel: #222831;
+      --panel-2: #28313b;
+      --text: #f5f7fb;
+      --muted: #bac4d1;
+      --line: #44505f;
+      --green: #45d483;
+      --amber: #f0b85a;
+      --blue: #89bfff;
+      --red: #ff8a73;
+      --radius: 8px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.5; }
+    header { padding: 32px 24px; border-bottom: 1px solid var(--line); background: #20262e; }
+    main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 22px 0 40px; display: grid; gap: 16px; }
+    h1, h2, h3 { margin: 0; line-height: 1.1; letter-spacing: 0; }
+    h1 { font-size: clamp(32px, 5vw, 54px); max-width: 940px; }
+    h2 { font-size: clamp(22px, 3vw, 32px); }
+    h3 { font-size: 18px; }
+    p { margin: 0; color: var(--muted); }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #d8e8ff; }
+    section { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); padding: 18px; }
+    ul { margin: 10px 0 0; padding-left: 20px; color: var(--muted); }
+    li + li { margin-top: 6px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; min-width: 760px; }
+    th, td { padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: #d9e7ff; font-size: 12px; text-transform: uppercase; background: var(--panel-2); }
+    td { color: var(--muted); font-size: 13px; }
+    .wrap { overflow: auto; border: 1px solid var(--line); border-radius: var(--radius); }
+    .kicker { color: var(--green); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+    .deck { max-width: 780px; margin-top: 10px; font-size: 18px; }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .pill { border: 1px solid var(--green); border-radius: 999px; padding: 5px 10px; color: #c8f8d8; background: #173827; font-size: 12px; font-weight: 800; }
+    .pill.amber { border-color: var(--amber); background: #3a2d18; color: #ffe0ad; }
+    .pill.blue { border-color: var(--blue); background: #1d3047; color: #d8e8ff; }
+    .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .metric { border: 1px solid var(--line); background: var(--panel-2); border-radius: var(--radius); padding: 14px; }
+    .metric strong { display: block; font-size: 30px; color: var(--green); line-height: 1; }
+    .metric span { display: block; margin-top: 6px; color: var(--muted); font-size: 13px; }
+    .status { border-left: 4px solid var(--green); }
+    .warn { border-left: 4px solid var(--amber); }
+    .checks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .check { background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; color: var(--muted); }
+    .check strong { display: block; color: var(--text); }
+    @media (max-width: 800px) {
+      .grid, .checks { grid-template-columns: 1fr; }
+      header { padding: 24px 18px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="kicker">P003-W042 / SharpDots Estimator / Proposal content batch</div>
+    <h1>All 14 Proposal sources are now loadable sanitized starters.</h1>
+    <p class="deck">This run converted the Proposal-category cohort from the Better Proposals native PDF archive into structured starter templates inside the existing Publishing workflow. Historical customer, contact, account, fixed pricing, credential, and legacy legal content was not carried forward.</p>
+    <div class="pill-row">
+      <span class="pill">14 Proposal starters</span>
+      <span class="pill blue">30 catalog entries preserved</span>
+      <span class="pill amber">No database or live work</span>
+    </div>
+  </header>
+  <main>
+    <section class="status">
+      <h2>Result</h2>
+      <div class="grid" style="margin-top:14px">
+        <div class="metric"><strong>30</strong><span>source catalog records remain traceable</span></div>
+        <div class="metric"><strong>14</strong><span>Proposal-category PDFs now load as starters</span></div>
+        <div class="metric"><strong>15</strong><span>total sanitized starters including the preserved services overview</span></div>
+        <div class="metric"><strong>0</strong><span>schema, auth, config, deploy, or external writes</span></div>
+      </div>
+      <ul>
+        <li>Added sanitized starter content for the remaining Proposal source IDs and preserved the existing Omni Mail, Sales Machine, and Sharpdots Services starters.</li>
+        <li>Updated catalog status and quality notes so Proposal entries display as sanitized starters with source warnings.</li>
+        <li>Kept loading, rename-copy, reset-to-source, editable narrative fields, and read-only calculated sections on the existing Proposal JSON path.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Converted Sources</h2>
+      <p>The table shows the Proposal cohort represented in the app. Source IDs, filenames, page counts, and checksums remain in <code>app.js</code>; default text is sanitized and generalized.</p>
+      <div class="wrap">
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Starter</th><th>Source shape retained</th><th>Warning applied</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>734472</td><td>Capture Audience</td><td>Audience intelligence, cross-channel activation, dashboard review.</td><td>Claims, channels, and eligibility require current review.</td></tr>
+            <tr><td>131263</td><td>Aggregated Audience</td><td>Location/time window, campaign build, activation, matchback.</td><td>Legacy CPMs and fixed fees removed.</td></tr>
+            <tr><td>314145</td><td>Capture Pixel</td><td>Visitor capture, filtering, follow-up activation.</td><td>Identification rates and data-use claims require review.</td></tr>
+            <tr><td>272773</td><td>Data Services</td><td>Data append, cleanup, audience sourcing, analysis.</td><td>Historical line-item pricing removed.</td></tr>
+            <tr><td>487336</td><td>Social Ad Campaign</td><td>Paid social setup, landing-page coordination, optimization.</td><td>Legacy fixed fee and terms removed.</td></tr>
+            <tr><td>140631</td><td>Location-Based Ads</td><td>Address/list targeting, campaign activation, lead capture.</td><td>Data-use rights and match assumptions require review.</td></tr>
+            <tr><td>556333</td><td>Machine Learning Project</td><td>Discovery, data staging, model build, QA, handoff.</td><td>Client scenario, rates, and staff claims generalized.</td></tr>
+            <tr><td>182333</td><td>Marketing Automation Tier 1</td><td>Data clarity, workflow strategy, first-stage automation.</td><td>Tier packaging and source statistics require review.</td></tr>
+            <tr><td>155858</td><td>Marketing Automation Tier 2</td><td>Lead-generation system, nurture, qualification.</td><td>Package claims and pricing removed.</td></tr>
+            <tr><td>170605</td><td>Neighbor Targeting</td><td>New-mover segment targeting and local activation.</td><td>Known clipped page-1 heading; not a visual baseline.</td></tr>
+            <tr><td>329536</td><td>Omni Mail</td><td>Preserved Phase-1 direct-mail campaign starter.</td><td>Historical customer details remain excluded.</td></tr>
+            <tr><td>169895</td><td>Real Time Movers</td><td>Mover-segment targeting with rapid updates.</td><td>Legacy pricing and legal terms removed.</td></tr>
+            <tr><td>314224</td><td>Sales Machine</td><td>Preserved Phase-1 services starter.</td><td>Historical customer details remain excluded.</td></tr>
+            <tr><td>138958</td><td>Virtual Venue</td><td>Historical-location audience building and activation.</td><td>Location-data assumptions require review.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="warn">
+      <h2>Safety Notes</h2>
+      <ul>
+        <li>The source PDFs were read from the operator-supplied native PDF archive; raw PDF text was used only for local conversion and is not copied into this review.</li>
+        <li>Pricing, schedules, services, sourcing, print quote, and ecomm sections remain computed/read-only from current Estimator records.</li>
+        <li>Client-facing use still requires human review. The templates are loadable drafting starters, not approved legal, pricing, privacy, or product-claims truth.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Validation</h2>
+      <div class="checks">
+        <div class="check"><strong>Syntax</strong><code>node --check app.js</code>, <code>node --check server.js</code>, and validator syntax passed.</div>
+        <div class="check"><strong>Focused validator</strong>Passed with 30 catalog entries, 14 Proposal starters, 15 total sanitized starters, and 9 editable narrative fields.</div>
+        <div class="check"><strong>Whitespace</strong><code>git diff --check</code> passed.</div>
+        <div class="check"><strong>Content scan</strong>No new starter copy matched the blocked historical/source tokens. Remaining hits were pre-existing demo defaults and the validator's blocked-token list.</div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
