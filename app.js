@@ -225,6 +225,13 @@ function defaultProposal() {
 }
 
 let proposal = defaultProposal();
+let docusealConfiguration = {
+  configured: false,
+  emailDeliveryEnabled: false,
+  webhookVerificationConfigured: false,
+  mode: "checking"
+};
+let proposalDocumentTransactions = [];
 
 function defaultPrintQuoteValidUntil() {
   const date = new Date();
@@ -570,6 +577,7 @@ const els = {
   proposalPublishPdfBtn: document.querySelector("#proposalPublishPdfBtn"),
   proposalPublishCsvBtn: document.querySelector("#proposalPublishCsvBtn"),
   proposalSignatureBtn: document.querySelector("#proposalSignatureBtn"),
+  proposalSignatureStatus: document.querySelector("#proposalSignatureStatus"),
   proposalPublishSummary: document.querySelector("#proposalPublishSummary"),
   proposalPublishReadiness: document.querySelector("#proposalPublishReadiness"),
   proposalPublishManifest: document.querySelector("#proposalPublishManifest"),
@@ -621,6 +629,17 @@ const els = {
   proposalEcommSection: document.querySelector("#proposalEcommSection"),
   proposalEcommNote: document.querySelector("#proposalEcommNote"),
   proposalEcommLines: document.querySelector("#proposalEcommLines"),
+  docusealModal: document.querySelector("#docusealModal"),
+  closeDocusealBtn: document.querySelector("#closeDocusealBtn"),
+  cancelDocusealBtn: document.querySelector("#cancelDocusealBtn"),
+  createDocusealRequestBtn: document.querySelector("#createDocusealRequestBtn"),
+  docusealDialogMode: document.querySelector("#docusealDialogMode"),
+  docusealRecipientName: document.querySelector("#docusealRecipientName"),
+  docusealRecipientEmail: document.querySelector("#docusealRecipientEmail"),
+  docusealMessageSubject: document.querySelector("#docusealMessageSubject"),
+  docusealMessageBody: document.querySelector("#docusealMessageBody"),
+  docusealSendEmail: document.querySelector("#docusealSendEmail"),
+  docusealDialogStatus: document.querySelector("#docusealDialogStatus"),
   servicesView: document.querySelector("#servicesView"),
   sourcingView: document.querySelector("#sourcingView"),
   serviceScenario: document.querySelector("#serviceScenario"),
@@ -2045,7 +2064,10 @@ async function newWorkspaceRecord(collection) {
   activeWorkspaceRecords[collection] = isLibraryRecordCollection(collection)
     ? nextLibraryRecordNumber(collection)
     : nextWorkspaceRecordNumber(collection, type.prefix, type.numberKey, type.start);
-  if (collection === "proposals") proposal = defaultProposal();
+  if (collection === "proposals") {
+    proposal = defaultProposal();
+    proposalDocumentTransactions = [];
+  }
   if (collection === "services") {
     serviceScenario = "salesmachine";
     serviceRows = structuredClone(serviceSeedRows);
@@ -2104,6 +2126,7 @@ function applyWorkspaceRecord(collection, record, versionNumber = null, options 
   if (shouldActivate) setActiveView(type.viewId);
   if (shouldRender) render();
   if (shouldActivate) setSaveStatus(`Loaded ${record[type.numberKey]} v${record.version || 1}`);
+  if (collection === "proposals") fetchProposalDocumentTransactions();
 }
 
 function applyLibraryRecord(collection, record, versionNumber = null, options = {}) {
@@ -3766,6 +3789,217 @@ function setProposalEditorValues() {
   renderProposalPublishingActions();
 }
 
+const docusealProposalStyles = `
+  * { box-sizing: border-box; }
+  body { margin: 0; color: #1d2b34; background: #fff; font-family: Arial, Helvetica, sans-serif; font-size: 11px; line-height: 1.45; }
+  .proposal-page { width: 100%; margin: 0; padding: 0; background: #fff; }
+  .proposal-hero { padding: 26px; color: #fff; background: #1b2f3d; }
+  .proposal-hero > span { color: #b7d5ed; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+  .proposal-hero h2 { margin: 7px 0 4px; color: #fff; font-size: 34px; line-height: 1; }
+  .proposal-hero p { margin: 0; color: #dbe7ed; font-size: 15px; }
+  .proposal-meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 22px 0 0; }
+  .proposal-meta-grid div { border-top: 1px solid #6e7e89; padding-top: 8px; }
+  .proposal-meta-grid dt { color: #b7d5ed; font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+  .proposal-meta-grid dd { margin: 3px 0 0; color: #fff; font-weight: 700; }
+  .proposal-source-snapshot { display: flex; gap: 6px; margin-top: 9px; padding-bottom: 9px; border-bottom: 1px solid #d5dde2; color: #64727c; font-size: 8px; }
+  .proposal-source-snapshot span { padding: 2px 6px; border: 1px solid #d5dde2; border-radius: 10px; }
+  .proposal-source-snapshot strong { color: #1b2f3d; text-transform: uppercase; }
+  .proposal-copy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; padding-top: 22px; }
+  .proposal-copy-grid h3, .proposal-section-title h3 { margin: 0 0 6px; color: #1b2f3d; font-size: 14px; }
+  .proposal-copy-grid p, .proposal-section-title p { margin: 0; color: #33414a; white-space: pre-line; }
+  .proposal-pricing-section { margin-top: 24px; border-top: 4px solid #1b2f3d; padding-top: 15px; }
+  .proposal-output-section { margin-top: 20px; border-top: 2px solid #1b2f3d; padding-top: 13px; }
+  .proposal-section-title { display: flex; justify-content: space-between; gap: 18px; }
+  .proposal-section-title > strong { color: #1b2f3d; font-size: 24px; white-space: nowrap; }
+  .proposal-pricing-summary, .proposal-output-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin: 12px 0; }
+  .proposal-pricing-summary div, .proposal-output-summary div { border: 1px solid #d5dde2; border-radius: 4px; padding: 7px; background: #f7f9fa; }
+  .proposal-pricing-summary span, .proposal-output-summary span { display: block; color: #64727c; font-size: 8px; font-weight: 800; text-transform: uppercase; }
+  .proposal-pricing-summary strong, .proposal-output-summary strong { display: block; margin-top: 2px; color: #1b2f3d; font-size: 12px; }
+  .proposal-pricing-lines, .proposal-output-lines { display: grid; gap: 0; margin-top: 8px; }
+  .proposal-line, .proposal-output-line { display: grid; grid-template-columns: minmax(0, 1fr) 90px 100px 105px; gap: 8px; align-items: center; padding: 7px; border-bottom: 1px solid #e2e7ea; font-size: 9px; }
+  .proposal-output-line { grid-template-columns: minmax(0, 1.4fr) minmax(0, .8fr) minmax(0, .8fr) minmax(0, .45fr); }
+  .proposal-output-line.compact { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); }
+  .proposal-line.header, .proposal-output-line.header { color: #fff; background: #1b2f3d; font-size: 8px; font-weight: 800; text-transform: uppercase; }
+  .proposal-line small, .proposal-output-line small { display: block; color: #64727c; font-size: 8px; }
+  .proposal-publish-footer { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 24px; padding-top: 9px; border-top: 2px solid #1b2f3d; color: #64727c; font-size: 8px; }
+  .proposal-publish-footer div:last-child { text-align: right; }
+  .proposal-publish-footer strong, .proposal-publish-footer span { display: block; }
+  .proposal-publish-footer strong { color: #1b2f3d; text-transform: uppercase; }
+  .docuseal-acceptance { margin-top: 26px; padding-top: 15px; border-top: 3px solid #1b2f3d; page-break-inside: avoid; }
+  .docuseal-acceptance h3 { margin: 0 0 5px; color: #1b2f3d; font-size: 15px; }
+  .docuseal-acceptance p { margin: 0 0 14px; color: #33414a; }
+  .docuseal-signature-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 18px; align-items: end; }
+  .docuseal-field-label { display: block; margin-bottom: 5px; color: #64727c; font-size: 8px; font-weight: 800; text-transform: uppercase; }
+  [hidden] { display: none !important; }
+`;
+
+function frozenProposalHtml() {
+  const source = document.querySelector(".proposal-page");
+  if (!source) throw new Error("Proposal preview is unavailable");
+  const page = source.cloneNode(true);
+  page.querySelector("#proposalDraftBanner")?.remove();
+  page.querySelectorAll("[hidden]").forEach((node) => node.remove());
+  page.querySelectorAll("[id]").forEach((node) => node.removeAttribute("id"));
+  const acceptance = document.createElement("section");
+  acceptance.className = "docuseal-acceptance";
+  acceptance.innerHTML = `
+    <h3>Client Acceptance</h3>
+    <p>By signing below, the client accepts this proposal and authorizes Sharpdots to proceed under the scope, pricing, schedule, and terms shown in this document.</p>
+    <div class="docuseal-signature-grid">
+      <div>
+        <span class="docuseal-field-label">Authorized signature</span>
+        <signature-field name="Client Signature" role="Client" required="true" style="display: block; width: 360px; height: 72px; border-bottom: 1px solid #1b2f3d;"></signature-field>
+      </div>
+      <div>
+        <span class="docuseal-field-label">Date signed</span>
+        <date-field name="Date Signed" role="Client" required="true" style="display: block; width: 150px; height: 32px; border-bottom: 1px solid #1b2f3d;"></date-field>
+      </div>
+    </div>
+  `;
+  page.append(acceptance);
+  return `<!doctype html><html><head><meta charset="utf-8"><style>${docusealProposalStyles}</style></head><body>${page.outerHTML}</body></html>`;
+}
+
+function renderProposalSignatureStatus() {
+  if (!els.proposalSignatureStatus) return;
+  if (!docusealConfiguration.configured) {
+    const setupLabel = docusealConfiguration.mode === "checking"
+      ? ""
+      : docusealConfiguration.apiConfigured && !docusealConfiguration.databaseReady
+        ? "Database setup required"
+        : "API key setup required";
+    els.proposalSignatureStatus.innerHTML = docusealConfiguration.mode === "checking"
+      ? ""
+      : `<div class="signature-status-head"><strong>DocuSeal</strong><span>${escapeHtml(setupLabel)}</span></div>`;
+    return;
+  }
+  const latest = proposalDocumentTransactions.slice(0, 3);
+  els.proposalSignatureStatus.innerHTML = `
+    <div class="signature-status-head">
+      <strong>DocuSeal</strong>
+      <span>${escapeHtml(docusealConfiguration.emailDeliveryEnabled ? "Email sending enabled" : "Prepare-only mode")}</span>
+    </div>
+    ${latest.map((transaction) => `
+      <div class="signature-transaction" title="${escapeHtml(transaction.lastError || transaction.transactionId)}">
+        <div>
+          <strong>${escapeHtml(transaction.recipientEmail)}</strong>
+          <small>${escapeHtml(`${new Date(transaction.createdAt).toLocaleString()} · ${transaction.artifactCount || 0} archived file${Number(transaction.artifactCount || 0) === 1 ? "" : "s"}`)}</small>
+        </div>
+        <span class="signature-state ${escapeHtml(transaction.status)}">${escapeHtml(transaction.status)}</span>
+      </div>
+    `).join("")}
+  `;
+}
+
+async function fetchDocusealConfiguration() {
+  try {
+    const response = await fetch("/api/document-signing/status");
+    if (!response.ok) throw new Error("DocuSeal status unavailable");
+    docusealConfiguration = await response.json();
+  } catch {
+    docusealConfiguration = {
+      configured: false,
+      emailDeliveryEnabled: false,
+      webhookVerificationConfigured: false,
+      mode: "unavailable"
+    };
+  }
+  renderProposalPublishingActions();
+  if (docusealConfiguration.configured) fetchProposalDocumentTransactions();
+}
+
+async function fetchProposalDocumentTransactions() {
+  const proposalNumber = activeRecordNumber("proposals");
+  const savedProposal = savedRecordForCollection("proposals");
+  if (!docusealConfiguration.configured || !proposalNumber || !savedProposal) {
+    proposalDocumentTransactions = [];
+    renderProposalSignatureStatus();
+    return;
+  }
+  try {
+    const response = await fetch(`/api/document-transactions?proposalNumber=${encodeURIComponent(proposalNumber)}`);
+    if (!response.ok) throw new Error("Document history unavailable");
+    proposalDocumentTransactions = await response.json();
+  } catch {
+    proposalDocumentTransactions = [];
+  }
+  renderProposalSignatureStatus();
+}
+
+function closeDocusealDialog() {
+  if (!els.docusealModal) return;
+  els.docusealModal.hidden = true;
+  els.docusealDialogStatus.textContent = "";
+  els.docusealDialogStatus.classList.remove("error");
+}
+
+function openDocusealDialog() {
+  const manifest = proposalPublishingManifest();
+  if (!docusealConfiguration.configured || !manifest.ready || !proposalIsClientOutput()) return;
+  els.docusealRecipientName.value = proposal.preparedFor || els.clientName.value.trim();
+  els.docusealRecipientEmail.value = "";
+  els.docusealMessageSubject.value = `Please review and sign ${proposal.title || manifest.proposalNumber}`;
+  els.docusealMessageBody.value = "Please review and sign this proposal using the secure link below. {{submitter.link}}";
+  els.docusealSendEmail.checked = false;
+  els.docusealSendEmail.disabled = !docusealConfiguration.emailDeliveryEnabled;
+  els.docusealDialogMode.textContent = docusealConfiguration.emailDeliveryEnabled
+    ? "Prepare the request in DocuSeal, with optional immediate email delivery."
+    : "Creates the DocuSeal request without emailing the client. Email delivery remains locked on this server.";
+  els.createDocusealRequestBtn.textContent = "Prepare Request";
+  els.createDocusealRequestBtn.disabled = false;
+  els.docusealModal.hidden = false;
+  setTimeout(() => els.docusealRecipientEmail.focus(), 0);
+}
+
+async function createDocusealRequest() {
+  const manifest = proposalPublishingManifest();
+  const savedProposal = savedRecordForCollection("proposals");
+  const recipientEmail = els.docusealRecipientEmail.value.trim();
+  if (!recipientEmail || !els.docusealRecipientEmail.checkValidity()) {
+    els.docusealDialogStatus.textContent = "Enter a valid recipient email.";
+    els.docusealDialogStatus.classList.add("error");
+    return;
+  }
+  if (!manifest.ready || !savedProposal) {
+    els.docusealDialogStatus.textContent = "Save the proposal and all included source records first.";
+    els.docusealDialogStatus.classList.add("error");
+    return;
+  }
+  els.createDocusealRequestBtn.disabled = true;
+  els.createDocusealRequestBtn.textContent = "Preparing...";
+  els.docusealDialogStatus.classList.remove("error");
+  els.docusealDialogStatus.textContent = "Freezing the proposal and creating the DocuSeal request.";
+  try {
+    const response = await fetch("/api/document-transactions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        workspaceNumber: currentWorkspaceNumber,
+        proposalNumber: manifest.proposalNumber,
+        proposalVersion: savedProposal.version || 1,
+        recipientName: els.docusealRecipientName.value.trim(),
+        recipientEmail,
+        documentName: `${manifest.proposalNumber} ${proposal.title || "Proposal"}`,
+        documentHtml: frozenProposalHtml(),
+        proposalSnapshot: proposalSnapshotWithSources(manifest, { persist: false }),
+        messageSubject: els.docusealMessageSubject.value.trim(),
+        messageBody: els.docusealMessageBody.value.trim(),
+        sendEmail: els.docusealSendEmail.checked
+      })
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || "DocuSeal request failed");
+    closeDocusealDialog();
+    await fetchProposalDocumentTransactions();
+    setSaveStatus(`${result.proposalNumber} prepared in DocuSeal for ${result.recipientEmail}`);
+  } catch (error) {
+    els.docusealDialogStatus.textContent = error.message || "DocuSeal request failed";
+    els.docusealDialogStatus.classList.add("error");
+    els.createDocusealRequestBtn.disabled = false;
+    els.createDocusealRequestBtn.textContent = "Prepare Request";
+  }
+}
+
 function renderProposalPublishingActions() {
   const included = [...proposalIncludedSections()];
   const matchesTemplate = proposalMatchesTemplatePreset();
@@ -3834,15 +4068,31 @@ function renderProposalPublishingActions() {
       : `Export a ${audienceLower} CSV from the selected publishing sections.`;
   }
   if (els.proposalSignatureBtn) {
-    els.proposalSignatureBtn.disabled = true;
-    els.proposalSignatureBtn.textContent = "Handoff later";
-    els.proposalSignatureBtn.title = "Document signing and payment platform handoff will be connected later.";
+    const signatureReady = docusealConfiguration.configured
+      && manifest.ready
+      && proposalIsClientOutput();
+    els.proposalSignatureBtn.disabled = !signatureReady;
+    els.proposalSignatureBtn.textContent = docusealConfiguration.mode === "checking"
+      ? "Checking DocuSeal"
+      : "Prepare DocuSeal";
+    els.proposalSignatureBtn.title = !docusealConfiguration.configured
+      ? "Configure DocuSeal on the server before preparing a signing request."
+      : !proposalIsClientOutput()
+        ? "Switch the publishing audience to Client before preparing a signature request."
+        : !manifest.ready
+          ? "Save or attach every included source before preparing a signature request."
+          : docusealConfiguration.emailDeliveryEnabled
+            ? "Prepare a DocuSeal signature request, with optional email delivery."
+            : "Prepare a DocuSeal signature request without emailing the client.";
   }
   if (els.proposalPublishNote) {
     els.proposalPublishNote.textContent = hasPublishWarnings
       ? `${audienceName} preview output is available; save or attach flagged records before final output.`
-      : `Ready for ${audienceLower} PDF or CSV output. Document signing/payment handoff will be connected later.`;
+      : docusealConfiguration.configured
+        ? `Ready for ${audienceLower} output${proposalIsClientOutput() ? " and DocuSeal preparation" : ""}.`
+        : `Ready for ${audienceLower} PDF or CSV output. DocuSeal server setup is still required.`;
   }
+  renderProposalSignatureStatus();
 }
 
 function proposalLineName(row) {
@@ -10346,6 +10596,7 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && !els.loadEstimateModal.hidden) closeLoadEstimateDialog();
   if (event.key === "Escape" && !els.loadWorkspaceModal.hidden) closeLoadWorkspaceDialog();
   if (event.key === "Escape" && els.libraryRecordModal && !els.libraryRecordModal.hidden) closeLibraryRecordDialog();
+  if (event.key === "Escape" && els.docusealModal && !els.docusealModal.hidden) closeDocusealDialog();
 });
 els.addPackageBtn.addEventListener("click", addPackage);
 els.addProductBtn.addEventListener("click", addProduct);
@@ -10354,6 +10605,13 @@ els.exportBtn.addEventListener("click", exportCsv);
 els.pdfBtn.addEventListener("click", printReport);
 els.proposalPublishPdfBtn.addEventListener("click", printProposalPublishingOutput);
 els.proposalPublishCsvBtn.addEventListener("click", exportProposalPublishingCsv);
+els.proposalSignatureBtn?.addEventListener("click", openDocusealDialog);
+els.closeDocusealBtn?.addEventListener("click", closeDocusealDialog);
+els.cancelDocusealBtn?.addEventListener("click", closeDocusealDialog);
+els.createDocusealRequestBtn?.addEventListener("click", createDocusealRequest);
+els.docusealModal?.addEventListener("click", (event) => {
+  if (event.target === els.docusealModal) closeDocusealDialog();
+});
 window.addEventListener("beforeprint", prepareReportPrint);
 window.addEventListener("afterprint", restoreReportPrint);
 els.resetBtn.addEventListener("click", async () => {
@@ -10401,6 +10659,7 @@ async function init() {
   startBlankEstimate();
   setWorkspaceMode("full", { preferredView: "proposalView" });
   render();
+  fetchDocusealConfiguration();
   runProposalExportQaIfRequested();
   fetchAndApplySeed()
     .then(() => {
