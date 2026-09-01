@@ -55,13 +55,13 @@ const sowStarterIds = sowCatalogEntries.filter((entry) => starters[entry.id]).ma
 const sourceIds = new Set(catalog.map((entry) => entry.id));
 const narrativeFields = evalLiteral(extractConst("proposalNarrativeFields", "[", "]"));
 
-assert(catalog.length === 30, `Expected 30 catalog entries, found ${catalog.length}`);
-assert(new Set(catalog.map((entry) => entry.id)).size === 30, "Catalog IDs must be unique");
-assert(proposalCatalogEntries.length === 14, `Expected 14 proposal catalog entries, found ${proposalCatalogEntries.length}`);
-assert(starterIds.length === 30, `Expected all 30 starter templates after W044, found ${starterIds.length}`);
+assert(catalog.length === 31, `Expected 31 catalog entries, found ${catalog.length}`);
+assert(new Set(catalog.map((entry) => entry.id)).size === 31, "Catalog IDs must be unique");
+assert(proposalCatalogEntries.length === 15, `Expected 15 proposal catalog entries, found ${proposalCatalogEntries.length}`);
+assert(starterIds.length === 31, `Expected all 31 starter templates, found ${starterIds.length}`);
 assert(starterCatalogEntries.length === 0, "Deprecated starter status should not be used");
-assert(sanitizedStarterCatalogEntries.length === 30, `Expected 30 catalog entries marked sanitized-starter, found ${sanitizedStarterCatalogEntries.length}`);
-assert(proposalStarterIds.length === 14, `Expected all 14 proposal entries to be loadable, found ${proposalStarterIds.length}`);
+assert(sanitizedStarterCatalogEntries.length === 31, `Expected 31 catalog entries marked sanitized-starter, found ${sanitizedStarterCatalogEntries.length}`);
+assert(proposalStarterIds.length === 15, `Expected all 15 proposal entries to be loadable, found ${proposalStarterIds.length}`);
 assert(collateralCatalogEntries.length === 8, `Expected 8 addendum/brochure catalog entries, found ${collateralCatalogEntries.length}`);
 assert(collateralStarterIds.length === 8, `Expected all 8 addendum/brochure entries to be loadable, found ${collateralStarterIds.length}`);
 assert(agreementCatalogEntries.length === 3, `Expected 3 agreement catalog entries, found ${agreementCatalogEntries.length}`);
@@ -78,6 +78,13 @@ starterIds.forEach((id) => {
     assert(typeof starters[id].fields[field] === "string" && starters[id].fields[field].trim(), `Starter ${id} missing ${field}`);
   });
 });
+const petReactivationSource = catalog.find((entry) => entry.id === "728026");
+const petReactivationStarter = starters["728026"];
+assert(petReactivationSource?.checksum === "62458323e2eb612404dc0aa02d7b5a2e085b8c0fa44a0832d696403e01061ea1", "Pet reactivation starter must preserve source checksum traceability");
+assert(petReactivationStarter?.basePreset === "directMail", "Pet reactivation starter must use the direct-mail output preset");
+assert(/customer segment/i.test(petReactivationStarter?.fields?.overview || ""), "Pet reactivation starter must preserve the campaign-segment premise");
+assert(/6x9 postcard/i.test(petReactivationStarter?.fields?.deliverables || ""), "Pet reactivation starter must preserve the postcard deliverable");
+assert(!/\$495|\$795|\$1,095/.test(JSON.stringify(petReactivationStarter)), "Pet reactivation starter must source current prices from linked records");
 collateralStarterIds.forEach((id) => {
   assert(/review/i.test(catalog.find((entry) => entry.id === id).qualityNotes || ""), `Collateral starter ${id} is missing a catalog review warning`);
   const text = Object.values(starters[id].fields || {}).join(" ");
@@ -98,7 +105,7 @@ assert(app.includes("sourceTemplateId: source.id"), "Template metadata must pres
 assert(app.includes("sourceChecksum: source.checksum"), "Template metadata must preserve source checksum");
 assert(app.includes("proposalTemplateStatusLabels"), "Template status labels must be explicit");
 assert(html.includes("publishing-template-workflow"), "Source template workflow must live inside Publishing");
-assert(html.includes("30 catalog entries / 30 sanitized starters"), "Static source-template count must match W044 starter count");
+assert(html.includes("31 catalog entries / 31 sanitized starters"), "Static source-template count must match starter count");
 assert(!html.includes("Proposal template library"), "Standalone Template Library landmark must be removed");
 assert(!html.includes("<h2>Template Library</h2>"), "Standalone Template Library heading must be removed");
 assert(/function renameProposalTemplateCopy\(\)[\s\S]*displayName: nextName/.test(app), "Rename must update displayName");
