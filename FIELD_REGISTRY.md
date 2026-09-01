@@ -29,6 +29,12 @@ Status values:
 | Customs / Broker / Entry Fees | Sourcing / Import Quotes tab | Estimated customs brokerage and entry-related charges | money | Future quote cost table | No | Needs DB Home | Should support multiple fee lines. |
 | Selected Award | Sourcing / Import Quotes tab | Captures winning quote/quantity selected for project | record | Future quote award table | No | Needs DB Home | Should lock the quote basis used by estimate cost and future PO draft. |
 | PO Draft | Future purchasing / Xero relay | Structured purchase order candidate from selected quote | record | Future PO staging table; Xero relay | No | Needs Decision | Should not create live Xero PO until explicitly approved. |
+| Document Transaction | Proposal publishing / DocuSeal | Tracks each frozen proposal signature request and its lifecycle | record | `sfpq_document_transactions` | Yes, when migration is applied | Ready | Provider-neutral transaction record; current provider is DocuSeal. |
+| Document Event | DocuSeal webhook / audit history | Stores verified, deduplicated signing events | record | `sfpq_document_events` | Yes, when migration is applied | Ready | HMAC verification is required before an event is accepted. |
+| Signed Document Artifact | Completed DocuSeal submission | Preserves the final signed PDF before the provider URL expires | binary record | `sfpq_document_artifacts` | Yes, when migration is applied | Needs Decision | Requires authenticated retrieval plus approved retention/deletion policy before production. |
+| Signature Audit Certificate | Completed DocuSeal submission | Preserves DocuSeal's Certificate of Signature | binary record | `sfpq_document_artifacts` | Yes, when migration is applied | Ready | Stored as an audit-certificate artifact with SHA-256 hash. |
+| Signing Recipient | Proposal publishing | Identifies the person asked to sign | name/email | Document transaction now; future client/contact lookup | Yes, when migration is applied | Needs Lookup | Email is entered manually in the first slice; should come from the selected client contact. |
+| DocuSeal Delivery Mode | Proposal publishing | Separates prepare-only requests from actual email sends | enum/boolean | Server configuration and document transaction | Yes, when migration is applied | Needs Decision | Email delivery remains server-locked until estimator authentication and operator authorization exist. |
 
 ## Immediate Issues To Track
 

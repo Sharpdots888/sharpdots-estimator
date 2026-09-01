@@ -91,6 +91,10 @@ button:hover {
   padding: 6px 0;
 }
 
+.topbar > * {
+  min-width: 0;
+}
+
 .topbar h1,
 .section-head h2 {
   margin: 0;
@@ -131,6 +135,7 @@ button:hover {
   grid-template-columns: minmax(180px, 1fr) auto;
   gap: 6px;
   align-items: end;
+  min-width: 0;
 }
 
 .workspace-client-control {
@@ -351,6 +356,7 @@ body[data-workspace-mode="printEcomm"] .workspace-mode-option.active {
   display: grid;
   justify-items: end;
   gap: 5px;
+  min-width: 0;
 }
 
 .workspace-strip,
@@ -510,11 +516,12 @@ body[data-workspace-mode="printEcomm"] .workspace-mode-option.active {
 }
 
 .record-actions {
-  display: inline-flex;
-  overflow: hidden;
+  display: flex;
   gap: 4px;
   justify-content: flex-end;
   justify-self: end;
+  min-width: 0;
+  flex-wrap: wrap;
   white-space: nowrap;
 }
 
@@ -2906,6 +2913,145 @@ body.summary-view .summary-hide {
   background: var(--soft);
   cursor: not-allowed;
   filter: none;
+}
+
+.proposal-signature-status:empty {
+  display: none;
+}
+
+.proposal-signature-status {
+  display: grid;
+  gap: 5px;
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px solid var(--line);
+}
+
+.signature-status-head,
+.signature-transaction {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.signature-status-head strong {
+  color: var(--primary-dark);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.signature-status-head span,
+.signature-transaction small {
+  color: var(--muted);
+  font-size: 0.64rem;
+  font-weight: 800;
+}
+
+.signature-transaction {
+  padding: 5px 7px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.signature-transaction strong {
+  display: block;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 0.68rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.signature-state {
+  min-width: 68px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  color: #355267;
+  background: #e8f1f7;
+  font-size: 0.62rem;
+  font-weight: 900;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.signature-state.completed {
+  color: #1d5a3c;
+  background: #e3f4ea;
+}
+
+.signature-state.failed,
+.signature-state.declined,
+.signature-state.expired {
+  color: #8b2c2c;
+  background: #f8e7e7;
+}
+
+.docuseal-dialog {
+  width: min(620px, calc(100vw - 32px));
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 20px 48px rgba(20, 24, 26, 0.24);
+}
+
+.docuseal-dialog .load-estimate-head > div {
+  min-width: 0;
+}
+
+.docuseal-dialog .load-estimate-head p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.docuseal-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.docuseal-form-grid .wide-field {
+  grid-column: 1 / -1;
+}
+
+.docuseal-send-option {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 12px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--soft);
+}
+
+.docuseal-dialog-status {
+  min-height: 18px;
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.docuseal-dialog-status.error {
+  color: #9b2f2f;
+}
+
+@media (max-width: 620px) {
+  .docuseal-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .docuseal-form-grid .wide-field {
+    grid-column: auto;
+  }
 }
 
 .proposal-preview-wrap {
@@ -5910,6 +6056,70 @@ button.sourcing-health-pill:focus-visible {
   display: none;
 }
 
+@media (max-width: 1240px) {
+  .app-shell {
+    width: min(100vw - 28px, 2528px);
+  }
+
+  .topbar {
+    grid-template-columns: minmax(260px, 0.85fr) minmax(380px, 1.15fr) auto;
+    gap: 10px;
+  }
+
+  .workspace-controls {
+    grid-template-columns: minmax(170px, 0.85fr) minmax(250px, 1.15fr);
+    gap: 5px;
+  }
+
+  .workspace-mode-control {
+    width: auto;
+    padding-inline: 6px;
+  }
+
+  .workspace-mode-option {
+    padding-inline: 5px;
+    font-size: 0.68rem;
+  }
+
+  .workspace-action-row {
+    justify-content: flex-start;
+  }
+
+  .workspace-action-row .compact-btn {
+    padding-inline: 7px;
+    font-size: 0.7rem;
+  }
+
+  .header-utility .report-project-number {
+    display: none;
+  }
+
+  .tab-record-controls.estimate-record-controls {
+    grid-template-columns:
+      minmax(120px, 0.65fr)
+      minmax(220px, 1.2fr)
+      minmax(68px, 0.35fr)
+      minmax(190px, 1fr)
+      minmax(116px, 0.55fr);
+  }
+
+  .estimate-record-controls .record-state {
+    grid-column: 1 / 3;
+    grid-row: 2;
+  }
+
+  .estimate-record-controls .record-actions {
+    grid-column: 3 / -1;
+    grid-row: 2;
+    width: 100%;
+  }
+
+  .record-load-select,
+  .record-version-select {
+    min-width: 0;
+  }
+}
+
 @media (max-width: 980px) {
   .summary-grid,
   .lower-grid,
@@ -5935,6 +6145,10 @@ button.sourcing-health-pill:focus-visible {
     justify-items: stretch;
   }
 
+  .workspace-controls {
+    grid-template-columns: 1fr;
+  }
+
   .workspace-action-row,
   .header-utility {
     justify-content: flex-start;
@@ -5943,6 +6157,23 @@ button.sourcing-health-pill:focus-visible {
 
   .proposal-preview-wrap {
     max-height: none;
+  }
+
+  .tab-record-controls,
+  .tab-record-controls.estimate-record-controls,
+  .tab-record-controls.library-record-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .estimate-record-controls .record-state,
+  .estimate-record-controls .record-actions {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .record-actions {
+    justify-self: stretch;
+    justify-content: flex-start;
   }
 
   .proposal-page {

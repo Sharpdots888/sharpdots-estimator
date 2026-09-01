@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sharpdots Estimator</title>
-    <link rel="stylesheet" href="styles.css?v=proposal-export-qa2" />
+    <link rel="stylesheet" href="styles.css?v=load-responsive-fix1" />
   </head>
   <body>
     <main class="app-shell">
@@ -478,9 +478,10 @@
               <div class="publishing-actions">
                 <button id="proposalPublishPdfBtn" type="button">Prepare PDF</button>
                 <button id="proposalPublishCsvBtn" class="ghost-btn" type="button">Export CSV</button>
-                <button id="proposalSignatureBtn" class="ghost-btn" type="button" disabled>Handoff later</button>
+                <button id="proposalSignatureBtn" class="ghost-btn" type="button" disabled>Prepare DocuSeal</button>
                 <span id="proposalPublishNote" class="publishing-action-note">Signature/payment handoff will be connected later.</span>
               </div>
+              <div id="proposalSignatureStatus" class="proposal-signature-status" aria-live="polite"></div>
             </section>
           </aside>
 
@@ -1139,6 +1140,45 @@
       </section>
     </div>
 
-    <script src="app.js?v=proposal-export-qa2"></script>
+    <div id="docusealModal" class="modal-backdrop" hidden>
+      <section class="docuseal-dialog" role="dialog" aria-modal="true" aria-labelledby="docusealTitle">
+        <header class="load-estimate-head">
+          <div>
+            <h2 id="docusealTitle">Prepare DocuSeal Request</h2>
+            <p id="docusealDialogMode">Creates a signing request without emailing the client.</p>
+          </div>
+          <button id="closeDocusealBtn" class="ghost-btn" type="button" title="Close">×</button>
+        </header>
+        <div class="docuseal-form-grid">
+          <label>
+            Recipient name
+            <input id="docusealRecipientName" type="text" autocomplete="name" />
+          </label>
+          <label>
+            Recipient email
+            <input id="docusealRecipientEmail" type="email" autocomplete="email" required />
+          </label>
+          <label class="wide-field">
+            Email subject
+            <input id="docusealMessageSubject" type="text" />
+          </label>
+          <label class="wide-field">
+            Message
+            <textarea id="docusealMessageBody" rows="3"></textarea>
+          </label>
+        </div>
+        <label class="docuseal-send-option">
+          <input id="docusealSendEmail" type="checkbox" disabled />
+          Email the signature request immediately
+        </label>
+        <p id="docusealDialogStatus" class="docuseal-dialog-status" aria-live="polite"></p>
+        <div class="dirty-record-actions">
+          <button id="createDocusealRequestBtn" type="button">Prepare Request</button>
+          <button id="cancelDocusealBtn" class="ghost-btn" type="button">Cancel</button>
+        </div>
+      </section>
+    </div>
+
+    <script src="app.js?v=docuseal1"></script>
   </body>
 </html>

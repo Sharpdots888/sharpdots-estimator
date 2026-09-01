@@ -1,4 +1,5 @@
 const http = require("http");
+const crypto = require("crypto");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
@@ -25,6 +26,13 @@ if (!process.env.ESTIMATOR_SESSION_SECRET && !process.env.SESSION_SECRET) {
 if (authMode !== configuredAuthMode) {
   console.warn(`Unknown ESTIMATOR_AUTH_MODE "${configuredAuthMode}". Falling back to portal-token-required.`);
 }
+
+const docusealApiUrl = String(process.env.DOCUSEAL_API_URL || "https://api.docuseal.com").replace(/\/$/, "");
+const docusealApiKey = String(process.env.DOCUSEAL_API_KEY || "").trim();
+const docusealWebhookSecret = String(process.env.DOCUSEAL_WEBHOOK_SECRET || "").trim();
+const docusealSendEnabled = /^(1|true|yes)$/i.test(String(process.env.DOCUSEAL_SEND_ENABLED || ""));
+const maxSigningHtmlBytes = 1_500_000;
+const maxArtifactBytes = 15_000_000;
 
 // Strip sslmode from connection string — pg Pool's ssl config handles this explicitly
 const pool = new Pool({
@@ -131,11 +139,71 @@ const migrations = [
   `ALTER TABLE sfpq_manufacturers ADD COLUMN IF NOT EXISTS sfvc_company_id UUID REFERENCES sfvc_companies(company_id)`
 ];
 
+const documentMigrations = [
+  `CREATE TABLE IF NOT EXISTS sfpq_document_transactions (
+    transaction_id UUID PRIMARY KEY,
+    workspace_number VARCHAR(20),
+    proposal_number VARCHAR(20) NOT NULL,
+    proposal_version INTEGER NOT NULL DEFAULT 1,
+    provider VARCHAR(30) NOT NULL DEFAULT 'docuseal',
+    provider_submission_id VARCHAR(100),
+    recipient_name TEXT NOT NULL DEFAULT '',
+    recipient_email TEXT NOT NULL,
+    document_name TEXT NOT NULL,
+    status VARCHAR(40) NOT NULL DEFAULT 'creating',
+    email_delivery_requested BOOLEAN NOT NULL DEFAULT FALSE,
+    email_delivery_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+    proposal_snapshot JSONB NOT NULL DEFAULT '{}',
+    provider_payload JSONB NOT NULL DEFAULT '{}',
+    last_error TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    completed_at TIMESTAMPTZ
+  )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS sfpq_document_transactions_provider_submission_idx
+    ON sfpq_document_transactions (provider, provider_submission_id)
+    WHERE provider_submission_id IS NOT NULL`,
+  `CREATE INDEX IF NOT EXISTS sfpq_document_transactions_proposal_idx
+    ON sfpq_document_transactions (proposal_number, proposal_version, created_at DESC)`,
+  `CREATE TABLE IF NOT EXISTS sfpq_document_events (
+    id BIGSERIAL PRIMARY KEY,
+    transaction_id UUID NOT NULL REFERENCES sfpq_document_transactions(transaction_id) ON DELETE CASCADE,
+    provider VARCHAR(30) NOT NULL DEFAULT 'docuseal',
+    provider_event_key TEXT NOT NULL,
+    event_type TEXT NOT NULL,
+    event_timestamp TIMESTAMPTZ,
+    verified BOOLEAN NOT NULL DEFAULT FALSE,
+    payload JSONB NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (provider, provider_event_key)
+  )`,
+  `CREATE TABLE IF NOT EXISTS sfpq_document_artifacts (
+    id BIGSERIAL PRIMARY KEY,
+    transaction_id UUID NOT NULL REFERENCES sfpq_document_transactions(transaction_id) ON DELETE CASCADE,
+    provider_artifact_key TEXT NOT NULL,
+    artifact_type VARCHAR(30) NOT NULL,
+    filename TEXT NOT NULL,
+    content_type TEXT NOT NULL DEFAULT 'application/pdf',
+    byte_size INTEGER NOT NULL,
+    sha256 CHAR(64) NOT NULL,
+    content BYTEA NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (transaction_id, provider_artifact_key)
+  )`
+];
+
 async function runMigrations() {
   for (const sql of migrations) {
     await pool.query(sql);
   }
   console.log("Migrations complete.");
+}
+
+async function runDocumentMigrations() {
+  for (const sql of documentMigrations) {
+    await pool.query(sql);
+  }
+  console.log("Document workflow migrations complete.");
 }
 
 let schemaColumnsCache = null;
@@ -797,6 +865,374 @@ async function handlePostEstimate(body, res) {
   }
 }
 
+function validEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
+}
+
+function validRecordNumber(value, prefix) {
+  return new RegExp(`^${prefix}-\\d{6}$`).test(String(value || "").trim());
+}
+
+function publicDocumentTransaction(row) {
+  return {
+    transactionId: row.transaction_id,
+    workspaceNumber: row.workspace_number || "",
+    proposalNumber: row.proposal_number,
+    proposalVersion: Number(row.proposal_version || 1),
+    provider: row.provider,
+    providerSubmissionId: row.provider_submission_id || "",
+    recipientName: row.recipient_name || "",
+    recipientEmail: row.recipient_email,
+    documentName: row.document_name,
+    status: row.status,
+    emailDeliveryRequested: Boolean(row.email_delivery_requested),
+    emailDeliveryEnabled: Boolean(row.email_delivery_enabled),
+    lastError: row.last_error || "",
+    artifactCount: Number(row.artifact_count || 0),
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    completedAt: row.completed_at
+  };
+}
+
+async function docusealRequest(apiPath, options = {}) {
+  if (!docusealApiKey) throw new Error("DocuSeal is not configured");
+  const response = await fetch(`${docusealApiUrl}${apiPath}`, {
+    ...options,
+    headers: {
+      "X-Auth-Token": docusealApiKey,
+      "Content-Type": "application/json",
+      ...(options.headers || {})
+    }
+  });
+  const text = await response.text();
+  let payload = {};
+  try {
+    payload = text ? JSON.parse(text) : {};
+  } catch {
+    payload = { message: text };
+  }
+  if (!response.ok) {
+    const detail = payload.error || payload.message || `DocuSeal request failed (${response.status})`;
+    throw new Error(String(detail).slice(0, 500));
+  }
+  return payload;
+}
+
+async function handleDocumentSigningStatus(res) {
+  let databaseReady = false;
+  try {
+    const result = await pool.query(`SELECT to_regclass('sfpq_document_transactions') IS NOT NULL AS ready`);
+    databaseReady = Boolean(result.rows[0]?.ready);
+  } catch {
+    databaseReady = false;
+  }
+  sendJson(res, 200, {
+    provider: "docuseal",
+    configured: Boolean(docusealApiKey) && databaseReady,
+    apiConfigured: Boolean(docusealApiKey),
+    databaseReady,
+    emailDeliveryEnabled: docusealSendEnabled,
+    webhookVerificationConfigured: Boolean(docusealWebhookSecret),
+    mode: docusealSendEnabled ? "send" : "prepare-only"
+  });
+}
+
+async function handleCreateDocumentTransaction(body, res) {
+  if (!docusealApiKey) {
+    sendJson(res, 503, { error: "DocuSeal is not configured on this server" });
+    return;
+  }
+
+  const payload = JSON.parse(body || "{}");
+  const proposalNumber = String(payload.proposalNumber || "").trim();
+  const workspaceNumber = String(payload.workspaceNumber || "").trim();
+  const recipientEmail = String(payload.recipientEmail || "").trim().toLowerCase();
+  const recipientName = String(payload.recipientName || "").trim().slice(0, 200);
+  const documentName = String(payload.documentName || `${proposalNumber} proposal`).trim().slice(0, 200);
+  const documentHtml = String(payload.documentHtml || "");
+  const proposalVersion = Math.max(1, Math.round(Number(payload.proposalVersion) || 1));
+  const emailDeliveryRequested = Boolean(payload.sendEmail);
+  const emailDeliveryEnabled = emailDeliveryRequested && docusealSendEnabled;
+
+  if (!validRecordNumber(proposalNumber, "P")) {
+    sendJson(res, 400, { error: "A saved proposal number is required" });
+    return;
+  }
+  if (workspaceNumber && !validRecordNumber(workspaceNumber, "W")) {
+    sendJson(res, 400, { error: "Workspace number is invalid" });
+    return;
+  }
+  if (!validEmail(recipientEmail)) {
+    sendJson(res, 400, { error: "A valid recipient email is required" });
+    return;
+  }
+  if (!documentHtml.includes("<signature-field") || Buffer.byteLength(documentHtml, "utf8") > maxSigningHtmlBytes) {
+    sendJson(res, 400, { error: "The frozen proposal document is missing a signature field or is too large" });
+    return;
+  }
+  if (emailDeliveryRequested && !docusealSendEnabled) {
+    sendJson(res, 403, { error: "Email delivery is locked on this server; prepare the request without sending" });
+    return;
+  }
+
+  const transactionId = crypto.randomUUID();
+  const snapshot = payload.proposalSnapshot && typeof payload.proposalSnapshot === "object"
+    ? payload.proposalSnapshot
+    : {};
+  await pool.query(
+    `INSERT INTO sfpq_document_transactions (
+      transaction_id, workspace_number, proposal_number, proposal_version,
+      recipient_name, recipient_email, document_name, status,
+      email_delivery_requested, email_delivery_enabled, proposal_snapshot
+    ) VALUES ($1,$2,$3,$4,$5,$6,$7,'creating',$8,$9,$10::jsonb)`,
+    [
+      transactionId,
+      workspaceNumber || null,
+      proposalNumber,
+      proposalVersion,
+      recipientName,
+      recipientEmail,
+      documentName,
+      emailDeliveryRequested,
+      emailDeliveryEnabled,
+      JSON.stringify(snapshot)
+    ]
+  );
+
+  try {
+    const submissionPayload = {
+      name: documentName,
+      send_email: emailDeliveryEnabled,
+      order: "preserved",
+      documents: [{
+        name: documentName.replace(/[^a-z0-9_-]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 100) || "proposal",
+        html: documentHtml,
+        size: "Letter"
+      }],
+      submitters: [{
+        role: "Client",
+        name: recipientName || undefined,
+        email: recipientEmail,
+        external_id: transactionId,
+        metadata: {
+          transactionId,
+          workspaceNumber,
+          proposalNumber,
+          proposalVersion
+        }
+      }]
+    };
+    if (payload.messageSubject || payload.messageBody) {
+      submissionPayload.message = {
+        subject: String(payload.messageSubject || `Please review and sign ${documentName}`).slice(0, 200),
+        body: String(payload.messageBody || "Please review and sign this proposal. {{submitter.link}}").slice(0, 4000)
+      };
+    }
+
+    const providerResult = await docusealRequest("/submissions/html", {
+      method: "POST",
+      body: JSON.stringify(submissionPayload)
+    });
+    const submission = Array.isArray(providerResult) ? providerResult[0] || {} : providerResult;
+    const submissionId = submission.id || submission.submission_id;
+    if (!submissionId) throw new Error("DocuSeal did not return a submission identifier");
+    const status = emailDeliveryEnabled ? "sent" : "prepared";
+    const result = await pool.query(
+      `UPDATE sfpq_document_transactions
+       SET provider_submission_id = $2, provider_payload = $3::jsonb, status = $4,
+           updated_at = NOW(), last_error = NULL
+       WHERE transaction_id = $1
+       RETURNING *`,
+      [transactionId, String(submissionId), JSON.stringify(submission), status]
+    );
+    sendJson(res, 201, publicDocumentTransaction(result.rows[0]));
+  } catch (error) {
+    await pool.query(
+      `UPDATE sfpq_document_transactions
+       SET status = 'failed', last_error = $2, updated_at = NOW()
+       WHERE transaction_id = $1`,
+      [transactionId, String(error.message || error).slice(0, 1000)]
+    );
+    sendJson(res, 502, { error: error.message || "DocuSeal request failed", transactionId });
+  }
+}
+
+async function handleGetDocumentTransactions(reqUrl, res) {
+  const requestUrl = new URL(reqUrl, "http://localhost");
+  const proposalNumber = String(requestUrl.searchParams.get("proposalNumber") || "").trim();
+  if (!validRecordNumber(proposalNumber, "P")) {
+    sendJson(res, 400, { error: "A valid proposal number is required" });
+    return;
+  }
+  const result = await pool.query(
+    `SELECT t.*, COUNT(a.id) AS artifact_count
+     FROM sfpq_document_transactions t
+     LEFT JOIN sfpq_document_artifacts a ON a.transaction_id = t.transaction_id
+     WHERE t.proposal_number = $1
+     GROUP BY t.transaction_id
+     ORDER BY t.created_at DESC
+     LIMIT 25`,
+    [proposalNumber]
+  );
+  sendJson(res, 200, result.rows.map(publicDocumentTransaction));
+}
+
+function verifyDocusealWebhook(rawBody, signatureHeader) {
+  if (!docusealWebhookSecret || !signatureHeader) return false;
+  const [timestamp, signature] = String(signatureHeader).split(".", 2);
+  if (!timestamp || !signature || !/^\d+$/.test(timestamp) || !/^[a-f0-9]+$/i.test(signature)) return false;
+  if (Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) return false;
+  const expected = crypto
+    .createHmac("sha256", docusealWebhookSecret)
+    .update(`${timestamp}.${rawBody}`)
+    .digest("hex");
+  if (expected.length !== signature.length) return false;
+  return crypto.timingSafeEqual(Buffer.from(expected, "utf8"), Buffer.from(signature, "utf8"));
+}
+
+function docusealWebhookStatus(eventType) {
+  return ({
+    "form.viewed": "viewed",
+    "form.started": "started",
+    "form.completed": "partially-signed",
+    "form.declined": "declined",
+    "submission.created": "prepared",
+    "submission.completed": "completed",
+    "submission.expired": "expired",
+    "submission.archived": "archived"
+  })[eventType] || "updated";
+}
+
+function trustedDocusealArtifactUrl(rawUrl) {
+  try {
+    const artifact = new URL(rawUrl);
+    const api = new URL(docusealApiUrl);
+    if (artifact.protocol !== "https:") return false;
+    if (api.hostname === "api.docuseal.com") {
+      return artifact.hostname === "docuseal.com" || artifact.hostname.endsWith(".docuseal.com");
+    }
+    return artifact.host === api.host;
+  } catch {
+    return false;
+  }
+}
+
+async function storeDocusealArtifact(transactionId, artifactKey, artifactType, filename, rawUrl) {
+  if (!rawUrl || !trustedDocusealArtifactUrl(rawUrl)) return;
+  const existing = await pool.query(
+    `SELECT 1 FROM sfpq_document_artifacts WHERE transaction_id = $1 AND provider_artifact_key = $2`,
+    [transactionId, artifactKey]
+  );
+  if (existing.rows.length) return;
+  const response = await fetch(rawUrl);
+  if (!response.ok) throw new Error(`Unable to archive ${artifactType} (${response.status})`);
+  const announcedSize = Number(response.headers.get("content-length") || 0);
+  if (announcedSize > maxArtifactBytes) throw new Error(`${artifactType} exceeds the artifact size limit`);
+  const content = Buffer.from(await response.arrayBuffer());
+  if (content.length > maxArtifactBytes) throw new Error(`${artifactType} exceeds the artifact size limit`);
+  const sha256 = crypto.createHash("sha256").update(content).digest("hex");
+  await pool.query(
+    `INSERT INTO sfpq_document_artifacts (
+       transaction_id, provider_artifact_key, artifact_type, filename,
+       content_type, byte_size, sha256, content
+     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+     ON CONFLICT (transaction_id, provider_artifact_key) DO NOTHING`,
+    [
+      transactionId,
+      artifactKey,
+      artifactType,
+      filename,
+      response.headers.get("content-type") || "application/pdf",
+      content.length,
+      sha256,
+      content
+    ]
+  );
+}
+
+async function archiveCompletedDocusealSubmission(transactionId, submissionId) {
+  const submission = await docusealRequest(`/submissions/${encodeURIComponent(submissionId)}`, { method: "GET" });
+  const documents = Array.isArray(submission.documents) ? submission.documents : [];
+  for (let index = 0; index < documents.length; index += 1) {
+    const document = documents[index] || {};
+    await storeDocusealArtifact(
+      transactionId,
+      `document:${index}`,
+      "signed-document",
+      `${String(document.name || `signed-document-${index + 1}`).replace(/[^a-z0-9_.-]+/gi, "-")}.pdf`,
+      document.url
+    );
+  }
+  await storeDocusealArtifact(transactionId, "audit-log", "audit-certificate", "signature-audit-log.pdf", submission.audit_log_url);
+}
+
+async function resolveDocusealTransaction(webhookData) {
+  const submitters = Array.isArray(webhookData.submitters) ? webhookData.submitters : [];
+  const externalId = webhookData.external_id
+    || webhookData.metadata?.transactionId
+    || submitters.find((submitter) => submitter.external_id)?.external_id
+    || submitters.find((submitter) => submitter.metadata?.transactionId)?.metadata?.transactionId;
+  if (externalId && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(externalId))) {
+    const result = await pool.query(
+      `SELECT * FROM sfpq_document_transactions WHERE transaction_id = $1`,
+      [String(externalId)]
+    );
+    if (result.rows[0]) return result.rows[0];
+  }
+  const submissionId = webhookData.submission_id || webhookData.id;
+  if (!submissionId) return null;
+  const result = await pool.query(
+    `SELECT * FROM sfpq_document_transactions
+     WHERE provider = 'docuseal' AND provider_submission_id = $1`,
+    [String(submissionId)]
+  );
+  return result.rows[0] || null;
+}
+
+async function handleDocusealWebhook(rawBody, req, res) {
+  if (!verifyDocusealWebhook(rawBody, req.headers["x-docuseal-signature"])) {
+    sendJson(res, 401, { error: "Invalid webhook signature" });
+    return;
+  }
+  const payload = JSON.parse(rawBody || "{}");
+  const eventType = String(payload.event_type || "unknown");
+  const webhookData = payload.data && typeof payload.data === "object" ? payload.data : {};
+  const transaction = await resolveDocusealTransaction(webhookData);
+  if (!transaction) {
+    sendJson(res, 202, { accepted: true, matched: false });
+    return;
+  }
+  const submissionId = webhookData.submission_id || webhookData.id || transaction.provider_submission_id;
+  if (eventType === "submission.completed" && submissionId) {
+    await archiveCompletedDocusealSubmission(transaction.transaction_id, String(submissionId));
+  }
+  const providerEventKey = crypto.createHash("sha256").update(rawBody).digest("hex");
+  await pool.query(
+    `INSERT INTO sfpq_document_events (
+       transaction_id, provider_event_key, event_type, event_timestamp, verified, payload
+     ) VALUES ($1,$2,$3,$4,TRUE,$5::jsonb)
+     ON CONFLICT (provider, provider_event_key) DO NOTHING`,
+    [
+      transaction.transaction_id,
+      providerEventKey,
+      eventType,
+      payload.timestamp || webhookData.event_timestamp || null,
+      JSON.stringify(payload)
+    ]
+  );
+  const status = docusealWebhookStatus(eventType);
+  await pool.query(
+    `UPDATE sfpq_document_transactions
+     SET status = $2, updated_at = NOW(),
+         completed_at = CASE WHEN $2 = 'completed' THEN COALESCE(completed_at, NOW()) ELSE completed_at END,
+         provider_payload = provider_payload || $3::jsonb
+     WHERE transaction_id = $1`,
+    [transaction.transaction_id, status, JSON.stringify({ lastWebhook: payload })]
+  );
+  sendJson(res, 200, { accepted: true, matched: true });
+}
+
 function safePath(urlPath) {
   const cleanPath = decodeURIComponent(urlPath.split("?")[0]);
   const target = cleanPath === "/" ? "/index.html" : cleanPath;
@@ -854,6 +1290,16 @@ const server = http.createServer(async (req, res) => {
       await handleGetManufacturers(res);
     } else if (url.startsWith("/api/inventory/search") && method === "GET") {
       await handleInventorySearch(req.url, res);
+    } else if (url === "/api/document-signing/status" && method === "GET") {
+      await handleDocumentSigningStatus(res);
+    } else if (url === "/api/document-transactions" && method === "GET") {
+      await handleGetDocumentTransactions(req.url, res);
+    } else if (url === "/api/document-transactions" && method === "POST") {
+      const body = await collectBody(req);
+      await handleCreateDocumentTransaction(body, res);
+    } else if (url === "/api/webhooks/docuseal" && method === "POST") {
+      const body = await collectBody(req);
+      await handleDocusealWebhook(body, req, res);
     } else {
       const filePath = safePath(req.url || "/");
       fs.readFile(filePath, (error, content) => {
@@ -884,4 +1330,6 @@ const server = http.createServer(async (req, res) => {
 
 runMigrations()
   .catch(err => console.warn("Schema migrations skipped (already applied or insufficient permissions):", err.message))
+  .then(() => runDocumentMigrations())
+  .catch(err => console.warn("Document workflow migrations skipped (already applied or insufficient permissions):", err.message))
   .finally(() => server.listen(port, host, () => console.log(`Estimator running on http://${host}:${port}`)));
