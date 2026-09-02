@@ -1097,7 +1097,7 @@ function workspaceModeTabLabels(mode = workspaceMode) {
   return visibleWorkspaceViews(mode)
     .map((viewId) => {
       const tab = Array.from(els.appTabs || []).find((button) => button.dataset.view === viewId);
-      return tab?.textContent.trim() || workspaceRecordTypes.find((type) => type.viewId === viewId)?.label;
+      return tab?.dataset.label || tab?.textContent.trim() || workspaceRecordTypes.find((type) => type.viewId === viewId)?.label;
     })
     .filter(Boolean);
 }

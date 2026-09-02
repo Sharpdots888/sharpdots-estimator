@@ -68,13 +68,14 @@
         </div>
       </header>
 
-      <nav class="app-tabs" aria-label="Estimating app sections">
-        <button class="app-tab active" type="button" data-view="proposalView">Proposal</button>
-        <button class="app-tab" type="button" data-view="estimateView">Estimate</button>
-        <button class="app-tab" type="button" data-view="servicesView">Services Calculator</button>
-        <button class="app-tab" type="button" data-view="sourcingView">Sourcing</button>
-        <button class="app-tab" type="button" data-view="printQuoteView">Print Quote</button>
-        <button class="app-tab" type="button" data-view="ecommView">Ecomm Pricing</button>
+      <nav class="app-tabs" aria-label="Workspace tools">
+        <div class="tool-nav-label" aria-hidden="true"><span>Workspace tools</span><small>Choose a work surface</small></div>
+        <button class="app-tab active" type="button" data-view="proposalView" data-label="Proposal"><span>Proposal</span><small>Deliver</small></button>
+        <button class="app-tab" type="button" data-view="estimateView" data-label="Estimate"><span>Estimate</span><small>Cost</small></button>
+        <button class="app-tab" type="button" data-view="servicesView" data-label="Services Calculator"><span>Services</span><small>Price services</small></button>
+        <button class="app-tab" type="button" data-view="sourcingView" data-label="Sourcing"><span>Sourcing</span><small>Source</small></button>
+        <button class="app-tab" type="button" data-view="printQuoteView" data-label="Print Quote"><span>Print Quote</span><small>Quote builder</small></button>
+        <button class="app-tab" type="button" data-view="ecommView" data-label="Ecomm Pricing"><span>Ecomm</span><small>Price list</small></button>
       </nav>
 
       <section id="estimateView" class="app-view" hidden>

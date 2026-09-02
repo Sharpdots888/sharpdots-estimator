@@ -85,10 +85,11 @@ button:hover {
 
 .topbar {
   display: grid;
-  grid-template-columns: minmax(300px, 1fr) minmax(420px, 0.85fr) auto;
-  align-items: end;
-  gap: 14px;
-  padding: 6px 0;
+  grid-template-columns: minmax(270px, 0.75fr) minmax(520px, 1.25fr) auto;
+  align-items: start;
+  gap: 12px 18px;
+  padding: 10px 0 12px;
+  border-bottom: 1px solid rgba(217, 217, 217, 0.9);
 }
 
 .topbar > * {
@@ -319,7 +320,7 @@ body[data-workspace-mode="printEcomm"] .workspace-mode-option.active {
   padding: 0;
   color: var(--ink);
   background: transparent;
-  font-size: clamp(1.45rem, 2.4vw, 2.35rem);
+  font-size: clamp(1.45rem, 2vw, 2rem);
   font-weight: 800;
   line-height: 1;
 }
@@ -538,14 +539,40 @@ body[data-workspace-mode="printEcomm"] .workspace-mode-option.active {
   flex-wrap: wrap;
   align-items: flex-end;
   margin: 10px 0 0;
-  padding: 0 0 0 4px;
+  padding: 7px 0 0 4px;
   border-bottom: 1px solid var(--line);
   background: transparent;
 }
 
+.tool-nav-label {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 2px;
+  padding: 0 10px 9px 2px;
+  color: var(--muted);
+  line-height: 1;
+}
+
+.tool-nav-label span {
+  color: var(--ink);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tool-nav-label small {
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
 .app-tab {
+  display: grid;
+  gap: 2px;
+  align-content: center;
   position: relative;
-  min-height: 36px;
+  min-height: 44px;
+  padding: 5px 14px 6px;
   border-color: var(--line);
   border-bottom-color: var(--line);
   border-radius: 10px 10px 0 0;
@@ -553,6 +580,18 @@ body[data-workspace-mode="printEcomm"] .workspace-mode-option.active {
   background: #e9eef2;
   font-weight: 800;
   box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.06);
+}
+
+.app-tab > span {
+  font-size: 0.86rem;
+  line-height: 1;
+}
+
+.app-tab > small {
+  opacity: 0.72;
+  font-size: 0.64rem;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .app-tab.library-tab {
@@ -571,7 +610,7 @@ body[data-workspace-mode="printEcomm"] .workspace-mode-option.active {
 
 .app-tab.active {
   z-index: 1;
-  min-height: 40px;
+  min-height: 48px;
   color: var(--primary-dark);
   border-color: var(--line);
   border-bottom-color: #ffffff;
@@ -739,11 +778,12 @@ body[data-workspace-mode="printEcomm"] .app-tab.active {
   grid-template-columns: minmax(148px, 0.72fr) minmax(240px, 1.35fr) minmax(108px, 0.34fr) minmax(118px, 0.48fr) auto;
   gap: 6px;
   align-items: center;
-  margin: 0 0 8px;
-  padding: 5px 7px;
+  margin: 0 0 10px;
+  padding: 7px 9px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: linear-gradient(180deg, #ffffff 0%, var(--soft) 100%);
+  background: linear-gradient(90deg, #ffffff 0%, #fafcfc 100%);
+  box-shadow: inset 3px 0 0 rgba(66, 139, 202, 0.35);
 }
 
 .tab-record-controls.estimate-record-controls {
