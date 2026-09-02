@@ -3601,6 +3601,24 @@ body.summary-view .summary-hide {
   gap: 10px;
 }
 
+.workbench-section-label {
+  margin: 4px 0 -3px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
+  color: var(--primary-dark);
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.services-controls > .section-head + .workbench-section-label,
+.sourcing-controls > .section-head + .workbench-section-label {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
 .services-workspace {
   min-width: 0;
   display: grid;
@@ -3804,6 +3822,35 @@ body.summary-view .summary-hide {
   display: grid;
   align-content: start;
   gap: 8px;
+}
+
+.sourcing-controls .workbench-section-label {
+  margin-top: 5px;
+}
+
+.sourcing-view-toggle {
+  max-width: 780px;
+  flex-wrap: wrap;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.sourcing-view-toggle button {
+  min-height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 8px;
+  background: #ffffff;
+}
+
+.sourcing-view-toggle button + button {
+  border-left: 1px solid var(--line);
+}
+
+.sourcing-view-toggle button.group-start {
+  margin-left: 6px;
 }
 
 .sourcing-help {

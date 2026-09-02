@@ -631,6 +631,7 @@
                 <p>Omnichannel appointment engine prototype</p>
               </div>
             </div>
+            <div class="workbench-section-label">Commercial model</div>
             <label>
               Scenario
               <select id="serviceScenario">
@@ -652,6 +653,7 @@
               <label><input name="serviceTermMode" type="radio" value="initial" checked /> Initial term</label>
               <label><input name="serviceTermMode" type="radio" value="monthly" /> Monthly after initial</label>
             </fieldset>
+            <div class="workbench-section-label">Execution inputs</div>
             <label>
               Target Appointments / Month
               <input id="serviceAppointments" type="number" min="0" step="1" value="10" />
@@ -665,6 +667,7 @@
               <label>Win Rate % <input id="execWinRate" type="number" min="0" max="100" step="1" value="20" /></label>
               <div id="executionSummary" class="execution-summary"></div>
             </div>
+            <div class="workbench-section-label">Pricing policy</div>
             <label>
               Startup Markup %
               <input id="serviceStartupMarkup" type="number" min="0" max="300" step="5" value="50" />
@@ -740,6 +743,7 @@
                 <p>Manufacturer and vendor quote workbench</p>
               </div>
             </div>
+            <div class="workbench-section-label">Find sourcing items</div>
             <label>
               Search
               <input id="sourcingSearch" type="search" placeholder="Item, SKU, vendor, HTS" />
@@ -780,6 +784,7 @@
               <input id="sourcingShowAll" type="checkbox" />
               Show all estimate items
             </label>
+            <div class="workbench-section-label">Quote actions</div>
             <button id="populateSourcingSampleBtn" class="ghost-btn" type="button">Populate Sample Quotes</button>
             <div class="sourcing-import-export">
               <button id="selectVisibleSourcingBtn" class="ghost-btn" type="button">Select Visible</button>
@@ -827,7 +832,7 @@
               <div class="section-head">
                 <div>
                   <h2>Quote Board</h2>
-                  <p>Multiple suppliers and quantity breaks per item</p>
+                  <p>Compare suppliers, refresh quotes, make awards, and prepare purchasing.</p>
                 </div>
                 <div class="view-mode-toggle sourcing-view-toggle" role="group" aria-label="Sourcing board detail">
                   <button class="active" type="button" data-sourcing-view-mode="summary" aria-pressed="true">Summary</button>
