@@ -1063,6 +1063,20 @@ body[data-workspace-mode="printEcomm"] .placeholder-view .placeholder-panel {
 
 .print-quote-form-grid {
   margin-top: 12px;
+  align-content: start;
+  gap: 10px 12px;
+}
+
+.quote-form-heading {
+  grid-column: 1 / -1;
+  margin: 3px 0 -3px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
+  color: var(--print-purple-dark);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .internal-note-field textarea {
@@ -1073,6 +1087,35 @@ body[data-workspace-mode="printEcomm"] .placeholder-view .placeholder-panel {
 .print-quote-output {
   min-width: 0;
   margin-top: 12px;
+  position: sticky;
+  top: 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fbfcfc;
+  box-shadow: 0 8px 22px rgba(31, 52, 66, 0.06);
+}
+
+.print-quote-output > .section-head {
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.print-quote-actions {
+  align-items: stretch;
+  gap: 7px;
+}
+
+.print-quote-action-group {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.print-quote-view-switcher {
+  padding-left: 7px;
+  border-left: 1px solid var(--line);
 }
 
 .print-quote-boundary {
@@ -1675,6 +1718,37 @@ legend {
   align-content: start;
   gap: 4px;
   padding: 6px;
+}
+
+.control-panel-heading {
+  margin: 1px 0 5px;
+  padding: 2px 2px 7px;
+  border-bottom: 1px solid var(--line);
+}
+
+.control-panel-heading h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.98rem;
+  line-height: 1.1;
+}
+
+.control-panel-heading p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.3;
+}
+
+.control-panel-section-label {
+  margin: 7px 0 1px;
+  padding-top: 7px;
+  border-top: 1px solid var(--line);
+  color: var(--primary-dark);
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 label,

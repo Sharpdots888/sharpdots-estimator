@@ -111,6 +111,10 @@
 
       <section class="workspace">
         <aside class="control-panel" aria-label="Estimator controls">
+          <div class="control-panel-heading">
+            <h2>Estimate controls</h2>
+            <p>Set the scope, pricing defaults, and quantity scenario.</p>
+          </div>
           <label>
             Estimate #
             <output id="projectNumber" class="project-number-input"></output>
@@ -121,6 +125,7 @@
           </label>
           <datalist id="yearLookup"></datalist>
 
+          <div class="control-panel-section-label">Scope &amp; filters</div>
           <label>
             Search
             <input id="searchInput" type="search" placeholder="Package, product, element" />
@@ -136,6 +141,7 @@
             <div id="typeFilters" class="check-list"></div>
           </fieldset>
 
+          <div class="control-panel-section-label">Pricing defaults</div>
           <div class="control-row">
             <label>
               Global Markup
@@ -151,6 +157,7 @@
             </label>
           </div>
 
+          <div class="control-panel-section-label">Quantity scenario</div>
           <fieldset class="simulation-controls">
             <legend>Quantity Edit</legend>
             <label>
@@ -880,6 +887,7 @@
                 Valid until
                 <input id="printQuoteValidUntil" type="date" />
               </label>
+              <div class="quote-form-heading">Customer &amp; fulfillment</div>
               <label>
                 Customer contact
                 <input id="printQuoteCustomerName" type="text" placeholder="Customer contact" />
@@ -896,6 +904,7 @@
                 Shipping amount
                 <input id="printQuoteShippingAmount" type="number" min="0" step="0.01" />
               </label>
+              <div class="quote-form-heading">Source &amp; scope</div>
               <label>
                 Source
                 <input id="printQuoteSource" type="text" value="In-house / vendor print source" />
@@ -908,6 +917,7 @@
                 Source URL
                 <input id="printQuoteSourceUrl" type="url" placeholder="https://..." />
               </label>
+              <div class="quote-form-heading">Customer-facing content</div>
               <label class="wide-field">
                 Customer note
                 <textarea id="printQuoteCustomerNote" rows="3" placeholder="Customer-safe note only"></textarea>
@@ -916,6 +926,7 @@
                 Customer terms
                 <textarea id="printQuoteCustomerTerms" rows="3">All pricing is draft pending internal review and approval.</textarea>
               </label>
+              <div class="quote-form-heading internal-note-field">Internal working notes</div>
               <label class="wide-field internal-note-field">
                 Internal notes - not shown in customer preview
                 <textarea id="printQuoteInternalNotes" rows="3">Classify any notes before relying on customer output. Do not include source/vendor/cost/markup/pricing-basis details in customer preview.</textarea>
@@ -931,11 +942,15 @@
                   <h2 id="printQuoteOutputTitle">Quote Builder</h2>
                   <p id="printQuoteOutputSubtitle">Internal draft built from customer-safe estimate totals.</p>
                 </div>
-                <div class="button-group">
-                  <button id="addPrintQuoteLineBtn" class="ghost-btn primary-action" type="button">Add Quote Line</button>
-                  <button id="refreshPrintQuoteLinesBtn" class="ghost-btn" type="button">Refresh Lines From Estimate</button>
-                  <button class="ghost-btn print-quote-mode active" type="button" data-print-quote-mode="builder" aria-pressed="true">Builder</button>
-                  <button class="ghost-btn print-quote-mode" type="button" data-print-quote-mode="customer" aria-pressed="false">Customer Preview</button>
+                <div class="button-group print-quote-actions">
+                  <div class="print-quote-action-group">
+                    <button id="addPrintQuoteLineBtn" class="ghost-btn primary-action" type="button">Add Quote Line</button>
+                    <button id="refreshPrintQuoteLinesBtn" class="ghost-btn" type="button">Refresh Lines From Estimate</button>
+                  </div>
+                  <div class="print-quote-action-group print-quote-view-switcher" role="group" aria-label="Quote output view">
+                    <button class="ghost-btn print-quote-mode active" type="button" data-print-quote-mode="builder" aria-pressed="true">Builder</button>
+                    <button class="ghost-btn print-quote-mode" type="button" data-print-quote-mode="customer" aria-pressed="false">Customer Preview</button>
+                  </div>
                 </div>
               </div>
               <div class="print-quote-boundary">
