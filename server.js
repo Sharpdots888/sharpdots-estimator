@@ -1224,8 +1224,8 @@ async function handleDocusealWebhook(rawBody, req, res) {
   const status = docusealWebhookStatus(eventType);
   await pool.query(
     `UPDATE sfpq_document_transactions
-     SET status = $2, updated_at = NOW(),
-         completed_at = CASE WHEN $2 = 'completed' THEN COALESCE(completed_at, NOW()) ELSE completed_at END,
+     SET status = $2::varchar, updated_at = NOW(),
+         completed_at = CASE WHEN $2::varchar = 'completed' THEN COALESCE(completed_at, NOW()) ELSE completed_at END,
          provider_payload = provider_payload || $3::jsonb
      WHERE transaction_id = $1`,
     [transaction.transaction_id, status, JSON.stringify({ lastWebhook: payload })]
