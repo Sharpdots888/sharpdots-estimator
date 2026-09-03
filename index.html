@@ -13,13 +13,11 @@
           <div class="workspace-title-row">
             <label class="project-title-label" for="workspaceName">Workspace Name</label>
             <span class="workspace-number-pill">Workspace # <output id="workspaceNumber" class="workspace-number-output"></output></span>
+            <span id="estimateDate" class="estimate-date"></span>
           </div>
           <input id="workspaceName" class="project-title-input" list="workspaceLookup" type="text" value="" placeholder="New workspace" />
           <span id="reportProjectTitle" class="report-project-title">Estimate</span>
-          <div class="report-meta">
-            <span id="estimateDate" class="estimate-date"></span>
-            <span class="report-project-number">Estimate # <strong id="reportProjectNumber">Unassigned</strong></span>
-          </div>
+          <span class="report-project-number">Estimate # <strong id="reportProjectNumber">Unassigned</strong></span>
           <datalist id="workspaceLookup"></datalist>
         </div>
         <div class="workspace-client-section header-section">
@@ -45,7 +43,6 @@
               <button class="workspace-mode-option" type="button" data-workspace-mode="proposal">Proposal</button>
               <button class="workspace-mode-option" type="button" data-workspace-mode="printEcomm">Print / Ecomm</button>
             </div>
-            <small id="workspaceModeScope" class="workspace-mode-scope">All tabs available</small>
         </div>
         <div class="workspace-actions-section header-section">
           <span class="header-section-label">Workspace actions</span>
@@ -389,7 +386,8 @@
             </label>
             <label>
               Prepared For
-              <input id="proposalPreparedFor" type="text" placeholder="Client contact or recipient name" />
+              <input id="proposalPreparedFor" list="proposalContactLookup" type="text" placeholder="Select a contact for this client" />
+              <datalist id="proposalContactLookup"></datalist>
             </label>
             <label>
               Pricing View

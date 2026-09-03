@@ -152,6 +152,10 @@ button:hover {
   text-transform: uppercase;
 }
 
+.workspace-title-row .estimate-date {
+  font-size: 0.72rem;
+}
+
 .workspace-client-control {
   display: grid;
   gap: 2px;
@@ -187,19 +191,6 @@ button:hover {
   font-size: 0.72rem;
   font-weight: 900;
   text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.workspace-mode-scope {
-  grid-column: 1 / -1;
-  overflow: hidden;
-  color: var(--muted);
-  font-size: 0.66rem;
-  font-weight: 800;
-  letter-spacing: 0;
-  line-height: 1.1;
-  text-overflow: ellipsis;
-  text-transform: none;
   white-space: nowrap;
 }
 
@@ -617,6 +608,11 @@ body[data-workspace-mode="printEcomm"] .workspace-mode-option.active {
   box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.06);
 }
 
+.app-tab[hidden],
+.app-tab-group[hidden] {
+  display: none;
+}
+
 .app-tab > span {
   font-size: 0.86rem;
   line-height: 1;
@@ -755,22 +751,6 @@ body[data-workspace-mode="proposal"] .app-view:not([hidden]) {
 
 body[data-workspace-mode="proposal"] .app-tab {
   background: #e6f0ec;
-}
-
-body[data-workspace-mode="proposal"] .app-tab[data-view="proposalView"] {
-  order: 1;
-}
-
-body[data-workspace-mode="proposal"] .app-tab[data-view="servicesView"] {
-  order: 2;
-}
-
-body[data-workspace-mode="proposal"] .app-tab[data-view="estimateView"] {
-  order: 3;
-}
-
-body[data-workspace-mode="proposal"] .app-tab[data-view="printQuoteView"] {
-  order: 4;
 }
 
 body[data-workspace-mode="proposal"] .app-tab.active {

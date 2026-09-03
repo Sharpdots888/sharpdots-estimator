@@ -480,6 +480,26 @@ async function handleGetClients(res) {
   sendJson(res, 200, result.rows.map(r => r.name));
 }
 
+async function handleGetClientContacts(reqUrl, res) {
+  const client = (new URL(`http://localhost${reqUrl}`).searchParams.get("client") || "").trim();
+  if (!client) {
+    sendJson(res, 200, []);
+    return;
+  }
+  const result = await pool.query(
+    `SELECT TRIM(CONCAT_WS(' ', p.first_name, p.last_name)) AS name, p.email
+     FROM sfvc_companies c
+     JOIN sfvc_company_people cp ON cp.company_id = c.company_id
+     JOIN sfvc_people p ON p.person_id = cp.person_id
+     WHERE c.status = 'Active'
+       AND (LOWER(COALESCE(c.display_name, '')) = LOWER($1)
+         OR LOWER(COALESCE(c.legal_name, '')) = LOWER($1))
+     ORDER BY cp.is_primary DESC, p.last_name, p.first_name`,
+    [client]
+  );
+  sendJson(res, 200, result.rows.filter((row) => row.name));
+}
+
 async function handleInventorySearch(reqUrl, res) {
   const params = new URL(`http://localhost${reqUrl}`).searchParams;
   const q = (params.get("q") || "").trim();
@@ -1284,6 +1304,8 @@ const server = http.createServer(async (req, res) => {
       await handleGetEstimate(key, res);
     } else if (url === "/api/seed" && method === "GET") {
       await handleGetSeed(req.url, res);
+    } else if (url.startsWith("/api/clients/contacts") && method === "GET") {
+      await handleGetClientContacts(req.url, res);
     } else if (url === "/api/clients" && method === "GET") {
       await handleGetClients(res);
     } else if (url === "/api/manufacturers" && method === "GET") {

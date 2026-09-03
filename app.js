@@ -201,6 +201,7 @@ function paymentSettingFor(type) {
 let paymentSettings = defaultPaymentSettings();
 let estimatesList = [];
 let clientsList = [];
+let clientContacts = [];
 let activeView = "proposalView";
 
 function defaultProposal() {
@@ -391,7 +392,7 @@ const workspaceModes = {
     scopeLabel: "Proposal and services workspace",
     templateDefault: "services",
     defaultView: "proposalView",
-    views: ["proposalView", "servicesView", "estimateView", "printQuoteView"]
+    views: ["proposalView", "estimateView", "servicesView", "sourcingView"]
   },
   printEcomm: {
     label: "Print / Ecomm",
@@ -399,7 +400,7 @@ const workspaceModes = {
     scopeLabel: "Print estimating workspace",
     templateDefault: "printQuote",
     defaultView: "printQuoteView",
-    views: ["estimateView", "printQuoteView", "ecommView"]
+    views: ["printQuoteView", "ecommView"]
   }
 };
 
@@ -414,7 +415,6 @@ const els = {
   workspaceName: document.querySelector("#workspaceName"),
   workspaceMode: document.querySelector("#workspaceMode"),
   workspaceModeButtons: document.querySelectorAll(".workspace-mode-option[data-workspace-mode]"),
-  workspaceModeScope: document.querySelector("#workspaceModeScope"),
   workspaceLookup: document.querySelector("#workspaceLookup"),
   estimateRecordNumber: document.querySelector("#estimateRecordNumber"),
   proposalRecordNumber: document.querySelector("#proposalRecordNumber"),
@@ -559,6 +559,7 @@ const els = {
   proposalTitle: document.querySelector("#proposalTitle"),
   proposalSubtitle: document.querySelector("#proposalSubtitle"),
   proposalPreparedFor: document.querySelector("#proposalPreparedFor"),
+  proposalContactLookup: document.querySelector("#proposalContactLookup"),
   proposalPricingMode: document.querySelector("#proposalPricingMode"),
   proposalTemplateSearch: document.querySelector("#proposalTemplateSearch"),
   proposalTemplateCategory: document.querySelector("#proposalTemplateCategory"),
@@ -1103,8 +1104,6 @@ function workspaceModeTabLabels(mode = workspaceMode) {
 }
 
 function renderWorkspaceModeButtons() {
-  const activeTabLabels = workspaceModeTabLabels();
-  const activeConfig = workspaceModes[workspaceMode] || workspaceModes.full;
   els.workspaceModeButtons?.forEach((button) => {
     const mode = button.dataset.workspaceMode;
     const config = workspaceModes[mode];
@@ -1115,10 +1114,6 @@ function renderWorkspaceModeButtons() {
     if (config?.buttonLabel) button.textContent = config.buttonLabel;
     button.title = config ? `${config.label}: ${tabLabels.join(", ")}` : "";
   });
-  if (els.workspaceModeScope) {
-    els.workspaceModeScope.textContent = `${activeConfig.scopeLabel} · ${activeTabLabels.join(", ")}`;
-    els.workspaceModeScope.title = `${activeConfig.label}: ${activeTabLabels.join(", ")}`;
-  }
 }
 
 function applyPublishingTemplateDefaultForMode(mode, previousMode = workspaceMode, force = false) {
@@ -1147,7 +1142,8 @@ function setWorkspaceMode(mode, options = {}) {
   }
   const targetView = options.preferredView && isViewVisibleInMode(options.preferredView)
     ? options.preferredView
-    : isViewVisibleInMode(activeView) ? activeView : defaultWorkspaceView();
+    : workspaceMode === "full" ? defaultWorkspaceView()
+      : isViewVisibleInMode(activeView) ? activeView : defaultWorkspaceView();
   setActiveView(targetView);
 }
 
@@ -8390,6 +8386,9 @@ function setActiveView(viewId) {
     tab.hidden = !isVisible;
     tab.classList.toggle("active", tab.dataset.view === activeView);
   });
+  document.querySelectorAll(".app-tab-group").forEach((group) => {
+    group.hidden = !Array.from(group.querySelectorAll(".app-tab")).some((tab) => !tab.hidden);
+  });
   if (activeView === "proposalView") renderProposal();
   if (activeView === "servicesView") renderServicesCalculator();
   if (activeView === "sourcingView") renderSourcing();
@@ -8446,6 +8445,35 @@ function renderDatalists() {
       els.projectNameLookup.append(option);
     }
   });
+}
+
+function renderProposalContactLookup() {
+  if (!els.proposalContactLookup) return;
+  els.proposalContactLookup.innerHTML = "";
+  clientContacts.forEach((contact) => {
+    const name = typeof contact === "string" ? contact : String(contact?.name || "").trim();
+    if (!name) return;
+    const option = document.createElement("option");
+    option.value = name;
+    if (contact?.email) option.label = contact.email;
+    els.proposalContactLookup.append(option);
+  });
+}
+
+async function refreshProposalContactLookup() {
+  const client = els.clientName?.value.trim();
+  clientContacts = [];
+  renderProposalContactLookup();
+  if (!client) return;
+  try {
+    const response = await fetch(`/api/clients/contacts?client=${encodeURIComponent(client)}`);
+    if (!response.ok) return;
+    const contacts = await response.json();
+    clientContacts = Array.isArray(contacts) ? contacts : [];
+    renderProposalContactLookup();
+  } catch {
+    // The static preview has no API; keep the contact field available for manual entry.
+  }
 }
 
 function renderFilters() {
@@ -10921,6 +10949,7 @@ els.estimateYear.addEventListener("change", () => {
   render();
 });
 els.clientName.addEventListener("input", renderProposalPreview);
+els.clientName.addEventListener("change", refreshProposalContactLookup);
 bindEstimateMetaInputs();
 els.workspaceName.addEventListener("change", syncWorkspaceFromName);
 els.workspaceName.addEventListener("input", renderSourcing);
@@ -11060,6 +11089,7 @@ async function init() {
   els.estimateDate.textContent = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date());
   startBlankEstimate();
   setWorkspaceMode("full", { preferredView: "proposalView" });
+  refreshProposalContactLookup();
   render();
   fetchDocusealConfiguration();
   runProposalExportQaIfRequested();
