@@ -399,7 +399,7 @@ const workspaceModes = {
     scopeLabel: "Print estimating workspace",
     templateDefault: "printQuote",
     defaultView: "printQuoteView",
-    views: ["printQuoteView", "ecommView", "estimateView"]
+    views: ["estimateView", "printQuoteView", "ecommView"]
   }
 };
 

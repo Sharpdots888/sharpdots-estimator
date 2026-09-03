@@ -544,6 +544,21 @@ body[data-workspace-mode="printEcomm"] .workspace-mode-option.active {
   background: transparent;
 }
 
+.app-tab-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.print-ecomm-tool-group {
+  margin: -4px 0 -1px 2px;
+  padding: 4px 4px 1px;
+  border: 1px solid var(--print-line);
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+  background: linear-gradient(180deg, #f3eaf4 0%, #efe4d9 100%);
+}
+
 .tool-nav-label {
   display: grid;
   flex: 0 0 auto;
@@ -700,11 +715,9 @@ body[data-workspace-mode="printEcomm"] .workspace-mode-option.active {
 }
 
 body[data-workspace-mode="printEcomm"] .app-tabs {
-  padding: 8px 8px 0;
-  border: 1px solid var(--print-line);
-  border-bottom: 0;
-  border-radius: 10px 10px 0 0;
-  background: linear-gradient(180deg, #f3eaf4 0%, #efe4d9 100%);
+  padding: 7px 0 0 4px;
+  border-bottom: 1px solid var(--print-line);
+  background: transparent;
 }
 
 body[data-workspace-mode="proposal"] .app-tabs {
@@ -749,22 +762,6 @@ body[data-workspace-mode="proposal"] .app-tab.active {
 body[data-workspace-mode="printEcomm"] .app-view:not([hidden]) {
   border-color: var(--print-line);
   background: #fffaf6;
-}
-
-body[data-workspace-mode="printEcomm"] .app-tab {
-  background: #eadfe8;
-}
-
-body[data-workspace-mode="printEcomm"] .app-tab[data-view="printQuoteView"] {
-  order: 1;
-}
-
-body[data-workspace-mode="printEcomm"] .app-tab[data-view="ecommView"] {
-  order: 2;
-}
-
-body[data-workspace-mode="printEcomm"] .app-tab[data-view="estimateView"] {
-  order: 3;
 }
 
 body[data-workspace-mode="printEcomm"] .app-tab.active {
