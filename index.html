@@ -9,16 +9,20 @@
   <body>
     <main class="app-shell">
       <header class="topbar">
-        <div class="workspace-title-wrap">
+        <div class="workspace-title-wrap header-section">
           <div class="workspace-title-row">
             <label class="project-title-label" for="workspaceName">Workspace Name</label>
             <span class="workspace-number-pill">Workspace # <output id="workspaceNumber" class="workspace-number-output"></output></span>
           </div>
           <input id="workspaceName" class="project-title-input" list="workspaceLookup" type="text" value="" placeholder="New workspace" />
           <span id="reportProjectTitle" class="report-project-title">Estimate</span>
+          <div class="report-meta">
+            <span id="estimateDate" class="estimate-date"></span>
+            <span class="report-project-number">Estimate # <strong id="reportProjectNumber">Unassigned</strong></span>
+          </div>
           <datalist id="workspaceLookup"></datalist>
         </div>
-        <div class="workspace-controls">
+        <div class="workspace-client-section header-section">
           <label class="workspace-client-control">
             Client / Account
             <input id="clientName" list="clientLookup" type="text" value="" placeholder="Enter or look up client" />
@@ -28,8 +32,9 @@
             <option value="Portofino"></option>
             <option value="Santa Direct"></option>
           </datalist>
-          <div class="workspace-mode-control">
-            <span>Mode</span>
+        </div>
+        <div class="workspace-mode-control header-section">
+            <span>Workspace mode</span>
             <select id="workspaceMode" class="workspace-mode-select" aria-label="Workspace mode">
               <option value="full">All Tools</option>
               <option value="proposal">Proposal / Services</option>
@@ -41,21 +46,17 @@
               <button class="workspace-mode-option" type="button" data-workspace-mode="printEcomm">Print / Ecomm</button>
             </div>
             <small id="workspaceModeScope" class="workspace-mode-scope">All tabs available</small>
-          </div>
-          <div class="workspace-action-row">
-            <button id="newWorkspaceBtn" class="ghost-btn compact-btn" type="button" title="Start a new workspace">New Workspace</button>
-            <button id="saveWorkspaceBtn" class="ghost-btn compact-btn" type="button" title="Save changed workspace tabs">Save Workspace</button>
-            <button id="duplicateWorkspaceBtn" class="ghost-btn compact-btn" type="button" title="Copy this workspace">Copy Workspace</button>
-            <button id="loadWorkspaceBtn" class="ghost-btn compact-btn" type="button" title="Open a saved workspace">Open Workspace</button>
-          </div>
         </div>
-        <div class="header-utility">
-          <div class="report-meta">
-            <span id="estimateDate" class="estimate-date"></span>
-            <span class="report-project-number">Estimate # <strong id="reportProjectNumber">Unassigned</strong></span>
+        <div class="workspace-actions-section header-section">
+          <span class="header-section-label">Workspace actions</span>
+          <div class="workspace-action-row">
+            <button id="newWorkspaceBtn" class="ghost-btn compact-btn" type="button" title="Start a new workspace">New</button>
+            <button id="saveWorkspaceBtn" class="ghost-btn compact-btn" type="button" title="Save changed workspace tabs">Save</button>
+            <button id="duplicateWorkspaceBtn" class="ghost-btn compact-btn" type="button" title="Copy this workspace">Copy</button>
+            <button id="loadWorkspaceBtn" class="ghost-btn compact-btn" type="button" title="Open a saved workspace">Open</button>
+            <button id="resetBtn" class="ghost-btn compact-btn" type="button" title="Reset to sheet values">Reset</button>
           </div>
           <span id="estimateSaveStatus" class="estimate-save-status" aria-live="polite"></span>
-          <button id="resetBtn" class="ghost-btn compact-btn" type="button" title="Reset to sheet values">Reset</button>
           <div class="header-output-controls" hidden>
             <select id="pdfScope" class="pdf-scope" title="Choose report pages for PDF">
               <option value="both">Both</option>
@@ -68,13 +69,16 @@
         </div>
       </header>
 
-      <nav class="app-tabs" aria-label="Estimating app sections">
-        <button class="app-tab active" type="button" data-view="proposalView">Proposal</button>
-        <button class="app-tab" type="button" data-view="estimateView">Estimate</button>
-        <button class="app-tab" type="button" data-view="servicesView">Services Calculator</button>
-        <button class="app-tab" type="button" data-view="sourcingView">Sourcing</button>
-        <button class="app-tab" type="button" data-view="printQuoteView">Print Quote</button>
-        <button class="app-tab" type="button" data-view="ecommView">Ecomm Pricing</button>
+      <nav class="app-tabs" aria-label="Workspace tools">
+        <div class="tool-nav-label" aria-hidden="true"><span>Workspace tools</span><small>Choose a work surface</small></div>
+        <button class="app-tab active" type="button" data-view="proposalView" data-label="Proposal"><span>Proposal</span><small>Deliver</small></button>
+        <button class="app-tab" type="button" data-view="estimateView" data-label="Estimate"><span>Estimate</span><small>Cost</small></button>
+        <button class="app-tab" type="button" data-view="servicesView" data-label="Services Calculator"><span>Services</span><small>Price services</small></button>
+        <button class="app-tab" type="button" data-view="sourcingView" data-label="Sourcing"><span>Sourcing</span><small>Source</small></button>
+        <div class="app-tab-group print-ecomm-tool-group" role="group" aria-label="Print and ecomm tools">
+          <button class="app-tab" type="button" data-view="printQuoteView" data-label="Print Quote"><span>Print Quote</span><small>Quote builder</small></button>
+          <button class="app-tab" type="button" data-view="ecommView" data-label="Ecomm Pricing"><span>Ecomm</span><small>Price list</small></button>
+        </div>
       </nav>
 
       <section id="estimateView" class="app-view" hidden>
@@ -110,6 +114,10 @@
 
       <section class="workspace">
         <aside class="control-panel" aria-label="Estimator controls">
+          <div class="control-panel-heading">
+            <h2>Estimate controls</h2>
+            <p>Set the scope, pricing defaults, and quantity scenario.</p>
+          </div>
           <label>
             Estimate #
             <output id="projectNumber" class="project-number-input"></output>
@@ -120,6 +128,7 @@
           </label>
           <datalist id="yearLookup"></datalist>
 
+          <div class="control-panel-section-label">Scope &amp; filters</div>
           <label>
             Search
             <input id="searchInput" type="search" placeholder="Package, product, element" />
@@ -135,6 +144,7 @@
             <div id="typeFilters" class="check-list"></div>
           </fieldset>
 
+          <div class="control-panel-section-label">Pricing defaults</div>
           <div class="control-row">
             <label>
               Global Markup
@@ -150,6 +160,7 @@
             </label>
           </div>
 
+          <div class="control-panel-section-label">Quantity scenario</div>
           <fieldset class="simulation-controls">
             <legend>Quantity Edit</legend>
             <label>
@@ -367,6 +378,7 @@
                 <p>Template-based narrative and pricing setup</p>
               </div>
             </div>
+            <div class="proposal-editor-section-label">Core proposal details</div>
             <label>
               Proposal Title
               <input id="proposalTitle" type="text" />
@@ -390,12 +402,13 @@
             <section class="proposal-publishing-panel" aria-label="Publishing setup">
               <div class="section-head compact-head">
                 <div>
-                  <h2>Publishing</h2>
-                  <p>Source template, working copy, and output setup</p>
+                <h2>Publishing</h2>
+                  <p>Choose a source, configure output, then prepare a review draft.</p>
                 </div>
                 <span id="proposalTemplateLibraryCount" class="publishing-template-count">31 catalog entries / 31 sanitized starters</span>
               </div>
               <section class="publishing-template-workflow" aria-label="Publishing source template workflow">
+                <div class="publishing-workflow-label">1. Choose a source template</div>
                 <div class="template-library-controls">
                   <label>
                     Search sources
@@ -426,6 +439,7 @@
                   <span id="proposalTemplateWorkingStatus" class="template-working-status">No starter loaded</span>
                 </div>
               </section>
+              <div class="publishing-workflow-label">2. Configure the output</div>
               <div class="publishing-grid">
                 <label>
                   Output preset
@@ -460,6 +474,7 @@
                 <span id="proposalTemplateStatus">Matches template</span>
                 <button id="resetProposalTemplateBtn" class="ghost-btn compact-btn" type="button" disabled>Reset to Template</button>
               </div>
+              <div class="publishing-workflow-label">3. Prepare for review</div>
               <details class="publishing-section-details">
                 <summary>Choose included sections</summary>
                 <fieldset class="publishing-section-picker">
@@ -623,6 +638,7 @@
                 <p>Omnichannel appointment engine prototype</p>
               </div>
             </div>
+            <div class="workbench-section-label">Commercial model</div>
             <label>
               Scenario
               <select id="serviceScenario">
@@ -644,6 +660,7 @@
               <label><input name="serviceTermMode" type="radio" value="initial" checked /> Initial term</label>
               <label><input name="serviceTermMode" type="radio" value="monthly" /> Monthly after initial</label>
             </fieldset>
+            <div class="workbench-section-label">Execution inputs</div>
             <label>
               Target Appointments / Month
               <input id="serviceAppointments" type="number" min="0" step="1" value="10" />
@@ -657,6 +674,7 @@
               <label>Win Rate % <input id="execWinRate" type="number" min="0" max="100" step="1" value="20" /></label>
               <div id="executionSummary" class="execution-summary"></div>
             </div>
+            <div class="workbench-section-label">Pricing policy</div>
             <label>
               Startup Markup %
               <input id="serviceStartupMarkup" type="number" min="0" max="300" step="5" value="50" />
@@ -732,6 +750,7 @@
                 <p>Manufacturer and vendor quote workbench</p>
               </div>
             </div>
+            <div class="workbench-section-label">Find sourcing items</div>
             <label>
               Search
               <input id="sourcingSearch" type="search" placeholder="Item, SKU, vendor, HTS" />
@@ -772,6 +791,7 @@
               <input id="sourcingShowAll" type="checkbox" />
               Show all estimate items
             </label>
+            <div class="workbench-section-label">Quote actions</div>
             <button id="populateSourcingSampleBtn" class="ghost-btn" type="button">Populate Sample Quotes</button>
             <div class="sourcing-import-export">
               <button id="selectVisibleSourcingBtn" class="ghost-btn" type="button">Select Visible</button>
@@ -819,7 +839,7 @@
               <div class="section-head">
                 <div>
                   <h2>Quote Board</h2>
-                  <p>Multiple suppliers and quantity breaks per item</p>
+                  <p>Compare suppliers, refresh quotes, make awards, and prepare purchasing.</p>
                 </div>
                 <div class="view-mode-toggle sourcing-view-toggle" role="group" aria-label="Sourcing board detail">
                   <button class="active" type="button" data-sourcing-view-mode="summary" aria-pressed="true">Summary</button>
@@ -879,6 +899,7 @@
                 Valid until
                 <input id="printQuoteValidUntil" type="date" />
               </label>
+              <div class="quote-form-heading">Customer &amp; fulfillment</div>
               <label>
                 Customer contact
                 <input id="printQuoteCustomerName" type="text" placeholder="Customer contact" />
@@ -895,6 +916,7 @@
                 Shipping amount
                 <input id="printQuoteShippingAmount" type="number" min="0" step="0.01" />
               </label>
+              <div class="quote-form-heading">Source &amp; scope</div>
               <label>
                 Source
                 <input id="printQuoteSource" type="text" value="In-house / vendor print source" />
@@ -907,6 +929,7 @@
                 Source URL
                 <input id="printQuoteSourceUrl" type="url" placeholder="https://..." />
               </label>
+              <div class="quote-form-heading">Customer-facing content</div>
               <label class="wide-field">
                 Customer note
                 <textarea id="printQuoteCustomerNote" rows="3" placeholder="Customer-safe note only"></textarea>
@@ -915,6 +938,7 @@
                 Customer terms
                 <textarea id="printQuoteCustomerTerms" rows="3">All pricing is draft pending internal review and approval.</textarea>
               </label>
+              <div class="quote-form-heading internal-note-field">Internal working notes</div>
               <label class="wide-field internal-note-field">
                 Internal notes - not shown in customer preview
                 <textarea id="printQuoteInternalNotes" rows="3">Classify any notes before relying on customer output. Do not include source/vendor/cost/markup/pricing-basis details in customer preview.</textarea>
@@ -930,11 +954,15 @@
                   <h2 id="printQuoteOutputTitle">Quote Builder</h2>
                   <p id="printQuoteOutputSubtitle">Internal draft built from customer-safe estimate totals.</p>
                 </div>
-                <div class="button-group">
-                  <button id="addPrintQuoteLineBtn" class="ghost-btn primary-action" type="button">Add Quote Line</button>
-                  <button id="refreshPrintQuoteLinesBtn" class="ghost-btn" type="button">Refresh Lines From Estimate</button>
-                  <button class="ghost-btn print-quote-mode active" type="button" data-print-quote-mode="builder" aria-pressed="true">Builder</button>
-                  <button class="ghost-btn print-quote-mode" type="button" data-print-quote-mode="customer" aria-pressed="false">Customer Preview</button>
+                <div class="button-group print-quote-actions">
+                  <div class="print-quote-action-group">
+                    <button id="addPrintQuoteLineBtn" class="ghost-btn primary-action" type="button">Add Quote Line</button>
+                    <button id="refreshPrintQuoteLinesBtn" class="ghost-btn" type="button">Refresh Lines From Estimate</button>
+                  </div>
+                  <div class="print-quote-action-group print-quote-view-switcher" role="group" aria-label="Quote output view">
+                    <button class="ghost-btn print-quote-mode active" type="button" data-print-quote-mode="builder" aria-pressed="true">Builder</button>
+                    <button class="ghost-btn print-quote-mode" type="button" data-print-quote-mode="customer" aria-pressed="false">Customer Preview</button>
+                  </div>
                 </div>
               </div>
               <div class="print-quote-boundary">
@@ -992,6 +1020,7 @@
             </article>
           </div>
           <div class="placeholder-form" aria-label="Ecomm price list draft fields">
+            <div class="placeholder-form-heading">List configuration</div>
             <label>
               Price List Name
               <input id="ecommListName" type="text" value="Ecomm Price List Draft" />
@@ -1000,6 +1029,7 @@
               Channel
               <input id="ecommChannel" type="text" value="Catalog / storefront" />
             </label>
+            <div class="placeholder-form-heading">Source &amp; scope</div>
             <label>
               External Ref
               <input id="ecommExternalRef" type="text" placeholder="Legacy price list id" />

@@ -85,14 +85,36 @@ button:hover {
 
 .topbar {
   display: grid;
-  grid-template-columns: minmax(300px, 1fr) minmax(420px, 0.85fr) auto;
-  align-items: end;
-  gap: 14px;
-  padding: 6px 0;
+  grid-template-columns: minmax(240px, 0.85fr) minmax(230px, 0.9fr) minmax(330px, 1.15fr) minmax(250px, 0.9fr);
+  align-items: start;
+  gap: 0;
+  padding: 10px 0 12px;
+  border-bottom: 1px solid rgba(217, 217, 217, 0.9);
 }
 
 .topbar > * {
   min-width: 0;
+}
+
+.header-section {
+  min-height: 62px;
+}
+
+.header-section + .header-section {
+  margin-left: 14px;
+  padding-left: 14px;
+  border-left: 1px solid var(--line);
+}
+
+.header-section-label {
+  display: block;
+  margin: 1px 0 5px;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .topbar h1,
@@ -130,14 +152,6 @@ button:hover {
   text-transform: uppercase;
 }
 
-.workspace-controls {
-  display: grid;
-  grid-template-columns: minmax(180px, 1fr) auto;
-  gap: 6px;
-  align-items: end;
-  min-width: 0;
-}
-
 .workspace-client-control {
   display: grid;
   gap: 2px;
@@ -162,7 +176,7 @@ button:hover {
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: 6px;
-  width: 390px;
+  width: auto;
   max-width: 100%;
   min-height: 30px;
   padding: 3px 5px 3px 8px;
@@ -191,18 +205,25 @@ button:hover {
 
 .workspace-action-row {
   display: flex;
-  grid-column: 1 / -1;
   gap: 5px;
-  justify-content: flex-end;
   flex-wrap: wrap;
 }
 
 .workspace-action-row .compact-btn {
   min-height: 28px;
-  min-width: 0;
-  padding: 0 8px;
+  min-width: 44px;
+  padding: 0 9px;
   font-size: 0.74rem;
   white-space: nowrap;
+}
+
+.workspace-actions-section .estimate-save-status {
+  display: block;
+  min-height: 14px;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 800;
 }
 
 .workspace-mode-select {
@@ -319,7 +340,7 @@ body[data-workspace-mode="printEcomm"] .workspace-mode-option.active {
   padding: 0;
   color: var(--ink);
   background: transparent;
-  font-size: clamp(1.45rem, 2.4vw, 2.35rem);
+  font-size: clamp(1.45rem, 2vw, 2rem);
   font-weight: 800;
   line-height: 1;
 }
@@ -538,14 +559,55 @@ body[data-workspace-mode="printEcomm"] .workspace-mode-option.active {
   flex-wrap: wrap;
   align-items: flex-end;
   margin: 10px 0 0;
-  padding: 0 0 0 4px;
+  padding: 7px 0 0 4px;
   border-bottom: 1px solid var(--line);
   background: transparent;
 }
 
+.app-tab-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.print-ecomm-tool-group {
+  margin: -4px 0 -1px 2px;
+  padding: 4px 4px 1px;
+  border: 1px solid var(--print-line);
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+  background: linear-gradient(180deg, #f3eaf4 0%, #efe4d9 100%);
+}
+
+.tool-nav-label {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 2px;
+  padding: 0 10px 9px 2px;
+  color: var(--muted);
+  line-height: 1;
+}
+
+.tool-nav-label span {
+  color: var(--ink);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tool-nav-label small {
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
 .app-tab {
+  display: grid;
+  gap: 2px;
+  align-content: center;
   position: relative;
-  min-height: 36px;
+  min-height: 44px;
+  padding: 5px 14px 6px;
   border-color: var(--line);
   border-bottom-color: var(--line);
   border-radius: 10px 10px 0 0;
@@ -553,6 +615,18 @@ body[data-workspace-mode="printEcomm"] .workspace-mode-option.active {
   background: #e9eef2;
   font-weight: 800;
   box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.06);
+}
+
+.app-tab > span {
+  font-size: 0.86rem;
+  line-height: 1;
+}
+
+.app-tab > small {
+  opacity: 0.72;
+  font-size: 0.64rem;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .app-tab.library-tab {
@@ -571,7 +645,7 @@ body[data-workspace-mode="printEcomm"] .workspace-mode-option.active {
 
 .app-tab.active {
   z-index: 1;
-  min-height: 40px;
+  min-height: 48px;
   color: var(--primary-dark);
   border-color: var(--line);
   border-bottom-color: #ffffff;
@@ -661,11 +735,9 @@ body[data-workspace-mode="printEcomm"] .workspace-mode-option.active {
 }
 
 body[data-workspace-mode="printEcomm"] .app-tabs {
-  padding: 8px 8px 0;
-  border: 1px solid var(--print-line);
-  border-bottom: 0;
-  border-radius: 10px 10px 0 0;
-  background: linear-gradient(180deg, #f3eaf4 0%, #efe4d9 100%);
+  padding: 7px 0 0 4px;
+  border-bottom: 1px solid var(--print-line);
+  background: transparent;
 }
 
 body[data-workspace-mode="proposal"] .app-tabs {
@@ -712,22 +784,6 @@ body[data-workspace-mode="printEcomm"] .app-view:not([hidden]) {
   background: #fffaf6;
 }
 
-body[data-workspace-mode="printEcomm"] .app-tab {
-  background: #eadfe8;
-}
-
-body[data-workspace-mode="printEcomm"] .app-tab[data-view="printQuoteView"] {
-  order: 1;
-}
-
-body[data-workspace-mode="printEcomm"] .app-tab[data-view="ecommView"] {
-  order: 2;
-}
-
-body[data-workspace-mode="printEcomm"] .app-tab[data-view="estimateView"] {
-  order: 3;
-}
-
 body[data-workspace-mode="printEcomm"] .app-tab.active {
   border-bottom-color: #fffaf6;
   background: #fffaf6;
@@ -739,11 +795,12 @@ body[data-workspace-mode="printEcomm"] .app-tab.active {
   grid-template-columns: minmax(148px, 0.72fr) minmax(240px, 1.35fr) minmax(108px, 0.34fr) minmax(118px, 0.48fr) auto;
   gap: 6px;
   align-items: center;
-  margin: 0 0 8px;
-  padding: 5px 7px;
+  margin: 0 0 10px;
+  padding: 7px 9px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: linear-gradient(180deg, #ffffff 0%, var(--soft) 100%);
+  background: linear-gradient(90deg, #ffffff 0%, #fafcfc 100%);
+  box-shadow: inset 3px 0 0 rgba(66, 139, 202, 0.35);
 }
 
 .tab-record-controls.estimate-record-controls {
@@ -991,6 +1048,18 @@ body[data-workspace-mode="printEcomm"] .placeholder-view .placeholder-panel {
   grid-column: 1 / -1;
 }
 
+.placeholder-form-heading {
+  grid-column: 1 / -1;
+  margin: 3px 0 -3px;
+  padding-top: 9px;
+  border-top: 1px solid var(--print-line);
+  color: var(--print-brown);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .placeholder-form input,
 .placeholder-form textarea {
   width: 100%;
@@ -1023,6 +1092,20 @@ body[data-workspace-mode="printEcomm"] .placeholder-view .placeholder-panel {
 
 .print-quote-form-grid {
   margin-top: 12px;
+  align-content: start;
+  gap: 10px 12px;
+}
+
+.quote-form-heading {
+  grid-column: 1 / -1;
+  margin: 3px 0 -3px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
+  color: var(--print-purple-dark);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .internal-note-field textarea {
@@ -1033,6 +1116,35 @@ body[data-workspace-mode="printEcomm"] .placeholder-view .placeholder-panel {
 .print-quote-output {
   min-width: 0;
   margin-top: 12px;
+  position: sticky;
+  top: 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fbfcfc;
+  box-shadow: 0 8px 22px rgba(31, 52, 66, 0.06);
+}
+
+.print-quote-output > .section-head {
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.print-quote-actions {
+  align-items: stretch;
+  gap: 7px;
+}
+
+.print-quote-action-group {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.print-quote-view-switcher {
+  padding-left: 7px;
+  border-left: 1px solid var(--line);
 }
 
 .print-quote-boundary {
@@ -1635,6 +1747,37 @@ legend {
   align-content: start;
   gap: 4px;
   padding: 6px;
+}
+
+.control-panel-heading {
+  margin: 1px 0 5px;
+  padding: 2px 2px 7px;
+  border-bottom: 1px solid var(--line);
+}
+
+.control-panel-heading h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.98rem;
+  line-height: 1.1;
+}
+
+.control-panel-heading p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.3;
+}
+
+.control-panel-section-label {
+  margin: 7px 0 1px;
+  padding-top: 7px;
+  border-top: 1px solid var(--line);
+  color: var(--primary-dark);
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 label,
@@ -2278,6 +2421,26 @@ body.summary-view .summary-hide {
 .proposal-editor textarea {
   min-height: 92px;
   line-height: 1.45;
+}
+
+.proposal-editor-section-label,
+.publishing-workflow-label {
+  color: var(--primary-dark);
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.proposal-editor-section-label {
+  margin: 3px 0 -2px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
+}
+
+.publishing-workflow-label {
+  margin: 4px 0 -2px;
 }
 
 .proposal-publishing-panel {
@@ -3487,6 +3650,24 @@ body.summary-view .summary-hide {
   gap: 10px;
 }
 
+.workbench-section-label {
+  margin: 4px 0 -3px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
+  color: var(--primary-dark);
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.services-controls > .section-head + .workbench-section-label,
+.sourcing-controls > .section-head + .workbench-section-label {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
 .services-workspace {
   min-width: 0;
   display: grid;
@@ -3690,6 +3871,35 @@ body.summary-view .summary-hide {
   display: grid;
   align-content: start;
   gap: 8px;
+}
+
+.sourcing-controls .workbench-section-label {
+  margin-top: 5px;
+}
+
+.sourcing-view-toggle {
+  max-width: 780px;
+  flex-wrap: wrap;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.sourcing-view-toggle button {
+  min-height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 8px;
+  background: #ffffff;
+}
+
+.sourcing-view-toggle button + button {
+  border-left: 1px solid var(--line);
+}
+
+.sourcing-view-toggle button.group-start {
+  margin-left: 6px;
 }
 
 .sourcing-help {
@@ -6062,13 +6272,14 @@ button.sourcing-health-pill:focus-visible {
   }
 
   .topbar {
-    grid-template-columns: minmax(260px, 0.85fr) minmax(380px, 1.15fr) auto;
-    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 0;
   }
 
-  .workspace-controls {
-    grid-template-columns: minmax(170px, 0.85fr) minmax(250px, 1.15fr);
-    gap: 5px;
+  .topbar .header-section:nth-child(3) {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: 0;
   }
 
   .workspace-mode-control {
@@ -6081,16 +6292,12 @@ button.sourcing-health-pill:focus-visible {
     font-size: 0.68rem;
   }
 
-  .workspace-action-row {
-    justify-content: flex-start;
-  }
-
   .workspace-action-row .compact-btn {
     padding-inline: 7px;
     font-size: 0.7rem;
   }
 
-  .header-utility .report-project-number {
+  .workspace-title-wrap .report-project-number {
     display: none;
   }
 
@@ -6137,22 +6344,20 @@ button.sourcing-health-pill:focus-visible {
   .topbar {
     align-items: flex-start;
     grid-template-columns: 1fr;
+    gap: 10px;
   }
 
-  .workspace-controls,
-  .header-utility {
+  .header-section,
+  .topbar .header-section:nth-child(3) {
     width: 100%;
-    justify-items: stretch;
+    min-height: 0;
+    margin-left: 0;
+    padding-left: 0;
+    border-left: 0;
   }
 
-  .workspace-controls {
-    grid-template-columns: 1fr;
-  }
-
-  .workspace-action-row,
-  .header-utility {
+  .workspace-action-row {
     justify-content: flex-start;
-    justify-items: start;
   }
 
   .proposal-preview-wrap {
@@ -6189,7 +6394,8 @@ button.sourcing-health-pill:focus-visible {
   }
 
   .workspace-title-wrap,
-  .workspace-controls,
+  .workspace-client-section,
+  .workspace-actions-section,
   .workspace-mode-control,
   .workspace-action-row,
   .tab-record-controls,
@@ -6200,14 +6406,16 @@ button.sourcing-health-pill:focus-visible {
   }
 
   .workspace-title-row,
-  .workspace-controls,
+  .workspace-client-section,
+  .workspace-actions-section,
   .workspace-mode-control,
   .workspace-action-row,
   .tab-record-controls {
     width: 100%;
   }
 
-  .workspace-controls,
+  .workspace-client-section,
+  .workspace-actions-section,
   .workspace-mode-control,
   .tab-record-controls,
   .tab-record-controls.estimate-record-controls,
