@@ -5,6 +5,10 @@ const os = require("os");
 const path = require("path");
 const { createHmac, randomBytes, timingSafeEqual } = require("crypto");
 const { Pool } = require("pg");
+const {
+  canSendClientDocuments,
+  requiresPortalSession
+} = require("./document-security");
 
 const port = process.env.PORT || 3000;
 const host = process.env.HOST || (process.env.PORT ? "0.0.0.0" : "127.0.0.1");
@@ -188,8 +192,12 @@ const documentMigrations = [
     sha256 CHAR(64) NOT NULL,
     content BYTEA NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE (transaction_id, provider_artifact_key)
-  )`
+     UNIQUE (transaction_id, provider_artifact_key)
+  )`,
+  `ALTER TABLE sfpq_document_transactions ADD COLUMN IF NOT EXISTS operator_id TEXT`,
+  `ALTER TABLE sfpq_document_transactions ADD COLUMN IF NOT EXISTS operator_username TEXT`,
+  `ALTER TABLE sfpq_document_transactions ADD COLUMN IF NOT EXISTS operator_email TEXT`,
+  `ALTER TABLE sfpq_document_transactions ADD COLUMN IF NOT EXISTS operator_is_admin BOOLEAN NOT NULL DEFAULT FALSE`
 ];
 
 async function runMigrations() {
@@ -397,9 +405,7 @@ async function handlePortalSso(req, res, token) {
 }
 
 function authRequiredFor(url) {
-  if (authMode === "disabled" || authMode === "portal-token-preferred") return false;
-  if (url === "/api/auth/me" || url === "/api/auth/logout" || url === "/favicon.ico") return false;
-  return authMode === "portal-token-required";
+  return requiresPortalSession(authMode, url);
 }
 
 function sendUnauthorized(res) {
@@ -919,7 +925,7 @@ async function docusealRequest(apiPath, options = {}) {
   return payload;
 }
 
-async function handleDocumentSigningStatus(res) {
+async function handleDocumentSigningStatus(res, session) {
   let databaseReady = false;
   try {
     const result = await pool.query(`SELECT to_regclass('sfpq_document_transactions') IS NOT NULL AS ready`);
@@ -927,18 +933,19 @@ async function handleDocumentSigningStatus(res) {
   } catch {
     databaseReady = false;
   }
+  const emailDeliveryEnabled = docusealSendEnabled && canSendClientDocuments(session);
   sendJson(res, 200, {
     provider: "docuseal",
     configured: Boolean(docusealApiKey) && databaseReady,
     apiConfigured: Boolean(docusealApiKey),
     databaseReady,
-    emailDeliveryEnabled: docusealSendEnabled,
+    emailDeliveryEnabled,
     webhookVerificationConfigured: Boolean(docusealWebhookSecret),
-    mode: docusealSendEnabled ? "send" : "prepare-only"
+    mode: emailDeliveryEnabled ? "send" : "prepare-only"
   });
 }
 
-async function handleCreateDocumentTransaction(body, res) {
+async function handleCreateDocumentTransaction(body, res, session) {
   if (!docusealApiKey) {
     sendJson(res, 503, { error: "DocuSeal is not configured on this server" });
     return;
@@ -975,6 +982,14 @@ async function handleCreateDocumentTransaction(body, res) {
     sendJson(res, 403, { error: "Email delivery is locked on this server; prepare the request without sending" });
     return;
   }
+  if (emailDeliveryRequested && !session) {
+    sendJson(res, 401, { error: "Authentication is required to send client documents" });
+    return;
+  }
+  if (emailDeliveryRequested && !canSendClientDocuments(session)) {
+    sendJson(res, 403, { error: "Only portal administrators may send client documents" });
+    return;
+  }
 
   const transactionId = crypto.randomUUID();
   const snapshot = payload.proposalSnapshot && typeof payload.proposalSnapshot === "object"
@@ -984,8 +999,9 @@ async function handleCreateDocumentTransaction(body, res) {
     `INSERT INTO sfpq_document_transactions (
       transaction_id, workspace_number, proposal_number, proposal_version,
       recipient_name, recipient_email, document_name, status,
-      email_delivery_requested, email_delivery_enabled, proposal_snapshot
-    ) VALUES ($1,$2,$3,$4,$5,$6,$7,'creating',$8,$9,$10::jsonb)`,
+      email_delivery_requested, email_delivery_enabled, proposal_snapshot,
+      operator_id, operator_username, operator_email, operator_is_admin
+    ) VALUES ($1,$2,$3,$4,$5,$6,$7,'creating',$8,$9,$10::jsonb,$11,$12,$13,$14)`,
     [
       transactionId,
       workspaceNumber || null,
@@ -996,7 +1012,11 @@ async function handleCreateDocumentTransaction(body, res) {
       documentName,
       emailDeliveryRequested,
       emailDeliveryEnabled,
-      JSON.stringify(snapshot)
+      JSON.stringify(snapshot),
+      session?.user?.id == null ? null : String(session.user.id),
+      String(session?.user?.username || "") || null,
+      String(session?.user?.email || "") || null,
+      Boolean(session?.user?.isAdmin)
     ]
   );
 
@@ -1056,6 +1076,82 @@ async function handleCreateDocumentTransaction(body, res) {
     );
     sendJson(res, 502, { error: error.message || "DocuSeal request failed", transactionId });
   }
+}
+
+async function handleGetDocumentArtifact(url, session, res) {
+  const match = url.match(/^\/api\/document-artifacts\/(\d+)$/);
+  if (!match) {
+    sendJson(res, 404, { error: "Document artifact not found" });
+    return;
+  }
+  const result = await pool.query(
+    `SELECT id, transaction_id, artifact_type, filename, content_type,
+            byte_size, sha256, content
+     FROM sfpq_document_artifacts
+     WHERE id = $1`,
+    [Number(match[1])]
+  );
+  const artifact = result.rows[0];
+  if (!artifact) {
+    sendJson(res, 404, { error: "Document artifact not found" });
+    return;
+  }
+
+  await recordArtifactAccess(artifact, session);
+  const filename = String(artifact.filename || "signed-document.pdf")
+    .replace(/[\r\n"]/g, "")
+    .slice(0, 180);
+  res.writeHead(200, {
+    "Content-Type": artifact.content_type || "application/pdf",
+    "Content-Length": Number(artifact.byte_size),
+    "Content-Disposition": `inline; filename="${filename}"`,
+    "Cache-Control": "private, no-store",
+    "X-Content-Type-Options": "nosniff"
+  });
+  res.end(artifact.content);
+}
+
+async function recordArtifactAccess(artifact, session) {
+  await pool.query(
+    `INSERT INTO sfpq_document_events (
+       transaction_id, provider, provider_event_key, event_type,
+       event_timestamp, verified, payload
+     ) VALUES ($1,'internal',$2,'artifact.accessed',NOW(),TRUE,$3::jsonb)`,
+    [
+      artifact.transaction_id,
+      crypto.randomUUID(),
+      JSON.stringify({
+        artifactId: Number(artifact.id),
+        artifactType: artifact.artifact_type,
+        operator: sanitizePortalUser(session?.user || {})
+      })
+    ]
+  );
+}
+
+async function handleGetDocumentArtifactList(url, res) {
+  const match = url.match(/^\/api\/document-transactions\/([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\/artifacts$/i);
+  if (!match) {
+    sendJson(res, 404, { error: "Document transaction not found" });
+    return;
+  }
+  const result = await pool.query(
+    `SELECT id, artifact_type, filename, content_type, byte_size, sha256, created_at
+     FROM sfpq_document_artifacts
+     WHERE transaction_id = $1
+     ORDER BY id`,
+    [match[1]]
+  );
+  sendJson(res, 200, result.rows.map((artifact) => ({
+    artifactId: Number(artifact.id),
+    artifactType: artifact.artifact_type,
+    filename: artifact.filename,
+    contentType: artifact.content_type,
+    byteSize: Number(artifact.byte_size),
+    sha256: artifact.sha256,
+    createdAt: artifact.created_at,
+    viewUrl: `/api/document-artifacts/${artifact.id}`
+  })));
 }
 
 async function handleGetDocumentTransactions(reqUrl, res) {
@@ -1291,12 +1387,16 @@ const server = http.createServer(async (req, res) => {
     } else if (url.startsWith("/api/inventory/search") && method === "GET") {
       await handleInventorySearch(req.url, res);
     } else if (url === "/api/document-signing/status" && method === "GET") {
-      await handleDocumentSigningStatus(res);
+      await handleDocumentSigningStatus(res, session);
     } else if (url === "/api/document-transactions" && method === "GET") {
       await handleGetDocumentTransactions(req.url, res);
     } else if (url === "/api/document-transactions" && method === "POST") {
       const body = await collectBody(req);
-      await handleCreateDocumentTransaction(body, res);
+      await handleCreateDocumentTransaction(body, res, session);
+    } else if (url.startsWith("/api/document-transactions/") && url.endsWith("/artifacts") && method === "GET") {
+      await handleGetDocumentArtifactList(url, res);
+    } else if (url.startsWith("/api/document-artifacts/") && method === "GET") {
+      await handleGetDocumentArtifact(url, session, res);
     } else if (url === "/api/webhooks/docuseal" && method === "POST") {
       const body = await collectBody(req);
       await handleDocusealWebhook(body, req, res);

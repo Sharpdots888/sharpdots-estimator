@@ -12,7 +12,7 @@ The estimator can prepare client proposal signature requests through DocuSeal Pr
 6. DocuSeal events update the transaction status through a verified webhook.
 7. On `submission.completed`, the server immediately archives the signed PDF and Certificate of Signature in Postgres.
 
-The estimator does not expose archived signed documents through a public download endpoint. An authenticated document viewer and retention policy should be added before production sending is enabled.
+Archived signed documents are available only through authenticated artifact endpoints. Each artifact access is written to the document event audit trail. The Proposal interface does not yet surface those endpoints as a document viewer.
 
 ## Server configuration
 
@@ -52,11 +52,13 @@ If startup reports that document workflow migrations were skipped, the database 
 Do not set `DOCUSEAL_SEND_ENABLED=true` until all of the following are complete:
 
 - Users authenticate to the estimator.
-- Roles identify who may send client documents.
-- The send action records the authenticated operator.
-- Archived-document access is authenticated and logged.
+- Portal administrators are the only users authorized to send client documents.
+- The send action records the authenticated operator ID, username, email, and admin status.
+- Archived-document access is authenticated and logged through `artifact.accessed` events.
 - Retention and deletion rules are approved.
 - Sandbox signing, decline, expiration, duplicate webhook, and completed-artifact tests pass.
+
+`portal-token-preferred` still allows general estimator use without a portal session, but document transactions and archived artifacts require one. The signed DocuSeal webhook is the sole document-workflow exception because it uses HMAC verification instead of a browser session. Before switching the entire app to `portal-token-required`, verify the Portal launcher and `/api/auth/me` response for each operator role.
 
 ## Later payment handoff
 
