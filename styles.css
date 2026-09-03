@@ -85,15 +85,36 @@ button:hover {
 
 .topbar {
   display: grid;
-  grid-template-columns: minmax(270px, 0.75fr) minmax(520px, 1.25fr) auto;
+  grid-template-columns: minmax(240px, 0.85fr) minmax(230px, 0.9fr) minmax(330px, 1.15fr) minmax(250px, 0.9fr);
   align-items: start;
-  gap: 12px 18px;
+  gap: 0;
   padding: 10px 0 12px;
   border-bottom: 1px solid rgba(217, 217, 217, 0.9);
 }
 
 .topbar > * {
   min-width: 0;
+}
+
+.header-section {
+  min-height: 62px;
+}
+
+.header-section + .header-section {
+  margin-left: 14px;
+  padding-left: 14px;
+  border-left: 1px solid var(--line);
+}
+
+.header-section-label {
+  display: block;
+  margin: 1px 0 5px;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .topbar h1,
@@ -131,14 +152,6 @@ button:hover {
   text-transform: uppercase;
 }
 
-.workspace-controls {
-  display: grid;
-  grid-template-columns: minmax(180px, 1fr) auto;
-  gap: 6px;
-  align-items: end;
-  min-width: 0;
-}
-
 .workspace-client-control {
   display: grid;
   gap: 2px;
@@ -163,7 +176,7 @@ button:hover {
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: 6px;
-  width: 390px;
+  width: auto;
   max-width: 100%;
   min-height: 30px;
   padding: 3px 5px 3px 8px;
@@ -192,18 +205,25 @@ button:hover {
 
 .workspace-action-row {
   display: flex;
-  grid-column: 1 / -1;
   gap: 5px;
-  justify-content: flex-end;
   flex-wrap: wrap;
 }
 
 .workspace-action-row .compact-btn {
   min-height: 28px;
-  min-width: 0;
-  padding: 0 8px;
+  min-width: 44px;
+  padding: 0 9px;
   font-size: 0.74rem;
   white-space: nowrap;
+}
+
+.workspace-actions-section .estimate-save-status {
+  display: block;
+  min-height: 14px;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 800;
 }
 
 .workspace-mode-select {
@@ -6252,13 +6272,14 @@ button.sourcing-health-pill:focus-visible {
   }
 
   .topbar {
-    grid-template-columns: minmax(260px, 0.85fr) minmax(380px, 1.15fr) auto;
-    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 0;
   }
 
-  .workspace-controls {
-    grid-template-columns: minmax(170px, 0.85fr) minmax(250px, 1.15fr);
-    gap: 5px;
+  .topbar .header-section:nth-child(3) {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: 0;
   }
 
   .workspace-mode-control {
@@ -6271,16 +6292,12 @@ button.sourcing-health-pill:focus-visible {
     font-size: 0.68rem;
   }
 
-  .workspace-action-row {
-    justify-content: flex-start;
-  }
-
   .workspace-action-row .compact-btn {
     padding-inline: 7px;
     font-size: 0.7rem;
   }
 
-  .header-utility .report-project-number {
+  .workspace-title-wrap .report-project-number {
     display: none;
   }
 
@@ -6327,22 +6344,20 @@ button.sourcing-health-pill:focus-visible {
   .topbar {
     align-items: flex-start;
     grid-template-columns: 1fr;
+    gap: 10px;
   }
 
-  .workspace-controls,
-  .header-utility {
+  .header-section,
+  .topbar .header-section:nth-child(3) {
     width: 100%;
-    justify-items: stretch;
+    min-height: 0;
+    margin-left: 0;
+    padding-left: 0;
+    border-left: 0;
   }
 
-  .workspace-controls {
-    grid-template-columns: 1fr;
-  }
-
-  .workspace-action-row,
-  .header-utility {
+  .workspace-action-row {
     justify-content: flex-start;
-    justify-items: start;
   }
 
   .proposal-preview-wrap {
@@ -6379,7 +6394,8 @@ button.sourcing-health-pill:focus-visible {
   }
 
   .workspace-title-wrap,
-  .workspace-controls,
+  .workspace-client-section,
+  .workspace-actions-section,
   .workspace-mode-control,
   .workspace-action-row,
   .tab-record-controls,
@@ -6390,14 +6406,16 @@ button.sourcing-health-pill:focus-visible {
   }
 
   .workspace-title-row,
-  .workspace-controls,
+  .workspace-client-section,
+  .workspace-actions-section,
   .workspace-mode-control,
   .workspace-action-row,
   .tab-record-controls {
     width: 100%;
   }
 
-  .workspace-controls,
+  .workspace-client-section,
+  .workspace-actions-section,
   .workspace-mode-control,
   .tab-record-controls,
   .tab-record-controls.estimate-record-controls,
