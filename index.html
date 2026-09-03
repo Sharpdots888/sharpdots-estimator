@@ -386,8 +386,7 @@
             </label>
             <label>
               Prepared For
-              <input id="proposalPreparedFor" list="proposalContactLookup" type="text" placeholder="Select a contact for this client" />
-              <datalist id="proposalContactLookup"></datalist>
+              <select id="proposalPreparedFor" disabled><option value="">Select a workspace client first</option></select>
             </label>
             <label>
               Pricing View
@@ -425,10 +424,11 @@
                   <span id="proposalTemplateWorkingStatus" class="template-working-status">No starter loaded</span>
                 </div>
               </section>
-              <div class="publishing-workflow-label">2. Configure the output</div>
+              <div class="publishing-workflow-label">2. Decide what the client receives</div>
+              <p class="publishing-business-copy">Choose the offer, who will receive it, and the information they can review before you send it.</p>
               <div class="publishing-grid">
                 <label>
-                  Output preset
+                  What you're offering
                   <select id="proposalPublishingTemplate">
                     <option value="directMail">Direct Mail Proposal</option>
                     <option value="services">Services Proposal</option>
@@ -438,14 +438,14 @@
                   </select>
                 </label>
                 <label>
-                  Audience
+                  Who will receive it
                   <select id="proposalOutputAudience">
                     <option value="client">Client</option>
                     <option value="internal">Internal</option>
                   </select>
                 </label>
                 <label>
-                  Output
+                  What it includes
                   <select id="proposalOutputScope">
                     <option value="both">Costs + Schedule</option>
                     <option value="costs">Costs Only</option>
@@ -460,7 +460,8 @@
                 <span id="proposalTemplateStatus">Matches template</span>
                 <button id="resetProposalTemplateBtn" class="ghost-btn compact-btn" type="button" disabled>Reset to Template</button>
               </div>
-              <div class="publishing-workflow-label">3. Prepare for review</div>
+              <div class="publishing-workflow-label">3. Get it ready to send</div>
+              <p class="publishing-business-copy">Confirm the records behind the proposal, then preview the client-facing version before sharing it.</p>
               <details class="publishing-section-details">
                 <summary>Choose included sections</summary>
                 <fieldset class="publishing-section-picker">
@@ -639,6 +640,17 @@
             <button id="uploadProposalTemplateBtn" type="submit">Upload starter</button>
             <span id="proposalTemplateUploadStatus" class="template-working-status" aria-live="polite"></span>
           </form>
+        </section>
+      </div>
+
+      <div id="proposalPdfPreviewModal" class="modal-backdrop" hidden>
+        <section class="load-estimate-dialog proposal-pdf-preview-dialog" role="dialog" aria-modal="true" aria-labelledby="proposalPdfPreviewTitle">
+          <div class="load-estimate-head">
+            <div><h2 id="proposalPdfPreviewTitle">Client proposal preview</h2><p>Review this client-facing version before printing or saving it as a PDF.</p></div>
+            <button id="closeProposalPdfPreviewBtn" class="ghost-btn compact-btn" type="button">Close</button>
+          </div>
+          <div id="proposalPdfPreviewContent" class="proposal-pdf-preview-content"></div>
+          <div class="template-library-actions"><button id="printProposalPdfPreviewBtn" type="button">Print / Save PDF</button></div>
         </section>
       </div>
 

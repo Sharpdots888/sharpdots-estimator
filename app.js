@@ -559,7 +559,10 @@ const els = {
   proposalTitle: document.querySelector("#proposalTitle"),
   proposalSubtitle: document.querySelector("#proposalSubtitle"),
   proposalPreparedFor: document.querySelector("#proposalPreparedFor"),
-  proposalContactLookup: document.querySelector("#proposalContactLookup"),
+  proposalPdfPreviewModal: document.querySelector("#proposalPdfPreviewModal"),
+  closeProposalPdfPreviewBtn: document.querySelector("#closeProposalPdfPreviewBtn"),
+  proposalPdfPreviewContent: document.querySelector("#proposalPdfPreviewContent"),
+  printProposalPdfPreviewBtn: document.querySelector("#printProposalPdfPreviewBtn"),
   proposalPricingMode: document.querySelector("#proposalPricingMode"),
   proposalTemplateSearch: document.querySelector("#proposalTemplateSearch"),
   proposalTemplateCategory: document.querySelector("#proposalTemplateCategory"),
@@ -1272,7 +1275,8 @@ async function syncWorkspaceFromName() {
   }
   clearAllWorkspaceRecordDirty();
   setWorkspaceNumber(workspace.workspaceNumber);
-  if (!els.clientName.value && workspace.clientName) els.clientName.value = workspace.clientName;
+  if (els.clientName) els.clientName.value = workspace.clientName || "";
+  await refreshProposalContactLookup();
   renderWorkspaceDatalists();
   renderSourcing();
 }
@@ -4275,7 +4279,6 @@ function renderProposalPublishFooter() {
 function ensureProposalDefaults() {
   const client = els.clientName.value.trim();
   const projectName = els.projectName.value.trim();
-  if (!proposal.preparedFor && client) proposal.preparedFor = client;
   if ((!proposal.title || proposal.title === "Proposal for Client") && client) proposal.title = `Proposal for ${client}`;
   if (!proposal.subtitle && projectName) proposal.subtitle = projectName;
 }
@@ -4384,11 +4387,11 @@ function renderProposalSignatureStatus() {
     const setupLabel = docusealConfiguration.mode === "checking"
       ? ""
       : docusealConfiguration.apiConfigured && !docusealConfiguration.databaseReady
-        ? "Database setup required"
-        : "API key setup required";
+        ? "Approval records are being set up"
+        : "Electronic client approval is not connected yet";
     els.proposalSignatureStatus.innerHTML = docusealConfiguration.mode === "checking"
       ? ""
-      : `<div class="signature-status-head"><strong>DocuSeal</strong><span>${escapeHtml(setupLabel)}</span></div>`;
+      : `<div class="signature-status-head"><strong>Client approval</strong><span>${escapeHtml(setupLabel)}</span></div>`;
     return;
   }
   const latest = proposalDocumentTransactions.slice(0, 3);
@@ -4608,7 +4611,7 @@ function renderProposalPublishingActions() {
       ? `${audienceName} preview output is available; save or attach flagged records before final output.`
       : docusealConfiguration.configured
         ? `Ready for ${audienceLower} output${proposalIsClientOutput() ? " and DocuSeal preparation" : ""}.`
-        : `Ready for ${audienceLower} PDF or CSV output. DocuSeal server setup is still required.`;
+        : `Ready for ${audienceLower} PDF or CSV output. Electronic client approval can be connected when that step is needed.`;
   }
   renderProposalSignatureStatus();
 }
@@ -8568,16 +8571,29 @@ function renderDatalists() {
 }
 
 function renderProposalContactLookup() {
-  if (!els.proposalContactLookup) return;
-  els.proposalContactLookup.innerHTML = "";
+  if (!els.proposalPreparedFor) return;
+  const previous = proposal.preparedFor || els.proposalPreparedFor.value;
+  els.proposalPreparedFor.innerHTML = "";
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = els.clientName?.value.trim() ? "Select a client contact" : "Select a workspace client first";
+  els.proposalPreparedFor.append(placeholder);
   clientContacts.forEach((contact) => {
     const name = typeof contact === "string" ? contact : String(contact?.name || "").trim();
     if (!name) return;
     const option = document.createElement("option");
     option.value = name;
-    if (contact?.email) option.label = contact.email;
-    els.proposalContactLookup.append(option);
+    option.textContent = contact?.email ? `${name} — ${contact.email}` : name;
+    els.proposalPreparedFor.append(option);
   });
+  if (previous && !clientContacts.some((contact) => (typeof contact === "string" ? contact : contact?.name) === previous)) {
+    const option = document.createElement("option");
+    option.value = previous;
+    option.textContent = previous;
+    els.proposalPreparedFor.append(option);
+  }
+  els.proposalPreparedFor.disabled = !els.clientName?.value.trim() || !clientContacts.length;
+  els.proposalPreparedFor.value = previous || "";
 }
 
 async function refreshProposalContactLookup() {
@@ -8598,7 +8614,8 @@ async function refreshProposalContactLookup() {
     clientContacts = Array.isArray(contacts) ? contacts : [];
     renderProposalContactLookup();
   } catch {
-    // The static preview has no API; keep the contact field available for manual entry.
+    // A contact must belong to the selected account; wait until its account record can be reached.
+    renderProposalContactLookup();
   }
 }
 
@@ -10244,7 +10261,7 @@ function printReport() {
   window.print();
 }
 
-function printProposalPublishingOutput() {
+function openProposalPdfPreview() {
   renderProposalPreview();
   const { needsSave, needsAttach } = proposalPublishingReadiness();
   const warningCount = needsSave.length + needsAttach.length;
@@ -10252,9 +10269,15 @@ function printProposalPublishingOutput() {
   setSaveStatus(warningCount
     ? `Preparing ${audienceLabel} PDF preview; ${warningCount} source issue${warningCount === 1 ? "" : "s"} flagged`
     : `Preparing ${audienceLabel} proposal PDF`);
+  if (els.proposalPdfPreviewContent) {
+    els.proposalPdfPreviewContent.innerHTML = document.querySelector(".proposal-page")?.outerHTML || "";
+  }
+  if (els.proposalPdfPreviewModal) els.proposalPdfPreviewModal.hidden = false;
+}
+
+function printProposalPublishingOutput() {
   document.body.classList.remove("report-print-costs", "report-print-schedule", "report-print-both");
   document.body.classList.add("proposal-print");
-  document.body.classList.toggle("proposal-print-draft", warningCount > 0);
   document.body.dataset.proposalOutputAudience = proposal.outputAudience || "client";
   document.body.dataset.proposalOutputScope = proposal.outputScope || "both";
   document.body.dataset.proposalPublishingTemplate = proposal.publishingTemplate || "directMail";
@@ -10905,6 +10928,16 @@ els.proposalTemplateUploadForm?.addEventListener("submit", uploadProposalTemplat
 els.loadProposalTemplateBtn?.addEventListener("click", loadSelectedProposalTemplate);
 els.renameProposalTemplateCopyBtn?.addEventListener("click", renameProposalTemplateCopy);
 els.resetProposalSourceBtn?.addEventListener("click", resetProposalStarterToSource);
+els.proposalPreparedFor?.addEventListener("change", () => {
+  proposal.preparedFor = els.proposalPreparedFor.value;
+  touchWorkspaceRecord("proposals");
+  renderProposalPreview();
+});
+els.closeProposalPdfPreviewBtn?.addEventListener("click", () => { els.proposalPdfPreviewModal.hidden = true; });
+els.proposalPdfPreviewModal?.addEventListener("click", (event) => {
+  if (event.target === els.proposalPdfPreviewModal) els.proposalPdfPreviewModal.hidden = true;
+});
+els.printProposalPdfPreviewBtn?.addEventListener("click", printProposalPublishingOutput);
 els.proposalEditPreviewBtn?.addEventListener("click", () => {
   proposalPreviewEditMode = !proposalPreviewEditMode;
   syncProposalPreviewEditableState();
@@ -11166,13 +11199,14 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && !els.loadWorkspaceModal.hidden) closeLoadWorkspaceDialog();
   if (event.key === "Escape" && els.libraryRecordModal && !els.libraryRecordModal.hidden) closeLibraryRecordDialog();
   if (event.key === "Escape" && els.docusealModal && !els.docusealModal.hidden) closeDocusealDialog();
+  if (event.key === "Escape" && els.proposalPdfPreviewModal && !els.proposalPdfPreviewModal.hidden) els.proposalPdfPreviewModal.hidden = true;
 });
 els.addPackageBtn.addEventListener("click", addPackage);
 els.addProductBtn.addEventListener("click", addProduct);
 els.addElementBtn.addEventListener("click", addElement);
 els.exportBtn.addEventListener("click", exportCsv);
 els.pdfBtn.addEventListener("click", printReport);
-els.proposalPublishPdfBtn.addEventListener("click", printProposalPublishingOutput);
+els.proposalPublishPdfBtn.addEventListener("click", openProposalPdfPreview);
 els.proposalPublishCsvBtn.addEventListener("click", exportProposalPublishingCsv);
 els.proposalSignatureBtn?.addEventListener("click", openDocusealDialog);
 els.closeDocusealBtn?.addEventListener("click", closeDocusealDialog);

@@ -483,9 +483,9 @@ async function handleGetEstimates(res) {
 async function handleGetClients(res) {
   // Pull from sfvc_companies (full contact DB) rather than the sparse sfpq_customers table
   const result = await pool.query(
-    `SELECT COALESCE(display_name, legal_name) AS name
+    `SELECT DISTINCT COALESCE(display_name, legal_name) AS name
      FROM sfvc_companies
-     WHERE status = 'Active'
+     WHERE COALESCE(display_name, legal_name) IS NOT NULL
      ORDER BY COALESCE(display_name, legal_name)`
   );
   sendJson(res, 200, result.rows.map(r => r.name));
@@ -502,8 +502,7 @@ async function handleGetClientContacts(reqUrl, res) {
      FROM sfvc_companies c
      JOIN sfvc_company_people cp ON cp.company_id = c.company_id
      JOIN sfvc_people p ON p.person_id = cp.person_id
-     WHERE c.status = 'Active'
-       AND (LOWER(COALESCE(c.display_name, '')) = LOWER($1)
+     WHERE (LOWER(COALESCE(c.display_name, '')) = LOWER($1)
          OR LOWER(COALESCE(c.legal_name, '')) = LOWER($1))
      ORDER BY cp.is_primary DESC, p.last_name, p.first_name`,
     [client]
