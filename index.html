@@ -407,24 +407,12 @@
               </div>
               <section class="publishing-template-workflow" aria-label="Publishing source template workflow">
                 <div class="publishing-workflow-label">1. Choose a source template</div>
-                <div class="template-library-controls">
-                  <label>
-                    Search sources
-                    <input id="proposalTemplateSearch" type="search" placeholder="Name, ID, category" />
-                  </label>
-                  <label>
-                    Category
-                    <select id="proposalTemplateCategory">
-                      <option value="all">All categories</option>
-                    </select>
-                  </label>
-                </div>
-                <label>
-                  Source template
-                  <select id="proposalTemplateSelect"></select>
-                </label>
+                <input id="proposalTemplateSearch" type="search" hidden />
+                <select id="proposalTemplateCategory" hidden><option value="all">All categories</option></select>
+                <select id="proposalTemplateSelect" hidden></select>
                 <div id="proposalTemplateSourceSummary" class="template-source-summary" aria-live="polite"></div>
                 <div class="template-library-actions">
+                  <button id="openProposalTemplateLibraryBtn" class="ghost-btn" type="button">Browse templates</button>
                   <button id="loadProposalTemplateBtn" type="button">Load Starter</button>
                   <button id="resetProposalSourceBtn" class="ghost-btn compact-btn" type="button" disabled>Reset to Source</button>
                 </div>
@@ -625,6 +613,34 @@
           </section>
         </section>
       </section>
+
+      <div id="proposalTemplateLibraryModal" class="modal-backdrop" hidden>
+        <section class="load-estimate-dialog library-record-dialog template-library-dialog" role="dialog" aria-modal="true" aria-labelledby="proposalTemplateLibraryTitle">
+          <div class="load-estimate-head">
+            <div>
+              <h2 id="proposalTemplateLibraryTitle">Source template library</h2>
+              <p>Find a starter by type, or add a new review-required source template.</p>
+            </div>
+            <button id="closeProposalTemplateLibraryBtn" class="ghost-btn compact-btn" type="button">Close</button>
+          </div>
+          <div class="template-library-dialog-controls">
+            <label>Search templates<input id="proposalTemplateLibrarySearch" type="search" placeholder="Name, file, ID, or type" /></label>
+            <label>Template type<select id="proposalTemplateLibraryCategory"><option value="all">All types</option></select></label>
+          </div>
+          <div id="proposalTemplateLibraryResults" class="template-library-results" aria-live="polite"></div>
+          <form id="proposalTemplateUploadForm" class="template-upload-form">
+            <div>
+              <h3>Add starter source</h3>
+              <p>Upload a PDF, DOC, or DOCX source. It will be marked review-required until approved copy is prepared.</p>
+            </div>
+            <label>Template name<input id="proposalTemplateUploadName" type="text" required placeholder="e.g. Q4 services proposal" /></label>
+            <label>Template type<select id="proposalTemplateUploadCategory"><option value="proposal">Proposal</option><option value="agreement">Agreement</option><option value="statement-of-work">Statement of work</option><option value="addendum">Addendum</option><option value="brochure">Brochure</option><option value="other">Other</option></select></label>
+            <label class="template-upload-file">Source file<input id="proposalTemplateUploadFile" type="file" accept="application/pdf,.pdf,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required /></label>
+            <button id="uploadProposalTemplateBtn" type="submit">Upload starter</button>
+            <span id="proposalTemplateUploadStatus" class="template-working-status" aria-live="polite"></span>
+          </form>
+        </section>
+      </div>
 
       <section id="servicesView" class="app-view services-view" hidden>
         <section class="tab-record-controls" data-record-type="services" aria-label="Service calculation record controls"></section>

@@ -140,6 +140,17 @@ const migrations = [
 ];
 
 const documentMigrations = [
+  `CREATE TABLE IF NOT EXISTS sfpq_proposal_source_templates (
+    template_id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    category TEXT NOT NULL DEFAULT 'other',
+    filename TEXT NOT NULL,
+    content_type TEXT NOT NULL,
+    byte_size INTEGER NOT NULL,
+    status TEXT NOT NULL DEFAULT 'review-held',
+    content BYTEA NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  )`,
   `CREATE TABLE IF NOT EXISTS sfpq_document_transactions (
     transaction_id UUID PRIMARY KEY,
     workspace_number VARCHAR(20),
@@ -498,6 +509,49 @@ async function handleGetClientContacts(reqUrl, res) {
     [client]
   );
   sendJson(res, 200, result.rows.filter((row) => row.name));
+}
+
+async function handleGetProposalSourceTemplates(res) {
+  const result = await pool.query(
+    `SELECT template_id AS id, name, category, filename AS file,
+            content_type AS "contentType", byte_size AS "byteSize", status,
+            created_at AS "createdAt"
+     FROM sfpq_proposal_source_templates
+     ORDER BY created_at DESC, name`
+  );
+  sendJson(res, 200, result.rows.map((row) => ({ ...row, pages: "—", qualityNotes: "Uploaded source starter; review all scope, pricing, claims, and terms before client use." })));
+}
+
+async function handlePostProposalSourceTemplate(body, res) {
+  const payload = JSON.parse(body || "{}");
+  const name = String(payload.name || "").trim().slice(0, 180);
+  const category = String(payload.category || "other").trim().slice(0, 80) || "other";
+  const filename = path.basename(String(payload.filename || "").trim()).slice(0, 220);
+  const contentType = String(payload.mimeType || "application/octet-stream").trim().slice(0, 120);
+  const allowedTypes = new Set([
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  ]);
+  if (!name || !filename || !allowedTypes.has(contentType)) {
+    sendJson(res, 400, { error: "Provide a name and a PDF, DOC, or DOCX file." });
+    return;
+  }
+  const content = Buffer.from(String(payload.data || ""), "base64");
+  if (!content.length || content.length > 10 * 1024 * 1024) {
+    sendJson(res, 400, { error: "Uploaded source must be between 1 byte and 10 MB." });
+    return;
+  }
+  const templateId = `upload-${crypto.randomUUID()}`;
+  const result = await pool.query(
+    `INSERT INTO sfpq_proposal_source_templates
+       (template_id, name, category, filename, content_type, byte_size, content)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
+     RETURNING template_id AS id, name, category, filename AS file,
+       content_type AS "contentType", byte_size AS "byteSize", status, created_at AS "createdAt"`,
+    [templateId, name, category, filename, contentType, content.length, content]
+  );
+  sendJson(res, 201, { ...result.rows[0], pages: "—", qualityNotes: "Uploaded source starter; review all scope, pricing, claims, and terms before client use." });
 }
 
 async function handleInventorySearch(reqUrl, res) {
@@ -1304,6 +1358,11 @@ const server = http.createServer(async (req, res) => {
       await handleGetEstimate(key, res);
     } else if (url === "/api/seed" && method === "GET") {
       await handleGetSeed(req.url, res);
+    } else if (url === "/api/proposal-source-templates" && method === "GET") {
+      await handleGetProposalSourceTemplates(res);
+    } else if (url === "/api/proposal-source-templates" && method === "POST") {
+      const body = await collectBody(req);
+      await handlePostProposalSourceTemplate(body, res);
     } else if (url.startsWith("/api/clients/contacts") && method === "GET") {
       await handleGetClientContacts(req.url, res);
     } else if (url === "/api/clients" && method === "GET") {

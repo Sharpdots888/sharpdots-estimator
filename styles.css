@@ -2509,6 +2509,89 @@ body.summary-view .summary-hide {
   font-size: 0.74rem;
 }
 
+.template-library-dialog {
+  width: min(980px, calc(100vw - 32px));
+}
+
+.template-library-dialog-controls,
+.template-upload-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(180px, 0.6fr);
+  gap: 10px;
+  align-items: end;
+}
+
+.template-library-results {
+  display: grid;
+  gap: 14px;
+  max-height: min(46vh, 520px);
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.template-library-type {
+  display: grid;
+  gap: 7px;
+}
+
+.template-library-type h3,
+.template-upload-form h3 {
+  margin: 0;
+  color: var(--primary-dark);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.template-library-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.template-library-card {
+  display: grid;
+  gap: 3px;
+  min-height: 84px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: #ffffff;
+  text-align: left;
+}
+
+.template-library-card:hover,
+.template-library-card:focus-visible,
+.template-library-card.selected {
+  border-color: var(--primary);
+  background: #f4f9fc;
+  box-shadow: inset 3px 0 0 var(--primary);
+}
+
+.template-library-card strong { font-size: 0.84rem; }
+.template-library-card span { color: var(--primary-dark); font-size: 0.7rem; font-weight: 900; }
+.template-library-card small { color: var(--muted); font-size: 0.68rem; overflow-wrap: anywhere; }
+
+.template-upload-form {
+  grid-template-columns: minmax(180px, 1fr) minmax(170px, 0.8fr) minmax(180px, 1fr) auto;
+  padding: 12px;
+  border: 1px solid rgba(66, 139, 202, 0.28);
+  border-radius: 8px;
+  background: #f8fbfd;
+}
+
+.template-upload-form > div { grid-column: 1 / -1; }
+.template-upload-form p { margin: 3px 0 0; color: var(--muted); font-size: 0.74rem; font-weight: 700; }
+.template-upload-form button { min-height: 32px; }
+.template-upload-form .template-working-status { grid-column: 1 / -1; }
+
+@media (max-width: 720px) {
+  .template-library-dialog-controls,
+  .template-upload-form,
+  .template-library-card-grid { grid-template-columns: 1fr; }
+}
+
 .template-working-status {
   flex: 1 1 150px;
   min-width: 0;

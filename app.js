@@ -564,6 +564,17 @@ const els = {
   proposalTemplateSearch: document.querySelector("#proposalTemplateSearch"),
   proposalTemplateCategory: document.querySelector("#proposalTemplateCategory"),
   proposalTemplateSelect: document.querySelector("#proposalTemplateSelect"),
+  openProposalTemplateLibraryBtn: document.querySelector("#openProposalTemplateLibraryBtn"),
+  proposalTemplateLibraryModal: document.querySelector("#proposalTemplateLibraryModal"),
+  closeProposalTemplateLibraryBtn: document.querySelector("#closeProposalTemplateLibraryBtn"),
+  proposalTemplateLibrarySearch: document.querySelector("#proposalTemplateLibrarySearch"),
+  proposalTemplateLibraryCategory: document.querySelector("#proposalTemplateLibraryCategory"),
+  proposalTemplateLibraryResults: document.querySelector("#proposalTemplateLibraryResults"),
+  proposalTemplateUploadForm: document.querySelector("#proposalTemplateUploadForm"),
+  proposalTemplateUploadName: document.querySelector("#proposalTemplateUploadName"),
+  proposalTemplateUploadCategory: document.querySelector("#proposalTemplateUploadCategory"),
+  proposalTemplateUploadFile: document.querySelector("#proposalTemplateUploadFile"),
+  proposalTemplateUploadStatus: document.querySelector("#proposalTemplateUploadStatus"),
   proposalTemplateLibraryCount: document.querySelector("#proposalTemplateLibraryCount"),
   proposalTemplateSourceSummary: document.querySelector("#proposalTemplateSourceSummary"),
   loadProposalTemplateBtn: document.querySelector("#loadProposalTemplateBtn"),
@@ -3071,6 +3082,8 @@ const proposalTemplateCatalog = [
   { id: "406423", category: "statement-of-work", name: "Print Editing and Marketing Platform Statement of Work", file: "030-406423-statement-of-work-print-editing-and-marketing-platform.pdf", pages: 10, checksum: "66b8011fe8c9be49b0c171c081f5f3b3e8239b50d90265e75da801f9de00ca61", status: "sanitized-starter", qualityNotes: "Sanitized print-editing/platform SOW starter; print scope, data flows, platform work, approvals, fees, and terms require current review." }
 ];
 
+let uploadedProposalTemplateCatalog = [];
+
 const proposalStarterTemplates = {
   "122606": {
     basePreset: "services",
@@ -3516,8 +3529,12 @@ const proposalTemplateStatusLabels = {
 };
 let proposalPreviewEditMode = false;
 
+function allProposalTemplateCatalog() {
+  return [...proposalTemplateCatalog, ...uploadedProposalTemplateCatalog];
+}
+
 function proposalCatalogEntry(id) {
-  return proposalTemplateCatalog.find((entry) => entry.id === String(id || "")) || null;
+  return allProposalTemplateCatalog().find((entry) => entry.id === String(id || "")) || null;
 }
 
 function proposalStarterEntry(id) {
@@ -3529,13 +3546,13 @@ function proposalTemplateStatusLabel(status) {
 }
 
 function proposalTemplateCategories() {
-  return uniqueValues(proposalTemplateCatalog.map((entry) => entry.category));
+  return uniqueValues(allProposalTemplateCatalog().map((entry) => entry.category));
 }
 
 function proposalFilteredTemplateCatalog() {
-  const query = String(els.proposalTemplateSearch?.value || "").trim().toLowerCase();
-  const category = els.proposalTemplateCategory?.value || "all";
-  return proposalTemplateCatalog.filter((entry) => {
+  const query = String(els.proposalTemplateLibrarySearch?.value || els.proposalTemplateSearch?.value || "").trim().toLowerCase();
+  const category = els.proposalTemplateLibraryCategory?.value || els.proposalTemplateCategory?.value || "all";
+  return allProposalTemplateCatalog().filter((entry) => {
     if (category !== "all" && entry.category !== category) return false;
     if (!query) return true;
     return [entry.id, entry.name, entry.category, entry.file, entry.status]
@@ -3548,28 +3565,37 @@ function proposalFilteredTemplateCatalog() {
 function proposalTemplateMetaFor(sourceId, displayName) {
   const source = proposalCatalogEntry(sourceId);
   const starter = proposalStarterEntry(sourceId);
-  if (!source || !starter) return null;
+  if (!source) return null;
   return {
     sourceTemplateId: source.id,
     sourceName: source.name,
     sourceFile: source.file,
     sourceChecksum: source.checksum,
-    displayName: String(displayName || starter.displayName || source.name).trim() || source.name,
+    displayName: String(displayName || starter?.displayName || source.name).trim() || source.name,
     category: source.category,
-    basePreset: starter.basePreset,
+    basePreset: starter?.basePreset || "directMail",
     sourceRevision: 1,
-    starterStatus: "sanitized-starter"
+    starterStatus: starter ? "sanitized-starter" : source.status || "review-held"
   };
 }
 
 function applyProposalStarter(sourceId, options = {}) {
   const source = proposalCatalogEntry(sourceId);
   const starter = proposalStarterEntry(sourceId);
-  if (!source || !starter) return false;
-  const displayName = options.displayName || starter.displayName || source.name;
-  applyProposalTemplatePreset(starter.basePreset || "directMail");
+  if (!source) return false;
+  const displayName = options.displayName || starter?.displayName || source.name;
+  applyProposalTemplatePreset(starter?.basePreset || "directMail");
   proposal.templateMeta = proposalTemplateMetaFor(source.id, displayName);
-  Object.entries(starter.fields || {}).forEach(([key, value]) => {
+  Object.entries(starter?.fields || {
+    title: source.name,
+    subtitle: `${source.category.replaceAll("-", " ")} source starter — review required before client use`,
+    overview: `This draft starts from the uploaded source “${source.name}.” Confirm all client-specific scope, pricing, claims, terms, and approvals before use.`,
+    audience: "Confirm the client, authorized contacts, intended audience, source assumptions, and required reviewers.",
+    deliverables: "Add the current deliverables and references that have been approved for this engagement.",
+    valueNarrative: "Use the source as a review input; current project and estimate records remain the operating source of truth.",
+    nextSteps: "1. Review the uploaded source.\n2. Add current project details and approvals.\n3. Confirm client-ready copy before sending.",
+    terms: "Review required. Uploaded source material does not establish approved terms, pricing, or commitments."
+  }).forEach(([key, value]) => {
     if (proposalNarrativeFields.includes(key)) proposal[key] = value;
   });
   return true;
@@ -3622,20 +3648,20 @@ function renderProposalTemplateLibrary() {
   if (!els.proposalTemplateSelect) return;
   const starterCount = Object.keys(proposalStarterTemplates).length;
   if (els.proposalTemplateLibraryCount) {
-    els.proposalTemplateLibraryCount.textContent = `${proposalTemplateCatalog.length} catalog entries / ${starterCount} sanitized starters`;
+    els.proposalTemplateLibraryCount.textContent = `${allProposalTemplateCatalog().length} sources / ${starterCount} prepared starters`;
   }
-  if (els.proposalTemplateCategory && !els.proposalTemplateCategory.dataset.loaded) {
+  if (els.proposalTemplateLibraryCategory && !els.proposalTemplateLibraryCategory.dataset.loaded) {
     proposalTemplateCategories().forEach((category) => {
       const option = document.createElement("option");
       option.value = category;
       option.textContent = category.replaceAll("-", " ");
-      els.proposalTemplateCategory.append(option);
+      els.proposalTemplateLibraryCategory.append(option);
     });
-    els.proposalTemplateCategory.dataset.loaded = "true";
+    els.proposalTemplateLibraryCategory.dataset.loaded = "true";
   }
 
   const previous = els.proposalTemplateSelect.value || proposal.templateMeta?.sourceTemplateId || "329536";
-  const entries = proposalFilteredTemplateCatalog();
+  const entries = allProposalTemplateCatalog();
   els.proposalTemplateSelect.innerHTML = "";
   entries.forEach((entry) => {
     const option = document.createElement("option");
@@ -3656,7 +3682,7 @@ function renderProposalTemplateLibrary() {
       `
       : "<span>No catalog entries match the current filter.</span>";
   }
-  if (els.loadProposalTemplateBtn) els.loadProposalTemplateBtn.disabled = !selectedStarter;
+  if (els.loadProposalTemplateBtn) els.loadProposalTemplateBtn.disabled = !selected;
   if (els.resetProposalSourceBtn) els.resetProposalSourceBtn.disabled = !proposal.templateMeta?.sourceTemplateId || !proposalStarterEntry(proposal.templateMeta.sourceTemplateId);
   if (els.renameProposalTemplateCopyBtn) els.renameProposalTemplateCopyBtn.disabled = !proposal.templateMeta?.sourceTemplateId;
   if (els.proposalTemplateDisplayName && document.activeElement !== els.proposalTemplateDisplayName) {
@@ -3666,6 +3692,100 @@ function renderProposalTemplateLibrary() {
     els.proposalTemplateWorkingStatus.textContent = proposal.templateMeta?.sourceTemplateId
       ? `Working copy from ${proposal.templateMeta.sourceTemplateId}; source identity preserved`
       : "No starter loaded";
+  }
+  renderProposalTemplateLibraryResults();
+}
+
+function renderProposalTemplateLibraryResults() {
+  if (!els.proposalTemplateLibraryResults) return;
+  const entries = proposalFilteredTemplateCatalog();
+  if (!entries.length) {
+    els.proposalTemplateLibraryResults.innerHTML = `<div class="proposal-empty">No templates match this search.</div>`;
+    return;
+  }
+  const byCategory = entries.reduce((groups, entry) => {
+    (groups[entry.category] ||= []).push(entry);
+    return groups;
+  }, {});
+  els.proposalTemplateLibraryResults.innerHTML = Object.entries(byCategory).map(([category, templates]) => `
+    <section class="template-library-type">
+      <h3>${escapeHtml(category.replaceAll("-", " "))}</h3>
+      <div class="template-library-card-grid">
+        ${templates.map((entry) => `
+          <button class="template-library-card ${entry.id === els.proposalTemplateSelect?.value ? "selected" : ""}" type="button" data-proposal-template-id="${escapeHtml(entry.id)}">
+            <strong>${escapeHtml(entry.name)}</strong>
+            <span>${escapeHtml(proposalTemplateStatusLabel(entry.status))} · ${escapeHtml(String(entry.pages || "—"))} pages</span>
+            <small>${escapeHtml(entry.file)}</small>
+          </button>
+        `).join("")}
+      </div>
+    </section>
+  `).join("");
+}
+
+function openProposalTemplateLibrary() {
+  if (!els.proposalTemplateLibraryModal) return;
+  els.proposalTemplateLibraryModal.hidden = false;
+  renderProposalTemplateLibrary();
+  els.proposalTemplateLibrarySearch?.focus();
+}
+
+function closeProposalTemplateLibrary() {
+  if (els.proposalTemplateLibraryModal) els.proposalTemplateLibraryModal.hidden = true;
+}
+
+async function loadUploadedProposalTemplates() {
+  try {
+    const response = await fetch("/api/proposal-source-templates");
+    if (!response.ok) return;
+    const templates = await response.json();
+    uploadedProposalTemplateCatalog = Array.isArray(templates) ? templates : [];
+    if (els.proposalTemplateLibraryCategory) {
+      els.proposalTemplateLibraryCategory.innerHTML = `<option value="all">All types</option>`;
+      els.proposalTemplateLibraryCategory.dataset.loaded = "";
+    }
+    renderProposalTemplateLibrary();
+  } catch {
+    // The standalone file preview intentionally runs without the source-template API.
+  }
+}
+
+async function uploadProposalTemplate(event) {
+  event.preventDefault();
+  const file = els.proposalTemplateUploadFile?.files?.[0];
+  const name = els.proposalTemplateUploadName?.value.trim();
+  if (!file || !name) return;
+  if (file.size > 10 * 1024 * 1024) {
+    els.proposalTemplateUploadStatus.textContent = "Choose a file smaller than 10 MB.";
+    return;
+  }
+  els.proposalTemplateUploadStatus.textContent = "Uploading source…";
+  const data = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || "").split(",", 2)[1] || "");
+    reader.onerror = () => reject(new Error("Unable to read the source file."));
+    reader.readAsDataURL(file);
+  });
+  try {
+    const response = await fetch("/api/proposal-source-templates", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        category: els.proposalTemplateUploadCategory?.value || "other",
+        filename: file.name,
+        mimeType: file.type || "application/octet-stream",
+        data
+      })
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || "Upload failed");
+    uploadedProposalTemplateCatalog = [...uploadedProposalTemplateCatalog, result];
+    els.proposalTemplateUploadForm.reset();
+    els.proposalTemplateUploadStatus.textContent = "Uploaded. Select the new source below.";
+    renderProposalTemplateLibrary();
+  } catch (error) {
+    els.proposalTemplateUploadStatus.textContent = error.message || "Upload failed.";
   }
 }
 
@@ -8462,6 +8582,12 @@ function renderProposalContactLookup() {
 
 async function refreshProposalContactLookup() {
   const client = els.clientName?.value.trim();
+  const workspace = workspaceByNumber(currentWorkspaceNumber);
+  if (workspace && workspace.clientName !== client) {
+    workspace.clientName = client;
+    workspace.updatedAt = new Date().toISOString();
+    saveWorkspaces();
+  }
   clientContacts = [];
   renderProposalContactLookup();
   if (!client) return;
@@ -10757,13 +10883,25 @@ if (els.sourcingItems) {
   });
 }
 [
-  els.proposalTemplateSearch,
-  els.proposalTemplateCategory,
-  els.proposalTemplateSelect
+  els.proposalTemplateLibrarySearch,
+  els.proposalTemplateLibraryCategory
 ].filter(Boolean).forEach((input) => {
-  input.addEventListener("input", renderProposalTemplateLibrary);
-  input.addEventListener("change", renderProposalTemplateLibrary);
+  input.addEventListener("input", renderProposalTemplateLibraryResults);
+  input.addEventListener("change", renderProposalTemplateLibraryResults);
 });
+els.openProposalTemplateLibraryBtn?.addEventListener("click", openProposalTemplateLibrary);
+els.closeProposalTemplateLibraryBtn?.addEventListener("click", closeProposalTemplateLibrary);
+els.proposalTemplateLibraryModal?.addEventListener("click", (event) => {
+  if (event.target === els.proposalTemplateLibraryModal) closeProposalTemplateLibrary();
+});
+els.proposalTemplateLibraryResults?.addEventListener("click", (event) => {
+  const card = event.target.closest("[data-proposal-template-id]");
+  if (!card || !els.proposalTemplateSelect) return;
+  els.proposalTemplateSelect.value = card.dataset.proposalTemplateId;
+  renderProposalTemplateLibrary();
+  closeProposalTemplateLibrary();
+});
+els.proposalTemplateUploadForm?.addEventListener("submit", uploadProposalTemplate);
 els.loadProposalTemplateBtn?.addEventListener("click", loadSelectedProposalTemplate);
 els.renameProposalTemplateCopyBtn?.addEventListener("click", renameProposalTemplateCopy);
 els.resetProposalSourceBtn?.addEventListener("click", resetProposalStarterToSource);
@@ -11090,6 +11228,7 @@ async function init() {
   startBlankEstimate();
   setWorkspaceMode("full", { preferredView: "proposalView" });
   refreshProposalContactLookup();
+  loadUploadedProposalTemplates();
   render();
   fetchDocusealConfiguration();
   runProposalExportQaIfRequested();
