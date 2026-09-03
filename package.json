@@ -4,7 +4,8 @@
   "private": true,
   "description": "Estimator application for package, product/service, and element costing.",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test"
   },
   "engines": {
     "node": "22.x"
