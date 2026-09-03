@@ -1031,6 +1031,18 @@ body[data-workspace-mode="printEcomm"] .placeholder-view .placeholder-panel {
   grid-column: 1 / -1;
 }
 
+.placeholder-form-heading {
+  grid-column: 1 / -1;
+  margin: 3px 0 -3px;
+  padding-top: 9px;
+  border-top: 1px solid var(--print-line);
+  color: var(--print-brown);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .placeholder-form input,
 .placeholder-form textarea {
   width: 100%;
