@@ -47,6 +47,19 @@ The server creates these tables when its database role has schema privileges:
 
 If startup reports that document workflow migrations were skipped, the database owner must apply the `documentMigrations` statements from `server.js` before the feature can create requests.
 
+## Pilot retention policy
+
+Approved September 3, 2026 for the DocuSeal pilot:
+
+- Retain completed signed PDFs, Certificates of Signature, transaction metadata, and audit events indefinitely during the pilot.
+- Do not automatically delete document-workflow records or artifacts.
+- Delete records or artifacts only through a documented action approved by an administrator.
+- Preserve transaction metadata and audit events for declined, expired, and failed requests. These states do not produce signed-document artifacts.
+- A legal hold overrides any future deletion schedule or deletion approval.
+- Review the long-term retention period and migration of document artifacts to external object storage by December 2, 2026.
+
+This policy is the pilot operating rule, not the final company records schedule. Any automated deletion, shortened retention period, or storage migration requires a separately reviewed implementation and approval.
+
 ## Production gate
 
 Do not set `DOCUSEAL_SEND_ENABLED=true` until all of the following are complete:
@@ -55,7 +68,7 @@ Do not set `DOCUSEAL_SEND_ENABLED=true` until all of the following are complete:
 - Portal administrators are the only users authorized to send client documents.
 - The send action records the authenticated operator ID, username, email, and admin status.
 - Archived-document access is authenticated and logged through `artifact.accessed` events.
-- Retention and deletion rules are approved.
+- The approved pilot retention policy above is in effect.
 - Sandbox signing, decline, expiration, duplicate webhook, and completed-artifact tests pass.
 
 `portal-token-preferred` still allows general estimator use without a portal session, but document transactions and archived artifacts require one. The signed DocuSeal webhook is the sole document-workflow exception because it uses HMAC verification instead of a browser session. Before switching the entire app to `portal-token-required`, verify the Portal launcher and `/api/auth/me` response for each operator role.
