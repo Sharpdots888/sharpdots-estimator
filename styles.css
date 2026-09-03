@@ -2406,6 +2406,26 @@ body.summary-view .summary-hide {
   line-height: 1.45;
 }
 
+.proposal-editor-section-label,
+.publishing-workflow-label {
+  color: var(--primary-dark);
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.proposal-editor-section-label {
+  margin: 3px 0 -2px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
+}
+
+.publishing-workflow-label {
+  margin: 4px 0 -2px;
+}
+
 .proposal-publishing-panel {
   display: grid;
   grid-template-columns: minmax(0, 1fr);

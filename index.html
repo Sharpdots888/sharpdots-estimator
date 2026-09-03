@@ -375,6 +375,7 @@
                 <p>Template-based narrative and pricing setup</p>
               </div>
             </div>
+            <div class="proposal-editor-section-label">Core proposal details</div>
             <label>
               Proposal Title
               <input id="proposalTitle" type="text" />
@@ -398,12 +399,13 @@
             <section class="proposal-publishing-panel" aria-label="Publishing setup">
               <div class="section-head compact-head">
                 <div>
-                  <h2>Publishing</h2>
-                  <p>Source template, working copy, and output setup</p>
+                <h2>Publishing</h2>
+                  <p>Choose a source, configure output, then prepare a review draft.</p>
                 </div>
                 <span id="proposalTemplateLibraryCount" class="publishing-template-count">31 catalog entries / 31 sanitized starters</span>
               </div>
               <section class="publishing-template-workflow" aria-label="Publishing source template workflow">
+                <div class="publishing-workflow-label">1. Choose a source template</div>
                 <div class="template-library-controls">
                   <label>
                     Search sources
@@ -434,6 +436,7 @@
                   <span id="proposalTemplateWorkingStatus" class="template-working-status">No starter loaded</span>
                 </div>
               </section>
+              <div class="publishing-workflow-label">2. Configure the output</div>
               <div class="publishing-grid">
                 <label>
                   Output preset
@@ -468,6 +471,7 @@
                 <span id="proposalTemplateStatus">Matches template</span>
                 <button id="resetProposalTemplateBtn" class="ghost-btn compact-btn" type="button" disabled>Reset to Template</button>
               </div>
+              <div class="publishing-workflow-label">3. Prepare for review</div>
               <details class="publishing-section-details">
                 <summary>Choose included sections</summary>
                 <fieldset class="publishing-section-picker">
