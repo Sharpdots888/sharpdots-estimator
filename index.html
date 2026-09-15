@@ -956,6 +956,7 @@
                 </div>
                 <div class="button-group print-quote-actions">
                   <div class="print-quote-action-group">
+                    <button id="addStandardProductBtn" class="ghost-btn standard-product-action" type="button">Add Standard Product</button>
                     <button id="addPrintQuoteLineBtn" class="ghost-btn primary-action" type="button">Add Quote Line</button>
                     <button id="refreshPrintQuoteLinesBtn" class="ghost-btn" type="button">Refresh Lines From Estimate</button>
                   </div>
@@ -1105,6 +1106,38 @@
     <datalist id="elementLookup"></datalist>
 
     <div id="invLookupDropdown" class="inv-lookup-dropdown" hidden></div>
+
+    <div id="standardProductModal" class="modal-backdrop" hidden>
+      <section class="standard-product-dialog" role="dialog" aria-modal="true" aria-labelledby="standardProductTitle">
+        <header class="standard-product-head">
+          <div>
+            <span class="standard-product-kicker">Synthetic catalog prototype</span>
+            <h2 id="standardProductTitle">Add a Standard Product</h2>
+            <p>Choose a product, configure production options, and review the calculated quote price.</p>
+          </div>
+          <button id="closeStandardProductBtn" class="ghost-btn icon-close-btn" type="button" title="Close" aria-label="Close standard product configurator">&times;</button>
+        </header>
+        <div class="standard-product-workspace">
+          <nav class="standard-product-categories" aria-label="Product categories">
+            <span class="standard-product-step">1. Category</span>
+            <div id="standardProductCategories" class="standard-product-choice-list"></div>
+          </nav>
+          <section class="standard-product-products" aria-labelledby="standardProductListTitle">
+            <span class="standard-product-step">2. Product</span>
+            <h3 id="standardProductListTitle">Products</h3>
+            <div id="standardProductList" class="standard-product-choice-list"></div>
+          </section>
+          <section id="standardProductConfigurator" class="standard-product-configurator" aria-label="Product configuration"></section>
+        </div>
+        <footer class="standard-product-footer">
+          <p>Prototype prices are synthetic and are not approved production rates.</p>
+          <div class="button-group">
+            <button id="cancelStandardProductBtn" class="ghost-btn" type="button">Cancel</button>
+            <button id="addConfiguredProductBtn" type="button">Add Product to Quote</button>
+          </div>
+        </footer>
+      </section>
+    </div>
 
     <div id="dirtyRecordsModal" class="modal-backdrop" hidden>
       <section class="dirty-record-dialog" role="dialog" aria-modal="true" aria-labelledby="dirtyRecordsTitle">

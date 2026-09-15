@@ -259,6 +259,179 @@ function defaultPrintQuote() {
   };
 }
 
+const standardProductCatalog = [
+  {
+    id: "cards",
+    name: "Cards",
+    description: "Postcards, business cards, and folded cards",
+    products: [
+      {
+        id: "postcard",
+        name: "Postcard",
+        description: "Commercial postcard printing with common direct-mail configurations.",
+        setupCost: 42,
+        defaultMarkup: 40,
+        quantities: [500, 1000, 2500, 5000, 10000],
+        baseCosts: { 500: 0.19, 1000: 0.12, 2500: 0.075, 5000: 0.052, 10000: 0.039 },
+        options: [
+          { id: "size", label: "Finished size", choices: [
+            { value: "4x6", label: "4 x 6 in", multiplier: 1 },
+            { value: "5x7", label: "5 x 7 in", multiplier: 1.18 },
+            { value: "6x9", label: "6 x 9 in", multiplier: 1.42 }
+          ] },
+          { id: "stock", label: "Paper stock", choices: [
+            { value: "14pt-c2s", label: "14pt C2S", multiplier: 1 },
+            { value: "100lb-dull", label: "100 lb dull cover", multiplier: 1.12 },
+            { value: "16pt-c2s", label: "16pt C2S", multiplier: 1.2 }
+          ] },
+          { id: "printing", label: "Printing", choices: [
+            { value: "4-0", label: "Full color front only (4/0)", multiplier: 0.88 },
+            { value: "4-1", label: "Full color front / grayscale back (4/1)", multiplier: 0.95 },
+            { value: "4-4", label: "Full color both sides (4/4)", multiplier: 1 }
+          ] },
+          { id: "finishing", label: "Finishing", choices: [
+            { value: "none", label: "No coating", multiplier: 1 },
+            { value: "uv-front", label: "UV coating - front", multiplier: 1.08 },
+            { value: "uv-both", label: "UV coating - both sides", multiplier: 1.14 }
+          ] }
+        ]
+      },
+      {
+        id: "business-card",
+        name: "Business Card",
+        description: "Standard and premium business card configurations.",
+        setupCost: 28,
+        defaultMarkup: 45,
+        quantities: [250, 500, 1000, 2500, 5000],
+        baseCosts: { 250: 0.22, 500: 0.14, 1000: 0.085, 2500: 0.052, 5000: 0.038 },
+        options: [
+          { id: "size", label: "Finished size", choices: [{ value: "3.5x2", label: "3.5 x 2 in", multiplier: 1 }] },
+          { id: "stock", label: "Paper stock", choices: [
+            { value: "14pt-c2s", label: "14pt C2S", multiplier: 1 },
+            { value: "16pt-c2s", label: "16pt C2S", multiplier: 1.16 },
+            { value: "32pt-uncoated", label: "32pt uncoated", multiplier: 1.85 }
+          ] },
+          { id: "printing", label: "Printing", choices: [
+            { value: "4-0", label: "Full color front only (4/0)", multiplier: 0.9 },
+            { value: "4-4", label: "Full color both sides (4/4)", multiplier: 1 }
+          ] },
+          { id: "finishing", label: "Finishing", choices: [
+            { value: "none", label: "No coating", multiplier: 1 },
+            { value: "matte", label: "Matte finish", multiplier: 1.12 },
+            { value: "soft-touch", label: "Soft-touch laminate", multiplier: 1.36 }
+          ] }
+        ]
+      },
+      {
+        id: "greeting-card",
+        name: "Greeting Card",
+        description: "Folded cards supplied flat or scored and folded.",
+        setupCost: 55,
+        defaultMarkup: 42,
+        quantities: [250, 500, 1000, 2500, 5000],
+        baseCosts: { 250: 0.72, 500: 0.48, 1000: 0.31, 2500: 0.22, 5000: 0.17 },
+        options: [
+          { id: "size", label: "Finished size", choices: [
+            { value: "4.25x5.5", label: "4.25 x 5.5 in", multiplier: 1 },
+            { value: "5x7", label: "5 x 7 in", multiplier: 1.24 }
+          ] },
+          { id: "stock", label: "Paper stock", choices: [
+            { value: "100lb-dull", label: "100 lb dull cover", multiplier: 1 },
+            { value: "120lb-uncoated", label: "120 lb uncoated", multiplier: 1.22 }
+          ] },
+          { id: "printing", label: "Printing", choices: [
+            { value: "4-0", label: "Full color outside only", multiplier: 0.9 },
+            { value: "4-4", label: "Full color inside and outside", multiplier: 1.12 }
+          ] },
+          { id: "finishing", label: "Finishing", choices: [
+            { value: "score", label: "Score only", multiplier: 1 },
+            { value: "fold", label: "Score and fold", multiplier: 1.1 }
+          ] }
+        ]
+      }
+    ]
+  },
+  {
+    id: "marketing",
+    name: "Marketing Print",
+    description: "Brochures, flyers, and sell sheets",
+    products: [
+      {
+        id: "trifold-brochure",
+        name: "Tri-fold Brochure",
+        description: "Full-color brochure with folding included.",
+        setupCost: 65,
+        defaultMarkup: 40,
+        quantities: [250, 500, 1000, 2500, 5000],
+        baseCosts: { 250: 0.88, 500: 0.58, 1000: 0.39, 2500: 0.28, 5000: 0.21 },
+        options: [
+          { id: "size", label: "Flat size", choices: [{ value: "8.5x11", label: "8.5 x 11 in", multiplier: 1 }, { value: "11x17", label: "11 x 17 in", multiplier: 1.62 }] },
+          { id: "stock", label: "Paper stock", choices: [{ value: "100lb-gloss-text", label: "100 lb gloss text", multiplier: 1 }, { value: "100lb-dull-text", label: "100 lb dull text", multiplier: 1.08 }] },
+          { id: "printing", label: "Printing", choices: [{ value: "4-4", label: "Full color both sides (4/4)", multiplier: 1 }] },
+          { id: "finishing", label: "Fold", choices: [{ value: "trifold", label: "Tri-fold", multiplier: 1 }, { value: "zfold", label: "Z-fold", multiplier: 1.06 }] }
+        ]
+      },
+      {
+        id: "sell-sheet",
+        name: "Sell Sheet",
+        description: "Single-sheet product or service handout.",
+        setupCost: 38,
+        defaultMarkup: 40,
+        quantities: [250, 500, 1000, 2500, 5000],
+        baseCosts: { 250: 0.52, 500: 0.34, 1000: 0.23, 2500: 0.16, 5000: 0.12 },
+        options: [
+          { id: "size", label: "Finished size", choices: [{ value: "8.5x11", label: "8.5 x 11 in", multiplier: 1 }, { value: "11x17", label: "11 x 17 in", multiplier: 1.58 }] },
+          { id: "stock", label: "Paper stock", choices: [{ value: "100lb-gloss-text", label: "100 lb gloss text", multiplier: 1 }, { value: "80lb-uncoated", label: "80 lb uncoated text", multiplier: 0.94 }] },
+          { id: "printing", label: "Printing", choices: [{ value: "4-0", label: "Full color front only (4/0)", multiplier: 0.88 }, { value: "4-4", label: "Full color both sides (4/4)", multiplier: 1 }] }
+        ]
+      }
+    ]
+  },
+  {
+    id: "large-format",
+    name: "Large Format",
+    description: "Displays, banners, and rigid signage",
+    products: [
+      {
+        id: "retractable-banner",
+        name: "Retractable Banner",
+        description: "Portable banner stand with printed insert and carry case.",
+        setupCost: 18,
+        defaultMarkup: 45,
+        quantities: [1, 2, 5, 10, 25],
+        baseCosts: { 1: 118, 2: 109, 5: 96, 10: 88, 25: 79 },
+        options: [
+          { id: "size", label: "Display size", choices: [{ value: "33x80", label: "33 x 80 in", multiplier: 1 }, { value: "36x92", label: "36 x 92 in", multiplier: 1.24 }] },
+          { id: "hardware", label: "Hardware", choices: [{ value: "standard", label: "Standard stand", multiplier: 1 }, { value: "premium", label: "Premium stand", multiplier: 1.42 }] },
+          { id: "material", label: "Banner material", choices: [{ value: "vinyl", label: "Blockout vinyl", multiplier: 1 }, { value: "fabric", label: "Dye-sublimated fabric", multiplier: 1.18 }] }
+        ]
+      },
+      {
+        id: "yard-sign",
+        name: "Yard Sign",
+        description: "Printed corrugated plastic sign with optional stakes.",
+        setupCost: 24,
+        defaultMarkup: 42,
+        quantities: [10, 25, 50, 100, 250],
+        baseCosts: { 10: 8.4, 25: 6.1, 50: 4.7, 100: 3.65, 250: 2.82 },
+        options: [
+          { id: "size", label: "Finished size", choices: [{ value: "18x24", label: "18 x 24 in", multiplier: 1 }, { value: "24x36", label: "24 x 36 in", multiplier: 1.68 }] },
+          { id: "printing", label: "Printing", choices: [{ value: "4-0", label: "Full color one side", multiplier: 0.88 }, { value: "4-4", label: "Full color both sides", multiplier: 1 }] },
+          { id: "stakes", label: "Hardware", choices: [{ value: "none", label: "Signs only", multiplier: 1 }, { value: "h-stake", label: "Include H-stakes", multiplier: 1.24 }] }
+        ]
+      }
+    ]
+  }
+];
+
+let standardProductDraft = {
+  categoryId: standardProductCatalog[0].id,
+  productId: standardProductCatalog[0].products[0].id,
+  quantity: standardProductCatalog[0].products[0].quantities[1],
+  markupPercent: standardProductCatalog[0].products[0].defaultMarkup,
+  selections: {}
+};
+
 function defaultEcommPriceList() {
   return {
     name: "Ecomm Price List Draft",
@@ -441,6 +614,7 @@ const els = {
   printQuoteCustomerNote: document.querySelector("#printQuoteCustomerNote"),
   printQuoteCustomerTerms: document.querySelector("#printQuoteCustomerTerms"),
   printQuoteInternalNotes: document.querySelector("#printQuoteInternalNotes"),
+  addStandardProductBtn: document.querySelector("#addStandardProductBtn"),
   addPrintQuoteLineBtn: document.querySelector("#addPrintQuoteLineBtn"),
   refreshPrintQuoteLinesBtn: document.querySelector("#refreshPrintQuoteLinesBtn"),
   printQuoteOutputModeButtons: document.querySelectorAll("[data-print-quote-mode]"),
@@ -452,6 +626,13 @@ const els = {
   printQuoteLines: document.querySelector("#printQuoteLines"),
   printQuoteTotals: document.querySelector("#printQuoteTotals"),
   printQuoteMessage: document.querySelector("#printQuoteMessage"),
+  standardProductModal: document.querySelector("#standardProductModal"),
+  closeStandardProductBtn: document.querySelector("#closeStandardProductBtn"),
+  cancelStandardProductBtn: document.querySelector("#cancelStandardProductBtn"),
+  addConfiguredProductBtn: document.querySelector("#addConfiguredProductBtn"),
+  standardProductCategories: document.querySelector("#standardProductCategories"),
+  standardProductList: document.querySelector("#standardProductList"),
+  standardProductConfigurator: document.querySelector("#standardProductConfigurator"),
   ecommListName: document.querySelector("#ecommListName"),
   ecommChannel: document.querySelector("#ecommChannel"),
   ecommExternalRef: document.querySelector("#ecommExternalRef"),
@@ -1755,6 +1936,161 @@ function addPrintQuoteLine() {
   setSaveStatus("Quote line added");
 }
 
+function selectedStandardCategory() {
+  return standardProductCatalog.find((category) => category.id === standardProductDraft.categoryId) || standardProductCatalog[0];
+}
+
+function selectedStandardProduct() {
+  const category = selectedStandardCategory();
+  return category.products.find((product) => product.id === standardProductDraft.productId) || category.products[0];
+}
+
+function defaultStandardSelections(product) {
+  return Object.fromEntries(product.options.map((option) => [option.id, option.choices[0].value]));
+}
+
+function resetStandardProductDraft(categoryId = standardProductCatalog[0].id, productId = null) {
+  const category = standardProductCatalog.find((candidate) => candidate.id === categoryId) || standardProductCatalog[0];
+  const product = category.products.find((candidate) => candidate.id === productId) || category.products[0];
+  standardProductDraft = {
+    categoryId: category.id,
+    productId: product.id,
+    quantity: product.quantities[Math.min(1, product.quantities.length - 1)],
+    markupPercent: product.defaultMarkup,
+    selections: defaultStandardSelections(product)
+  };
+}
+
+function standardProductPrice(product = selectedStandardProduct()) {
+  const quantity = Math.max(Math.round(asNumber(standardProductDraft.quantity)), 1);
+  const baseUnitCost = asNumber(product.baseCosts[quantity] || product.baseCosts[product.quantities[product.quantities.length - 1]]);
+  const optionMultiplier = product.options.reduce((factor, option) => {
+    const selectedValue = standardProductDraft.selections[option.id];
+    const choice = option.choices.find((candidate) => candidate.value === selectedValue) || option.choices[0];
+    return factor * asNumber(choice.multiplier || 1);
+  }, 1);
+  const productionUnitCost = baseUnitCost * optionMultiplier;
+  const costTotal = productionUnitCost * quantity + asNumber(product.setupCost);
+  const markupPercent = Math.min(Math.max(asNumber(standardProductDraft.markupPercent), 0), 200);
+  const customerTotal = costTotal * (1 + markupPercent / 100);
+  return {
+    quantity,
+    productionUnitCost,
+    setupCost: asNumber(product.setupCost),
+    costTotal,
+    markupPercent,
+    customerUnitPrice: customerTotal / quantity,
+    customerTotal
+  };
+}
+
+function standardProductDescription(product = selectedStandardProduct()) {
+  return product.options.map((option) => {
+    const selectedValue = standardProductDraft.selections[option.id];
+    const choice = option.choices.find((candidate) => candidate.value === selectedValue) || option.choices[0];
+    return `${option.label}: ${choice.label}`;
+  }).join("; ");
+}
+
+function renderStandardProductConfigurator() {
+  if (!els.standardProductModal) return;
+  const category = selectedStandardCategory();
+  const product = selectedStandardProduct();
+  const price = standardProductPrice(product);
+
+  els.standardProductCategories.innerHTML = standardProductCatalog.map((candidate) => `
+    <button class="standard-product-choice${candidate.id === category.id ? " active" : ""}" type="button" data-standard-category="${escapeHtml(candidate.id)}" aria-pressed="${candidate.id === category.id}">
+      <strong>${escapeHtml(candidate.name)}</strong>
+      <span>${escapeHtml(candidate.description)}</span>
+    </button>
+  `).join("");
+
+  els.standardProductList.innerHTML = category.products.map((candidate) => `
+    <button class="standard-product-choice${candidate.id === product.id ? " active" : ""}" type="button" data-standard-product="${escapeHtml(candidate.id)}" aria-pressed="${candidate.id === product.id}">
+      <strong>${escapeHtml(candidate.name)}</strong>
+      <span>${escapeHtml(candidate.description)}</span>
+    </button>
+  `).join("");
+
+  els.standardProductConfigurator.innerHTML = `
+    <div class="standard-product-config-head">
+      <div>
+        <span class="standard-product-step">3. Configure</span>
+        <h3>${escapeHtml(product.name)}</h3>
+        <p>${escapeHtml(product.description)}</p>
+      </div>
+      <span class="synthetic-price-badge">Synthetic pricing</span>
+    </div>
+    <div class="standard-product-fields">
+      ${product.options.map((option) => `
+        <label>
+          ${escapeHtml(option.label)}
+          <select data-standard-option="${escapeHtml(option.id)}">
+            ${option.choices.map((choice) => `<option value="${escapeHtml(choice.value)}"${choice.value === standardProductDraft.selections[option.id] ? " selected" : ""}>${escapeHtml(choice.label)}</option>`).join("")}
+          </select>
+        </label>
+      `).join("")}
+      <label>
+        Quantity
+        <select data-standard-quantity>
+          ${product.quantities.map((quantity) => `<option value="${quantity}"${quantity === price.quantity ? " selected" : ""}>${quantity.toLocaleString()}</option>`).join("")}
+        </select>
+      </label>
+      <label>
+        Markup
+        <span class="standard-product-input-suffix"><input type="number" min="0" max="200" step="1" value="${escapeHtml(price.markupPercent)}" data-standard-markup /><span>%</span></span>
+      </label>
+    </div>
+    <div class="standard-product-price-summary" aria-live="polite">
+      <div><span>Estimated cost</span><strong>${money(price.costTotal, 2)}</strong><small>Includes ${money(price.setupCost, 2)} setup</small></div>
+      <div><span>Markup</span><strong>${price.markupPercent.toFixed(0)}%</strong><small>${money(price.customerTotal - price.costTotal, 2)} gross dollars</small></div>
+      <div><span>Unit price</span><strong>${money(price.customerUnitPrice, 4)}</strong><small>At ${price.quantity.toLocaleString()} units</small></div>
+      <div class="standard-product-total"><span>Quote total</span><strong>${money(price.customerTotal, 2)}</strong><small>Before shipping and tax</small></div>
+    </div>
+  `;
+}
+
+function openStandardProductConfigurator() {
+  resetStandardProductDraft();
+  renderStandardProductConfigurator();
+  els.standardProductModal.hidden = false;
+  document.body.classList.add("modal-open");
+}
+
+function closeStandardProductConfigurator() {
+  els.standardProductModal.hidden = true;
+  document.body.classList.remove("modal-open");
+}
+
+function addConfiguredStandardProduct() {
+  const category = selectedStandardCategory();
+  const product = selectedStandardProduct();
+  const price = standardProductPrice(product);
+  printQuote.lineItems = [
+    ...printQuoteLineRows(),
+    {
+      id: nextPrintQuoteLineId(),
+      name: product.name,
+      description: standardProductDescription(product),
+      quantity: price.quantity,
+      customerTotal: Number(price.customerTotal.toFixed(2)),
+      sourceLabel: "Synthetic standard product pricing",
+      standardProductId: product.id,
+      standardProductCategory: category.name,
+      estimatedCost: Number(price.costTotal.toFixed(2)),
+      markupPercent: price.markupPercent,
+      configuration: { ...standardProductDraft.selections }
+    }
+  ];
+  printQuote.outputMode = "builder";
+  touchWorkspaceRecord("printQuotes");
+  renderPrintQuoteDraft();
+  renderTabRecordControls();
+  renderProposalPreview();
+  closeStandardProductConfigurator();
+  setSaveStatus(`${product.name} added to quote`);
+}
+
 function updatePrintQuoteLine(lineId, field, value) {
   const numericFields = new Set(["quantity", "customerTotal"]);
   printQuote.lineItems = printQuoteLineRows().map((line) => {
@@ -1816,7 +2152,7 @@ function renderPrintQuoteLines(isCustomerOutput) {
     </div>
     ${lines.map((line) => isCustomerOutput ? `
       <div class="print-quote-line">
-        <strong>${escapeHtml(line.name)}</strong>
+        <strong>${escapeHtml(line.name)}${line.standardProductId ? `<small class="standard-product-line-label">Standard product</small>` : ""}</strong>
         <span>${escapeHtml(line.description)}</span>
         <span>${Math.round(asNumber(line.quantity)).toLocaleString()}</span>
         <span>${money(line.customerTotal, 2)}</span>
@@ -1825,11 +2161,11 @@ function renderPrintQuoteLines(isCustomerOutput) {
       <div class="print-quote-line builder-line" data-print-quote-line-id="${escapeHtml(line.id)}">
         <label>
           Item
-          <input class="print-quote-line-input" type="text" data-print-quote-line-field="name" value="${escapeHtml(line.name)}" />
+          <span class="print-quote-line-name"><input class="print-quote-line-input" type="text" data-print-quote-line-field="name" value="${escapeHtml(line.name)}" />${line.standardProductId ? `<small class="standard-product-line-label">Standard product</small>` : ""}</span>
         </label>
         <label>
           Description
-          <input class="print-quote-line-input" type="text" data-print-quote-line-field="description" value="${escapeHtml(line.description)}" />
+          <textarea class="print-quote-line-input print-quote-line-description" rows="2" data-print-quote-line-field="description">${escapeHtml(line.description)}</textarea>
         </label>
         <label>
           Qty
@@ -10876,6 +11212,49 @@ els.proposalPublishSummary?.addEventListener("click", (event) => {
   });
 });
 els.addPrintQuoteLineBtn?.addEventListener("click", addPrintQuoteLine);
+els.addStandardProductBtn?.addEventListener("click", openStandardProductConfigurator);
+els.closeStandardProductBtn?.addEventListener("click", closeStandardProductConfigurator);
+els.cancelStandardProductBtn?.addEventListener("click", closeStandardProductConfigurator);
+els.standardProductCategories?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-standard-category]");
+  if (!button) return;
+  resetStandardProductDraft(button.dataset.standardCategory);
+  renderStandardProductConfigurator();
+});
+els.standardProductList?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-standard-product]");
+  if (!button) return;
+  resetStandardProductDraft(standardProductDraft.categoryId, button.dataset.standardProduct);
+  renderStandardProductConfigurator();
+});
+els.standardProductConfigurator?.addEventListener("change", (event) => {
+  const option = event.target.closest("[data-standard-option]");
+  if (option) standardProductDraft.selections[option.dataset.standardOption] = option.value;
+  const quantity = event.target.closest("[data-standard-quantity]");
+  if (quantity) standardProductDraft.quantity = asNumber(quantity.value);
+  const markup = event.target.closest("[data-standard-markup]");
+  if (markup) standardProductDraft.markupPercent = asNumber(markup.value);
+  renderStandardProductConfigurator();
+});
+els.standardProductConfigurator?.addEventListener("input", (event) => {
+  const markup = event.target.closest("[data-standard-markup]");
+  if (!markup) return;
+  standardProductDraft.markupPercent = asNumber(markup.value);
+  const price = standardProductPrice();
+  const summary = els.standardProductConfigurator.querySelector(".standard-product-price-summary");
+  if (summary) {
+    summary.innerHTML = `
+      <div><span>Estimated cost</span><strong>${money(price.costTotal, 2)}</strong><small>Includes ${money(price.setupCost, 2)} setup</small></div>
+      <div><span>Markup</span><strong>${price.markupPercent.toFixed(0)}%</strong><small>${money(price.customerTotal - price.costTotal, 2)} gross dollars</small></div>
+      <div><span>Unit price</span><strong>${money(price.customerUnitPrice, 4)}</strong><small>At ${price.quantity.toLocaleString()} units</small></div>
+      <div class="standard-product-total"><span>Quote total</span><strong>${money(price.customerTotal, 2)}</strong><small>Before shipping and tax</small></div>
+    `;
+  }
+});
+els.addConfiguredProductBtn?.addEventListener("click", addConfiguredStandardProduct);
+els.standardProductModal?.addEventListener("click", (event) => {
+  if (event.target === els.standardProductModal) closeStandardProductConfigurator();
+});
 els.refreshPrintQuoteLinesBtn?.addEventListener("click", refreshPrintQuoteLinesFromEstimate);
 els.printQuoteLines?.addEventListener("change", (event) => {
   const input = event.target.closest("[data-print-quote-line-field]");
