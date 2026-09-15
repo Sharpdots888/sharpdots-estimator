@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Product>
+  <Fields Quantities="100,250,500,1000,2500" ShowPages="false">
+    <Field Label="Stock" Options="Stock">Stock</Field>
+  </Fields>
+  <Options>
+    <Option Name="Stock" Label="Size" Options="1">100# Dull Cover</Option>
+    <Option Name="Stock" Label="Size" Options="2">14PT Gloss Cover</Option>
+    <Option Name="Stock" Label="Size" Options="3">16PT Gloss Cover</Option>
+    <Option Name="1" Label="Color" Options="4" Weight="0">4.25x6</Option>
+    <Option Name="1" Label="Color" Options="5" Weight="0">4x6</Option>
+    <Option Name="1" Label="Color" Options="6" Weight="0">5.5x8.5</Option>
+    <Option Name="1" Label="Color" Options="7" Weight="0">5x7</Option>
+    <Option Name="1" Label="Color" Options="8" Weight="0">6x11</Option>
+    <Option Name="1" Label="Color" Options="9" Weight="0">6x9</Option>
+    <Option Name="1" Label="Color" Options="10" Weight="0">8.5x11</Option>
+    <Option Name="2" Label="Color" Options="11" Weight="0">4.25x6</Option>
+    <Option Name="2" Label="Color" Options="12" Weight="0">4x6</Option>
+    <Option Name="2" Label="Color" Options="13" Weight="0">5.5x8.5</Option>
+    <Option Name="2" Label="Color" Options="14" Weight="0">5x7</Option>
+    <Option Name="2" Label="Color" Options="15" Weight="0">6x11</Option>
+    <Option Name="2" Label="Color" Options="16" Weight="0">6x9</Option>
+    <Option Name="2" Label="Color" Options="17" Weight="0">8.5x11</Option>
+    <Option Name="3" Label="Color" Options="18" Weight="0">4x6</Option>
+    <Option Name="3" Label="Color" Options="19" Weight="0">5.5x8.5</Option>
+    <Option Name="3" Label="Color" Options="20" Weight="0">5x7</Option>
+    <Option Name="3" Label="Color" Options="21" Weight="0">8.5x11</Option>
+    <Option Name="4" Label="" Prices="Color_100# Dull Cover_4.25x6_Full Color Both Sides" Weight="0">Full Color Both Sides</Option>
+    <Option Name="4" Label="" Prices="Color_100# Dull Cover_4.25x6_Full Color Front / Blank Back" Weight="0">Full Color Front / Blank Back</Option>
+    <Option Name="4" Label="" Prices="Color_100# Dull Cover_4.25x6_Full Color Front / Grayscale Back" Weight="0">Full Color Front / Grayscale Back</Option>
+    <Option Name="5" Label="" Prices="Color_100# Dull Cover_4x6_Full Color Both Sides" Weight="0">Full Color Both Sides</Option>
+    <Option Name="5" Label="" Prices="Color_100# Dull Cover_4x6_Full Color Front / Blank Back" Weight="0">Full Color Front / Blank Back</Option>
+    <Option Name="5" Label="" Prices="Color_100# Dull Cover_4x6_Full Color Front / Grayscale Back" Weight="0">Full Color Front / Grayscale Back</Option>
+    <Option Name="6" Label="" Prices="Color_100# Dull Cover_5.5x8.5_Full Color Both Sides" Weight="0">Full Color Both Sides</Option>
+    <Option Name="6" Label="" Prices="Color_100# Dull Cover_5.5x8.5_Full Color Front / Blank Back" Weight="0">Full Color Front / Blank Back</Option>
+    <Option Name="6" Label="" Prices="Color_100# Dull Cover_5.5x8.5_Full Color Front / Grayscale Back" Weight="0">Full Color Front / Grayscale Back</Option>
+    <Option Name="7" Label="" Prices="Color_100# Dull Cover_5x7_Full Color Both Sides" Weight="0">Full Color Both Sides</Option>
+    <Option Name="7" Label="" Prices="Color_100# Dull Cover_5x7_Full Color Front / Blank Back" Weight="0">Full Color Front / Blank Back</Option>
+    <Option Name="7" Label="" Prices="Color_100# Dull Cover_5x7_Full Color Front / Grayscale Back" Weight="0">Full Color Front / Grayscale Back</Option>
+    <Option Name="8" Label="" Prices="Color_100# Dull Cover_6x11_Full Color Both Sides" Weight="0">Full Color Both Sides</Option>
+    <Option Name="8" Label="" Prices="Color_100# Dull Cover_6x11_Full Color Front / Blank Back" Weight="0">Full Color Front / Blank Back</Option>
+    <Option Name="8" Label="" Prices="Color_100# Dull Cover_6x11_Full Color Front / Grayscale Back" Weight="0">Full Color Front / Grayscale Back</Option>
+    <Option Name="9" Label="" Prices="Color_100# Dull Cover_6x9_Full Color Both Sides" Weight="0">Full Color Both Sides</Option>
+    <Option Name="9" Label="" Prices="Color_100# Dull Cover_6x9_Full Color Front / Blank Back" Weight="0">Full Color Front / Blank Back</Option>
+    <Option Name="9" Label="" Prices="Color_100# Dull Cover_6x9_Full Color Front / Grayscale Back" Weight="0">Full Color Front / Grayscale Back</Option>
+    <Option Name="10" Label="" Prices="Color_100# Dull Cover_8.5x11_Full Color Both Sides" Weight="0">Full Color Both Sides</Option>
+    <Option Name="10" Label="" Prices="Color_100# Dull Cover_8.5x11_Full Color Front / Blank Back" Weight="0">Full Color Front / Blank Back</Option>
+    <Option Name="10" Label="" Prices="Color_100# Dull Cover_8.5x11_Full Color Front / Grayscale Back" Weight="0">Full Color Front / Grayscale Back</Option>
+    <Option Name="11" Label="" Prices="Color_14PT Gloss Cover_4.25x6_Full Color Both Sides" Weight="0">Full Color Both Sides</Option>
+    <Option Name="11" Label="" Prices="Color_14PT Gloss Cover_4.25x6_Full Color Front / Blank Back" Weight="0">Full Color Front / Blank Back</Option>
+    <Option Name="11" Label="" Prices="Color_14PT Gloss Cover_4.25x6_Full Color Front / Grayscale Back" Weight="0">Full Color Front / Grayscale Back</Option>
+    <Option Name="12" Label="" Prices="Color_14PT Gloss Cover_4x6_Full Color Both Sides" Weight="0">Full Color Both Sides</Option>
+    <Option Name="12" Label="" Prices="Color_14PT Gloss Cover_4x6_Full Color Front / Blank Back" Weight="0">Full Color Front / Blank Back</Option>
+    <Option Name="12" Label="" Prices="Color_14PT Gloss Cover_4x6_Full Color Front / Grayscale Back" Weight="0">Full Color Front / Grayscale Back</Option>
+    <Option Name="13" Label="" Prices="Color_14PT Gloss Cover_5.5x8.5_Full Color Both Sides" Weight="0">Full Color Both Sides</Option>
+    <Option Name="13" Label="" Prices="Color_14PT Gloss Cover_5.5x8.5_Full Color Front / Blank Back" Weight="0">Full Color Front / Blank Back</Option>
+    <Option Name="13" Label="" Prices="Color_14PT Gloss Cover_5.5x8.5_Full Color Front / Grayscale Back" Weight="0">Full Color Front / Grayscale Back</Option>
+    <Option Name="14" Label="" Prices="Color_14PT Gloss Cover_5x7_Full Color Both Sides" Weight="0">Full Color Both Sides</Option>
+    <Option Name="14" Label="" Prices="Color_14PT Gloss Cover_5x7_Full Color Front / Blank Back" Weight="0">Full Color Front / Blank Back</Option>
+    <Option Name="14" Label="" Prices="Color_14PT Gloss Cover_5x7_Full Color Front / Grayscale Back" Weight="0">Full Color Front / Grayscale Back</Option>
+    <Option Name="15" Label="" Prices="Color_14PT Gloss Cover_6x11_Full Color Both Sides" Weight="0">Full Color Both Sides</Option>
+    <Option Name="15" Label="" Prices="Color_14PT Gloss Cover_6x11_Full Color Front / Blank Back" Weight="0">Full Color Front / Blank Back</Option>
+    <Option Name="15" Label="" Prices="Color_14PT Gloss Cover_6x11_Full Color Front / Grayscale Back" Weight="0">Full Color Front / Grayscale Back</Option>
+    <Option Name="16" Label="" Prices="Color_14PT Gloss Cover_6x9_Full Color Both Sides" Weight="0">Full Color Both Sides</Option>
+    <Option Name="16" Label="" Prices="Color_14PT Gloss Cover_6x9_Full Color Front / Blank Back" Weight="0">Full Color Front / Blank Back</Option>
+    <Option Name="16" Label="" Prices="Color_14PT Gloss Cover_6x9_Full Color Front / Grayscale Back" Weight="0">Full Color Front / Grayscale Back</Option>
+    <Option Name="17" Label="" Prices="Color_14PT Gloss Cover_8.5x11_Full Color Both Sides" Weight="0">Full Color Both Sides</Option>
+    <Option Name="17" Label="" Prices="Color_14PT Gloss Cover_8.5x11_Full Color Front / Blank Back" Weight="0">Full Color Front / Blank Back</Option>
+    <Option Name="17" Label="" Prices="Color_14PT Gloss Cover_8.5x11_Full Color Front / Grayscale Back" Weight="0">Full Color Front / Grayscale Back</Option>
+    <Option Name="18" Label="" Prices="Color_16PT Gloss Cover_4x6_Full Color Both Sides" Weight="0">Full Color Both Sides</Option>
+    <Option Name="18" Label="" Prices="Color_16PT Gloss Cover_4x6_Full Color Front / Blank Back" Weight="0">Full Color Front / Blank Back</Option>
+    <Option Name="18" Label="" Prices="Color_16PT Gloss Cover_4x6_Full Color Front / Grayscale Back" Weight="0">Full Color Front / Grayscale Back</Option>
+    <Option Name="19" Label="" Prices="Color_16PT Gloss Cover_5.5x8.5_Full Color Both Sides" Weight="0">Full Color Both Sides</Option>
+    <Option Name="20" Label="" Prices="Color_16PT Gloss Cover_5x7_Full Color Both Sides" Weight="0">Full Color Both Sides</Option>
+    <Option Name="20" Label="" Prices="Color_16PT Gloss Cover_5x7_Full Color Front / Blank Back" Weight="0">Full Color Front / Blank Back</Option>
+    <Option Name="20" Label="" Prices="Color_16PT Gloss Cover_5x7_Full Color Front / Grayscale Back" Weight="0">Full Color Front / Grayscale Back</Option>
+    <Option Name="21" Label="" Prices="Color_16PT Gloss Cover_8.5x11_Full Color Both Sides" Weight="0">Full Color Both Sides</Option>
+  </Options>
+  <Prices>
+    <Price Name="Color_100# Dull Cover_4.25x6_Full Color Both Sides" Break="100" UnitPrice="0.5262" />
+    <Price Name="Color_100# Dull Cover_4.25x6_Full Color Both Sides" Break="250" UnitPrice="0.287" />
+    <Price Name="Color_100# Dull Cover_4.25x6_Full Color Both Sides" Break="500" UnitPrice="0.1775" />
+    <Price Name="Color_100# Dull Cover_4.25x6_Full Color Both Sides" Break="1000" UnitPrice="0.10914" />
+    <Price Name="Color_100# Dull Cover_4.25x6_Full Color Both Sides" Break="2500" UnitPrice="0.06916" />
+    <Price Name="Color_100# Dull Cover_4.25x6_Full Color Front / Blank Back" Break="100" UnitPrice="0.51" />
+    <Price Name="Color_100# Dull Cover_4.25x6_Full Color Front / Blank Back" Break="250" UnitPrice="0.26912" />
+    <Price Name="Color_100# Dull Cover_4.25x6_Full Color Front / Blank Back" Break="500" UnitPrice="0.15626" />
+    <Price Name="Color_100# Dull Cover_4.25x6_Full Color Front / Blank Back" Break="1000" UnitPrice="0.0964" />
+    <Price Name="Color_100# Dull Cover_4.25x6_Full Color Front / Blank Back" Break="2500" UnitPrice="0.06304" />
+    <Price Name="Color_100# Dull Cover_4.25x6_Full Color Front / Grayscale Back" Break="100" UnitPrice="0.5135" />
+    <Price Name="Color_100# Dull Cover_4.25x6_Full Color Front / Grayscale Back" Break="250" UnitPrice="0.276" />
+    <Price Name="Color_100# Dull Cover_4.25x6_Full Color Front / Grayscale Back" Break="500" UnitPrice="0.17" />
+    <Price Name="Color_100# Dull Cover_4.25x6_Full Color Front / Grayscale Back" Break="1000" UnitPrice="0.1042" />
+    <Price Name="Color_100# Dull Cover_4.25x6_Full Color Front / Grayscale Back" Break="2500" UnitPrice="0.06568" />
+    <Price Name="Color_100# Dull Cover_4x6_Full Color Both Sides" Break="100" UnitPrice="0.52" />
+    <Price Name="Color_100# Dull Cover_4x6_Full Color Both Sides" Break="250" UnitPrice="0.276" />
+    <Price Name="Color_100# Dull Cover_4x6_Full Color Both Sides" Break="500" UnitPrice="0.17" />
+    <Price Name="Color_100# Dull Cover_4x6_Full Color Both Sides" Break="1000" UnitPrice="0.1042" />
+    <Price Name="Color_100# Dull Cover_4x6_Full Color Both Sides" Break="2500" UnitPrice="0.06568" />
+    <Price Name="Color_100# Dull Cover_4x6_Full Color Front / Blank Back" Break="100" UnitPrice="0.498" />
+    <Price Name="Color_100# Dull Cover_4x6_Full Color Front / Blank Back" Break="250" UnitPrice="0.2592" />
+    <Price Name="Color_100# Dull Cover_4x6_Full Color Front / Blank Back" Break="500" UnitPrice="0.15" />
+    <Price Name="Color_100# Dull Cover_4x6_Full Color Front / Blank Back" Break="1000" UnitPrice="0.0922" />
+    <Price Name="Color_100# Dull Cover_4x6_Full Color Front / Blank Back" Break="2500" UnitPrice="0.05992" />
+    <Price Name="Color_100# Dull Cover_4x6_Full Color Front / Grayscale Back" Break="100" UnitPrice="0.51" />
+    <Price Name="Color_100# Dull Cover_4x6_Full Color Front / Grayscale Back" Break="250" UnitPrice="0.276" />
+    <Price Name="Color_100# Dull Cover_4x6_Full Color Front / Grayscale Back" Break="500" UnitPrice="0.17" />
+    <Price Name="Color_100# Dull Cover_4x6_Full Color Front / Grayscale Back" Break="1000" UnitPrice="0.1042" />
+    <Price Name="Color_100# Dull Cover_4x6_Full Color Front / Grayscale Back" Break="2500" UnitPrice="0.06568" />
+    <Price Name="Color_100# Dull Cover_5.5x8.5_Full Color Both Sides" Break="100" UnitPrice="0.6863" />
+    <Price Name="Color_100# Dull Cover_5.5x8.5_Full Color Both Sides" Break="250" UnitPrice="0.3774" />
+    <Price Name="Color_100# Dull Cover_5.5x8.5_Full Color Both Sides" Break="500" UnitPrice="0.2744" />
+    <Price Name="Color_100# Dull Cover_5.5x8.5_Full Color Both Sides" Break="1000" UnitPrice="0.17928" />
+    <Price Name="Color_100# Dull Cover_5.5x8.5_Full Color Both Sides" Break="2500" UnitPrice="0.1136" />
+    <Price Name="Color_100# Dull Cover_5.5x8.5_Full Color Front / Blank Back" Break="100" UnitPrice="0.6397" />
+    <Price Name="Color_100# Dull Cover_5.5x8.5_Full Color Front / Blank Back" Break="250" UnitPrice="0.3182" />
+    <Price Name="Color_100# Dull Cover_5.5x8.5_Full Color Front / Blank Back" Break="500" UnitPrice="0.20584" />
+    <Price Name="Color_100# Dull Cover_5.5x8.5_Full Color Front / Blank Back" Break="1000" UnitPrice="0.1559" />
+    <Price Name="Color_100# Dull Cover_5.5x8.5_Full Color Front / Blank Back" Break="2500" UnitPrice="0.096016" />
+    <Price Name="Color_100# Dull Cover_5.5x8.5_Full Color Front / Grayscale Back" Break="100" UnitPrice="0.6863" />
+    <Price Name="Color_100# Dull Cover_5.5x8.5_Full Color Front / Grayscale Back" Break="250" UnitPrice="0.3774" />
+    <Price Name="Color_100# Dull Cover_5.5x8.5_Full Color Front / Grayscale Back" Break="500" UnitPrice="0.2744" />
+    <Price Name="Color_100# Dull Cover_5.5x8.5_Full Color Front / Grayscale Back" Break="1000" UnitPrice="0.17928" />
+    <Price Name="Color_100# Dull Cover_5.5x8.5_Full Color Front / Grayscale Back" Break="2500" UnitPrice="0.1136" />
+    <Price Name="Color_100# Dull Cover_5x7_Full Color Both Sides" Break="100" UnitPrice="0.5767" />
+    <Price Name="Color_100# Dull Cover_5x7_Full Color Both Sides" Break="250" UnitPrice="0.30768" />
+    <Price Name="Color_100# Dull Cover_5x7_Full Color Both Sides" Break="500" UnitPrice="0.218" />
+    <Price Name="Color_100# Dull Cover_5x7_Full Color Both Sides" Break="1000" UnitPrice="0.1405" />
+    <Price Name="Color_100# Dull Cover_5x7_Full Color Both Sides" Break="2500" UnitPrice="0.099332" />
+    <Price Name="Color_100# Dull Cover_5x7_Full Color Front / Blank Back" Break="100" UnitPrice="0.5417" />
+    <Price Name="Color_100# Dull Cover_5x7_Full Color Front / Blank Back" Break="250" UnitPrice="0.26332" />
+    <Price Name="Color_100# Dull Cover_5x7_Full Color Front / Blank Back" Break="500" UnitPrice="0.16666" />
+    <Price Name="Color_100# Dull Cover_5x7_Full Color Front / Blank Back" Break="1000" UnitPrice="0.123" />
+    <Price Name="Color_100# Dull Cover_5x7_Full Color Front / Blank Back" Break="2500" UnitPrice="0.083892" />
+    <Price Name="Color_100# Dull Cover_5x7_Full Color Front / Grayscale Back" Break="100" UnitPrice="0.5767" />
+    <Price Name="Color_100# Dull Cover_5x7_Full Color Front / Grayscale Back" Break="250" UnitPrice="0.30768" />
+    <Price Name="Color_100# Dull Cover_5x7_Full Color Front / Grayscale Back" Break="500" UnitPrice="0.218" />
+    <Price Name="Color_100# Dull Cover_5x7_Full Color Front / Grayscale Back" Break="1000" UnitPrice="0.1405" />
+    <Price Name="Color_100# Dull Cover_5x7_Full Color Front / Grayscale Back" Break="2500" UnitPrice="0.095996" />
+    <Price Name="Color_100# Dull Cover_6x11_Full Color Both Sides" Break="100" UnitPrice="0.866" />
+    <Price Name="Color_100# Dull Cover_6x11_Full Color Both Sides" Break="250" UnitPrice="0.4916" />
+    <Price Name="Color_100# Dull Cover_6x11_Full Color Both Sides" Break="500" UnitPrice="0.3668" />
+    <Price Name="Color_100# Dull Cover_6x11_Full Color Both Sides" Break="1000" UnitPrice="0.2428" />
+    <Price Name="Color_100# Dull Cover_6x11_Full Color Both Sides" Break="2500" UnitPrice="0.156256" />
+    <Price Name="Color_100# Dull Cover_6x11_Full Color Front / Blank Back" Break="100" UnitPrice="0.8" />
+    <Price Name="Color_100# Dull Cover_6x11_Full Color Front / Blank Back" Break="250" UnitPrice="0.408" />
+    <Price Name="Color_100# Dull Cover_6x11_Full Color Front / Blank Back" Break="500" UnitPrice="0.27" />
+    <Price Name="Color_100# Dull Cover_6x11_Full Color Front / Blank Back" Break="1000" UnitPrice="0.2098" />
+    <Price Name="Color_100# Dull Cover_6x11_Full Color Front / Blank Back" Break="2500" UnitPrice="0.136512" />
+    <Price Name="Color_100# Dull Cover_6x11_Full Color Front / Grayscale Back" Break="100" UnitPrice="0.866" />
+    <Price Name="Color_100# Dull Cover_6x11_Full Color Front / Grayscale Back" Break="250" UnitPrice="0.4916" />
+    <Price Name="Color_100# Dull Cover_6x11_Full Color Front / Grayscale Back" Break="500" UnitPrice="0.3668" />
+    <Price Name="Color_100# Dull Cover_6x11_Full Color Front / Grayscale Back" Break="1000" UnitPrice="0.2428" />
+    <Price Name="Color_100# Dull Cover_6x11_Full Color Front / Grayscale Back" Break="2500" UnitPrice="0.156256" />
+    <Price Name="Color_100# Dull Cover_6x9_Full Color Both Sides" Break="100" UnitPrice="0.754" />
+    <Price Name="Color_100# Dull Cover_6x9_Full Color Both Sides" Break="250" UnitPrice="0.4204" />
+    <Price Name="Color_100# Dull Cover_6x9_Full Color Both Sides" Break="500" UnitPrice="0.3092" />
+    <Price Name="Color_100# Dull Cover_6x9_Full Color Both Sides" Break="1000" UnitPrice="0.2032" />
+    <Price Name="Color_100# Dull Cover_6x9_Full Color Both Sides" Break="2500" UnitPrice="0.129664" />
+    <Price Name="Color_100# Dull Cover_6x9_Full Color Front / Blank Back" Break="100" UnitPrice="0.7" />
+    <Price Name="Color_100# Dull Cover_6x9_Full Color Front / Blank Back" Break="250" UnitPrice="0.352" />
+    <Price Name="Color_100# Dull Cover_6x9_Full Color Front / Blank Back" Break="500" UnitPrice="0.23" />
+    <Price Name="Color_100# Dull Cover_6x9_Full Color Front / Blank Back" Break="1000" UnitPrice="0.1762" />
+    <Price Name="Color_100# Dull Cover_6x9_Full Color Front / Blank Back" Break="2500" UnitPrice="0.113856" />
+    <Price Name="Color_100# Dull Cover_6x9_Full Color Front / Grayscale Back" Break="100" UnitPrice="0.754" />
+    <Price Name="Color_100# Dull Cover_6x9_Full Color Front / Grayscale Back" Break="250" UnitPrice="0.4204" />
+    <Price Name="Color_100# Dull Cover_6x9_Full Color Front / Grayscale Back" Break="500" UnitPrice="0.3092" />
+    <Price Name="Color_100# Dull Cover_6x9_Full Color Front / Grayscale Back" Break="1000" UnitPrice="0.2032" />
+    <Price Name="Color_100# Dull Cover_6x9_Full Color Front / Grayscale Back" Break="2500" UnitPrice="0.129664" />
+    <Price Name="Color_100# Dull Cover_8.5x11_Full Color Both Sides" Break="100" UnitPrice="0.9958" />
+    <Price Name="Color_100# Dull Cover_8.5x11_Full Color Both Sides" Break="250" UnitPrice="0.6732" />
+    <Price Name="Color_100# Dull Cover_8.5x11_Full Color Both Sides" Break="500" UnitPrice="0.424" />
+    <Price Name="Color_100# Dull Cover_8.5x11_Full Color Both Sides" Break="1000" UnitPrice="0.399" />
+    <Price Name="Color_100# Dull Cover_8.5x11_Full Color Both Sides" Break="2500" UnitPrice="0.21944" />
+    <Price Name="Color_100# Dull Cover_8.5x11_Full Color Front / Blank Back" Break="100" UnitPrice="0.7643" />
+    <Price Name="Color_100# Dull Cover_8.5x11_Full Color Front / Blank Back" Break="250" UnitPrice="0.47124" />
+    <Price Name="Color_100# Dull Cover_8.5x11_Full Color Front / Blank Back" Break="500" UnitPrice="0.3305" />
+    <Price Name="Color_100# Dull Cover_8.5x11_Full Color Front / Blank Back" Break="1000" UnitPrice="0.28118" />
+    <Price Name="Color_100# Dull Cover_8.5x11_Full Color Front / Blank Back" Break="2500" UnitPrice="0.1798" />
+    <Price Name="Color_100# Dull Cover_8.5x11_Full Color Front / Grayscale Back" Break="100" UnitPrice="0.8962" />
+    <Price Name="Color_100# Dull Cover_8.5x11_Full Color Front / Grayscale Back" Break="250" UnitPrice="0.60588" />
+    <Price Name="Color_100# Dull Cover_8.5x11_Full Color Front / Grayscale Back" Break="500" UnitPrice="0.424" />
+    <Price Name="Color_100# Dull Cover_8.5x11_Full Color Front / Grayscale Back" Break="1000" UnitPrice="0.399" />
+    <Price Name="Color_100# Dull Cover_8.5x11_Full Color Front / Grayscale Back" Break="2500" UnitPrice="0.21944" />
+    <Price Name="Color_14PT Gloss Cover_4.25x6_Full Color Both Sides" Break="100" UnitPrice="0.5262" />
+    <Price Name="Color_14PT Gloss Cover_4.25x6_Full Color Both Sides" Break="250" UnitPrice="0.287" />
+    <Price Name="Color_14PT Gloss Cover_4.25x6_Full Color Both Sides" Break="500" UnitPrice="0.1775" />
+    <Price Name="Color_14PT Gloss Cover_4.25x6_Full Color Both Sides" Break="1000" UnitPrice="0.10914" />
+    <Price Name="Color_14PT Gloss Cover_4.25x6_Full Color Both Sides" Break="2500" UnitPrice="0.06916" />
+    <Price Name="Color_14PT Gloss Cover_4.25x6_Full Color Front / Blank Back" Break="100" UnitPrice="0.51" />
+    <Price Name="Color_14PT Gloss Cover_4.25x6_Full Color Front / Blank Back" Break="250" UnitPrice="0.26912" />
+    <Price Name="Color_14PT Gloss Cover_4.25x6_Full Color Front / Blank Back" Break="500" UnitPrice="0.15626" />
+    <Price Name="Color_14PT Gloss Cover_4.25x6_Full Color Front / Blank Back" Break="1000" UnitPrice="0.0964" />
+    <Price Name="Color_14PT Gloss Cover_4.25x6_Full Color Front / Blank Back" Break="2500" UnitPrice="0.06304" />
+    <Price Name="Color_14PT Gloss Cover_4.25x6_Full Color Front / Grayscale Back" Break="100" UnitPrice="0.5135" />
+    <Price Name="Color_14PT Gloss Cover_4.25x6_Full Color Front / Grayscale Back" Break="250" UnitPrice="0.276" />
+    <Price Name="Color_14PT Gloss Cover_4.25x6_Full Color Front / Grayscale Back" Break="500" UnitPrice="0.17" />
+    <Price Name="Color_14PT Gloss Cover_4.25x6_Full Color Front / Grayscale Back" Break="1000" UnitPrice="0.1042" />
+    <Price Name="Color_14PT Gloss Cover_4.25x6_Full Color Front / Grayscale Back" Break="2500" UnitPrice="0.06568" />
+    <Price Name="Color_14PT Gloss Cover_4x6_Full Color Both Sides" Break="100" UnitPrice="0.52" />
+    <Price Name="Color_14PT Gloss Cover_4x6_Full Color Both Sides" Break="250" UnitPrice="0.276" />
+    <Price Name="Color_14PT Gloss Cover_4x6_Full Color Both Sides" Break="500" UnitPrice="0.17" />
+    <Price Name="Color_14PT Gloss Cover_4x6_Full Color Both Sides" Break="1000" UnitPrice="0.1042" />
+    <Price Name="Color_14PT Gloss Cover_4x6_Full Color Both Sides" Break="2500" UnitPrice="0.067116" />
+    <Price Name="Color_14PT Gloss Cover_4x6_Full Color Front / Blank Back" Break="100" UnitPrice="0.498" />
+    <Price Name="Color_14PT Gloss Cover_4x6_Full Color Front / Blank Back" Break="250" UnitPrice="0.2592" />
+    <Price Name="Color_14PT Gloss Cover_4x6_Full Color Front / Blank Back" Break="500" UnitPrice="0.15" />
+    <Price Name="Color_14PT Gloss Cover_4x6_Full Color Front / Blank Back" Break="1000" UnitPrice="0.0922" />
+    <Price Name="Color_14PT Gloss Cover_4x6_Full Color Front / Blank Back" Break="2500" UnitPrice="0.05992" />
+    <Price Name="Color_14PT Gloss Cover_4x6_Full Color Front / Grayscale Back" Break="100" UnitPrice="0.51" />
+    <Price Name="Color_14PT Gloss Cover_4x6_Full Color Front / Grayscale Back" Break="250" UnitPrice="0.276" />
+    <Price Name="Color_14PT Gloss Cover_4x6_Full Color Front / Grayscale Back" Break="500" UnitPrice="0.17" />
+    <Price Name="Color_14PT Gloss Cover_4x6_Full Color Front / Grayscale Back" Break="1000" UnitPrice="0.1042" />
+    <Price Name="Color_14PT Gloss Cover_4x6_Full Color Front / Grayscale Back" Break="2500" UnitPrice="0.06568" />
+    <Price Name="Color_14PT Gloss Cover_5.5x8.5_Full Color Both Sides" Break="100" UnitPrice="0.6863" />
+    <Price Name="Color_14PT Gloss Cover_5.5x8.5_Full Color Both Sides" Break="250" UnitPrice="0.3774" />
+    <Price Name="Color_14PT Gloss Cover_5.5x8.5_Full Color Both Sides" Break="500" UnitPrice="0.2744" />
+    <Price Name="Color_14PT Gloss Cover_5.5x8.5_Full Color Both Sides" Break="1000" UnitPrice="0.17928" />
+    <Price Name="Color_14PT Gloss Cover_5.5x8.5_Full Color Both Sides" Break="2500" UnitPrice="0.1136" />
+    <Price Name="Color_14PT Gloss Cover_5.5x8.5_Full Color Front / Blank Back" Break="100" UnitPrice="0.6397" />
+    <Price Name="Color_14PT Gloss Cover_5.5x8.5_Full Color Front / Blank Back" Break="250" UnitPrice="0.3182" />
+    <Price Name="Color_14PT Gloss Cover_5.5x8.5_Full Color Front / Blank Back" Break="500" UnitPrice="0.20584" />
+    <Price Name="Color_14PT Gloss Cover_5.5x8.5_Full Color Front / Blank Back" Break="1000" UnitPrice="0.1559" />
+    <Price Name="Color_14PT Gloss Cover_5.5x8.5_Full Color Front / Blank Back" Break="2500" UnitPrice="0.096016" />
+    <Price Name="Color_14PT Gloss Cover_5.5x8.5_Full Color Front / Grayscale Back" Break="100" UnitPrice="0.6863" />
+    <Price Name="Color_14PT Gloss Cover_5.5x8.5_Full Color Front / Grayscale Back" Break="250" UnitPrice="0.3774" />
+    <Price Name="Color_14PT Gloss Cover_5.5x8.5_Full Color Front / Grayscale Back" Break="500" UnitPrice="0.2744" />
+    <Price Name="Color_14PT Gloss Cover_5.5x8.5_Full Color Front / Grayscale Back" Break="1000" UnitPrice="0.17928" />
+    <Price Name="Color_14PT Gloss Cover_5.5x8.5_Full Color Front / Grayscale Back" Break="2500" UnitPrice="0.1136" />
+    <Price Name="Color_14PT Gloss Cover_5x7_Full Color Both Sides" Break="100" UnitPrice="0.5767" />
+    <Price Name="Color_14PT Gloss Cover_5x7_Full Color Both Sides" Break="250" UnitPrice="0.30768" />
+    <Price Name="Color_14PT Gloss Cover_5x7_Full Color Both Sides" Break="500" UnitPrice="0.218" />
+    <Price Name="Color_14PT Gloss Cover_5x7_Full Color Both Sides" Break="1000" UnitPrice="0.1405" />
+    <Price Name="Color_14PT Gloss Cover_5x7_Full Color Both Sides" Break="2500" UnitPrice="0.099332" />
+    <Price Name="Color_14PT Gloss Cover_5x7_Full Color Front / Blank Back" Break="100" UnitPrice="0.5417" />
+    <Price Name="Color_14PT Gloss Cover_5x7_Full Color Front / Blank Back" Break="250" UnitPrice="0.26332" />
+    <Price Name="Color_14PT Gloss Cover_5x7_Full Color Front / Blank Back" Break="500" UnitPrice="0.16666" />
+    <Price Name="Color_14PT Gloss Cover_5x7_Full Color Front / Blank Back" Break="1000" UnitPrice="0.123" />
+    <Price Name="Color_14PT Gloss Cover_5x7_Full Color Front / Blank Back" Break="2500" UnitPrice="0.083892" />
+    <Price Name="Color_14PT Gloss Cover_5x7_Full Color Front / Grayscale Back" Break="100" UnitPrice="0.5767" />
+    <Price Name="Color_14PT Gloss Cover_5x7_Full Color Front / Grayscale Back" Break="250" UnitPrice="0.30768" />
+    <Price Name="Color_14PT Gloss Cover_5x7_Full Color Front / Grayscale Back" Break="500" UnitPrice="0.218" />
+    <Price Name="Color_14PT Gloss Cover_5x7_Full Color Front / Grayscale Back" Break="1000" UnitPrice="0.1405" />
+    <Price Name="Color_14PT Gloss Cover_5x7_Full Color Front / Grayscale Back" Break="2500" UnitPrice="0.095996" />
+    <Price Name="Color_14PT Gloss Cover_6x11_Full Color Both Sides" Break="100" UnitPrice="0.866" />
+    <Price Name="Color_14PT Gloss Cover_6x11_Full Color Both Sides" Break="250" UnitPrice="0.4916" />
+    <Price Name="Color_14PT Gloss Cover_6x11_Full Color Both Sides" Break="500" UnitPrice="0.3668" />
+    <Price Name="Color_14PT Gloss Cover_6x11_Full Color Both Sides" Break="1000" UnitPrice="0.2428" />
+    <Price Name="Color_14PT Gloss Cover_6x11_Full Color Both Sides" Break="2500" UnitPrice="0.156256" />
+    <Price Name="Color_14PT Gloss Cover_6x11_Full Color Front / Blank Back" Break="100" UnitPrice="0.8" />
+    <Price Name="Color_14PT Gloss Cover_6x11_Full Color Front / Blank Back" Break="250" UnitPrice="0.408" />
+    <Price Name="Color_14PT Gloss Cover_6x11_Full Color Front / Blank Back" Break="500" UnitPrice="0.27" />
+    <Price Name="Color_14PT Gloss Cover_6x11_Full Color Front / Blank Back" Break="1000" UnitPrice="0.2098" />
+    <Price Name="Color_14PT Gloss Cover_6x11_Full Color Front / Blank Back" Break="2500" UnitPrice="0.136512" />
+    <Price Name="Color_14PT Gloss Cover_6x11_Full Color Front / Grayscale Back" Break="100" UnitPrice="0.866" />
+    <Price Name="Color_14PT Gloss Cover_6x11_Full Color Front / Grayscale Back" Break="250" UnitPrice="0.4916" />
+    <Price Name="Color_14PT Gloss Cover_6x11_Full Color Front / Grayscale Back" Break="500" UnitPrice="0.3668" />
+    <Price Name="Color_14PT Gloss Cover_6x11_Full Color Front / Grayscale Back" Break="1000" UnitPrice="0.2428" />
+    <Price Name="Color_14PT Gloss Cover_6x11_Full Color Front / Grayscale Back" Break="2500" UnitPrice="0.156256" />
+    <Price Name="Color_14PT Gloss Cover_6x9_Full Color Both Sides" Break="100" UnitPrice="0.754" />
+    <Price Name="Color_14PT Gloss Cover_6x9_Full Color Both Sides" Break="250" UnitPrice="0.4204" />
+    <Price Name="Color_14PT Gloss Cover_6x9_Full Color Both Sides" Break="500" UnitPrice="0.3092" />
+    <Price Name="Color_14PT Gloss Cover_6x9_Full Color Both Sides" Break="1000" UnitPrice="0.2032" />
+    <Price Name="Color_14PT Gloss Cover_6x9_Full Color Both Sides" Break="2500" UnitPrice="0.129664" />
+    <Price Name="Color_14PT Gloss Cover_6x9_Full Color Front / Blank Back" Break="100" UnitPrice="0.7" />
+    <Price Name="Color_14PT Gloss Cover_6x9_Full Color Front / Blank Back" Break="250" UnitPrice="0.352" />
+    <Price Name="Color_14PT Gloss Cover_6x9_Full Color Front / Blank Back" Break="500" UnitPrice="0.23" />
+    <Price Name="Color_14PT Gloss Cover_6x9_Full Color Front / Blank Back" Break="1000" UnitPrice="0.1762" />
+    <Price Name="Color_14PT Gloss Cover_6x9_Full Color Front / Blank Back" Break="2500" UnitPrice="0.113856" />
+    <Price Name="Color_14PT Gloss Cover_6x9_Full Color Front / Grayscale Back" Break="100" UnitPrice="0.754" />
+    <Price Name="Color_14PT Gloss Cover_6x9_Full Color Front / Grayscale Back" Break="250" UnitPrice="0.4204" />
+    <Price Name="Color_14PT Gloss Cover_6x9_Full Color Front / Grayscale Back" Break="500" UnitPrice="0.3092" />
+    <Price Name="Color_14PT Gloss Cover_6x9_Full Color Front / Grayscale Back" Break="1000" UnitPrice="0.2032" />
+    <Price Name="Color_14PT Gloss Cover_6x9_Full Color Front / Grayscale Back" Break="2500" UnitPrice="0.129664" />
+    <Price Name="Color_14PT Gloss Cover_8.5x11_Full Color Both Sides" Break="100" UnitPrice="0.9958" />
+    <Price Name="Color_14PT Gloss Cover_8.5x11_Full Color Both Sides" Break="250" UnitPrice="0.6732" />
+    <Price Name="Color_14PT Gloss Cover_8.5x11_Full Color Both Sides" Break="500" UnitPrice="0.424" />
+    <Price Name="Color_14PT Gloss Cover_8.5x11_Full Color Both Sides" Break="1000" UnitPrice="0.399" />
+    <Price Name="Color_14PT Gloss Cover_8.5x11_Full Color Both Sides" Break="2500" UnitPrice="0.21944" />
+    <Price Name="Color_14PT Gloss Cover_8.5x11_Full Color Front / Blank Back" Break="100" UnitPrice="0.7643" />
+    <Price Name="Color_14PT Gloss Cover_8.5x11_Full Color Front / Blank Back" Break="250" UnitPrice="0.47124" />
+    <Price Name="Color_14PT Gloss Cover_8.5x11_Full Color Front / Blank Back" Break="500" UnitPrice="0.3305" />
+    <Price Name="Color_14PT Gloss Cover_8.5x11_Full Color Front / Blank Back" Break="1000" UnitPrice="0.28118" />
+    <Price Name="Color_14PT Gloss Cover_8.5x11_Full Color Front / Blank Back" Break="2500" UnitPrice="0.1798" />
+    <Price Name="Color_14PT Gloss Cover_8.5x11_Full Color Front / Grayscale Back" Break="100" UnitPrice="0.8962" />
+    <Price Name="Color_14PT Gloss Cover_8.5x11_Full Color Front / Grayscale Back" Break="250" UnitPrice="0.60588" />
+    <Price Name="Color_14PT Gloss Cover_8.5x11_Full Color Front / Grayscale Back" Break="500" UnitPrice="0.424" />
+    <Price Name="Color_14PT Gloss Cover_8.5x11_Full Color Front / Grayscale Back" Break="1000" UnitPrice="0.399" />
+    <Price Name="Color_14PT Gloss Cover_8.5x11_Full Color Front / Grayscale Back" Break="2500" UnitPrice="0.21944" />
+    <Price Name="Color_16PT Gloss Cover_4x6_Full Color Both Sides" Break="100" UnitPrice="0.545" />
+    <Price Name="Color_16PT Gloss Cover_4x6_Full Color Both Sides" Break="250" UnitPrice="0.2892" />
+    <Price Name="Color_16PT Gloss Cover_4x6_Full Color Both Sides" Break="500" UnitPrice="0.1836" />
+    <Price Name="Color_16PT Gloss Cover_4x6_Full Color Both Sides" Break="1000" UnitPrice="0.1139" />
+    <Price Name="Color_16PT Gloss Cover_4x6_Full Color Both Sides" Break="2500" UnitPrice="0.075904" />
+    <Price Name="Color_16PT Gloss Cover_4x6_Full Color Front / Blank Back" Break="100" UnitPrice="0.508" />
+    <Price Name="Color_16PT Gloss Cover_4x6_Full Color Front / Blank Back" Break="250" UnitPrice="0.2632" />
+    <Price Name="Color_16PT Gloss Cover_4x6_Full Color Front / Blank Back" Break="500" UnitPrice="0.154" />
+    <Price Name="Color_16PT Gloss Cover_4x6_Full Color Front / Blank Back" Break="1000" UnitPrice="0.0935" />
+    <Price Name="Color_16PT Gloss Cover_4x6_Full Color Front / Blank Back" Break="2500" UnitPrice="0.065768" />
+    <Price Name="Color_16PT Gloss Cover_4x6_Full Color Front / Grayscale Back" Break="100" UnitPrice="0.52" />
+    <Price Name="Color_16PT Gloss Cover_4x6_Full Color Front / Grayscale Back" Break="250" UnitPrice="0.2756" />
+    <Price Name="Color_16PT Gloss Cover_4x6_Full Color Front / Grayscale Back" Break="500" UnitPrice="0.1712" />
+    <Price Name="Color_16PT Gloss Cover_4x6_Full Color Front / Grayscale Back" Break="1000" UnitPrice="0.1068" />
+    <Price Name="Color_16PT Gloss Cover_4x6_Full Color Front / Grayscale Back" Break="2500" UnitPrice="0.071392" />
+    <Price Name="Color_16PT Gloss Cover_5.5x8.5_Full Color Both Sides" Break="100" UnitPrice="0.6863" />
+    <Price Name="Color_16PT Gloss Cover_5.5x8.5_Full Color Both Sides" Break="250" UnitPrice="0.3774" />
+    <Price Name="Color_16PT Gloss Cover_5.5x8.5_Full Color Both Sides" Break="500" UnitPrice="0.2744" />
+    <Price Name="Color_16PT Gloss Cover_5.5x8.5_Full Color Both Sides" Break="1000" UnitPrice="0.17928" />
+    <Price Name="Color_16PT Gloss Cover_5.5x8.5_Full Color Both Sides" Break="2500" UnitPrice="0.154728" />
+    <Price Name="Color_16PT Gloss Cover_5x7_Full Color Both Sides" Break="100" UnitPrice="0.605535" />
+    <Price Name="Color_16PT Gloss Cover_5x7_Full Color Both Sides" Break="250" UnitPrice="0.323064" />
+    <Price Name="Color_16PT Gloss Cover_5x7_Full Color Both Sides" Break="500" UnitPrice="0.2289" />
+    <Price Name="Color_16PT Gloss Cover_5x7_Full Color Both Sides" Break="1000" UnitPrice="0.13734" />
+    <Price Name="Color_16PT Gloss Cover_5x7_Full Color Both Sides" Break="2500" UnitPrice="0.05901" />
+    <Price Name="Color_16PT Gloss Cover_5x7_Full Color Front / Blank Back" Break="100" UnitPrice="0.568785" />
+    <Price Name="Color_16PT Gloss Cover_5x7_Full Color Front / Blank Back" Break="250" UnitPrice="0.276486" />
+    <Price Name="Color_16PT Gloss Cover_5x7_Full Color Front / Blank Back" Break="500" UnitPrice="0.174993" />
+    <Price Name="Color_16PT Gloss Cover_5x7_Full Color Front / Blank Back" Break="1000" UnitPrice="0.12915" />
+    <Price Name="Color_16PT Gloss Cover_5x7_Full Color Front / Blank Back" Break="2500" UnitPrice="0.088087" />
+    <Price Name="Color_16PT Gloss Cover_5x7_Full Color Front / Grayscale Back" Break="100" UnitPrice="0.605535" />
+    <Price Name="Color_16PT Gloss Cover_5x7_Full Color Front / Grayscale Back" Break="250" UnitPrice="0.323064" />
+    <Price Name="Color_16PT Gloss Cover_5x7_Full Color Front / Grayscale Back" Break="500" UnitPrice="0.2289" />
+    <Price Name="Color_16PT Gloss Cover_5x7_Full Color Front / Grayscale Back" Break="1000" UnitPrice="0.147525" />
+    <Price Name="Color_16PT Gloss Cover_5x7_Full Color Front / Grayscale Back" Break="2500" UnitPrice="0.100796" />
+    <Price Name="Color_16PT Gloss Cover_8.5x11_Full Color Both Sides" Break="100" UnitPrice="1.0952" />
+    <Price Name="Color_16PT Gloss Cover_8.5x11_Full Color Both Sides" Break="250" UnitPrice="0.71808" />
+    <Price Name="Color_16PT Gloss Cover_8.5x11_Full Color Both Sides" Break="500" UnitPrice="0.55156" />
+    <Price Name="Color_16PT Gloss Cover_8.5x11_Full Color Both Sides" Break="1000" UnitPrice="0.54663" />
+    <Price Name="Color_16PT Gloss Cover_8.5x11_Full Color Both Sides" Break="2500" UnitPrice="0.437312" />
+  </Prices>
+</Product>

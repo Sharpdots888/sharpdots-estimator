@@ -1070,6 +1070,172 @@ body[data-workspace-mode="printEcomm"] .placeholder-view .placeholder-panel {
   resize: vertical;
 }
 
+.ecomm-catalog-admin {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 2px solid var(--print-orange);
+}
+
+.ecomm-catalog-heading {
+  align-items: flex-start;
+}
+
+.section-kicker {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--print-orange);
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.catalog-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--muted);
+  background: var(--soft);
+  font-size: 0.76rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.catalog-status.connected {
+  border-color: #85bca5;
+  color: #23634f;
+  background: #edf8f4;
+}
+
+.catalog-status.error {
+  border-color: #dc9da1;
+  color: #8d3037;
+  background: #fff1f2;
+}
+
+.ecomm-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.ecomm-price-editor {
+  min-width: 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--print-line);
+}
+
+.ecomm-editor-head,
+.ecomm-selector-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ecomm-editor-head h4,
+.ecomm-editor-head p {
+  margin: 0;
+}
+
+.ecomm-editor-head h4 {
+  font-size: 0.96rem;
+}
+
+.ecomm-editor-head p {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.ecomm-selector-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.75fr) minmax(220px, 1.25fr);
+  margin-top: 12px;
+}
+
+.ecomm-selector-row.single {
+  grid-template-columns: 1fr;
+}
+
+.ecomm-selector-row label,
+.ecomm-selector-row select {
+  min-width: 0;
+  width: 100%;
+}
+
+.ecomm-selection-summary {
+  min-height: 44px;
+  margin-top: 10px;
+  padding: 9px 10px;
+  border-left: 3px solid var(--print-orange);
+  color: var(--muted);
+  background: #fff6ee;
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.ecomm-selection-summary strong {
+  color: var(--ink);
+}
+
+.ecomm-table-wrap {
+  overflow-x: auto;
+  margin-top: 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+
+.ecomm-price-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.ecomm-price-table th,
+.ecomm-price-table td {
+  padding: 8px 9px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.ecomm-price-table th {
+  color: var(--print-brown);
+  background: var(--soft);
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+.ecomm-price-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.ecomm-price-table input {
+  width: 100%;
+  min-width: 74px;
+}
+
+.ecomm-price-table .calculated-value {
+  font-weight: 800;
+  text-align: right;
+}
+
+.ecomm-catalog-message {
+  min-height: 20px;
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.ecomm-catalog-message.error {
+  color: var(--red);
+}
+
 .print-quote-workspace {
   display: grid;
   grid-template-columns: minmax(300px, 0.75fr) minmax(0, 1.25fr);
@@ -6867,6 +7033,16 @@ button.sourcing-health-pill:focus-visible {
 
   .standard-product-price-summary > div:last-child {
     border-bottom: 0;
+  }
+
+  .ecomm-editor-grid,
+  .ecomm-selector-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ecomm-editor-head,
+  .ecomm-catalog-heading {
+    flex-direction: column;
   }
 
   .app-shell {
