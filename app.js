@@ -259,6 +259,39 @@ function defaultPrintQuote() {
   };
 }
 
+const standardProofOptional = {
+  id: "proof",
+  label: "Proof type",
+  description: "Choose the approval method before production.",
+  choices: [
+    { value: "none", label: "No proof", pricing: { type: "flat", amount: 0 } },
+    { value: "pdf", label: "PDF proof", pricing: { type: "flat", amount: 15 } },
+    { value: "physical", label: "Physical proof", pricing: { type: "flat", amount: 45 } }
+  ]
+};
+
+const standardRoundCornersOptional = {
+  id: "round-corners",
+  label: "Round corners",
+  description: "Quantity-tiered corner rounding for cards.",
+  choices: [
+    { value: "none", label: "No round corners", pricing: { type: "flat", amount: 0 } },
+    { value: "one-eighth", label: "1/8 in radius", pricing: { type: "tier", amounts: { 250: 28, 500: 35, 1000: 48, 2500: 90, 5000: 145, 10000: 250 } } },
+    { value: "one-quarter", label: "1/4 in radius", pricing: { type: "tier", amounts: { 250: 32, 500: 40, 1000: 55, 2500: 102, 5000: 165, 10000: 285 } } }
+  ]
+};
+
+const standardDirectMailOptional = {
+  id: "direct-mail",
+  label: "Direct mail",
+  description: "Mail preparation priced from the selected quantity.",
+  choices: [
+    { value: "none", label: "No mailing service", pricing: { type: "flat", amount: 0 } },
+    { value: "standard", label: "Standard mail preparation", pricing: { type: "perUnit", setup: 75, amount: 0.08 } },
+    { value: "first-class", label: "First-class mail preparation", pricing: { type: "perUnit", setup: 95, amount: 0.115 } }
+  ]
+};
+
 const standardProductCatalog = [
   {
     id: "cards",
@@ -273,6 +306,7 @@ const standardProductCatalog = [
         defaultMarkup: 40,
         quantities: [500, 1000, 2500, 5000, 10000],
         baseCosts: { 500: 0.19, 1000: 0.12, 2500: 0.075, 5000: 0.052, 10000: 0.039 },
+        optionals: [standardProofOptional, standardRoundCornersOptional, standardDirectMailOptional],
         options: [
           { id: "size", label: "Finished size", choices: [
             { value: "4x6", label: "4 x 6 in", multiplier: 1 },
@@ -304,6 +338,7 @@ const standardProductCatalog = [
         defaultMarkup: 45,
         quantities: [250, 500, 1000, 2500, 5000],
         baseCosts: { 250: 0.22, 500: 0.14, 1000: 0.085, 2500: 0.052, 5000: 0.038 },
+        optionals: [standardProofOptional, standardRoundCornersOptional],
         options: [
           { id: "size", label: "Finished size", choices: [{ value: "3.5x2", label: "3.5 x 2 in", multiplier: 1 }] },
           { id: "stock", label: "Paper stock", choices: [
@@ -330,6 +365,7 @@ const standardProductCatalog = [
         defaultMarkup: 42,
         quantities: [250, 500, 1000, 2500, 5000],
         baseCosts: { 250: 0.72, 500: 0.48, 1000: 0.31, 2500: 0.22, 5000: 0.17 },
+        optionals: [standardProofOptional, standardDirectMailOptional],
         options: [
           { id: "size", label: "Finished size", choices: [
             { value: "4.25x5.5", label: "4.25 x 5.5 in", multiplier: 1 },
@@ -364,6 +400,7 @@ const standardProductCatalog = [
         defaultMarkup: 40,
         quantities: [250, 500, 1000, 2500, 5000],
         baseCosts: { 250: 0.88, 500: 0.58, 1000: 0.39, 2500: 0.28, 5000: 0.21 },
+        optionals: [standardProofOptional, standardDirectMailOptional],
         options: [
           { id: "size", label: "Flat size", choices: [{ value: "8.5x11", label: "8.5 x 11 in", multiplier: 1 }, { value: "11x17", label: "11 x 17 in", multiplier: 1.62 }] },
           { id: "stock", label: "Paper stock", choices: [{ value: "100lb-gloss-text", label: "100 lb gloss text", multiplier: 1 }, { value: "100lb-dull-text", label: "100 lb dull text", multiplier: 1.08 }] },
@@ -379,6 +416,7 @@ const standardProductCatalog = [
         defaultMarkup: 40,
         quantities: [250, 500, 1000, 2500, 5000],
         baseCosts: { 250: 0.52, 500: 0.34, 1000: 0.23, 2500: 0.16, 5000: 0.12 },
+        optionals: [standardProofOptional, standardDirectMailOptional],
         options: [
           { id: "size", label: "Finished size", choices: [{ value: "8.5x11", label: "8.5 x 11 in", multiplier: 1 }, { value: "11x17", label: "11 x 17 in", multiplier: 1.58 }] },
           { id: "stock", label: "Paper stock", choices: [{ value: "100lb-gloss-text", label: "100 lb gloss text", multiplier: 1 }, { value: "80lb-uncoated", label: "80 lb uncoated text", multiplier: 0.94 }] },
@@ -400,6 +438,7 @@ const standardProductCatalog = [
         defaultMarkup: 45,
         quantities: [1, 2, 5, 10, 25],
         baseCosts: { 1: 118, 2: 109, 5: 96, 10: 88, 25: 79 },
+        optionals: [standardProofOptional],
         options: [
           { id: "size", label: "Display size", choices: [{ value: "33x80", label: "33 x 80 in", multiplier: 1 }, { value: "36x92", label: "36 x 92 in", multiplier: 1.24 }] },
           { id: "hardware", label: "Hardware", choices: [{ value: "standard", label: "Standard stand", multiplier: 1 }, { value: "premium", label: "Premium stand", multiplier: 1.42 }] },
@@ -414,6 +453,7 @@ const standardProductCatalog = [
         defaultMarkup: 42,
         quantities: [10, 25, 50, 100, 250],
         baseCosts: { 10: 8.4, 25: 6.1, 50: 4.7, 100: 3.65, 250: 2.82 },
+        optionals: [standardProofOptional],
         options: [
           { id: "size", label: "Finished size", choices: [{ value: "18x24", label: "18 x 24 in", multiplier: 1 }, { value: "24x36", label: "24 x 36 in", multiplier: 1.68 }] },
           { id: "printing", label: "Printing", choices: [{ value: "4-0", label: "Full color one side", multiplier: 0.88 }, { value: "4-4", label: "Full color both sides", multiplier: 1 }] },
@@ -429,7 +469,9 @@ let standardProductDraft = {
   productId: standardProductCatalog[0].products[0].id,
   quantity: standardProductCatalog[0].products[0].quantities[1],
   markupPercent: standardProductCatalog[0].products[0].defaultMarkup,
-  selections: {}
+  selections: {},
+  optionalSelections: {},
+  optionsExpanded: false
 };
 
 function defaultEcommPriceList() {
@@ -1949,6 +1991,10 @@ function defaultStandardSelections(product) {
   return Object.fromEntries(product.options.map((option) => [option.id, option.choices[0].value]));
 }
 
+function defaultStandardOptionalSelections(product) {
+  return Object.fromEntries((product.optionals || []).map((optional) => [optional.id, optional.choices[0].value]));
+}
+
 function resetStandardProductDraft(categoryId = standardProductCatalog[0].id, productId = null) {
   const category = standardProductCatalog.find((candidate) => candidate.id === categoryId) || standardProductCatalog[0];
   const product = category.products.find((candidate) => candidate.id === productId) || category.products[0];
@@ -1957,8 +2003,23 @@ function resetStandardProductDraft(categoryId = standardProductCatalog[0].id, pr
     productId: product.id,
     quantity: product.quantities[Math.min(1, product.quantities.length - 1)],
     markupPercent: product.defaultMarkup,
-    selections: defaultStandardSelections(product)
+    selections: defaultStandardSelections(product),
+    optionalSelections: defaultStandardOptionalSelections(product),
+    optionsExpanded: false
   };
+}
+
+function standardOptionalPrice(pricing, quantity) {
+  if (!pricing) return 0;
+  if (pricing.type === "perUnit") return asNumber(pricing.setup) + asNumber(pricing.amount) * quantity;
+  if (pricing.type === "tier") {
+    const tiers = Object.entries(pricing.amounts || {})
+      .map(([tierQuantity, amount]) => [asNumber(tierQuantity), asNumber(amount)])
+      .sort((a, b) => a[0] - b[0]);
+    const tier = tiers.find(([tierQuantity]) => tierQuantity >= quantity) || tiers[tiers.length - 1];
+    return tier ? tier[1] : 0;
+  }
+  return asNumber(pricing.amount);
 }
 
 function standardProductPrice(product = selectedStandardProduct()) {
@@ -1970,13 +2031,23 @@ function standardProductPrice(product = selectedStandardProduct()) {
     return factor * asNumber(choice.multiplier || 1);
   }, 1);
   const productionUnitCost = baseUnitCost * optionMultiplier;
-  const costTotal = productionUnitCost * quantity + asNumber(product.setupCost);
+  const baseCost = productionUnitCost * quantity + asNumber(product.setupCost);
+  const optionalLines = (product.optionals || []).map((optional) => {
+    const selectedValue = standardProductDraft.optionalSelections[optional.id];
+    const choice = optional.choices.find((candidate) => candidate.value === selectedValue) || optional.choices[0];
+    return { optional, choice, amount: standardOptionalPrice(choice.pricing, quantity) };
+  });
+  const optionalsTotal = optionalLines.reduce((total, line) => total + line.amount, 0);
+  const costTotal = baseCost + optionalsTotal;
   const markupPercent = Math.min(Math.max(asNumber(standardProductDraft.markupPercent), 0), 200);
   const customerTotal = costTotal * (1 + markupPercent / 100);
   return {
     quantity,
     productionUnitCost,
     setupCost: asNumber(product.setupCost),
+    baseCost,
+    optionalLines,
+    optionalsTotal,
     costTotal,
     markupPercent,
     customerUnitPrice: customerTotal / quantity,
@@ -1985,11 +2056,15 @@ function standardProductPrice(product = selectedStandardProduct()) {
 }
 
 function standardProductDescription(product = selectedStandardProduct()) {
-  return product.options.map((option) => {
+  const specifications = product.options.map((option) => {
     const selectedValue = standardProductDraft.selections[option.id];
     const choice = option.choices.find((candidate) => candidate.value === selectedValue) || option.choices[0];
     return `${option.label}: ${choice.label}`;
-  }).join("; ");
+  });
+  const optionals = standardProductPrice(product).optionalLines
+    .filter((line) => line.choice.value !== "none")
+    .map((line) => `${line.optional.label}: ${line.choice.label}`);
+  return [...specifications, ...optionals].join("; ");
 }
 
 function renderStandardProductConfigurator() {
@@ -2041,8 +2116,31 @@ function renderStandardProductConfigurator() {
         <span class="standard-product-input-suffix"><input type="number" min="0" max="200" step="1" value="${escapeHtml(price.markupPercent)}" data-standard-markup /><span>%</span></span>
       </label>
     </div>
+    <section class="standard-product-optionals${standardProductDraft.optionsExpanded ? " expanded" : ""}">
+      <div class="standard-product-optionals-head">
+        <div>
+          <span class="standard-product-step">4. Options</span>
+          <h4>Optional services</h4>
+          <p>Add production and fulfillment services priced from the selected quantity.</p>
+        </div>
+        <button class="ghost-btn" type="button" data-standard-options-toggle>${standardProductDraft.optionsExpanded ? "Hide Options" : "Add Options"}</button>
+      </div>
+      ${standardProductDraft.optionsExpanded ? `
+        <div class="standard-product-optional-list">
+          ${price.optionalLines.map((line) => `
+            <label class="standard-product-optional-row">
+              <span><strong>${escapeHtml(line.optional.label)}</strong><small>${escapeHtml(line.optional.description)}</small></span>
+              <select data-standard-optional="${escapeHtml(line.optional.id)}">
+                ${line.optional.choices.map((choice) => `<option value="${escapeHtml(choice.value)}"${choice.value === line.choice.value ? " selected" : ""}>${escapeHtml(choice.label)}</option>`).join("")}
+              </select>
+              <strong class="standard-product-optional-price">${line.amount > 0 ? money(line.amount, 2) : "Included"}</strong>
+            </label>
+          `).join("")}
+        </div>
+      ` : ""}
+    </section>
     <div class="standard-product-price-summary" aria-live="polite">
-      <div><span>Estimated cost</span><strong>${money(price.costTotal, 2)}</strong><small>Includes ${money(price.setupCost, 2)} setup</small></div>
+      <div><span>Estimated cost</span><strong>${money(price.costTotal, 2)}</strong><small>${money(price.baseCost, 2)} base + ${money(price.optionalsTotal, 2)} options</small></div>
       <div><span>Markup</span><strong>${price.markupPercent.toFixed(0)}%</strong><small>${money(price.customerTotal - price.costTotal, 2)} gross dollars</small></div>
       <div><span>Unit price</span><strong>${money(price.customerUnitPrice, 4)}</strong><small>At ${price.quantity.toLocaleString()} units</small></div>
       <div class="standard-product-total"><span>Quote total</span><strong>${money(price.customerTotal, 2)}</strong><small>Before shipping and tax</small></div>
@@ -2079,7 +2177,10 @@ function addConfiguredStandardProduct() {
       standardProductCategory: category.name,
       estimatedCost: Number(price.costTotal.toFixed(2)),
       markupPercent: price.markupPercent,
-      configuration: { ...standardProductDraft.selections }
+      configuration: { ...standardProductDraft.selections },
+      optionals: price.optionalLines
+        .filter((line) => line.choice.value !== "none")
+        .map((line) => ({ id: line.optional.id, label: line.optional.label, value: line.choice.value, choice: line.choice.label, amount: Number(line.amount.toFixed(2)) }))
     }
   ];
   printQuote.outputMode = "builder";
@@ -11230,6 +11331,8 @@ els.standardProductList?.addEventListener("click", (event) => {
 els.standardProductConfigurator?.addEventListener("change", (event) => {
   const option = event.target.closest("[data-standard-option]");
   if (option) standardProductDraft.selections[option.dataset.standardOption] = option.value;
+  const optional = event.target.closest("[data-standard-optional]");
+  if (optional) standardProductDraft.optionalSelections[optional.dataset.standardOptional] = optional.value;
   const quantity = event.target.closest("[data-standard-quantity]");
   if (quantity) standardProductDraft.quantity = asNumber(quantity.value);
   const markup = event.target.closest("[data-standard-markup]");
@@ -11244,12 +11347,17 @@ els.standardProductConfigurator?.addEventListener("input", (event) => {
   const summary = els.standardProductConfigurator.querySelector(".standard-product-price-summary");
   if (summary) {
     summary.innerHTML = `
-      <div><span>Estimated cost</span><strong>${money(price.costTotal, 2)}</strong><small>Includes ${money(price.setupCost, 2)} setup</small></div>
+      <div><span>Estimated cost</span><strong>${money(price.costTotal, 2)}</strong><small>${money(price.baseCost, 2)} base + ${money(price.optionalsTotal, 2)} options</small></div>
       <div><span>Markup</span><strong>${price.markupPercent.toFixed(0)}%</strong><small>${money(price.customerTotal - price.costTotal, 2)} gross dollars</small></div>
       <div><span>Unit price</span><strong>${money(price.customerUnitPrice, 4)}</strong><small>At ${price.quantity.toLocaleString()} units</small></div>
       <div class="standard-product-total"><span>Quote total</span><strong>${money(price.customerTotal, 2)}</strong><small>Before shipping and tax</small></div>
     `;
   }
+});
+els.standardProductConfigurator?.addEventListener("click", (event) => {
+  if (!event.target.closest("[data-standard-options-toggle]")) return;
+  standardProductDraft.optionsExpanded = !standardProductDraft.optionsExpanded;
+  renderStandardProductConfigurator();
 });
 els.addConfiguredProductBtn?.addEventListener("click", addConfiguredStandardProduct);
 els.standardProductModal?.addEventListener("click", (event) => {
