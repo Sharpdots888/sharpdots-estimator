@@ -1149,6 +1149,16 @@ body[data-workspace-mode="printEcomm"] .placeholder-view .placeholder-panel {
   flex-wrap: wrap;
 }
 
+.print-quote-action-group:first-child {
+  flex-wrap: nowrap;
+}
+
+.print-quote-action-group:first-child .ghost-btn {
+  padding-inline: 10px;
+  font-size: 0.76rem;
+  white-space: nowrap;
+}
+
 .print-quote-view-switcher {
   padding-left: 7px;
   border-left: 1px solid var(--line);
@@ -6804,6 +6814,10 @@ button.sourcing-health-pill:focus-visible {
   .standard-product-dialog {
     width: calc(100vw - 16px);
     max-height: calc(100vh - 16px);
+  }
+
+  .print-quote-action-group:first-child {
+    flex-wrap: wrap;
   }
 
   .standard-product-head,
