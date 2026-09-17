@@ -589,6 +589,18 @@ function renderEcommCatalogAdmin() {
   }
 }
 
+function publishedStandardCategories(categories) {
+  return categories.map(category => ({ ...category, products: category.products
+    .filter(product => product.status === 'published')
+    .map(product => ({ ...product,
+      configurations: product.configurations.filter(configuration => configuration.status === 'published')
+        .map(configuration => ({ ...configuration, priceTiers: configuration.priceTiers.filter(tier => tier.status === 'published') }))
+        .filter(configuration => configuration.priceTiers.length),
+      optionals: product.optionals.filter(optional => optional.status === 'published')
+    })).filter(product => product.configurations.length)
+  })).filter(category => category.products.length);
+}
+
 async function loadSdspCatalog() {
   try {
     const response = await fetch("/api/sdsp/admin/catalog");
@@ -596,14 +608,15 @@ async function loadSdspCatalog() {
     if (!response.ok) throw new Error(result.error || "The Standard Products catalog could not be loaded");
     sdspCatalog = result;
     sdspCatalogError = "";
-    if (Array.isArray(result.categories) && result.categories.length) {
-      standardProductCatalog = result.categories;
+    standardProductCatalog = publishedStandardCategories(result.categories || []);
+    if (standardProductCatalog.length) {
       resetStandardProductDraft();
     }
     renderEcommCatalogAdmin();
     return result;
   } catch (error) {
     sdspCatalogError = error.message;
+    standardProductCatalog = [];
     renderEcommCatalogAdmin();
     return null;
   }
@@ -627,7 +640,7 @@ async function saveEcommProductPrices() {
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || "Product prices could not be saved");
     sdspCatalog = result;
-    standardProductCatalog = result.categories;
+    standardProductCatalog = publishedStandardCategories(result.categories);
     renderEcommCatalogAdmin();
     setEcommCatalogMessage(`${configuration.sku} price grid saved locally.`);
   } catch (error) {
@@ -654,7 +667,7 @@ async function saveEcommOptionalPrices() {
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || "Option prices could not be saved");
     sdspCatalog = result;
-    standardProductCatalog = result.categories;
+    standardProductCatalog = publishedStandardCategories(result.categories);
     renderEcommCatalogAdmin();
     setEcommCatalogMessage(`${optional.id} price grid saved locally.`);
   } catch (error) {
@@ -2213,9 +2226,8 @@ function availableStandardChoices(product, option) {
   if (!product?.configurations?.length) return option.choices;
   return option.choices.filter((choice) => product.configurations.some((configuration) => (
     configuration.selections[option.id] === choice.value
-    && product.options.every((otherOption) => (
-      otherOption.id === option.id
-      || !standardProductDraft.selections[otherOption.id]
+    && product.options.slice(0, product.options.indexOf(option)).every((otherOption) => (
+      !standardProductDraft.selections[otherOption.id]
       || configuration.selections[otherOption.id] === standardProductDraft.selections[otherOption.id]
     ))
   )));
@@ -2225,7 +2237,8 @@ function normalizeStandardSelections(product = selectedStandardProduct(), change
   if (!product?.configurations?.length) return;
   let candidate = selectedStandardConfiguration(product);
   if (!candidate && changedOptionId) {
-    candidate = product.configurations.find((configuration) => configuration.selections[changedOptionId] === standardProductDraft.selections[changedOptionId]);
+    const prefix = product.options.slice(0, product.options.findIndex(option => option.id === changedOptionId) + 1);
+    candidate = product.configurations.find((configuration) => prefix.every(option => configuration.selections[option.id] === standardProductDraft.selections[option.id]));
   }
   if (!candidate) candidate = product.configurations[0];
   product.options.forEach((option) => {
@@ -2286,7 +2299,7 @@ function standardProductPrice(product = selectedStandardProduct()) {
   });
   const optionalsTotal = optionalLines.reduce((total, line) => total + line.amount, 0);
   const costTotal = baseCost + optionalsTotal;
-  const markupPercent = Math.min(Math.max(asNumber(standardProductDraft.markupPercent), 0), 200);
+  const markupPercent = product.priceBasis === 'selling' ? 0 : Math.min(Math.max(asNumber(standardProductDraft.markupPercent), 0), 200);
   const customerTotal = costTotal * (1 + markupPercent / 100);
   return {
     available: product.pricingSource !== "sdsp" || Boolean(configuration && databaseTier),
@@ -2392,12 +2405,12 @@ function renderStandardProductConfigurator() {
           ${quantities.map((quantity) => `<option value="${quantity}"${quantity === price.quantity ? " selected" : ""}>${quantity.toLocaleString()}</option>`).join("")}
         </select>
       </label>
-      <label>
+      ${product.priceBasis === 'selling' ? '' : `<label>
         Markup
         <span class="standard-product-input-suffix"><input type="number" min="0" max="200" step="1" value="${escapeHtml(price.markupPercent)}" data-standard-markup /><span>%</span></span>
-      </label>
+      </label>`}
     </div>
-    <section class="standard-product-optionals${standardProductDraft.optionsExpanded ? " expanded" : ""}">
+    <section ${product.optionals.length ? '' : 'hidden'} class="standard-product-optionals${standardProductDraft.optionsExpanded ? " expanded" : ""}">
       <div class="standard-product-optionals-head">
         <div>
           <span class="standard-product-step">4. Options</span>
@@ -2420,9 +2433,9 @@ function renderStandardProductConfigurator() {
         </div>
       ` : ""}
     </section>
-    <div class="standard-product-price-summary" aria-live="polite">
-      <div><span>Estimated cost</span><strong>${money(price.costTotal, 2)}</strong><small>${money(price.baseCost, 2)} base + ${money(price.optionalsTotal, 2)} options</small></div>
-      <div><span>Markup</span><strong>${price.markupPercent.toFixed(0)}%</strong><small>${money(price.customerTotal - price.costTotal, 2)} gross dollars</small></div>
+    <div class="standard-product-price-summary${product.priceBasis === 'selling' ? ' selling-price-summary' : ''}" aria-live="polite">
+      ${product.priceBasis === 'selling' ? '' : `<div><span>Estimated cost</span><strong>${money(price.costTotal, 2)}</strong><small>${money(price.baseCost, 2)} base + ${money(price.optionalsTotal, 2)} options</small></div>
+      <div><span>Markup</span><strong>${price.markupPercent.toFixed(0)}%</strong><small>${money(price.customerTotal - price.costTotal, 2)} gross dollars</small></div>`}
       <div><span>Unit price</span><strong>${money(price.customerUnitPrice, 4)}</strong><small>At ${price.quantity.toLocaleString()} units</small></div>
       <div class="standard-product-total"><span>Quote total</span><strong>${money(price.customerTotal, 2)}</strong><small>Before shipping and tax</small></div>
     </div>

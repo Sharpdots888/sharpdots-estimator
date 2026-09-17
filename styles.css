@@ -1900,6 +1900,10 @@ body.modal-open {
   overflow: hidden;
 }
 
+.standard-product-price-summary.selling-price-summary {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .standard-product-price-summary > div {
   display: grid;
   align-content: center;
