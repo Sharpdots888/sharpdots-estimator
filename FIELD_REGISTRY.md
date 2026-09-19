@@ -2,6 +2,25 @@
 
 This registry tracks estimator fields that exist in the prototype, need a database home, need a lookup source, or need a decision before production use.
 
+## Opportunity CRM Draft
+
+These entries describe the local draft in `CRM_DRAFT.md`, not applied database migrations.
+
+| Field | Purpose | Current Home | Production Resolution |
+| --- | --- | --- | --- |
+| Opportunity ID / O number | Stable parent identity replacing user-facing Workspace numbers | Browser UUID + local sequential O number | Needs DB Home: server-assigned UUID and unique number allocation; migration mapping from Workspace |
+| Account, contact, owner | Customer and operator responsibility | Local text and sample owner list | Needs Lookup: customer/contact tables and authenticated operator IDs |
+| Stage / status / expected close | Sales progression and won/lost outcome | Browser opportunity | Needs DB Home: separate stage and outcome, timestamps, lost reason |
+| Qualification and next activity | Need, budget, authority, timing and follow-up accountability | Browser opportunity / activities | Needs DB Home: activities with due date, owner, completion, event history |
+| One-time / monthly / initial term | Single forecast value without component double-counting | Browser opportunity | Needs Decision: manual forecast vs approved offer reconciliation, recurring and variable billing rules |
+| Record links / role / version | Multiple calculator records, one primary acceptance basis | Local links plus legacy container adapter | Needs DB Home: opportunity-record-version relation; component, alternative, cost basis, primary offer |
+| Document transaction link | Acceptance of the exact offer/version | Local simulated document events | Needs DB Home: link existing sfpq document transaction to opportunity and frozen offer version |
+| Engagement / production handoff | Owner, target date, scope, dependencies, queued/received state | Browser opportunity | Needs DB Home: approved workbench outbox, idempotency key, external work-item reference, retry state |
+| Billing readiness / payment status | Prepare future Xero coordination without issuing invoices | Browser opportunity | Needs DB Home: contact, terms, deposit, first date, PO, invoice reference; Xero authoritative, Authorize.net retained |
+| Opportunity event history | Reviewable local change timeline | Browser opportunity | Needs DB Home: authenticated append-only audit events; browser history is not compliance evidence |
+
+## Estimator and Document Fields
+
 Status values:
 
 - `Prototype`: Exists in the app UI or proposed UI, but may not be final.
