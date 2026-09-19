@@ -1,13 +1,13 @@
 # DocuSeal Integration
 
-The estimator can prepare client proposal signature requests through DocuSeal Pro. The integration is intentionally prepare-only until application authentication is in place.
+The estimator prepares and can email client proposal signature requests through DocuSeal Pro. Production email delivery was enabled on September 18, 2026 after the authentication, webhook, lifecycle, archival, and retention gates below were verified.
 
 ## Current workflow
 
 1. Save the proposal and every source selected in its publishing manifest.
 2. Select a client publishing audience.
 3. Use `Prepare DocuSeal` in the Proposal tab.
-4. Enter the recipient name and email.
+4. Enter the recipient name and email. Email delivery is optional and remains unchecked by default.
 5. The server freezes the rendered proposal as HTML, adds client signature and signed-date fields, and creates a one-off DocuSeal submission.
 6. DocuSeal events update the transaction status through a verified webhook.
 7. On `submission.completed`, the server immediately archives the signed PDF and Certificate of Signature in Postgres.
@@ -25,7 +25,7 @@ Set these as Heroku config variables or local environment variables. Never place
 | `DOCUSEAL_WEBHOOK_SECRET` | Yes for events | HMAC secret shown in the DocuSeal webhook Security panel. |
 | `DOCUSEAL_SEND_ENABLED` | No | Defaults to false. Set to `true` only after estimator authentication and an operator authorization policy are in place. |
 
-With only `DOCUSEAL_API_KEY` configured, the app operates in prepare-only mode and sends no email.
+With only `DOCUSEAL_API_KEY` configured, the app operates in prepare-only mode and sends no email. In production, `DOCUSEAL_SEND_ENABLED=true` makes immediate email delivery available only to authenticated Portal administrators; each operator must still explicitly select it for the individual request.
 
 ## DocuSeal Console setup
 
@@ -62,7 +62,7 @@ This policy is the pilot operating rule, not the final company records schedule.
 
 ## Production gate
 
-Do not set `DOCUSEAL_SEND_ENABLED=true` until all of the following are complete:
+The production gate was completed on September 18, 2026. Keep these controls in place while `DOCUSEAL_SEND_ENABLED=true`:
 
 - Users authenticate to the estimator.
 - Portal administrators are the only users authorized to send client documents.
@@ -71,7 +71,9 @@ Do not set `DOCUSEAL_SEND_ENABLED=true` until all of the following are complete:
 - The approved pilot retention policy above is in effect.
 - Sandbox signing, decline, expiration, duplicate webhook, and completed-artifact tests pass.
 
-`portal-token-preferred` still allows general estimator use without a portal session, but document transactions and archived artifacts require one. The signed DocuSeal webhook is the sole document-workflow exception because it uses HMAC verification instead of a browser session. Before switching the entire app to `portal-token-required`, verify the Portal launcher and `/api/auth/me` response for each operator role.
+Production uses `ESTIMATOR_AUTH_MODE=portal-token-required`, so all estimator users must launch through the Space-Fold Portal. Portal administrators are the only users authorized to email signature requests. The signed DocuSeal webhook is the sole document-workflow exception because it uses HMAC verification instead of a browser session.
+
+The first production prepare-only signing test completed successfully before email delivery was enabled. It verified production API authentication, HMAC webhook delivery, completed status synchronization, operator attribution, signed-document archival, Certificate of Signature archival, and SHA-256 hashes for both artifacts.
 
 ## Later payment handoff
 
