@@ -6,6 +6,13 @@ This registry tracks estimator fields that exist in the prototype, need a databa
 
 These entries describe the local draft in `CRM_DRAFT.md`, not applied database migrations.
 
+The first durable header migration is now authored in
+`migrations/001_sfpq_opportunities.sql` (not executed). It defines the database-owned
+O identity, customer/owner reference placeholders, sales state, qualification,
+commercial values, legacy mapping and optimistic concurrency. Activities, versioned
+record links, document associations, handoffs and billing relays remain separate
+follow-up migrations; see `docs/opportunity-migration.md`.
+
 | Field | Purpose | Current Home | Production Resolution |
 | --- | --- | --- | --- |
 | Opportunity ID / O number | Stable parent identity replacing user-facing Workspace numbers | Browser UUID + local sequential O number | Needs DB Home: server-assigned UUID and unique number allocation; migration mapping from Workspace |

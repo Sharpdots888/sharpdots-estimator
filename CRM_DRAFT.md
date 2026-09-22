@@ -4,6 +4,11 @@
 
 Branch: `codex/opportunity-crm-draft`, based on `origin/main` at `8faa789`.
 
+Update: current main through `07b75f0` is reconciled into this branch. PR 33 now
+also includes an explicit, dormant `sfpq_opportunities` migration. See
+`docs/opportunity-migration.md` for schema detail, W-to-O backfill boundaries and
+the review/merge/deployment order. No production SQL has been executed.
+
 Run `PORT=4187 node crm/preview-server.cjs`, then open
 `http://127.0.0.1:4187/index.html?crm=1`.
 

@@ -3,7 +3,7 @@
 ## Opportunity CRM Draft Lane
 
 - Owner: Codex, current opportunity CRM task.
-- State: local draft built; verification and user review.
+- State: PR 33 review preparation; current main reconciled and dormant opportunity migration prepared.
 - Branch: `codex/opportunity-crm-draft` from `origin/main` (`8faa789`).
 - Worktree: `/Volumes/JTMMX/Users/JT/Documents/estimator-crm-draft`.
 - Files owned: `crm/`, opt-in script/style inclusions in `index.html`,
@@ -11,7 +11,11 @@
 - ClickUp: https://app.clickup.com/t/868jnxdp7
 - Preview: localhost:4187, static only; no database or production API calls.
 - Scope: Pipeline / Proposals / Quote shell and local opportunity lifecycle draft.
-- Production/DocuSeal/Xero schema changes, deployment, and live sends: excluded.
+- Migration authoring approved: `migrations/001_sfpq_opportunities.sql` and
+  `docs/opportunity-migration.md`; production execution, deployment, live sends and
+  PR merge are not approved by this preparation request.
+- Current main merged into this branch at `481dfb2`; catalog entrypoint versions
+  retained. Only the CRM's opt-in includes differ in `index.html`.
 
 ## Parallel Work Boundary
 
