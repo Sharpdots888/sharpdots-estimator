@@ -466,6 +466,7 @@ let standardProductCatalog = [
 
 let sdspCatalog = null;
 let sdspCatalogError = "";
+let sdspCatalogWritable = false;
 let ecommSelectedProductId = "";
 let ecommSelectedConfigurationId = "";
 let ecommSelectedOptionalId = "";
@@ -587,6 +588,14 @@ function renderEcommCatalogAdmin() {
     els.ecommOptionalSummary.textContent = "No optional price list is available.";
     els.ecommOptionalPriceRows.innerHTML = "";
   }
+
+  els.saveEcommProductPricesBtn.disabled = !sdspCatalogWritable;
+  els.saveEcommOptionalPricesBtn.disabled = !sdspCatalogWritable;
+  els.ecommProductPriceRows.querySelectorAll("input").forEach((input) => { input.disabled = !sdspCatalogWritable; });
+  els.ecommOptionalPriceRows.querySelectorAll("input").forEach((input) => { input.disabled = !sdspCatalogWritable; });
+  if (!sdspCatalogWritable) {
+    setEcommCatalogMessage("Published catalog loaded in read-only mode. Price editing remains restricted to the local catalog administrator.");
+  }
 }
 
 function publishedStandardCategories(categories) {
@@ -603,19 +612,29 @@ function publishedStandardCategories(categories) {
 
 async function loadSdspCatalog() {
   try {
-    const response = await fetch("/api/sdsp/admin/catalog");
+    const response = await fetch("/api/sdsp/catalog");
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || "The Standard Products catalog could not be loaded");
     sdspCatalog = result;
     sdspCatalogError = "";
+    sdspCatalogWritable = false;
     standardProductCatalog = publishedStandardCategories(result.categories || []);
     if (standardProductCatalog.length) {
       resetStandardProductDraft();
     }
     renderEcommCatalogAdmin();
+
+    const adminResponse = await fetch("/api/sdsp/admin/catalog");
+    if (adminResponse.ok) {
+      const adminResult = await adminResponse.json();
+      sdspCatalog = adminResult;
+      sdspCatalogWritable = true;
+      renderEcommCatalogAdmin();
+    }
     return result;
   } catch (error) {
     sdspCatalogError = error.message;
+    sdspCatalogWritable = false;
     standardProductCatalog = [];
     renderEcommCatalogAdmin();
     return null;
