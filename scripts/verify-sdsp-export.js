@@ -4,7 +4,9 @@ const { loadLocalEnv } = require('../lib/local-env');
 loadLocalEnv(require('path').resolve(__dirname, '..'));
 const { getCatalog, calculatePrice } = require('../lib/sdsp-catalog');
 async function main() {
-  const db = new Pool({ connectionString: process.env.SDSP_DATABASE_URL, ssl: false });
+  const connectionString = process.env.SDSP_DATABASE_URL;
+  const local = ['localhost', '127.0.0.1'].includes(new URL(connectionString).hostname);
+  const db = new Pool({ connectionString, ssl: local ? false : { rejectUnauthorized: false }, statement_timeout: 30000 });
   try {
     const { rows } = await db.query('SELECT quantity_break,unit_price,currency,status,source_metadata FROM sdsp_price_tiers');
     assert.equal(rows.length, 3577);

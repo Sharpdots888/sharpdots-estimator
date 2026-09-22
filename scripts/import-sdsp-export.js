@@ -46,12 +46,23 @@ async function main() {
   if (!process.argv.includes('--apply')) { console.log(JSON.stringify(report, null, 2)); return; }
   loadLocalEnv(root);
   const url = new URL(process.env.SDSP_DATABASE_URL);
-  if (!['localhost', '127.0.0.1'].includes(url.hostname) || url.pathname !== '/sharpdots_estimator_local') throw new Error('Import is restricted to the estimator local database');
-  const backupDir = path.join(process.env.SDSP_PG_DATA, '..', 'sdsp-backups');
+  const isLocalTarget = ['localhost', '127.0.0.1'].includes(url.hostname) && url.pathname === '/sharpdots_estimator_local';
+  const productionRequested = process.argv.includes('--apply-production');
+  const productionConfirmed = process.env.SDSP_PRODUCTION_IMPORT_CONFIRM === manifest.batch_id;
+  if (!isLocalTarget && (!productionRequested || !productionConfirmed)) {
+    throw new Error(`Production import requires --apply-production and SDSP_PRODUCTION_IMPORT_CONFIRM=${manifest.batch_id}`);
+  }
+  const configuredBackupDir = isLocalTarget
+    ? path.join(process.env.SDSP_PG_DATA, '..', 'sdsp-backups')
+    : process.env.SDSP_BACKUP_DIR;
+  if (!configuredBackupDir) throw new Error('SDSP_BACKUP_DIR is required for a production import');
+  const backupDir = path.resolve(configuredBackupDir);
   fs.mkdirSync(backupDir, { recursive: true });
   const backup = path.join(backupDir, `before-export-${Date.now()}.dump`);
-  execFileSync(path.join(process.env.SDSP_PG_BIN, 'pg_dump.exe'), ['-Fc', '-f', backup], { env: { ...process.env, PGHOST: url.hostname, PGPORT: url.port, PGUSER: decodeURIComponent(url.username), PGPASSWORD: decodeURIComponent(url.password), PGDATABASE: url.pathname.slice(1) }, windowsHide: true });
-  const pool = new Pool({ connectionString: url.href, ssl: false });
+  const backupArgs = ['-Fc', '-f', backup];
+  if (!isLocalTarget) backupArgs.push('--table=public.sdsp_*');
+  execFileSync(path.join(process.env.SDSP_PG_BIN, 'pg_dump.exe'), backupArgs, { env: { ...process.env, PGHOST: url.hostname, PGPORT: url.port, PGUSER: decodeURIComponent(url.username), PGPASSWORD: decodeURIComponent(url.password), PGDATABASE: url.pathname.slice(1), PGSSLMODE: isLocalTarget ? 'disable' : 'require' }, windowsHide: true });
+  const pool = new Pool({ connectionString: url.href, ssl: isLocalTarget ? false : { rejectUnauthorized: false } });
   const db = await pool.connect();
   const id = async (sql, args) => (await db.query(sql, args)).rows[0].id;
   try {
