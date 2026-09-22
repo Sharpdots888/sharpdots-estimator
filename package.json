@@ -5,12 +5,20 @@
   "description": "Estimator application for package, product/service, and element costing.",
   "scripts": {
     "start": "node server.js",
+    "db:start": "node scripts/sdsp-local-db.js start",
+    "db:stop": "node scripts/sdsp-local-db.js stop",
+    "db:status": "node scripts/sdsp-local-db.js status",
+    "db:migrate": "node scripts/migrate-sdsp.js",
+    "db:import": "node scripts/import-sdsp-bootstrap.js",
+    "db:setup": "npm run db:migrate && npm run db:import",
     "test": "node --test"
   },
   "engines": {
     "node": "22.x"
   },
   "dependencies": {
+    "csv-parse": "^7.0.2",
+    "fast-xml-parser": "^5.11.1",
     "pg": "^8.13.0"
   }
 }

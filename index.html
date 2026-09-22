@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sharpdots Estimator</title>
-    <link rel="stylesheet" href="styles.css?v=load-responsive-fix1" />
+    <link rel="stylesheet" href="styles.css?v=sdsp-catalog2" />
     <script src="crm/preview.js"></script>
     <link rel="stylesheet" href="crm/crm.css" />
   </head>
@@ -958,6 +958,7 @@
                 </div>
                 <div class="button-group print-quote-actions">
                   <div class="print-quote-action-group">
+                    <button id="addStandardProductBtn" class="ghost-btn standard-product-action" type="button">Add Standard Product</button>
                     <button id="addPrintQuoteLineBtn" class="ghost-btn primary-action" type="button">Add Quote Line</button>
                     <button id="refreshPrintQuoteLinesBtn" class="ghost-btn" type="button">Refresh Lines From Estimate</button>
                   </div>
@@ -1045,6 +1046,69 @@
               <textarea id="ecommNotes" rows="4">Use this draft to hold ecommerce list scope, channel assumptions, and selected products before the ecomm price list calculator is built.</textarea>
             </label>
           </div>
+          <section class="ecomm-catalog-admin" aria-labelledby="ecommCatalogTitle">
+            <div class="section-head ecomm-catalog-heading">
+              <div>
+                <span class="section-kicker">Local Standard Products catalog</span>
+                <h3 id="ecommCatalogTitle">Product and option price grids</h3>
+                <p>Manage the local catalog after the one-time XML and CSV bootstrap.</p>
+              </div>
+              <span id="ecommCatalogStatus" class="catalog-status">Connecting</span>
+            </div>
+
+            <div class="ecomm-editor-grid">
+              <section class="ecomm-price-editor" aria-labelledby="ecommProductPricesTitle">
+                <div class="ecomm-editor-head">
+                  <div>
+                    <h4 id="ecommProductPricesTitle">Product price grid</h4>
+                    <p>Select a sellable SKU and edit its quantity-tier unit prices.</p>
+                  </div>
+                  <button id="saveEcommProductPricesBtn" class="primary-btn" type="button">Save Product Prices</button>
+                </div>
+                <div class="ecomm-selector-row">
+                  <label>
+                    Product
+                    <select id="ecommProductSelect"></select>
+                  </label>
+                  <label>
+                    Sellable configuration
+                    <select id="ecommConfigurationSelect"></select>
+                  </label>
+                </div>
+                <div id="ecommConfigurationSummary" class="ecomm-selection-summary"></div>
+                <div class="ecomm-table-wrap">
+                  <table class="ecomm-price-table">
+                    <thead><tr><th>Quantity</th><th>Unit price</th><th>Extended source cost</th></tr></thead>
+                    <tbody id="ecommProductPriceRows"></tbody>
+                  </table>
+                </div>
+              </section>
+
+              <section class="ecomm-price-editor" aria-labelledby="ecommOptionalPricesTitle">
+                <div class="ecomm-editor-head">
+                  <div>
+                    <h4 id="ecommOptionalPricesTitle">Option price grid</h4>
+                    <p>Review source option codes, pricing methods, and quantity tiers.</p>
+                  </div>
+                  <button id="saveEcommOptionalPricesBtn" class="primary-btn" type="button">Save Option Prices</button>
+                </div>
+                <div class="ecomm-selector-row single">
+                  <label>
+                    Option or service
+                    <select id="ecommOptionalSelect"></select>
+                  </label>
+                </div>
+                <div id="ecommOptionalSummary" class="ecomm-selection-summary"></div>
+                <div class="ecomm-table-wrap">
+                  <table class="ecomm-price-table">
+                    <thead><tr><th>Quantity break</th><th>Display label</th><th>Price or rate</th></tr></thead>
+                    <tbody id="ecommOptionalPriceRows"></tbody>
+                  </table>
+                </div>
+              </section>
+            </div>
+            <p id="ecommCatalogMessage" class="ecomm-catalog-message" role="status" aria-live="polite"></p>
+          </section>
         </section>
       </section>
     </main>
@@ -1107,6 +1171,38 @@
     <datalist id="elementLookup"></datalist>
 
     <div id="invLookupDropdown" class="inv-lookup-dropdown" hidden></div>
+
+    <div id="standardProductModal" class="modal-backdrop" hidden>
+      <section class="standard-product-dialog" role="dialog" aria-modal="true" aria-labelledby="standardProductTitle">
+        <header class="standard-product-head">
+          <div>
+            <span class="standard-product-kicker">Standard Products catalog</span>
+            <h2 id="standardProductTitle">Add a Standard Product</h2>
+            <p>Choose a product, configure production options, and review the calculated quote price.</p>
+          </div>
+          <button id="closeStandardProductBtn" class="ghost-btn icon-close-btn" type="button" title="Close" aria-label="Close standard product configurator">&times;</button>
+        </header>
+        <div class="standard-product-workspace">
+          <nav class="standard-product-categories" aria-label="Product categories">
+            <span class="standard-product-step">1. Category</span>
+            <div id="standardProductCategories" class="standard-product-choice-list"></div>
+          </nav>
+          <section class="standard-product-products" aria-labelledby="standardProductListTitle">
+            <span class="standard-product-step">2. Product</span>
+            <h3 id="standardProductListTitle">Products</h3>
+            <div id="standardProductList" class="standard-product-choice-list"></div>
+          </section>
+          <section id="standardProductConfigurator" class="standard-product-configurator" aria-label="Product configuration"></section>
+        </div>
+        <footer class="standard-product-footer">
+          <p>Local imported prices remain subject to review before production use.</p>
+          <div class="button-group">
+            <button id="cancelStandardProductBtn" class="ghost-btn" type="button">Cancel</button>
+            <button id="addConfiguredProductBtn" type="button">Add Product to Quote</button>
+          </div>
+        </footer>
+      </section>
+    </div>
 
     <div id="dirtyRecordsModal" class="modal-backdrop" hidden>
       <section class="dirty-record-dialog" role="dialog" aria-modal="true" aria-labelledby="dirtyRecordsTitle">
@@ -1211,7 +1307,7 @@
       </section>
     </div>
 
-    <script src="app.js?v=docuseal1"></script>
+    <script src="app.js?v=sdsp-catalog3"></script>
     <script src="crm/vendor/lucide.js"></script>
     <script src="crm/model.js"></script>
     <script src="crm/crm.js"></script>

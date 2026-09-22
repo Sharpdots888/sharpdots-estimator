@@ -5,14 +5,23 @@ const os = require("os");
 const path = require("path");
 const { createHmac, randomBytes, timingSafeEqual } = require("crypto");
 const { Pool } = require("pg");
+const { loadLocalEnv } = require("./lib/local-env");
 const {
   canSendClientDocuments,
   requiresPortalSession
 } = require("./document-security");
 
+const root = __dirname;
+loadLocalEnv(root);
 const port = process.env.PORT || 3000;
 const host = process.env.HOST || (process.env.PORT ? "0.0.0.0" : "127.0.0.1");
-const root = __dirname;
+const {
+  calculatePrice: calculateSdspPrice,
+  catalogStatus: getSdspCatalogStatus,
+  getCatalog: getSdspCatalog,
+  updateConfigurationPrices: updateSdspConfigurationPrices,
+  updateOptionalPrices: updateSdspOptionalPrices
+} = require("./lib/sdsp-catalog");
 const portalBaseUrl = (process.env.SPACEFOLD_PORTAL_URL || "https://portal.space-fold.com").replace(/\/+$/, "");
 const configuredAuthMode = process.env.ESTIMATOR_AUTH_MODE || "portal-token-preferred";
 const authMode = ["disabled", "portal-token-preferred", "portal-token-required"].includes(configuredAuthMode)
@@ -38,11 +47,17 @@ const docusealSendEnabled = /^(1|true|yes)$/i.test(String(process.env.DOCUSEAL_S
 const maxSigningHtmlBytes = 1_500_000;
 const maxArtifactBytes = 15_000_000;
 
-// Strip sslmode from connection string — pg Pool's ssl config handles this explicitly
-const pool = new Pool({
-  connectionString: (process.env.DATABASE_URL || "").replace(/[?&]sslmode=[^&]*/i, "").replace(/[?&]uselibpqcompat=[^&]*/i, "").replace(/[?&]$/, ""),
-  ssl: { rejectUnauthorized: false }
-});
+// The legacy estimate database is optional in the local Standard Products pilot.
+const legacyConnectionString = String(process.env.DATABASE_URL || "")
+  .replace(/[?&]sslmode=[^&]*/i, "")
+  .replace(/[?&]uselibpqcompat=[^&]*/i, "")
+  .replace(/[?&]$/, "");
+const pool = legacyConnectionString
+  ? new Pool({
+    connectionString: legacyConnectionString,
+    ssl: /@(127\.0\.0\.1|localhost)(:\d+)?\//i.test(legacyConnectionString) ? false : { rejectUnauthorized: false }
+  })
+  : null;
 
 const mimeTypes = {
   ".html": "text/html; charset=utf-8",
@@ -433,6 +448,34 @@ function sendAuthPage(res) {
 function sendJson(res, status, data) {
   res.writeHead(status, { "Content-Type": "application/json" });
   res.end(JSON.stringify(data));
+}
+
+function parseJsonBody(body) {
+  try {
+    return JSON.parse(body || "{}");
+  } catch {
+    throw Object.assign(new Error("Request body must be valid JSON"), { statusCode: 400 });
+  }
+}
+
+function requireLocalCatalogAdmin(req) {
+  const remoteAddress = String(req.socket.remoteAddress || "");
+  if (!["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(remoteAddress)) {
+    throw Object.assign(new Error("Catalog administration is available only from localhost"), { statusCode: 403 });
+  }
+}
+
+function requiresLegacyDatabase(url) {
+  return url === "/api/estimates"
+    || url.startsWith("/api/estimates/")
+    || url === "/api/seed"
+    || url === "/api/clients"
+    || url === "/api/manufacturers"
+    || url.startsWith("/api/inventory/search")
+    || url.startsWith("/api/document-signing/")
+    || url.startsWith("/api/document-transactions")
+    || url.startsWith("/api/document-artifacts/")
+    || url === "/api/webhooks/docuseal";
 }
 
 function safeExportFilename(value) {
@@ -1367,6 +1410,28 @@ const server = http.createServer(async (req, res) => {
       sendUnauthorized(res);
     } else if (authRequiredFor(url) && !session) {
       sendAuthPage(res);
+    } else if (url === "/api/sdsp/status" && method === "GET") {
+      sendJson(res, 200, await getSdspCatalogStatus());
+    } else if (url === "/api/sdsp/catalog" && method === "GET") {
+      sendJson(res, 200, await getSdspCatalog());
+    } else if (url === "/api/sdsp/admin/catalog" && method === "GET") {
+      requireLocalCatalogAdmin(req);
+      sendJson(res, 200, await getSdspCatalog({ includeDraft: true }));
+    } else if (url === "/api/sdsp/price" && method === "POST") {
+      const body = parseJsonBody(await collectBody(req));
+      sendJson(res, 200, await calculateSdspPrice(body));
+    } else if (/^\/api\/sdsp\/admin\/configurations\/\d+\/prices$/.test(url) && method === "PUT") {
+      requireLocalCatalogAdmin(req);
+      const configurationId = url.split("/")[5];
+      const body = parseJsonBody(await collectBody(req));
+      sendJson(res, 200, await updateSdspConfigurationPrices(configurationId, body.tiers || []));
+    } else if (/^\/api\/sdsp\/admin\/optionals\/\d+\/prices$/.test(url) && method === "PUT") {
+      requireLocalCatalogAdmin(req);
+      const optionalId = url.split("/")[5];
+      const body = parseJsonBody(await collectBody(req));
+      sendJson(res, 200, await updateSdspOptionalPrices(optionalId, body.tiers || []));
+    } else if (!pool && requiresLegacyDatabase(url)) {
+      sendJson(res, 503, { error: "Legacy estimate persistence is unavailable in this local Standard Products session" });
     } else if (url === "/api/estimates" && method === "GET") {
       await handleGetEstimates(res);
     } else if (url === "/api/estimates" && method === "POST") {
@@ -1424,12 +1489,16 @@ const server = http.createServer(async (req, res) => {
     }
   } catch (err) {
     console.error("Request error:", err);
-    if (!res.headersSent) sendJson(res, 500, { error: "Internal server error" });
+    if (!res.headersSent) sendJson(res, err.statusCode || 500, { error: err.statusCode ? err.message : "Internal server error" });
   }
 });
 
-runMigrations()
-  .catch(err => console.warn("Schema migrations skipped (already applied or insufficient permissions):", err.message))
-  .then(() => runDocumentMigrations())
-  .catch(err => console.warn("Document workflow migrations skipped (already applied or insufficient permissions):", err.message))
+const legacyMigrationStartup = process.env.DATABASE_URL
+  ? runMigrations()
+    .catch(err => console.warn("Schema migrations skipped (already applied or insufficient permissions):", err.message))
+    .then(() => runDocumentMigrations())
+    .catch(err => console.warn("Document workflow migrations skipped (already applied or insufficient permissions):", err.message))
+  : Promise.resolve().then(() => console.warn("DATABASE_URL is not configured; legacy estimate persistence is unavailable in this local session."));
+
+legacyMigrationStartup
   .finally(() => server.listen(port, host, () => console.log(`Estimator running on http://${host}:${port}`)));
