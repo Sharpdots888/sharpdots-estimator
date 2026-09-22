@@ -1,0 +1,60 @@
+PriceID,"Price Description",Quantity,Value,"Display Quantity"
+12569,"Brochure Tabbing",100,"0.28",100
+12569,"Brochure Tabbing",250,"0.26",250
+12569,"Brochure Tabbing",500,"0.24",500
+12569,"Brochure Tabbing",1000,"0.18",1000
+12569,"Brochure Tabbing",2500,"0.08",2500
+12569,"Brochure Tabbing",5000,"0.058",5000
+12569,"Brochure Tabbing",10000,"0.042",10000
+13643,"Bundling 100's",1000,"0.018",1000
+13643,"Bundling 100's",2500,"0.01",2500
+13643,"Bundling 100's",5000,"0.009",5000
+13643,"Bundling 100's",10000,"0.007",10000
+13643,"Bundling 100's",15000,"0.005",15000
+13643,"Bundling 100's",20000,"0.004",20000
+14283,"Greeting card score",,"",
+12542,"Hard Proofs",,"",
+12561,"Mail Fulfillment",100,"0.6",100
+12561,"Mail Fulfillment",250,"0.44",250
+12561,"Mail Fulfillment",500,"0.232",500
+12561,"Mail Fulfillment",1000,"0.125",1000
+12561,"Mail Fulfillment",1500,"0.088",1500
+12561,"Mail Fulfillment",2500,"0.058",2500
+12561,"Mail Fulfillment",5000,"0.042",5000
+12561,"Mail Fulfillment",10000,"0.032",10000
+12561,"Mail Fulfillment",15000,"0.031",15000
+12561,"Mail Fulfillment",20000,"0.03",20000
+12561,"Mail Fulfillment",25000,"0.0296",25000
+12558,"No Charge",,"",
+12562,"Perforation - 1 perf",,"",
+14520,"Postge",,"",
+12566,"Rigid Grommets",,"",
+12541,"Round Corners",100,"10",100
+12541,"Round Corners",250,"10",250
+12541,"Round Corners",500,"15",500
+12541,"Round Corners",1000,"24",1000
+12541,"Round Corners",2500,"50",2500
+12541,"Round Corners",5000,"100",5000
+12541,"Round Corners",10000,"190",10000
+12541,"Round Corners",15000,"270",15000
+12541,"Round Corners",20000,"340",20000
+12541,"Round Corners",25000,"400",25000
+12563,"Score",1,"50",1 score
+12563,"Score",2,"100",2 score
+12563,"Score",3,"150",3 score
+14178,"Shrink Wrap 50's",500,"0.05",500
+14178,"Shrink Wrap 50's",1000,"0.03",1000
+14175,"Soft Touch Lamination",,"",
+12571,"Type Setting",1,"25",1/2 hour min.
+12571,"Type Setting",2,"50",1 hours
+12571,"Type Setting",3,"100",2 hours
+12540,"UV Coating",100,"15",100
+12540,"UV Coating",250,"20",250
+12540,"UV Coating",500,"25",500
+12540,"UV Coating",1000,"35",1000
+12540,"UV Coating",1200,"40",1200
+12540,"UV Coating",1500,"50",1500
+12540,"UV Coating",2500,"80",2500
+12540,"UV Coating",5000,"120",5000
+12540,"UV Coating",10000,"180",10000
+12540,"UV Coating",30000,"250",30000

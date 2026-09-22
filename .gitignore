@@ -5,3 +5,5 @@ npm-debug.log*
 .claude/
 
 .env.database-url
+.env.local
+.local/

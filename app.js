@@ -259,6 +259,227 @@ function defaultPrintQuote() {
   };
 }
 
+const standardProofOptional = {
+  id: "proof",
+  label: "Proof type",
+  description: "Choose the approval method before production.",
+  choices: [
+    { value: "none", label: "No proof", pricing: { type: "flat", amount: 0 } },
+    { value: "pdf", label: "PDF proof", pricing: { type: "flat", amount: 15 } },
+    { value: "physical", label: "Physical proof", pricing: { type: "flat", amount: 45 } }
+  ]
+};
+
+const standardRoundCornersOptional = {
+  id: "round-corners",
+  label: "Round corners",
+  description: "Quantity-tiered corner rounding for cards.",
+  choices: [
+    { value: "none", label: "No round corners", pricing: { type: "flat", amount: 0 } },
+    { value: "one-eighth", label: "1/8 in radius", pricing: { type: "tier", amounts: { 250: 28, 500: 35, 1000: 48, 2500: 90, 5000: 145, 10000: 250 } } },
+    { value: "one-quarter", label: "1/4 in radius", pricing: { type: "tier", amounts: { 250: 32, 500: 40, 1000: 55, 2500: 102, 5000: 165, 10000: 285 } } }
+  ]
+};
+
+const standardDirectMailOptional = {
+  id: "direct-mail",
+  label: "Direct mail",
+  description: "Mail preparation priced from the selected quantity.",
+  choices: [
+    { value: "none", label: "No mailing service", pricing: { type: "flat", amount: 0 } },
+    { value: "standard", label: "Standard mail preparation", pricing: { type: "perUnit", setup: 75, amount: 0.08 } },
+    { value: "first-class", label: "First-class mail preparation", pricing: { type: "perUnit", setup: 95, amount: 0.115 } }
+  ]
+};
+
+let standardProductCatalog = [
+  {
+    id: "cards",
+    name: "Cards",
+    description: "Postcards, business cards, and folded cards",
+    products: [
+      {
+        id: "postcard",
+        name: "Postcard",
+        description: "Commercial postcard printing with common direct-mail configurations.",
+        setupCost: 42,
+        defaultMarkup: 40,
+        quantities: [500, 1000, 2500, 5000, 10000],
+        baseCosts: { 500: 0.19, 1000: 0.12, 2500: 0.075, 5000: 0.052, 10000: 0.039 },
+        optionals: [standardProofOptional, standardRoundCornersOptional, standardDirectMailOptional],
+        options: [
+          { id: "size", label: "Finished size", choices: [
+            { value: "4x6", label: "4 x 6 in", multiplier: 1 },
+            { value: "5x7", label: "5 x 7 in", multiplier: 1.18 },
+            { value: "6x9", label: "6 x 9 in", multiplier: 1.42 }
+          ] },
+          { id: "stock", label: "Paper stock", choices: [
+            { value: "14pt-c2s", label: "14pt C2S", multiplier: 1 },
+            { value: "100lb-dull", label: "100 lb dull cover", multiplier: 1.12 },
+            { value: "16pt-c2s", label: "16pt C2S", multiplier: 1.2 }
+          ] },
+          { id: "printing", label: "Printing", choices: [
+            { value: "4-0", label: "Full color front only (4/0)", multiplier: 0.88 },
+            { value: "4-1", label: "Full color front / grayscale back (4/1)", multiplier: 0.95 },
+            { value: "4-4", label: "Full color both sides (4/4)", multiplier: 1 }
+          ] },
+          { id: "finishing", label: "Finishing", choices: [
+            { value: "none", label: "No coating", multiplier: 1 },
+            { value: "uv-front", label: "UV coating - front", multiplier: 1.08 },
+            { value: "uv-both", label: "UV coating - both sides", multiplier: 1.14 }
+          ] }
+        ]
+      },
+      {
+        id: "business-card",
+        name: "Business Card",
+        description: "Standard and premium business card configurations.",
+        setupCost: 28,
+        defaultMarkup: 45,
+        quantities: [250, 500, 1000, 2500, 5000],
+        baseCosts: { 250: 0.22, 500: 0.14, 1000: 0.085, 2500: 0.052, 5000: 0.038 },
+        optionals: [standardProofOptional, standardRoundCornersOptional],
+        options: [
+          { id: "size", label: "Finished size", choices: [{ value: "3.5x2", label: "3.5 x 2 in", multiplier: 1 }] },
+          { id: "stock", label: "Paper stock", choices: [
+            { value: "14pt-c2s", label: "14pt C2S", multiplier: 1 },
+            { value: "16pt-c2s", label: "16pt C2S", multiplier: 1.16 },
+            { value: "32pt-uncoated", label: "32pt uncoated", multiplier: 1.85 }
+          ] },
+          { id: "printing", label: "Printing", choices: [
+            { value: "4-0", label: "Full color front only (4/0)", multiplier: 0.9 },
+            { value: "4-4", label: "Full color both sides (4/4)", multiplier: 1 }
+          ] },
+          { id: "finishing", label: "Finishing", choices: [
+            { value: "none", label: "No coating", multiplier: 1 },
+            { value: "matte", label: "Matte finish", multiplier: 1.12 },
+            { value: "soft-touch", label: "Soft-touch laminate", multiplier: 1.36 }
+          ] }
+        ]
+      },
+      {
+        id: "greeting-card",
+        name: "Greeting Card",
+        description: "Folded cards supplied flat or scored and folded.",
+        setupCost: 55,
+        defaultMarkup: 42,
+        quantities: [250, 500, 1000, 2500, 5000],
+        baseCosts: { 250: 0.72, 500: 0.48, 1000: 0.31, 2500: 0.22, 5000: 0.17 },
+        optionals: [standardProofOptional, standardDirectMailOptional],
+        options: [
+          { id: "size", label: "Finished size", choices: [
+            { value: "4.25x5.5", label: "4.25 x 5.5 in", multiplier: 1 },
+            { value: "5x7", label: "5 x 7 in", multiplier: 1.24 }
+          ] },
+          { id: "stock", label: "Paper stock", choices: [
+            { value: "100lb-dull", label: "100 lb dull cover", multiplier: 1 },
+            { value: "120lb-uncoated", label: "120 lb uncoated", multiplier: 1.22 }
+          ] },
+          { id: "printing", label: "Printing", choices: [
+            { value: "4-0", label: "Full color outside only", multiplier: 0.9 },
+            { value: "4-4", label: "Full color inside and outside", multiplier: 1.12 }
+          ] },
+          { id: "finishing", label: "Finishing", choices: [
+            { value: "score", label: "Score only", multiplier: 1 },
+            { value: "fold", label: "Score and fold", multiplier: 1.1 }
+          ] }
+        ]
+      }
+    ]
+  },
+  {
+    id: "marketing",
+    name: "Marketing Print",
+    description: "Brochures, flyers, and sell sheets",
+    products: [
+      {
+        id: "trifold-brochure",
+        name: "Tri-fold Brochure",
+        description: "Full-color brochure with folding included.",
+        setupCost: 65,
+        defaultMarkup: 40,
+        quantities: [250, 500, 1000, 2500, 5000],
+        baseCosts: { 250: 0.88, 500: 0.58, 1000: 0.39, 2500: 0.28, 5000: 0.21 },
+        optionals: [standardProofOptional, standardDirectMailOptional],
+        options: [
+          { id: "size", label: "Flat size", choices: [{ value: "8.5x11", label: "8.5 x 11 in", multiplier: 1 }, { value: "11x17", label: "11 x 17 in", multiplier: 1.62 }] },
+          { id: "stock", label: "Paper stock", choices: [{ value: "100lb-gloss-text", label: "100 lb gloss text", multiplier: 1 }, { value: "100lb-dull-text", label: "100 lb dull text", multiplier: 1.08 }] },
+          { id: "printing", label: "Printing", choices: [{ value: "4-4", label: "Full color both sides (4/4)", multiplier: 1 }] },
+          { id: "finishing", label: "Fold", choices: [{ value: "trifold", label: "Tri-fold", multiplier: 1 }, { value: "zfold", label: "Z-fold", multiplier: 1.06 }] }
+        ]
+      },
+      {
+        id: "sell-sheet",
+        name: "Sell Sheet",
+        description: "Single-sheet product or service handout.",
+        setupCost: 38,
+        defaultMarkup: 40,
+        quantities: [250, 500, 1000, 2500, 5000],
+        baseCosts: { 250: 0.52, 500: 0.34, 1000: 0.23, 2500: 0.16, 5000: 0.12 },
+        optionals: [standardProofOptional, standardDirectMailOptional],
+        options: [
+          { id: "size", label: "Finished size", choices: [{ value: "8.5x11", label: "8.5 x 11 in", multiplier: 1 }, { value: "11x17", label: "11 x 17 in", multiplier: 1.58 }] },
+          { id: "stock", label: "Paper stock", choices: [{ value: "100lb-gloss-text", label: "100 lb gloss text", multiplier: 1 }, { value: "80lb-uncoated", label: "80 lb uncoated text", multiplier: 0.94 }] },
+          { id: "printing", label: "Printing", choices: [{ value: "4-0", label: "Full color front only (4/0)", multiplier: 0.88 }, { value: "4-4", label: "Full color both sides (4/4)", multiplier: 1 }] }
+        ]
+      }
+    ]
+  },
+  {
+    id: "large-format",
+    name: "Large Format",
+    description: "Displays, banners, and rigid signage",
+    products: [
+      {
+        id: "retractable-banner",
+        name: "Retractable Banner",
+        description: "Portable banner stand with printed insert and carry case.",
+        setupCost: 18,
+        defaultMarkup: 45,
+        quantities: [1, 2, 5, 10, 25],
+        baseCosts: { 1: 118, 2: 109, 5: 96, 10: 88, 25: 79 },
+        optionals: [standardProofOptional],
+        options: [
+          { id: "size", label: "Display size", choices: [{ value: "33x80", label: "33 x 80 in", multiplier: 1 }, { value: "36x92", label: "36 x 92 in", multiplier: 1.24 }] },
+          { id: "hardware", label: "Hardware", choices: [{ value: "standard", label: "Standard stand", multiplier: 1 }, { value: "premium", label: "Premium stand", multiplier: 1.42 }] },
+          { id: "material", label: "Banner material", choices: [{ value: "vinyl", label: "Blockout vinyl", multiplier: 1 }, { value: "fabric", label: "Dye-sublimated fabric", multiplier: 1.18 }] }
+        ]
+      },
+      {
+        id: "yard-sign",
+        name: "Yard Sign",
+        description: "Printed corrugated plastic sign with optional stakes.",
+        setupCost: 24,
+        defaultMarkup: 42,
+        quantities: [10, 25, 50, 100, 250],
+        baseCosts: { 10: 8.4, 25: 6.1, 50: 4.7, 100: 3.65, 250: 2.82 },
+        optionals: [standardProofOptional],
+        options: [
+          { id: "size", label: "Finished size", choices: [{ value: "18x24", label: "18 x 24 in", multiplier: 1 }, { value: "24x36", label: "24 x 36 in", multiplier: 1.68 }] },
+          { id: "printing", label: "Printing", choices: [{ value: "4-0", label: "Full color one side", multiplier: 0.88 }, { value: "4-4", label: "Full color both sides", multiplier: 1 }] },
+          { id: "stakes", label: "Hardware", choices: [{ value: "none", label: "Signs only", multiplier: 1 }, { value: "h-stake", label: "Include H-stakes", multiplier: 1.24 }] }
+        ]
+      }
+    ]
+  }
+];
+
+let sdspCatalog = null;
+let sdspCatalogError = "";
+let ecommSelectedProductId = "";
+let ecommSelectedConfigurationId = "";
+let ecommSelectedOptionalId = "";
+
+let standardProductDraft = {
+  categoryId: standardProductCatalog[0].id,
+  productId: standardProductCatalog[0].products[0].id,
+  quantity: standardProductCatalog[0].products[0].quantities[1],
+  markupPercent: standardProductCatalog[0].products[0].defaultMarkup,
+  selections: {},
+  optionalSelections: {},
+  optionsExpanded: false
+};
+
 function defaultEcommPriceList() {
   return {
     name: "Ecomm Price List Draft",
@@ -267,6 +488,191 @@ function defaultEcommPriceList() {
     sourceUrl: "",
     notes: "Use this draft to hold ecommerce list scope, channel assumptions, and selected products before the ecomm price list calculator is built."
   };
+}
+
+function sdspProducts() {
+  return (sdspCatalog?.categories || []).flatMap((category) => category.products.map((product) => ({ ...product, categoryName: category.name })));
+}
+
+function setEcommCatalogMessage(message, isError = false) {
+  if (!els.ecommCatalogMessage) return;
+  els.ecommCatalogMessage.textContent = message;
+  els.ecommCatalogMessage.classList.toggle("error", isError);
+}
+
+function selectedEcommProduct() {
+  const products = sdspProducts();
+  return products.find((product) => product.id === ecommSelectedProductId) || products[0] || null;
+}
+
+function selectedEcommConfiguration() {
+  const product = selectedEcommProduct();
+  return product?.configurations.find((configuration) => configuration.id === ecommSelectedConfigurationId) || product?.configurations[0] || null;
+}
+
+function selectedEcommOptional() {
+  return (sdspCatalog?.optionals || []).find((optional) => optional.databaseId === ecommSelectedOptionalId) || sdspCatalog?.optionals?.[0] || null;
+}
+
+function configurationLabel(product, configuration) {
+  const specifications = product.options.map((option) => {
+    const value = configuration.selections[option.id];
+    return option.choices.find((choice) => choice.value === value)?.label || value;
+  });
+  return `${configuration.sku} · ${specifications.join(" · ")}`;
+}
+
+function renderEcommCatalogAdmin() {
+  if (!els.ecommCatalogStatus) return;
+  const products = sdspProducts();
+  const optionals = sdspCatalog?.optionals || [];
+  if (!sdspCatalog || !products.length) {
+    els.ecommCatalogStatus.textContent = sdspCatalogError ? "Connection unavailable" : "Connecting";
+    els.ecommCatalogStatus.className = `catalog-status${sdspCatalogError ? " error" : ""}`;
+    if (sdspCatalogError) setEcommCatalogMessage(sdspCatalogError, true);
+    return;
+  }
+
+  els.ecommCatalogStatus.textContent = `${sdspCatalog.version?.name || "Local catalog"} · connected`;
+  els.ecommCatalogStatus.className = "catalog-status connected";
+  if (!ecommSelectedProductId || !products.some((product) => product.id === ecommSelectedProductId)) ecommSelectedProductId = products[0].id;
+  const product = selectedEcommProduct();
+  if (!ecommSelectedConfigurationId || !product.configurations.some((configuration) => configuration.id === ecommSelectedConfigurationId)) {
+    ecommSelectedConfigurationId = product.configurations[0]?.id || "";
+  }
+  if (!ecommSelectedOptionalId || !optionals.some((optional) => optional.databaseId === ecommSelectedOptionalId)) {
+    ecommSelectedOptionalId = optionals[0]?.databaseId || "";
+  }
+
+  els.ecommProductSelect.innerHTML = products.map((candidate) => `
+    <option value="${escapeHtml(candidate.id)}"${candidate.id === ecommSelectedProductId ? " selected" : ""}>${escapeHtml(candidate.categoryName)} · ${escapeHtml(candidate.name)}</option>
+  `).join("");
+  els.ecommConfigurationSelect.innerHTML = product.configurations.map((configuration) => `
+    <option value="${escapeHtml(configuration.id)}"${configuration.id === ecommSelectedConfigurationId ? " selected" : ""}>${escapeHtml(configurationLabel(product, configuration))}</option>
+  `).join("");
+
+  const configuration = selectedEcommConfiguration();
+  if (configuration) {
+    const details = product.options.map((option) => {
+      const selected = option.choices.find((choice) => choice.value === configuration.selections[option.id]);
+      return `${option.label}: ${selected?.label || configuration.selections[option.id]}`;
+    }).join(" · ");
+    els.ecommConfigurationSummary.innerHTML = `<strong>${escapeHtml(configuration.sku)}</strong> <span>${escapeHtml(details)} · ${configuration.skuStatus === "provisional" ? "Provisional SKU" : "Final SKU"}</span>`;
+    els.ecommProductPriceRows.innerHTML = configuration.priceTiers.map((tier) => `
+      <tr>
+        <td><input type="number" min="1" step="1" value="${tier.quantity}" data-ecomm-product-quantity /></td>
+        <td><input type="number" min="0" step="0.000001" value="${tier.unitPrice}" data-ecomm-product-price /></td>
+        <td class="calculated-value">${money(tier.quantity * tier.unitPrice, 2)}</td>
+      </tr>
+    `).join("");
+  } else {
+    els.ecommConfigurationSummary.textContent = "No sellable configuration is available.";
+    els.ecommProductPriceRows.innerHTML = "";
+  }
+
+  els.ecommOptionalSelect.innerHTML = optionals.map((optional) => `
+    <option value="${escapeHtml(optional.databaseId)}"${optional.databaseId === ecommSelectedOptionalId ? " selected" : ""}>${escapeHtml(optional.id)} · ${escapeHtml(optional.name)}</option>
+  `).join("");
+  const optional = selectedEcommOptional();
+  if (optional) {
+    els.ecommOptionalSummary.innerHTML = `<strong>${escapeHtml(optional.id)}</strong> <span>${escapeHtml(optional.pricingMethod.replaceAll("_", " "))} · ${escapeHtml(optional.unitLabel)} · ${escapeHtml(optional.status)}${optional.sourcePriceId ? ` · source ${escapeHtml(optional.sourcePriceId)}` : ""}</span>`;
+    els.ecommOptionalPriceRows.innerHTML = optional.tiers.map((tier) => `
+      <tr>
+        <td><input type="number" min="0" step="1" value="${tier.quantity}" data-ecomm-optional-quantity /></td>
+        <td><input type="text" value="${escapeHtml(tier.displayQuantity)}" data-ecomm-optional-label /></td>
+        <td><input type="number" min="0" step="0.000001" value="${tier.amount}" data-ecomm-optional-price /></td>
+      </tr>
+    `).join("");
+  } else {
+    els.ecommOptionalSummary.textContent = "No optional price list is available.";
+    els.ecommOptionalPriceRows.innerHTML = "";
+  }
+}
+
+function publishedStandardCategories(categories) {
+  return categories.map(category => ({ ...category, products: category.products
+    .filter(product => product.status === 'published')
+    .map(product => ({ ...product,
+      configurations: product.configurations.filter(configuration => configuration.status === 'published')
+        .map(configuration => ({ ...configuration, priceTiers: configuration.priceTiers.filter(tier => tier.status === 'published') }))
+        .filter(configuration => configuration.priceTiers.length),
+      optionals: product.optionals.filter(optional => optional.status === 'published')
+    })).filter(product => product.configurations.length)
+  })).filter(category => category.products.length);
+}
+
+async function loadSdspCatalog() {
+  try {
+    const response = await fetch("/api/sdsp/admin/catalog");
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || "The Standard Products catalog could not be loaded");
+    sdspCatalog = result;
+    sdspCatalogError = "";
+    standardProductCatalog = publishedStandardCategories(result.categories || []);
+    if (standardProductCatalog.length) {
+      resetStandardProductDraft();
+    }
+    renderEcommCatalogAdmin();
+    return result;
+  } catch (error) {
+    sdspCatalogError = error.message;
+    standardProductCatalog = [];
+    renderEcommCatalogAdmin();
+    return null;
+  }
+}
+
+async function saveEcommProductPrices() {
+  const configuration = selectedEcommConfiguration();
+  if (!configuration) return;
+  const rows = [...els.ecommProductPriceRows.querySelectorAll("tr")];
+  const tiers = rows.map((row) => ({
+    quantity: asNumber(row.querySelector("[data-ecomm-product-quantity]")?.value),
+    unitPrice: asNumber(row.querySelector("[data-ecomm-product-price]")?.value)
+  }));
+  setEcommCatalogMessage("Saving product price grid…");
+  try {
+    const response = await fetch(`/api/sdsp/admin/configurations/${encodeURIComponent(configuration.id)}/prices`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tiers })
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || "Product prices could not be saved");
+    sdspCatalog = result;
+    standardProductCatalog = publishedStandardCategories(result.categories);
+    renderEcommCatalogAdmin();
+    setEcommCatalogMessage(`${configuration.sku} price grid saved locally.`);
+  } catch (error) {
+    setEcommCatalogMessage(error.message, true);
+  }
+}
+
+async function saveEcommOptionalPrices() {
+  const optional = selectedEcommOptional();
+  if (!optional) return;
+  const rows = [...els.ecommOptionalPriceRows.querySelectorAll("tr")];
+  const tiers = rows.map((row) => ({
+    quantity: asNumber(row.querySelector("[data-ecomm-optional-quantity]")?.value),
+    displayQuantity: row.querySelector("[data-ecomm-optional-label]")?.value || "",
+    amount: asNumber(row.querySelector("[data-ecomm-optional-price]")?.value)
+  }));
+  setEcommCatalogMessage("Saving option price grid…");
+  try {
+    const response = await fetch(`/api/sdsp/admin/optionals/${encodeURIComponent(optional.databaseId)}/prices`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tiers })
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || "Option prices could not be saved");
+    sdspCatalog = result;
+    standardProductCatalog = publishedStandardCategories(result.categories);
+    renderEcommCatalogAdmin();
+    setEcommCatalogMessage(`${optional.id} price grid saved locally.`);
+  } catch (error) {
+    setEcommCatalogMessage(error.message, true);
+  }
 }
 
 let printQuote = defaultPrintQuote();
@@ -441,6 +847,7 @@ const els = {
   printQuoteCustomerNote: document.querySelector("#printQuoteCustomerNote"),
   printQuoteCustomerTerms: document.querySelector("#printQuoteCustomerTerms"),
   printQuoteInternalNotes: document.querySelector("#printQuoteInternalNotes"),
+  addStandardProductBtn: document.querySelector("#addStandardProductBtn"),
   addPrintQuoteLineBtn: document.querySelector("#addPrintQuoteLineBtn"),
   refreshPrintQuoteLinesBtn: document.querySelector("#refreshPrintQuoteLinesBtn"),
   printQuoteOutputModeButtons: document.querySelectorAll("[data-print-quote-mode]"),
@@ -452,11 +859,29 @@ const els = {
   printQuoteLines: document.querySelector("#printQuoteLines"),
   printQuoteTotals: document.querySelector("#printQuoteTotals"),
   printQuoteMessage: document.querySelector("#printQuoteMessage"),
+  standardProductModal: document.querySelector("#standardProductModal"),
+  closeStandardProductBtn: document.querySelector("#closeStandardProductBtn"),
+  cancelStandardProductBtn: document.querySelector("#cancelStandardProductBtn"),
+  addConfiguredProductBtn: document.querySelector("#addConfiguredProductBtn"),
+  standardProductCategories: document.querySelector("#standardProductCategories"),
+  standardProductList: document.querySelector("#standardProductList"),
+  standardProductConfigurator: document.querySelector("#standardProductConfigurator"),
   ecommListName: document.querySelector("#ecommListName"),
   ecommChannel: document.querySelector("#ecommChannel"),
   ecommExternalRef: document.querySelector("#ecommExternalRef"),
   ecommSourceUrl: document.querySelector("#ecommSourceUrl"),
   ecommNotes: document.querySelector("#ecommNotes"),
+  ecommCatalogStatus: document.querySelector("#ecommCatalogStatus"),
+  ecommCatalogMessage: document.querySelector("#ecommCatalogMessage"),
+  ecommProductSelect: document.querySelector("#ecommProductSelect"),
+  ecommConfigurationSelect: document.querySelector("#ecommConfigurationSelect"),
+  ecommConfigurationSummary: document.querySelector("#ecommConfigurationSummary"),
+  ecommProductPriceRows: document.querySelector("#ecommProductPriceRows"),
+  saveEcommProductPricesBtn: document.querySelector("#saveEcommProductPricesBtn"),
+  ecommOptionalSelect: document.querySelector("#ecommOptionalSelect"),
+  ecommOptionalSummary: document.querySelector("#ecommOptionalSummary"),
+  ecommOptionalPriceRows: document.querySelector("#ecommOptionalPriceRows"),
+  saveEcommOptionalPricesBtn: document.querySelector("#saveEcommOptionalPricesBtn"),
   tabRecordControls: document.querySelectorAll(".tab-record-controls"),
   estimateVersion: document.querySelector("#estimateVersion"),
   newWorkspaceBtn: document.querySelector("#newWorkspaceBtn"),
@@ -1755,6 +2180,343 @@ function addPrintQuoteLine() {
   setSaveStatus("Quote line added");
 }
 
+function selectedStandardCategory() {
+  return standardProductCatalog.find((category) => category.id === standardProductDraft.categoryId) || standardProductCatalog[0];
+}
+
+function selectedStandardProduct() {
+  const category = selectedStandardCategory();
+  return category?.products.find((product) => product.id === standardProductDraft.productId) || category?.products[0];
+}
+
+function defaultStandardSelections(product) {
+  if (product?.configurations?.length) return { ...product.configurations[0].selections };
+  return Object.fromEntries((product?.options || []).map((option) => [option.id, option.choices[0].value]));
+}
+
+function defaultStandardOptionalSelections(product) {
+  return Object.fromEntries((product.optionals || []).map((optional) => [optional.id, optional.choices[0].value]));
+}
+
+function resetStandardProductDraft(categoryId = standardProductCatalog[0].id, productId = null) {
+  const category = standardProductCatalog.find((candidate) => candidate.id === categoryId) || standardProductCatalog[0];
+  const product = category.products.find((candidate) => candidate.id === productId) || category.products[0];
+  const selections = defaultStandardSelections(product);
+  const configuration = product.configurations?.find((candidate) => product.options.every((option) => candidate.selections[option.id] === selections[option.id]));
+  const quantities = configuration?.priceTiers?.map((tier) => tier.quantity) || product.quantities;
+  standardProductDraft = {
+    categoryId: category.id,
+    productId: product.id,
+    quantity: quantities[Math.min(1, quantities.length - 1)],
+    markupPercent: product.defaultMarkup,
+    selections,
+    optionalSelections: defaultStandardOptionalSelections(product),
+    optionsExpanded: false
+  };
+}
+
+function selectedStandardConfiguration(product = selectedStandardProduct()) {
+  if (!product?.configurations?.length) return null;
+  return product.configurations.find((configuration) => (
+    product.options.every((option) => configuration.selections[option.id] === standardProductDraft.selections[option.id])
+  )) || null;
+}
+
+function availableStandardChoices(product, option) {
+  if (!product?.configurations?.length) return option.choices;
+  return option.choices.filter((choice) => product.configurations.some((configuration) => (
+    configuration.selections[option.id] === choice.value
+    && product.options.slice(0, product.options.indexOf(option)).every((otherOption) => (
+      !standardProductDraft.selections[otherOption.id]
+      || configuration.selections[otherOption.id] === standardProductDraft.selections[otherOption.id]
+    ))
+  )));
+}
+
+function normalizeStandardSelections(product = selectedStandardProduct(), changedOptionId = "") {
+  if (!product?.configurations?.length) return;
+  let candidate = selectedStandardConfiguration(product);
+  if (!candidate && changedOptionId) {
+    const prefix = product.options.slice(0, product.options.findIndex(option => option.id === changedOptionId) + 1);
+    candidate = product.configurations.find((configuration) => prefix.every(option => configuration.selections[option.id] === standardProductDraft.selections[option.id]));
+  }
+  if (!candidate) candidate = product.configurations[0];
+  product.options.forEach((option) => {
+    if (option.id !== changedOptionId || !standardProductDraft.selections[option.id]) {
+      standardProductDraft.selections[option.id] = candidate.selections[option.id];
+    }
+  });
+  const quantities = candidate.priceTiers.map((tier) => tier.quantity);
+  if (!quantities.includes(asNumber(standardProductDraft.quantity))) {
+    standardProductDraft.quantity = quantities[Math.min(1, quantities.length - 1)];
+  }
+}
+
+function standardOptionalPrice(pricing, quantity) {
+  if (!pricing) return 0;
+  if (pricing.type === "perUnit") return asNumber(pricing.setup) + asNumber(pricing.amount) * quantity;
+  if (["flat", "no_charge"].includes(pricing.type)) return asNumber(pricing.amount);
+  if (Array.isArray(pricing.tiers)) {
+    const tiers = pricing.tiers
+      .map((tier) => ({ quantity: asNumber(tier.quantity), amount: asNumber(tier.amount) }))
+      .sort((a, b) => a.quantity - b.quantity);
+    const tier = tiers.find((candidate) => candidate.quantity >= quantity) || tiers[tiers.length - 1];
+    if (!tier || pricing.type === "no_charge") return 0;
+    if (["per_unit", "per_unit_tier"].includes(pricing.type)) return tier.amount * quantity;
+    if (pricing.type === "per_bundle") return Math.ceil(quantity / Math.max(tier.quantity, 1)) * tier.amount;
+    return tier.amount;
+  }
+  if (pricing.type === "tier") {
+    const tiers = Object.entries(pricing.amounts || {})
+      .map(([tierQuantity, amount]) => [asNumber(tierQuantity), asNumber(amount)])
+      .sort((a, b) => a[0] - b[0]);
+    const tier = tiers.find(([tierQuantity]) => tierQuantity >= quantity) || tiers[tiers.length - 1];
+    return tier ? tier[1] : 0;
+  }
+  return asNumber(pricing.amount);
+}
+
+function standardProductPrice(product = selectedStandardProduct()) {
+  if (!product) return { available: false, quantity: 0, optionalLines: [], markupPercent: 0, baseCost: 0, optionalsTotal: 0, costTotal: 0, customerTotal: 0, customerUnitPrice: 0 };
+  const quantity = Math.max(Math.round(asNumber(standardProductDraft.quantity)), 1);
+  const configuration = selectedStandardConfiguration(product);
+  const databaseTier = configuration?.priceTiers?.find((tier) => tier.quantity === quantity);
+  const baseUnitCost = product.pricingSource === "sdsp"
+    ? asNumber(databaseTier?.unitPrice)
+    : asNumber(product.baseCosts[quantity] || product.baseCosts[product.quantities[product.quantities.length - 1]]);
+  const optionMultiplier = product.pricingSource === "sdsp" ? 1 : product.options.reduce((factor, option) => {
+    const selectedValue = standardProductDraft.selections[option.id];
+    const choice = option.choices.find((candidate) => candidate.value === selectedValue) || option.choices[0];
+    return factor * asNumber(choice.multiplier || 1);
+  }, 1);
+  const productionUnitCost = baseUnitCost * optionMultiplier;
+  const setupCost = product.pricingSource === "sdsp" ? 0 : asNumber(product.setupCost);
+  const baseCost = productionUnitCost * quantity + setupCost;
+  const optionalLines = (product.optionals || []).map((optional) => {
+    const selectedValue = standardProductDraft.optionalSelections[optional.id];
+    const choice = optional.choices.find((candidate) => candidate.value === selectedValue) || optional.choices[0];
+    return { optional, choice, amount: standardOptionalPrice(choice.pricing, quantity) };
+  });
+  const optionalsTotal = optionalLines.reduce((total, line) => total + line.amount, 0);
+  const costTotal = baseCost + optionalsTotal;
+  const markupPercent = product.priceBasis === 'selling' ? 0 : Math.min(Math.max(asNumber(standardProductDraft.markupPercent), 0), 200);
+  const customerTotal = costTotal * (1 + markupPercent / 100);
+  return {
+    available: product.pricingSource !== "sdsp" || Boolean(configuration && databaseTier),
+    configurationId: configuration?.id || null,
+    sku: configuration?.sku || "",
+    skuStatus: configuration?.skuStatus || "",
+    quantity,
+    productionUnitCost,
+    setupCost,
+    baseCost,
+    optionalLines,
+    optionalsTotal,
+    costTotal,
+    markupPercent,
+    customerUnitPrice: customerTotal / quantity,
+    customerTotal
+  };
+}
+
+function standardProductDescription(product = selectedStandardProduct()) {
+  const specifications = product.options.map((option) => {
+    const selectedValue = standardProductDraft.selections[option.id];
+    const choice = option.choices.find((candidate) => candidate.value === selectedValue) || option.choices[0];
+    return `${option.label}: ${choice.label}`;
+  });
+  const optionals = standardProductPrice(product).optionalLines
+    .filter((line) => line.choice.value !== "none")
+    .map((line) => `${line.optional.label}: ${line.choice.label}`);
+  return [...specifications, ...optionals].join("; ");
+}
+
+async function requestAuthoritativeStandardPrice(product) {
+  const optionalCodes = (product.optionals || [])
+    .filter((optional) => standardProductDraft.optionalSelections[optional.id] !== "none")
+    .map((optional) => optional.id);
+  const response = await fetch("/api/sdsp/price", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      productId: product.id,
+      selections: standardProductDraft.selections,
+      quantity: standardProductDraft.quantity,
+      optionalCodes,
+      markupPercent: standardProductDraft.markupPercent
+    })
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error || "The local catalog could not price this selection");
+  return result;
+}
+
+function renderStandardProductConfigurator() {
+  if (!els.standardProductModal) return;
+  const category = selectedStandardCategory();
+  const product = selectedStandardProduct();
+  if (!category || !product) {
+    els.standardProductCategories.innerHTML = "";
+    els.standardProductList.innerHTML = "";
+    els.standardProductConfigurator.innerHTML = `<div class="standard-product-empty"><strong>Standard Products are unavailable</strong><p>${escapeHtml(sdspCatalogError || "The local catalog is not loaded.")}</p></div>`;
+    els.addConfiguredProductBtn.disabled = true;
+    return;
+  }
+  normalizeStandardSelections(product);
+  const price = standardProductPrice(product);
+  const configuration = selectedStandardConfiguration(product);
+  const quantities = configuration?.priceTiers?.map((tier) => tier.quantity) || product.quantities;
+
+  els.standardProductCategories.innerHTML = standardProductCatalog.map((candidate) => `
+    <button class="standard-product-choice${candidate.id === category.id ? " active" : ""}" type="button" data-standard-category="${escapeHtml(candidate.id)}" aria-pressed="${candidate.id === category.id}">
+      <strong>${escapeHtml(candidate.name)}</strong>
+      <span>${escapeHtml(candidate.description)}</span>
+    </button>
+  `).join("");
+
+  els.standardProductList.innerHTML = category.products.map((candidate) => `
+    <button class="standard-product-choice${candidate.id === product.id ? " active" : ""}" type="button" data-standard-product="${escapeHtml(candidate.id)}" aria-pressed="${candidate.id === product.id}">
+      <strong>${escapeHtml(candidate.name)}</strong>
+      <span>${escapeHtml(candidate.description)}</span>
+    </button>
+  `).join("");
+
+  els.standardProductConfigurator.innerHTML = `
+    <div class="standard-product-config-head">
+      <div>
+        <span class="standard-product-step">3. Configure</span>
+        <h3>${escapeHtml(product.name)}</h3>
+        <p>${escapeHtml(product.description)}</p>
+      </div>
+      <span class="synthetic-price-badge">${product.pricingSource === "sdsp" ? `Local catalog${price.sku ? ` · ${escapeHtml(price.sku)}` : ""}` : "Synthetic fallback"}</span>
+    </div>
+    <div class="standard-product-fields">
+      ${product.options.map((option) => `
+        <label>
+          ${escapeHtml(option.label)}
+          <select data-standard-option="${escapeHtml(option.id)}">
+            ${availableStandardChoices(product, option).map((choice) => `<option value="${escapeHtml(choice.value)}"${choice.value === standardProductDraft.selections[option.id] ? " selected" : ""}>${escapeHtml(choice.label)}</option>`).join("")}
+          </select>
+        </label>
+      `).join("")}
+      <label>
+        Quantity
+        <select data-standard-quantity>
+          ${quantities.map((quantity) => `<option value="${quantity}"${quantity === price.quantity ? " selected" : ""}>${quantity.toLocaleString()}</option>`).join("")}
+        </select>
+      </label>
+      ${product.priceBasis === 'selling' ? '' : `<label>
+        Markup
+        <span class="standard-product-input-suffix"><input type="number" min="0" max="200" step="1" value="${escapeHtml(price.markupPercent)}" data-standard-markup /><span>%</span></span>
+      </label>`}
+    </div>
+    <section ${product.optionals.length ? '' : 'hidden'} class="standard-product-optionals${standardProductDraft.optionsExpanded ? " expanded" : ""}">
+      <div class="standard-product-optionals-head">
+        <div>
+          <span class="standard-product-step">4. Options</span>
+          <h4>Optional services</h4>
+          <p>Add production and fulfillment services priced from the selected quantity.</p>
+        </div>
+        <button class="ghost-btn" type="button" data-standard-options-toggle>${standardProductDraft.optionsExpanded ? "Hide Options" : "Add Options"}</button>
+      </div>
+      ${standardProductDraft.optionsExpanded ? `
+        <div class="standard-product-optional-list">
+          ${price.optionalLines.map((line) => `
+            <label class="standard-product-optional-row">
+              <span><strong>${escapeHtml(line.optional.label)}</strong><small>${escapeHtml(line.optional.description)}</small></span>
+              <select data-standard-optional="${escapeHtml(line.optional.id)}">
+                ${line.optional.choices.map((choice) => `<option value="${escapeHtml(choice.value)}"${choice.value === line.choice.value ? " selected" : ""}>${escapeHtml(choice.label)}</option>`).join("")}
+              </select>
+              <strong class="standard-product-optional-price">${line.choice.value === "none" ? "Not selected" : line.amount > 0 ? money(line.amount, 2) : "No charge"}</strong>
+            </label>
+          `).join("")}
+        </div>
+      ` : ""}
+    </section>
+    <div class="standard-product-price-summary${product.priceBasis === 'selling' ? ' selling-price-summary' : ''}" aria-live="polite">
+      ${product.priceBasis === 'selling' ? '' : `<div><span>Estimated cost</span><strong>${money(price.costTotal, 2)}</strong><small>${money(price.baseCost, 2)} base + ${money(price.optionalsTotal, 2)} options</small></div>
+      <div><span>Markup</span><strong>${price.markupPercent.toFixed(0)}%</strong><small>${money(price.customerTotal - price.costTotal, 2)} gross dollars</small></div>`}
+      <div><span>Unit price</span><strong>${money(price.customerUnitPrice, 4)}</strong><small>At ${price.quantity.toLocaleString()} units</small></div>
+      <div class="standard-product-total"><span>Quote total</span><strong>${money(price.customerTotal, 2)}</strong><small>Before shipping and tax</small></div>
+    </div>
+  `;
+  els.addConfiguredProductBtn.disabled = !price.available;
+}
+
+async function openStandardProductConfigurator() {
+  if (!sdspCatalog) await loadSdspCatalog();
+  if (!standardProductCatalog.length) {
+    renderStandardProductConfigurator();
+    els.standardProductModal.hidden = false;
+    document.body.classList.add("modal-open");
+    return;
+  }
+  resetStandardProductDraft();
+  renderStandardProductConfigurator();
+  els.standardProductModal.hidden = false;
+  document.body.classList.add("modal-open");
+}
+
+function closeStandardProductConfigurator() {
+  els.standardProductModal.hidden = true;
+  document.body.classList.remove("modal-open");
+}
+
+async function addConfiguredStandardProduct() {
+  const category = selectedStandardCategory();
+  const product = selectedStandardProduct();
+  let price = standardProductPrice(product);
+  if (!price.available) {
+    setSaveStatus("Select an available product combination");
+    return;
+  }
+  if (product.pricingSource === "sdsp") {
+    try {
+      const authoritative = await requestAuthoritativeStandardPrice(product);
+      const amountsByCode = new Map(authoritative.optionalLines.map((line) => [line.code, line.amount]));
+      price = {
+        ...price,
+        ...authoritative,
+        optionalLines: price.optionalLines.map((line) => ({
+          ...line,
+          amount: amountsByCode.get(line.optional.id) ?? line.amount
+        }))
+      };
+    } catch (error) {
+      setSaveStatus(error.message);
+      return;
+    }
+  }
+  printQuote.lineItems = [
+    ...printQuoteLineRows(),
+    {
+      id: nextPrintQuoteLineId(),
+      name: product.name,
+      description: standardProductDescription(product),
+      quantity: price.quantity,
+      customerTotal: Number(price.customerTotal.toFixed(2)),
+      sourceLabel: product.pricingSource === "sdsp" ? `SDSP local catalog${price.sku ? ` · ${price.sku}` : ""}` : "Synthetic standard product pricing",
+      standardProductId: product.id,
+      standardProductSku: price.sku || "",
+      standardProductConfigurationId: price.configurationId || null,
+      standardProductCategory: category.name,
+      estimatedCost: Number(price.costTotal.toFixed(2)),
+      markupPercent: price.markupPercent,
+      configuration: { ...standardProductDraft.selections },
+      optionals: price.optionalLines
+        .filter((line) => line.choice.value !== "none")
+        .map((line) => ({ id: line.optional.id, label: line.optional.label, value: line.choice.value, choice: line.choice.label, amount: Number(line.amount.toFixed(2)) }))
+    }
+  ];
+  printQuote.outputMode = "builder";
+  touchWorkspaceRecord("printQuotes");
+  renderPrintQuoteDraft();
+  renderTabRecordControls();
+  renderProposalPreview();
+  closeStandardProductConfigurator();
+  setSaveStatus(`${product.name} added to quote`);
+}
+
 function updatePrintQuoteLine(lineId, field, value) {
   const numericFields = new Set(["quantity", "customerTotal"]);
   printQuote.lineItems = printQuoteLineRows().map((line) => {
@@ -1816,7 +2578,7 @@ function renderPrintQuoteLines(isCustomerOutput) {
     </div>
     ${lines.map((line) => isCustomerOutput ? `
       <div class="print-quote-line">
-        <strong>${escapeHtml(line.name)}</strong>
+        <strong>${escapeHtml(line.name)}${line.standardProductId ? `<small class="standard-product-line-label">Standard product</small>` : ""}</strong>
         <span>${escapeHtml(line.description)}</span>
         <span>${Math.round(asNumber(line.quantity)).toLocaleString()}</span>
         <span>${money(line.customerTotal, 2)}</span>
@@ -1825,11 +2587,11 @@ function renderPrintQuoteLines(isCustomerOutput) {
       <div class="print-quote-line builder-line" data-print-quote-line-id="${escapeHtml(line.id)}">
         <label>
           Item
-          <input class="print-quote-line-input" type="text" data-print-quote-line-field="name" value="${escapeHtml(line.name)}" />
+          <span class="print-quote-line-name"><input class="print-quote-line-input" type="text" data-print-quote-line-field="name" value="${escapeHtml(line.name)}" />${line.standardProductId ? `<small class="standard-product-line-label">Standard product</small>` : ""}</span>
         </label>
         <label>
           Description
-          <input class="print-quote-line-input" type="text" data-print-quote-line-field="description" value="${escapeHtml(line.description)}" />
+          <textarea class="print-quote-line-input print-quote-line-description" rows="2" data-print-quote-line-field="description">${escapeHtml(line.description)}</textarea>
         </label>
         <label>
           Qty
@@ -10876,6 +11638,82 @@ els.proposalPublishSummary?.addEventListener("click", (event) => {
   });
 });
 els.addPrintQuoteLineBtn?.addEventListener("click", addPrintQuoteLine);
+els.addStandardProductBtn?.addEventListener("click", openStandardProductConfigurator);
+els.closeStandardProductBtn?.addEventListener("click", closeStandardProductConfigurator);
+els.cancelStandardProductBtn?.addEventListener("click", closeStandardProductConfigurator);
+els.standardProductCategories?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-standard-category]");
+  if (!button) return;
+  resetStandardProductDraft(button.dataset.standardCategory);
+  renderStandardProductConfigurator();
+});
+els.standardProductList?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-standard-product]");
+  if (!button) return;
+  resetStandardProductDraft(standardProductDraft.categoryId, button.dataset.standardProduct);
+  renderStandardProductConfigurator();
+});
+els.standardProductConfigurator?.addEventListener("change", (event) => {
+  const option = event.target.closest("[data-standard-option]");
+  if (option) {
+    standardProductDraft.selections[option.dataset.standardOption] = option.value;
+    normalizeStandardSelections(selectedStandardProduct(), option.dataset.standardOption);
+  }
+  const optional = event.target.closest("[data-standard-optional]");
+  if (optional) standardProductDraft.optionalSelections[optional.dataset.standardOptional] = optional.value;
+  const quantity = event.target.closest("[data-standard-quantity]");
+  if (quantity) standardProductDraft.quantity = asNumber(quantity.value);
+  const markup = event.target.closest("[data-standard-markup]");
+  if (markup) standardProductDraft.markupPercent = asNumber(markup.value);
+  renderStandardProductConfigurator();
+});
+els.standardProductConfigurator?.addEventListener("input", (event) => {
+  const markup = event.target.closest("[data-standard-markup]");
+  if (!markup) return;
+  standardProductDraft.markupPercent = asNumber(markup.value);
+  const price = standardProductPrice();
+  const summary = els.standardProductConfigurator.querySelector(".standard-product-price-summary");
+  if (summary) {
+    summary.innerHTML = `
+      <div><span>Estimated cost</span><strong>${money(price.costTotal, 2)}</strong><small>${money(price.baseCost, 2)} base + ${money(price.optionalsTotal, 2)} options</small></div>
+      <div><span>Markup</span><strong>${price.markupPercent.toFixed(0)}%</strong><small>${money(price.customerTotal - price.costTotal, 2)} gross dollars</small></div>
+      <div><span>Unit price</span><strong>${money(price.customerUnitPrice, 4)}</strong><small>At ${price.quantity.toLocaleString()} units</small></div>
+      <div class="standard-product-total"><span>Quote total</span><strong>${money(price.customerTotal, 2)}</strong><small>Before shipping and tax</small></div>
+    `;
+  }
+});
+els.standardProductConfigurator?.addEventListener("click", (event) => {
+  if (!event.target.closest("[data-standard-options-toggle]")) return;
+  standardProductDraft.optionsExpanded = !standardProductDraft.optionsExpanded;
+  renderStandardProductConfigurator();
+});
+els.addConfiguredProductBtn?.addEventListener("click", addConfiguredStandardProduct);
+els.standardProductModal?.addEventListener("click", (event) => {
+  if (event.target === els.standardProductModal) closeStandardProductConfigurator();
+});
+els.ecommProductSelect?.addEventListener("change", () => {
+  ecommSelectedProductId = els.ecommProductSelect.value;
+  ecommSelectedConfigurationId = "";
+  renderEcommCatalogAdmin();
+});
+els.ecommConfigurationSelect?.addEventListener("change", () => {
+  ecommSelectedConfigurationId = els.ecommConfigurationSelect.value;
+  renderEcommCatalogAdmin();
+});
+els.ecommOptionalSelect?.addEventListener("change", () => {
+  ecommSelectedOptionalId = els.ecommOptionalSelect.value;
+  renderEcommCatalogAdmin();
+});
+els.ecommProductPriceRows?.addEventListener("input", (event) => {
+  const row = event.target.closest("tr");
+  if (!row) return;
+  const quantity = asNumber(row.querySelector("[data-ecomm-product-quantity]")?.value);
+  const unitPrice = asNumber(row.querySelector("[data-ecomm-product-price]")?.value);
+  const total = row.querySelector(".calculated-value");
+  if (total) total.textContent = money(quantity * unitPrice, 2);
+});
+els.saveEcommProductPricesBtn?.addEventListener("click", saveEcommProductPrices);
+els.saveEcommOptionalPricesBtn?.addEventListener("click", saveEcommOptionalPrices);
 els.refreshPrintQuoteLinesBtn?.addEventListener("click", refreshPrintQuoteLinesFromEstimate);
 els.printQuoteLines?.addEventListener("change", (event) => {
   const input = event.target.closest("[data-print-quote-line-field]");
@@ -11061,6 +11899,7 @@ async function init() {
   startBlankEstimate();
   setWorkspaceMode("full", { preferredView: "proposalView" });
   render();
+  loadSdspCatalog();
   fetchDocusealConfiguration();
   runProposalExportQaIfRequested();
   fetchAndApplySeed()
