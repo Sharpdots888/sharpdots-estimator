@@ -24,9 +24,10 @@ production W links, enable production CRM, merge PR 33, or deploy to Heroku.
 | Migration | Unique nullable `legacy_workspace_key` for a reviewed canonical container mapping |
 | Audit/concurrency | Created/updated timestamps, incrementing `row_version`, soft archive timestamp |
 
-No foreign-key targets are invented. Warren must confirm exact customer, contact,
-operator and estimating-record table keys/types before adding constraints and APIs.
-References without those constraints are staging fields, not proven associations.
+Company/contact foreign keys now use verified UUID targets in `sfvc_companies`
+and `sfvc_people`. Operator references remain staging placeholders, not proven
+associations; Portal-to-local-user identity mapping is a production blocker.
+See the dated review findings below for remaining relationship checks.
 
 The sequence begins at 1 in a new database, never cycles, and stops at 999999.
 Failed/rolled-back inserts may leave gaps. Do not reset the sequence to fill gaps;
@@ -117,3 +118,77 @@ concurrent-client, backup or real-schema migration verification.
 
 Coordination: https://app.clickup.com/t/868jnxdp7
 PR: https://github.com/Sharpdots888/sharpdots-estimator/pull/33
+
+## Warren Review Follow-up: September 23, 2026
+
+### Verified, Read Only
+
+The quoting-proposals connection reports PostgreSQL 16.14 and runtime role
+`db_admin`. Catalog queries ran in a READ ONLY transaction, rolled back afterward.
+No client records, passwords, tokens, or document content were retrieved.
+
+- `sfvc_companies.company_id` and `sfvc_people.person_id` are UUIDs. Both tables
+  belong to `u1plkuc8dacl0j`. Migration now includes RESTRICT foreign keys and indexes.
+- `sfvc_company_people` has UUID company/person foreign keys, a separate UUID
+  `company_person_id` primary key, and no unique company/person pair constraint.
+  Before opportunity writes, the future API must check that a supplied contact
+  belongs to the supplied company through this junction. Two independent FKs
+  alone do NOT enforce that business rule. Reject a mismatched pair; changing the
+  company must revalidate or clear the contact. Do not ALTER the shared junction
+  or introduce a guessed composite FK in this header-only migration.
+- `users.id` is integer, owned by `db_admin`. `validatePortalToken` in `server.js`
+  receives `data.user` from Portal; the signed estimator session preserves that
+  external ID. There is no local `users` lookup or explicit identity bridge here.
+  Matching one sample numeric ID is insufficient proof. Warren must confirm the
+  Portal issuer/database identity contract or provide an explicit subject mapping.
+  Until then, keep operator fields unpopulated; production CRM remains blocked.
+  Future created/updated attribution must come from the authenticated server
+  session after resolution, never request-body operator fields or email guessing.
+- No opportunity table exists in the inspected database. `db_admin` has no direct
+  role memberships and is not a member of `u1plkuc8dacl0j`; neither role is superuser.
+  The existing owner has CREATE on public.
+
+### Proposed Owner and Exact Grants
+
+Use the existing contact/estimating schema owner `u1plkuc8dacl0j` to execute 001;
+retain `db_admin` as the current runtime connection. Warren must confirm access
+to that owner credential in the intended environment. Do not make the runtime
+role the owner or grant it membership in the owner role. No credential changes
+or existing-table ownership transfers are proposed here.
+
+Important finding: owner default privileges give `db_admin` and `replit_user`
+broad table access, and `production_app` / `n8n_workflows` further table/sequence
+access. Therefore 001 strips all non-owner ACL grants from its NEW table/sequence
+inside its transaction. It does not change global defaults or existing objects.
+
+`migrations/opportunity-runtime-grants.sql` contains the exact proposed grants,
+with an owner/membership guard: SELECT, column-scoped INSERT and UPDATE, schema
+USAGE, sequence USAGE. No DELETE, TRUNCATE, DDL, sequence reset, legacy-mapping
+write, or update to identity/creation/timestamp/version fields. Review both SQL
+files together. A superuser or privileged DBA can always bypass these controls;
+this plan restricts the runtime, not database administrators.
+
+After 001, run the grants file as the same owner with ON_ERROR_STOP. Inspect
+effective privileges and role memberships again before connecting any CRM API.
+If a previous partial grants run or manual column grants exist, stop and review;
+do not treat this script as a general permission repair tool.
+
+### Verification and Remaining Gates
+
+Passed `npm test`: 15 tests, including isolated PGlite FK/numbering checks.
+Passed `node scripts/verify-opportunity-postgres.cjs`: real disposable local
+PostgreSQL with distinct owner/runtime roles, synthetic reference tables and
+broad default ACL fixtures. Verified default-grant removal, allowed writes,
+denied DELETE/TRUNCATE/DDL/creation-field updates/sequence reset, two concurrent
+creates, conflicting optimistic updates, invalid UUID references and referenced
+parent deletion protection. The script uses a unique Unix socket, no TCP listener,
+does not read DATABASE_URL, and stops/removes its own temporary cluster.
+
+This is NOT a test on Warren's remote staging/fork or its full schema. Remaining:
+1. Warren confirms the owner credential and designates the staging database.
+2. Resolve Portal operator mapping and the authenticated company/contact check.
+3. Run both reviewed scripts on that staging environment, check effective grants,
+   backup/recovery and real-schema integration, then attach evidence to this PR.
+4. Joint review and explicit merge/production execution/deployment approvals.
+
+No production SQL, merge, deployment, W backfill, or runtime auth changes occurred.

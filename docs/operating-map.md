@@ -3,7 +3,9 @@
 ## Opportunity CRM Draft Lane
 
 - Owner: Codex, current opportunity CRM task.
-- State: PR 33 review preparation; current main reconciled and dormant opportunity migration prepared.
+- State: Warren review response prepared; confirmed UUID FKs and default-ACL hardening
+  tested on disposable local PostgreSQL. Portal identity mapping and designated
+  remote staging/owner credentials remain blockers before production migration.
 - Branch: `codex/opportunity-crm-draft` from `origin/main` (`8faa789`).
 - Worktree: `/Volumes/JTMMX/Users/JT/Documents/estimator-crm-draft`.
 - Files owned: `crm/`, opt-in script/style inclusions in `index.html`,
@@ -16,6 +18,9 @@
   PR merge are not approved by this preparation request.
 - Current main merged into this branch at `481dfb2`; catalog entrypoint versions
   retained. Only the CRM's opt-in includes differ in `index.html`.
+- September 23: read-only production catalog inspection; no production writes.
+  Exact proposed grants in `migrations/opportunity-runtime-grants.sql`; evidence
+  and outstanding review gates in `docs/opportunity-migration.md`.
 
 ## Parallel Work Boundary
 

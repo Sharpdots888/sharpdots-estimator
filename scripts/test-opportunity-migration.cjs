@@ -7,11 +7,15 @@ const {PGlite}=require(process.env.PGLITE_PATH || '@electric-sql/pglite');
   const db=new PGlite();
   try {
     const sql=readFileSync(path.join(__dirname,'../migrations/001_sfpq_opportunities.sql'),'utf8');
+    await db.exec(`CREATE TABLE public.sfvc_companies (company_id uuid PRIMARY KEY);
+      CREATE TABLE public.sfvc_people (person_id uuid PRIMARY KEY);`);
     await db.exec(sql);
     const insert=(key,name='Opportunity')=>db.query('INSERT INTO public.sfpq_opportunities (creation_key,name) VALUES ($1,$2) RETURNING *',[key,name]);
     const key=crypto.randomUUID();
     const first=(await insert(key)).rows[0];
     assert.equal(first.opportunity_number,'O-000001');
+    await assert.rejects(db.query('UPDATE sfpq_opportunities SET account_ref=$1 WHERE id=1',[crypto.randomUUID()]), /foreign key/);
+    await assert.rejects(db.query('UPDATE sfpq_opportunities SET contact_ref=$1 WHERE id=1',[crypto.randomUUID()]), /foreign key/);
     assert.equal((await insert(crypto.randomUUID())).rows[0].opportunity_number,'O-000002');
     await assert.rejects(insert(key));
     await assert.rejects(insert(crypto.randomUUID(),''));

@@ -16,9 +16,10 @@ CREATE TABLE public.sfpq_opportunities (
   account_name text NOT NULL DEFAULT '',
   contact_name text NOT NULL DEFAULT '',
   contact_email text NOT NULL DEFAULT '',
-  -- References are intentionally not guessed FKs: confirm shared table keys first.
-  account_ref text,
-  contact_ref text,
+  account_ref uuid REFERENCES public.sfvc_companies(company_id) ON DELETE RESTRICT,
+  contact_ref uuid REFERENCES public.sfvc_people(person_id) ON DELETE RESTRICT,
+  -- Portal subject -> users.id mapping is NOT yet verified; do not populate these
+  -- staging placeholders from a browser-supplied or assumed local user ID.
   owner_operator_ref text,
   offering text NOT NULL DEFAULT 'Print' CHECK (offering IN ('Print','Services','Mixed')),
   lead_source text NOT NULL DEFAULT '',
@@ -62,6 +63,8 @@ CREATE INDEX sfpq_opportunities_owner_idx
   ON public.sfpq_opportunities (owner_operator_ref, status) WHERE archived_at IS NULL;
 CREATE INDEX sfpq_opportunities_account_idx
   ON public.sfpq_opportunities (account_ref) WHERE account_ref IS NOT NULL;
+CREATE INDEX sfpq_opportunities_contact_idx
+  ON public.sfpq_opportunities (contact_ref) WHERE contact_ref IS NOT NULL;
 
 CREATE FUNCTION public.sfpq_opportunities_before_update()
 RETURNS trigger LANGUAGE plpgsql SET search_path = pg_catalog AS $$
@@ -94,6 +97,27 @@ COMMENT ON COLUMN public.sfpq_opportunities.row_version IS
 COMMENT ON COLUMN public.sfpq_opportunities.legacy_workspace_key IS
   'Reviewed canonical mapping only. Do not automatically equate browser-local W numbers across users or copy W suffixes to O numbers.';
 
--- No public/runtime grants here. DBA supplies explicit least-privilege grants
--- to the verified application role after schema review. Do not grant DELETE.
+-- Existing owner defaults grant broad access to several application roles.
+-- Strip defaults on ONLY these new objects before the transaction becomes visible.
+DO $$
+DECLARE grant_row record;
+BEGIN
+  FOR grant_row IN
+    SELECT DISTINCT c.oid::regclass AS object_name, c.relkind, a.grantee
+    FROM pg_class c
+    CROSS JOIN LATERAL aclexplode(c.relacl) a
+    WHERE c.oid IN ('public.sfpq_opportunities'::regclass,
+                   'public.sfpq_opportunities_id_seq'::regclass)
+      AND a.grantee <> c.relowner
+  LOOP
+    EXECUTE format('REVOKE ALL ON %s %s FROM %s',
+      CASE WHEN grant_row.relkind = 'S' THEN 'SEQUENCE' ELSE 'TABLE' END,
+      grant_row.object_name,
+      CASE WHEN grant_row.grantee = 0 THEN 'PUBLIC'
+           ELSE quote_ident(pg_get_userbyid(grant_row.grantee)) END);
+  END LOOP;
+END;
+$$;
+REVOKE ALL ON FUNCTION public.sfpq_opportunities_before_update() FROM PUBLIC;
+-- Apply reviewed opportunity-runtime-grants.sql separately as the owner.
 COMMIT;
