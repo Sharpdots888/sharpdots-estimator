@@ -3,9 +3,10 @@
 ## Opportunity CRM Draft Lane
 
 - Owner: Codex, current opportunity CRM task.
-- State: John confirmed shared Portal user IDs September 27; integer user FKs
-  added. Staging and separate-owner approach authorized. Verified remote staging
-  endpoint and owner credential remain needed; no production execution approved.
+- State: September 27 local staging passed against production reference-table
+  definitions with synthetic rows. Shared Portal IDs confirmed by John. No hosted
+  staging required. Production owner credential verification and merge/execution
+  approvals remain separate; no production writes or deployment.
 - Branch: `codex/opportunity-crm-draft` from `origin/main` (`8faa789`).
 - Worktree: `/Volumes/JTMMX/Users/JT/Documents/estimator-crm-draft`.
 - Files owned: `crm/`, opt-in script/style inclusions in `index.html`,

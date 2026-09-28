@@ -8,6 +8,9 @@ const { Client } = require('pg');
 const { randomUUID } = require('node:crypto');
 
 async function main() {
+  const schemaPath = process.env.OPPORTUNITY_REFERENCE_SCHEMA;
+  const enumPath = process.env.OPPORTUNITY_REFERENCE_ENUM;
+  if (schemaPath && !enumPath) throw new Error('Schema restore requires OPPORTUNITY_REFERENCE_ENUM');
   const bin = process.env.OPPORTUNITY_PG_BIN || '/opt/homebrew/opt/postgresql@16/bin';
   const dir = mkdtempSync(path.join(os.tmpdir(), 'opportunity-pg-'));
   const data = path.join(dir, 'data');
@@ -31,17 +34,31 @@ async function main() {
       CREATE ROLE replit_user LOGIN;
       CREATE ROLE production_app LOGIN;
       CREATE ROLE n8n_workflows LOGIN;
+      CREATE ROLE inventory_review NOLOGIN;
       GRANT USAGE, CREATE ON SCHEMA public TO u1plkuc8dacl0j,db_admin;
       SET ROLE u1plkuc8dacl0j;
       ALTER DEFAULT PRIVILEGES GRANT ALL ON TABLES TO db_admin,replit_user;
       ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO production_app,n8n_workflows;
       ALTER DEFAULT PRIVILEGES GRANT ALL ON SEQUENCES TO db_admin,replit_user,production_app,n8n_workflows;
+      RESET ROLE;`);
+    if (schemaPath) {
+      const labels = JSON.parse(readFileSync(enumPath, 'utf8'));
+      assert.ok(Array.isArray(labels) && labels.length && labels.every(s => typeof s === 'string'));
+      await admin.query(`CREATE TYPE public.user_role AS ENUM (${labels.map(s => "'" + s.replaceAll("'", "''") + "'").join(',')})`);
+      run('psql', ['-h', socket, '-U', 'test_admin', '-d', 'postgres', '-v', 'ON_ERROR_STOP=1', '-f', path.resolve(schemaPath)]);
+      await admin.query(`INSERT INTO public.users (id,username,email,password_hash,is_admin,is_active)
+        VALUES (45,'local_test','local-test@example.invalid','not-a-real-password-hash',false,true)`);
+    } else {
+      await admin.query(`SET ROLE u1plkuc8dacl0j;
       CREATE TABLE public.sfvc_companies (company_id uuid PRIMARY KEY);
       CREATE TABLE public.sfvc_people (person_id uuid PRIMARY KEY);
       RESET ROLE;
       SET ROLE db_admin;
       CREATE TABLE public.users (id integer PRIMARY KEY);
       INSERT INTO public.users VALUES (45);
+      RESET ROLE;`);
+    }
+    await admin.query(`SET ROLE db_admin;
       GRANT REFERENCES (id) ON public.users TO u1plkuc8dacl0j;
       RESET ROLE;`);
     const owner = await connect('u1plkuc8dacl0j');
@@ -80,16 +97,23 @@ async function main() {
     await assert.rejects(runtime.query('UPDATE public.sfpq_opportunities SET owner_operator_ref=999 WHERE id=$1', [id]), e => e.code === '23503');
     await runtime.query('UPDATE public.sfpq_opportunities SET owner_operator_ref=45,updated_by_operator_ref=45 WHERE id=$1', [id]);
     await assert.rejects(admin.query('DELETE FROM public.users WHERE id=45'), e => e.code === '23503');
-    await owner.query('INSERT INTO public.sfvc_companies VALUES ($1)', [company]);
-    await owner.query('INSERT INTO public.sfvc_people VALUES ($1)', [person]);
+    if (schemaPath) {
+      await owner.query('INSERT INTO public.sfvc_companies (company_id,legal_name) VALUES ($1,$2)', [company,'Synthetic staging company']);
+      await owner.query('INSERT INTO public.sfvc_people (person_id,first_name,last_name) VALUES ($1,$2,$3)', [person,'Synthetic','Contact']);
+      await owner.query('INSERT INTO public.sfvc_company_people (company_id,person_id) VALUES ($1,$2)', [company,person]);
+    } else {
+      await owner.query('INSERT INTO public.sfvc_companies VALUES ($1)', [company]);
+      await owner.query('INSERT INTO public.sfvc_people VALUES ($1)', [person]);
+    }
     await runtime.query('UPDATE public.sfpq_opportunities SET account_ref=$1,contact_ref=$2 WHERE id=$3', [company, person, id]);
     await assert.rejects(owner.query('DELETE FROM public.sfvc_companies WHERE company_id=$1', [company]), e => e.code === '23503');
     await assert.rejects(owner.query('DELETE FROM public.sfvc_people WHERE person_id=$1', [person]), e => e.code === '23503');
-    console.log('PASS: real local PostgreSQL, separate owner/runtime, restricted grants, concurrent allocation and optimistic updates, UUID FKs and delete protection. Synthetic fixture only; not remote staging or Portal mapping verification.');
+    console.log(`PASS: real local PostgreSQL, separate owner/runtime, restricted grants, concurrent allocation and optimistic updates, UUID/operator FKs and delete protection. ${schemaPath ? 'Restored production reference schema; synthetic rows only.' : 'Synthetic minimal schema fixture.'} No production writes or Portal implementation verification.`);
   } finally {
     await Promise.all(clients.map(c => c.end()));
     if (started) run('pg_ctl', ['-D', data, '-m', 'fast', '-w', 'stop']);
-    rmSync(dir, { recursive: true, force: true });
+    if (process.env.OPPORTUNITY_KEEP_LOCAL_DB === '1') console.log(`Stopped local staging cluster retained at ${dir}`);
+    else rmSync(dir, { recursive: true, force: true });
   }
 }
 main().catch(error => { console.error(error.message); process.exitCode = 1; });

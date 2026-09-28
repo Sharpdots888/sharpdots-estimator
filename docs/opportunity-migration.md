@@ -224,3 +224,54 @@ historical fork URL in ClickUp is still staging. To complete real-schema staging
 provide a verified staging runtime URL and its owner connection through a secure
 local configuration, or authorize provisioning a separately priced database after
 the host/plan is selected. No database was provisioned or remote grants changed.
+
+## Local Reference-Schema Staging: September 27
+
+John selected local PostgreSQL rather than a hosted staging database. This
+supersedes the requirement above for a remote staging URL.
+
+Completed: schema-only pg_dump of public.users, sfvc_companies, sfvc_people and
+sfvc_company_people from quoting-proposals' database, with read-only transactions.
+Captured user_role enum metadata separately. No table rows, passwords, customer
+data, or document artifacts were copied. Restored definitions, indexes, ownership
+and table ACLs into a separate local PostgreSQL 16 cluster; inserted synthetic data.
+Default-privilege fixtures remain deliberately broad test cases, not a full copy
+of cluster-wide production roles/configuration.
+
+Correction to September 23 inspection: the junction has a unique INDEX named
+uq_sfvc_company_people on (company_id, person_id). The earlier pg_constraint-only
+inspection missed it. API membership validation remains required under this
+migration's independent account/contact foreign keys.
+
+Both migration and grants scripts passed as the local schema owner. Verified
+operator/account/contact references, referenced-parent deletion protection, default
+ACL removal, restricted runtime operations, concurrent O-number allocation and
+optimistic edit conflicts. The full 15-test suite and minimal-schema PostgreSQL
+test also passed. This closes reference-schema local staging, not end-to-end CRM
+API testing, full production recovery verification or production owner login access.
+
+Reproduce after obtaining a fresh reviewed schema-only export and enum JSON:
+
+```bash
+OPPORTUNITY_REFERENCE_SCHEMA=/private/tmp/opportunity-reference-schema.sql \
+OPPORTUNITY_REFERENCE_ENUM=/private/tmp/opportunity-user-role.json \
+OPPORTUNITY_KEEP_LOCAL_DB=1 node scripts/verify-opportunity-postgres.cjs
+```
+
+The verifier never connects remotely. It restores the explicitly supplied schema
+file using psql only into its newly created local cluster. Its socket directory is
+unique, TCP is disabled, and the cluster is stopped even after a test failure.
+Without KEEP_LOCAL_DB it removes the temporary cluster after verification.
+
+Evidence snapshot SHA-256:
+- schema: d78dcbc62b57f2487a340809653f76d37cd8d7448ea01bfaa038250b7b4d31a2
+- enum: b8064e5d0191b7e7d2eba447a2c94f695bd226a891cef2bf57f577ca31a2cc62
+
+Local retained (stopped) cluster for this run:
+`/var/folders/g4/2vqmfb8j2mjb54_qf2_t0vsr0000gp/T/opportunity-pg-tnptaS`.
+Temporary files may be cleared by macOS; recreate from a fresh export if absent.
+
+Remaining: review/merge approval, production schema-owner credential verification
+and separate production migration/deployment approvals. No production writes or
+paid infrastructure were involved. No web application or outbound integrations
+were started for this database test.
