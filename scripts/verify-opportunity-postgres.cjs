@@ -31,13 +31,18 @@ async function main() {
       CREATE ROLE replit_user LOGIN;
       CREATE ROLE production_app LOGIN;
       CREATE ROLE n8n_workflows LOGIN;
-      GRANT USAGE, CREATE ON SCHEMA public TO u1plkuc8dacl0j;
+      GRANT USAGE, CREATE ON SCHEMA public TO u1plkuc8dacl0j,db_admin;
       SET ROLE u1plkuc8dacl0j;
       ALTER DEFAULT PRIVILEGES GRANT ALL ON TABLES TO db_admin,replit_user;
       ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO production_app,n8n_workflows;
       ALTER DEFAULT PRIVILEGES GRANT ALL ON SEQUENCES TO db_admin,replit_user,production_app,n8n_workflows;
       CREATE TABLE public.sfvc_companies (company_id uuid PRIMARY KEY);
       CREATE TABLE public.sfvc_people (person_id uuid PRIMARY KEY);
+      RESET ROLE;
+      SET ROLE db_admin;
+      CREATE TABLE public.users (id integer PRIMARY KEY);
+      INSERT INTO public.users VALUES (45);
+      GRANT REFERENCES (id) ON public.users TO u1plkuc8dacl0j;
       RESET ROLE;`);
     const owner = await connect('u1plkuc8dacl0j');
     const migration = readFileSync(path.join(__dirname, '../migrations/001_sfpq_opportunities.sql'), 'utf8');
@@ -63,7 +68,7 @@ async function main() {
       'DELETE FROM public.sfpq_opportunities',
       'TRUNCATE public.sfpq_opportunities',
       'UPDATE public.sfpq_opportunities SET created_at=now()',
-      'UPDATE public.sfpq_opportunities SET created_by_operator_ref=\'forged\'',
+      'UPDATE public.sfpq_opportunities SET created_by_operator_ref=45',
       'UPDATE public.sfpq_opportunities SET id=DEFAULT',
       'UPDATE public.sfpq_opportunities SET row_version=42',
       "SELECT setval('public.sfpq_opportunities_id_seq',1)",
@@ -72,6 +77,9 @@ async function main() {
     await assert.rejects(runtime.query('UPDATE public.sfpq_opportunities SET account_ref=$1 WHERE id=$2', [randomUUID(), id]), e => e.code === '23503');
     await assert.rejects(runtime.query('UPDATE public.sfpq_opportunities SET contact_ref=$1 WHERE id=$2', [randomUUID(), id]), e => e.code === '23503');
     const company = randomUUID(), person = randomUUID();
+    await assert.rejects(runtime.query('UPDATE public.sfpq_opportunities SET owner_operator_ref=999 WHERE id=$1', [id]), e => e.code === '23503');
+    await runtime.query('UPDATE public.sfpq_opportunities SET owner_operator_ref=45,updated_by_operator_ref=45 WHERE id=$1', [id]);
+    await assert.rejects(admin.query('DELETE FROM public.users WHERE id=45'), e => e.code === '23503');
     await owner.query('INSERT INTO public.sfvc_companies VALUES ($1)', [company]);
     await owner.query('INSERT INTO public.sfvc_people VALUES ($1)', [person]);
     await runtime.query('UPDATE public.sfpq_opportunities SET account_ref=$1,contact_ref=$2 WHERE id=$3', [company, person, id]);

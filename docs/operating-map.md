@@ -3,9 +3,9 @@
 ## Opportunity CRM Draft Lane
 
 - Owner: Codex, current opportunity CRM task.
-- State: Warren review response prepared; confirmed UUID FKs and default-ACL hardening
-  tested on disposable local PostgreSQL. Portal identity mapping and designated
-  remote staging/owner credentials remain blockers before production migration.
+- State: John confirmed shared Portal user IDs September 27; integer user FKs
+  added. Staging and separate-owner approach authorized. Verified remote staging
+  endpoint and owner credential remain needed; no production execution approved.
 - Branch: `codex/opportunity-crm-draft` from `origin/main` (`8faa789`).
 - Worktree: `/Volumes/JTMMX/Users/JT/Documents/estimator-crm-draft`.
 - Files owned: `crm/`, opt-in script/style inclusions in `index.html`,

@@ -18,9 +18,8 @@ CREATE TABLE public.sfpq_opportunities (
   contact_email text NOT NULL DEFAULT '',
   account_ref uuid REFERENCES public.sfvc_companies(company_id) ON DELETE RESTRICT,
   contact_ref uuid REFERENCES public.sfvc_people(person_id) ON DELETE RESTRICT,
-  -- Portal subject -> users.id mapping is NOT yet verified; do not populate these
-  -- staging placeholders from a browser-supplied or assumed local user ID.
-  owner_operator_ref text,
+  -- Shared Portal/users identity confirmed by John on 2026-09-27.
+  owner_operator_ref integer REFERENCES public.users(id) ON DELETE RESTRICT,
   offering text NOT NULL DEFAULT 'Print' CHECK (offering IN ('Print','Services','Mixed')),
   lead_source text NOT NULL DEFAULT '',
   brief text NOT NULL DEFAULT '',
@@ -44,8 +43,8 @@ CREATE TABLE public.sfpq_opportunities (
     (one_time_amount + monthly_amount * initial_term_months) STORED,
   -- Canonical legacy container identity, NOT an unqualified browser-local W number.
   legacy_workspace_key text UNIQUE CHECK (legacy_workspace_key IS NULL OR length(btrim(legacy_workspace_key)) > 0),
-  created_by_operator_ref text,
-  updated_by_operator_ref text,
+  created_by_operator_ref integer REFERENCES public.users(id) ON DELETE RESTRICT,
+  updated_by_operator_ref integer REFERENCES public.users(id) ON DELETE RESTRICT,
   created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
   row_version bigint NOT NULL DEFAULT 1 CHECK (row_version > 0),

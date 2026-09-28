@@ -8,7 +8,8 @@ const {PGlite}=require(process.env.PGLITE_PATH || '@electric-sql/pglite');
   try {
     const sql=readFileSync(path.join(__dirname,'../migrations/001_sfpq_opportunities.sql'),'utf8');
     await db.exec(`CREATE TABLE public.sfvc_companies (company_id uuid PRIMARY KEY);
-      CREATE TABLE public.sfvc_people (person_id uuid PRIMARY KEY);`);
+      CREATE TABLE public.sfvc_people (person_id uuid PRIMARY KEY);
+      CREATE TABLE public.users (id integer PRIMARY KEY);`);
     await db.exec(sql);
     const insert=(key,name='Opportunity')=>db.query('INSERT INTO public.sfpq_opportunities (creation_key,name) VALUES ($1,$2) RETURNING *',[key,name]);
     const key=crypto.randomUUID();

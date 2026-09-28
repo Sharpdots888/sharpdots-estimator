@@ -26,7 +26,8 @@ production W links, enable production CRM, merge PR 33, or deploy to Heroku.
 
 Company/contact foreign keys now use verified UUID targets in `sfvc_companies`
 and `sfvc_people`. Operator references remain staging placeholders, not proven
-associations; Portal-to-local-user identity mapping is a production blocker.
+associations in the September 23 review; the September 27 confirmation below
+supersedes that blocker and adds integer user foreign keys.
 See the dated review findings below for remaining relationship checks.
 
 The sequence begins at 1 in a new database, never cycles, and stops at 999999.
@@ -192,3 +193,34 @@ This is NOT a test on Warren's remote staging/fork or its full schema. Remaining
 4. Joint review and explicit merge/production execution/deployment approvals.
 
 No production SQL, merge, deployment, W backfill, or runtime auth changes occurred.
+
+## September 27 Authorization and Update
+
+John confirmed Portal and estimator use the same user IDs. This is the accepted
+identity contract (user confirmation, not an independently audited Portal implementation).
+Owner/created-by/updated-by references now use integer foreign keys to users.id,
+with RESTRICT deletion. The API must still derive audit actors from the validated
+session and reject unknown/inactive users, never trust client-supplied audit IDs.
+
+John authorizes staging work and the separate schema-owner/runtime approach.
+Warren is a source for existing schema information, not a required approver.
+Production migration, merge and deployment still require John's explicit approval.
+
+Additional prerequisite: users belongs to db_admin, so the migration owner needs
+REFERENCES on users.id. Execute the following as the users table owner in STAGING
+before 001 (production execution is not authorized):
+
+```sql
+GRANT REFERENCES (id) ON public.users TO u1plkuc8dacl0j;
+```
+
+The local PostgreSQL test reproduces the split ownership and this grant. It checks
+valid/invalid operator references and protects referenced users from deletion.
+
+Current access discovery: quoting-proposals is accessible through Heroku, but
+pg:info reports no attached Heroku PostgreSQL add-on. No staging-specific URL or
+owner credential was found in the two estimator checkouts. Do not assume the
+historical fork URL in ClickUp is still staging. To complete real-schema staging,
+provide a verified staging runtime URL and its owner connection through a secure
+local configuration, or authorize provisioning a separately priced database after
+the host/plan is selected. No database was provisioned or remote grants changed.
