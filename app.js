@@ -5157,7 +5157,7 @@ async function createDocusealRequest() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        workspaceNumber: currentWorkspaceNumber,
+        workspaceNumber: window.CRM_LIVE ? '' : currentWorkspaceNumber,
         proposalNumber: manifest.proposalNumber,
         proposalVersion: savedProposal.version || 1,
         recipientName: els.docusealRecipientName.value.trim(),

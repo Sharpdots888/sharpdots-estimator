@@ -54,8 +54,8 @@ async function main() {
       CREATE TABLE public.sfvc_people (person_id uuid PRIMARY KEY);
       RESET ROLE;
       SET ROLE db_admin;
-      CREATE TABLE public.users (id integer PRIMARY KEY);
-      INSERT INTO public.users VALUES (45);
+      CREATE TABLE public.users (id integer PRIMARY KEY,username text,is_active boolean,is_admin boolean);
+      INSERT INTO public.users VALUES (45,'local_test',true,true);
       RESET ROLE;`);
     }
     await admin.query(`SET ROLE db_admin;
@@ -108,6 +108,24 @@ async function main() {
     await runtime.query('UPDATE public.sfpq_opportunities SET account_ref=$1,contact_ref=$2 WHERE id=$3', [company, person, id]);
     await assert.rejects(owner.query('DELETE FROM public.sfvc_companies WHERE company_id=$1', [company]), e => e.code === '23503');
     await assert.rejects(owner.query('DELETE FROM public.sfvc_people WHERE person_id=$1', [person]), e => e.code === '23503');
+    if(process.env.OPPORTUNITY_LIVE_SMOKE === '1'){
+      await admin.query('UPDATE public.users SET is_admin=true WHERE id=45');
+      await owner.query(readFileSync(path.join(__dirname,'../migrations/002_opportunity_persistence.sql'),'utf8'));
+      for(const sql of [
+        'DELETE FROM public.sfpq_crm_record_versions',
+        "UPDATE public.sfpq_crm_record_versions SET name='tampered'",
+        'DELETE FROM public.sfpq_opportunity_audit',
+        "UPDATE public.sfpq_opportunity_audit SET action='tampered'",
+        "UPDATE public.sfpq_crm_records SET number='P-000001'",
+        "SELECT setval('public.sfpq_crm_records_id_seq',1)",
+        'TRUNCATE public.sfpq_opportunity_state'
+      ]) await assert.rejects(runtime.query(sql),e=>e.code==='42501');
+      for(const role of ['replit_user','production_app','n8n_workflows']){
+        const result=await admin.query("SELECT has_table_privilege($1,'public.sfpq_crm_record_versions','SELECT') AS readable",[role]);
+        assert.equal(result.rows[0].readable,false);
+      }
+      await require('./crm-live-smoke.cjs')(socket);
+    }
     console.log(`PASS: real local PostgreSQL, separate owner/runtime, restricted grants, concurrent allocation and optimistic updates, UUID/operator FKs and delete protection. ${schemaPath ? 'Restored production reference schema; synthetic rows only.' : 'Synthetic minimal schema fixture.'} No production writes or Portal implementation verification.`);
   } finally {
     await Promise.all(clients.map(c => c.end()));

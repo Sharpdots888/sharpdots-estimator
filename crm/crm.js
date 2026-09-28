@@ -1,27 +1,50 @@
 /* Opportunity shell for local review; existing calculators remain the record editors. */
-(() => {
-  if (!window.CRM_PREVIEW) return;
+(async () => {
+  const live=await window.crmLiveReady;
+  if (!window.CRM_PREVIEW && !live) return;
   const M=CrmModel, $=(s)=>document.querySelector(s), $$=(s)=>[...document.querySelectorAll(s)];
   const esc=(v)=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const icon=(name)=>`<i data-lucide="${name}" aria-hidden="true"></i>`;
   const money=(v)=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(v||0);
   const shortDate=(v)=>v?new Date(v+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'Not set';
-  const people=['John Tan','Amanda Tan','Warren Corrales'];
+  const people=live?live.lookups.users.map(u=>u.username):['John Tan','Amanda Tan','Warren Corrales'];
   let db;
-  try {db=JSON.parse(localStorage.getItem('sharpdots-crm-draft-v1'));} catch {}
+  try {if(!live)db=JSON.parse(localStorage.getItem('sharpdots-crm-draft-v1'));} catch {}
+  if(live)db={schema:2,opportunities:live.opportunities,selected:null};
   if(!db || !Array.isArray(db.opportunities))db={schema:1,opportunities:M.samples(),selected:null};
   let page='pipeline',view='board',detailTab='overview',selected=null,search='',owner='all',kind='all',scope='all',attention=false;
   let lastFocus=null,dragId=null,toastTimer;
   const current=()=>db.opportunities.find(o=>o.id===selected);
-  function persist(){try{localStorage.setItem('sharpdots-crm-draft-v1',JSON.stringify(db));}catch{toast('Storage is full. Export your draft before continuing.');}}
+  let saving=false,recordSaving=false,saveError='';
+  const fingerprint=o=>JSON.stringify({...o,history:[],documents:[],editor:undefined});
+  const baseline=new Map(db.opportunities.map(o=>[o.id,fingerprint(o)]));
+  function persist(){
+    if(!live){try{localStorage.setItem('sharpdots-crm-draft-v1',JSON.stringify(db));}catch{toast('Storage is full. Export your draft before continuing.');}return;}
+    if(saving||saveError)return;
+    const changed=db.opportunities.filter(o=>baseline.get(o.id)!==fingerprint(o));
+    if(!changed.length)return;
+    saving=true;document.body.classList.add('crm-saving');
+    return (async()=>{
+      try {
+        for(const o of changed){
+          const saved=await live.request('opportunities'+(o.rowVersion?'/'+o.id:''),o.rowVersion?'PUT':'POST',o);
+          const oldId=o.id;Object.assign(o,saved);delete o.note;
+          if(selected===oldId)selected=o.id;if(db.selected===oldId)db.selected=o.id;
+          baseline.delete(oldId);baseline.set(o.id,fingerprint(o));
+        }
+        toast('Saved to database');
+      } catch(e){saveError=e.message;toast('Not saved: '+e.message);}
+      finally{saving=false;document.body.classList.remove('crm-saving');render();if($('#crmDrawer').open)renderDetail();}
+    })();
+  }
   const label=(status)=>({'not-ready':'Not ready','ready':'Ready for Xero','not-invoiced':'Not invoiced','paid':'Paid','deposit-paid':'Deposit paid','completed':'Signed','viewed':'Viewed','sent':'Sent','prepared':'Prepared','declined':'Declined','expired':'Expired','failed':'Failed','draft':'Draft','queued':'Queued','accepted':'Accepted','not-required':'Not required','invoiced':'Invoiced','error':'Needs attention'}[status]||status);
   function pill(text,tone='neutral'){return `<span class="crm-pill ${tone}">${esc(text)}</span>`;}
   const tone=(s)=>['completed','accepted','paid','won'].includes(s)?'green':['declined','failed','error','lost'].includes(s)?'red':['viewed','expired','ready','queued'].includes(s)?'amber':'neutral';
   const btn=(action,text,ico='',attrs='',cls='')=>`<button type="button" data-action="${action}" ${attrs} class="crm-btn ${cls}">${ico?icon(ico):''}${text}</button>`;
-  const opts=(list,value)=>list.map(x=>{const [v,l]=Array.isArray(x)?x:[x,x];return `<option value="${esc(v)}" ${v===value?'selected':''}>${esc(l)}</option>`;}).join('');
+  const opts=(list,value)=>list.map(x=>{const [v,l]=Array.isArray(x)?x:[x,x];return `<option value="${esc(v)}" ${String(v)===String(value)?'selected':''}>${esc(l)}</option>`;}).join('');
   const input=(text,name,value,type='text',extra='')=>`<label class="crm-field">${text}<input name="${name}" type="${type}" value="${esc(value)}" ${extra}></label>`;
   const select=(text,name,list,value)=>`<label class="crm-field">${text}<select name="${name}">${opts(list,value)}</select></label>`;
-  function initials(n){return n.split(' ').map(x=>x[0]).slice(0,2).join('');}
+  function initials(n){return String(n||'Unassigned').split(' ').map(x=>x[0]).slice(0,2).join('');}
   const pending=(o)=>o.activities.filter(a=>!a.done).sort((a,b)=>a.due.localeCompare(b.due));
   const next=(o)=>pending(o)[0];
   function overdue(o){return pending(o).some(a=>a.due<M.date(0));}
@@ -32,7 +55,7 @@
   document.body.insertAdjacentHTML('afterbegin',`<div id="crmShell">
     <header class="crm-header"><a href="?crm=1" class="crm-brand" aria-label="Sharpdots Pipeline"><span class="crm-brand-mark">${icon('orbit')}</span>sharpdots<span class="crm-brand-product">Sales desk</span></a>
       <nav aria-label="Primary navigation">${['pipeline','proposals','quote'].map((p,i)=>btn('nav',['Pipeline','Proposals','Quote'][i],['columns-3','files','printer'][i],`data-page="${p}"`)).join('')}</nav>
-      <div class="crm-header-end">${pill('Local draft · Sample data','draft')}${btn('export','', 'download','title="Export opportunity backup" aria-label="Export opportunity backup"','icon-only')}<span class="crm-avatar">JT</span></div>
+      <div class="crm-header-end">${pill(live?'Shared CRM · Admin pilot':'Local draft · Sample data','draft')}${live?btn('refresh','Reload','refresh-cw'):''}${btn('export','', 'download','title="Export opportunity backup" aria-label="Export opportunity backup"','icon-only')}<span class="crm-avatar">${esc(initials(live?.lookups.user.username||'John Tan'))}</span></div>
     </header>
     <div id="crmContext"></div><section id="crmContent"></section>
     <div id="crmToast" role="status" aria-live="polite" hidden></div>
@@ -47,6 +70,7 @@
   </div>`;}
   function render(){
     persist();
+    document.body.classList.toggle('crm-save-error',!!saveError);
     document.body.dataset.crmPage=page;
     $$('.crm-header [data-page]').forEach(b=>{b.classList.toggle('selected',b.dataset.page===page);b.setAttribute('aria-current',b.dataset.page===page?'page':'false');});
     if(page==='pipeline'){
@@ -55,7 +79,7 @@
       ${metrics(db.opportunities)}
       <div class="crm-toolbar"><div class="crm-view-tabs" role="group" aria-label="Pipeline view">${[['board','Board','columns-3'],['list','List','list'],['activities','Activities','calendar-days'],['handoffs','Handoffs','arrow-right-left']].map(([v,l,i])=>btn('view',l,i,`data-view="${v}"`,view===v?'selected':'')).join('')}</div>
       <div class="crm-filters"><label class="crm-search">${icon('search')}<input id="crmSearch" aria-label="Search opportunities" placeholder="Search opportunities" value="${esc(search)}"></label><select id="crmOwner" aria-label="Owner">${opts([['all','All owners'],...people],owner)}</select><select id="crmKind" aria-label="Offering">${opts([['all','All offerings'],'Print','Services','Mixed'],kind)}</select><select id="crmScope" aria-label="Opportunity status">${opts([['open','Open'],['all','All statuses'],['won','Won'],['lost','Lost']],scope)}</select>${attention?btn('attention','Attention only','x','','chosen'):''}</div></div>
-      <div id="crmResults">${results()}</div><footer class="crm-board-footer"><span>${filtered().length} opportunities · USD · Initial-term contract value</span><span>${icon('check')} Draft saved on this browser</span></footer>`;
+      <div id="crmResults">${results()}</div><footer class="crm-board-footer"><span>${filtered().length} opportunities · USD · Initial-term contract value</span><span role="status">${icon('check')}${live?(saveError?'NOT SAVED: '+esc(saveError)+' · Export a backup, then reload.':saving?'Saving to database…':'Saved to database'):'Draft saved on this browser'}</span></footer>`;
     }else{
       $('#crmContent').innerHTML=''; renderContext();
     }
@@ -84,9 +108,19 @@
     $('#crmDrawer').innerHTML=`<header class="crm-drawer-header"><div><span class="crm-eyebrow">${o.number} ${pill(o.kind,o.kind==='Print'?'purple':'teal')}</span><h2 id="crmDetailTitle">${esc(o.title)}</h2><p>${esc(o.account)} · ${esc(o.contact)}</p></div>${btn('close-detail','','x','aria-label="Close opportunity"','icon-only')}</header>
     <div class="crm-detail-commercial"><div><strong>${money(M.value(o))}</strong><span>Initial contract</span></div><div><strong>${o.monthly?money(o.monthly)+'/mo':'One-time'}</strong><span>${o.monthly?o.term+' month initial term':'Print / project'}</span></div><div><strong>${shortDate(o.close)}</strong><span>Expected close</span></div><span class="crm-avatar" title="${esc(o.owner)}">${initials(o.owner)}</span></div>
     <div class="crm-stage-path" aria-label="Opportunity stage">${M.stages.map(s=>`<button data-action="stage" data-stage="${s.id}" class="${o.stage===s.id?'current':''}" aria-pressed="${o.stage===s.id}">${s.name}</button>`).join('')}</div>
-    <div class="crm-detail-actions">${o.status==='open'?`${btn('win','Mark won','check','','success')}${btn('lost','Mark lost','x')}`:`${pill(o.status==='won'?'Won':'Lost',tone(o.status))}${btn('reopen','Reopen','undo-2')}`}<span>${d?'Primary offer signed':o.status==='lost'?esc(o.lostReason||'Closed lost'):'Awaiting commercial acceptance'}</span>${btn('edit','Edit opportunity','pencil')}</div>
+    <div class="crm-detail-actions">${o.status==='open'?`${btn('win','Mark won','check','','success')}${btn('lost','Mark lost','x')}`:`${pill(o.status==='won'?'Won':'Lost',tone(o.status))}${btn('reopen','Reopen','undo-2')}`}<span>${d?'Primary offer signed':o.status==='lost'?esc(o.lostReason||'Closed lost'):o.approval.method&&o.approval.reference?esc(o.approval.method+' recorded'):'Awaiting commercial acceptance'}</span>${btn('edit','Edit opportunity','pencil')}</div>
     <nav class="crm-detail-tabs" aria-label="Opportunity detail tabs">${[['overview','Overview'],['records','Records'],['documents','Documents'],['handoff','Handoff & billing'],['activity','Activity']].map(([t,l])=>btn('detail-tab',l,'',`data-tab="${t}"`,detailTab===t?'selected':'')).join('')}</nav>
-    <div class="crm-detail-body">${detailTab==='overview'?overview(o):detailTab==='records'?records(o):detailTab==='documents'?documents(o):detailTab==='handoff'?handoff(o):activity(o)}</div>`;icons();
+    <div class="crm-detail-body">${detailTab==='overview'?overview(o):detailTab==='records'?records(o):detailTab==='documents'?documents(o):detailTab==='handoff'?handoff(o):activity(o)}</div>`;
+    if(live){
+      $('#crmDrawer').querySelectorAll('[data-record-role]').forEach(select=>{
+        const record=o.records.find(r=>String(r.id)===select.dataset.recordRole);
+        if(!['proposals','printQuotes'].includes(record?.collection))select.querySelector('option[value="Primary offer"]')?.remove();
+      });
+      $('#crmDrawer').querySelectorAll('small.crm-muted').forEach(el=>{
+        if(el.textContent==='Local coordination record · Workbench relay pending')el.textContent='Shared coordination record · Workbench relay pending';
+      });
+    }
+    icons();
   }
   function overview(o){const q=[['need','Business need'],['budget','Budget confirmed'],['authority','Decision-maker'],['timing','Timing agreed']];return `<div class="crm-detail-columns"><section><h3>Qualification <span>${Object.values(o.qualification).filter(Boolean).length}/4</span></h3><div class="crm-checklist">${q.map(([key,l])=>`<label><input type="checkbox" data-qualification="${key}" ${o.qualification[key]?'checked':''}>${l}</label>`).join('')}</div><h3>Opportunity brief</h3><p class="crm-prose">${esc(o.notes||'No brief yet.')}</p><dl class="crm-facts"><dt>Contact</dt><dd>${esc(o.contact)}</dd><dt>Email</dt><dd>${esc(o.email||'Not provided')}</dd><dt>Source</dt><dd>${esc(o.source)}</dd><dt>Owner</dt><dd>${esc(o.owner)}</dd><dt>Stage probability</dt><dd>${M.probability(o)}%</dd></dl>${btn('edit','Edit brief','pencil')}</section><section><div class="crm-section-title"><h3>Next activities</h3>${btn('add-activity','','plus','aria-label="Schedule activity"','icon-only')}</div>${pending(o).map(a=>`<article class="crm-mini-activity"><button class="crm-check" data-action="complete-activity" data-id="${o.id}" data-activity="${a.id}" aria-label="Complete ${esc(a.title)}">${icon('circle')}</button><div><strong>${esc(a.title)}</strong><small class="${a.due<M.date(0)?'crm-overdue':''}">${shortDate(a.due)} · ${esc(a.owner)}</small></div></article>`).join('')||'<p class="crm-muted">No next activity</p>'}<h3>Commercial readiness</h3><ul class="crm-readiness">${[['Records attached',o.records.length>0],['Primary offer accepted',!!M.acceptedDoc(o)||!!o.approval.reference],['Billing details ready',M.billingIssues(o).length===0]].map(([l,yes])=>`<li>${icon(yes?'circle-check':'circle')}<span>${l}</span></li>`).join('')}</ul>${M.acceptedDoc(o)&&o.status==='open'?`<div class="crm-callout">${icon('file-check')}<div><strong>Signed offer received</strong><p>Review scope and value, then mark won.</p></div></div>`:''}<h3>Records</h3><div class="crm-record-chips">${o.records.map(r=>pill(r.number)).join('')||'<span class="crm-muted">No records attached</span>'}</div>${btn('detail-tab','Manage records','arrow-right','data-tab="records"','text-link')}</section></div>`;}
   function records(o){return `<div class="crm-section-title"><div><h3>Linked calculations & offers</h3><p>${o.number} · ${esc(o.account)}</p></div>${btn('attach','Attach record','link')}</div><div class="crm-record-list">${o.records.map(r=>`<article><span class="crm-record-icon ${r.collection==='printQuotes'||r.collection==='ecomm'?'print':''}">${icon(r.collection==='printQuotes'?'printer':r.collection==='proposals'?'file-text':'calculator')}</span><div><strong>${esc(r.name)}</strong><small>${r.number} · v${r.version} · ${M.collectionMeta[r.collection][0]}</small></div><select aria-label="Role for ${r.number}" data-record-role="${r.id}">${opts(['Primary offer','Component','Cost basis','Alternative'],r.role)}</select>${btn('record-open','Open','arrow-up-right',`data-record="${r.id}"`)}${btn('detach','','unlink',`data-record="${r.id}" aria-label="Detach ${r.number}"`,'icon-only')}</article>`).join('')||'<div class="crm-stage-empty">No records attached yet</div>'}</div><h3>Create a linked record</h3><div class="crm-create-records">${Object.entries(M.collectionMeta).map(([key,[name]])=>btn('record-new',name,'plus',`data-collection="${key}"`)).join('')}</div><div class="crm-callout"><div>${icon('layers')}</div><p>One primary offer sets the acceptance basis. Estimates, services, sourcing and price lists support that offer; their values are not added again to the opportunity.</p></div>`;}
@@ -103,6 +137,7 @@
   function attachModal(){modal('Attach a saved record',`<label class="crm-search">${icon('search')}<input id="crmRecordSearch" placeholder="Find by number, title or account" aria-label="Search saved records"></label><div id="crmAttachList">${attachList('')}</div>`);}
   function attachList(q){const o=current();return recordCatalog().filter(r=>!o.records.some(x=>x.number===r.number&&x.collection===r.collection)&&`${r.number} ${r.name} ${r.account}`.toLowerCase().includes(q.toLowerCase())).map(r=>`<button class="crm-attach-result" data-action="attach-record" data-number="${r.number}" data-collection="${r.collection}"><span><strong>${r.number} · ${esc(r.name)}</strong><small>${esc(r.account)} · v${r.version}</small></span>${icon('plus')}</button>`).join('')||'<p class="crm-muted">No matching records. Create one from the opportunity.</p>';}
   function saveEditor(){
+    if(live)return;
     if(!db.selected)return;
     const o=db.opportunities.find(o=>o.id===db.selected);
     if(!o)return;
@@ -127,6 +162,7 @@
     persist();
   }
   function seedRecordEditors(o,w){
+    if(live){hydrateLiveRecords(o,w);return;}
     const estimateRows=buildSeedRows([
       {packageName:o.title,product:'Printed materials',element:'Printed materials',type:'FP',neededQty:5000,qty:5000,clientQoh:0,inventoryQty:0,cost:o.oneTime*.42,markup:.4,marginAdj:.4,priorPpp:0,notes:'Sample production scope'},
       {packageName:o.title,product:'Production preparation',element:'Production preparation',type:'M',neededQty:5000,qty:5000,clientQoh:0,inventoryQty:0,cost:o.oneTime*.12,markup:.4,marginAdj:.4,priorPpp:0,notes:'Sample creative and prepress'},
@@ -184,7 +220,7 @@
     const t=recordTypeFor(r.collection);
     if(r.collection==='estimates'){
       els.projectName.value=r.name;setProjectNumber(r.number);activeWorkspaceRecords.estimates=r.number;
-      if(r.snapshot?.rows){rows=structuredClone(r.snapshot.rows);expanded=new Set(rows.map(x=>x.id));}
+      if(r.snapshot?.rows){rows=structuredClone(r.snapshot.rows);expanded=new Set(rows.map(x=>x.id));if(live)restoreLiveEstimate(r);}
     } else {
       let native=workspaces.flatMap(w=>w.records?.[r.collection]||[]).find(x=>x[t.numberKey]===r.number)||libraryRecordsFor(r.collection).find(x=>x[t.numberKey]===r.number);
       if(native) isLibraryRecordCollection(r.collection)?applyLibraryRecord(r.collection,native):applyWorkspaceRecord(r.collection,native);
@@ -192,8 +228,93 @@
     }
     setActiveView(t.viewId);window.render();renderContext();icons();
   }
+  function restoreLiveEstimate(r){
+    const s=r.snapshot;rows=structuredClone(s.rows||[]);expanded=new Set(s.expanded||rows.map(x=>x.id));
+    lookups=structuredClone(s.lookups||seedLookups);paymentSettings=structuredClone(s.paymentSettings||defaultPaymentSettings());paymentDates=structuredClone(s.paymentDates||{});
+    els.estimateYear.value=s.estimateYear||'';els.projectName.value=r.name;els.estimateVersion.value=String(r.version);
+    els.globalMarkup.value=s.globalMarkup??.4;els.tariffRate.value=s.tariffRate??.3;
+    activePackage=s.activePackage||'All';activeTypes=new Set(s.activeTypes||Object.keys(typeLabels));setProjectNumber(r.number);
+  }
+  function hydrateLiveRecords(o,w){
+    for(const t of workspaceRecordTypes){
+      const groups=new Map();
+      for(const r of live.records.filter(r=>r.collection===t.collection)){
+        const g=groups.get(r.number)||[];g.push(r);groups.set(r.number,g);
+      }
+      const natives=[...groups.values()].map(versions=>{
+        const newest=versions.at(-1),linked=o?.records.find(r=>r.number===newest.number),r=linked||newest;
+        return {[t.numberKey]:r.number,name:r.name,version:r.version,snapshot:structuredClone(r.snapshot),versions:structuredClone(versions),
+          updatedAt:r.updatedAt,attachedWorkspaces:db.opportunities.filter(o=>o.records.some(x=>x.number===r.number)).map(o=>o.containerId)};
+      });
+      if(isLibraryRecordCollection(t.collection))libraryRecords[t.collection]=natives;
+      else if(w)w.records[t.collection]=o?natives.filter(r=>o.records.some(link=>link.number===r[t.numberKey])):natives;
+    }
+  }
+  async function saveLiveRecord(collection,copy=false){
+    if(saving||saveError)throw new Error(saveError||'Wait for opportunity save');
+    const t=recordTypeFor(collection),o=db.opportunities.find(o=>o.id===db.selected);
+    if(o?.status==='won')throw new Error('Reopen the opportunity before saving linked record changes');
+    const number=collection==='estimates'?currentEstimateNumber():activeWorkspaceRecords[collection];
+    const native=(isLibraryRecordCollection(collection)?libraryRecordsFor(collection):ensureWorkspace().records[collection]).find(r=>r[t.numberKey]===number);
+    const existing=copy?null:live.records.find(r=>r.collection===collection&&r.number===number&&r.version===(native?.version||currentEstimateVersion()));
+    const snapshot=collection==='estimates'?{rows:structuredClone(rows),lookups:structuredClone(lookups),paymentSettings:structuredClone(paymentSettings),paymentDates:structuredClone(paymentDates),estimateYear:els.estimateYear.value,expanded:[...expanded],activeTypes:[...activeTypes],activePackage,globalMarkup:asNumber(els.globalMarkup.value),tariffRate:asNumber(els.tariffRate.value)}:workspaceRecordSnapshot(t);
+    const key=collection+':'+(copy?'copy:':'')+number;
+    live.pendingCreates ||= new Map();
+    if(!live.pendingCreates.has(key))live.pendingCreates.set(key,crypto.randomUUID());
+    const saved=await live.request('records'+(existing?'/'+existing.id:''),existing?'PUT':'POST',{
+      collection,snapshot,name:(workspaceRecordDisplayName(t)||'Untitled')+(copy?' Copy':''),version:existing?.version,creationKey:live.pendingCreates.get(key)});
+    live.pendingCreates.delete(key);live.records.push(saved);
+    if(o){const r=o.records.find(r=>r.id===saved.id);if(r)Object.assign(r,saved);else o.records.push({...saved,role:'Component'});}
+    activeWorkspaceRecords[collection]=saved.number;
+    if(collection==='estimates'){setProjectNumber(saved.number);els.estimateVersion.value=String(saved.version);}
+    hydrateLiveRecords(o,ensureWorkspace());clearWorkspaceRecordDirty(collection);window.render();await persist();
+    if(saveError)throw new Error(`${saved.number} v${saved.version} was saved, but opportunity attachment failed: ${saveError}`);
+    setSaveStatus(`Saved ${saved.number} v${saved.version} to database`);return saved.number;
+  }
+  if(live){
+    const oldEdit=editModal;
+    editModal=(o=null,stage='intake')=>{
+      oldEdit(o,stage);
+      const f=$('#crmEditForm');
+      f.querySelector('footer').insertAdjacentHTML('beforebegin',`<div class="crm-form-grid">${select('Existing company','accountRef',[['','Unlinked prospect'],...live.lookups.companies.map(c=>[c.id,c.name])],o?.accountRef||'')}${select('Company contact','contactRef',[['','Unlinked contact'],...live.lookups.contacts.filter(c=>c.companyId===o?.accountRef).map(c=>[c.id,c.name])],o?.contactRef||'')}</div>`);
+    };
+    // Legacy browser stores remain untouched; DB snapshots hydrate editor caches.
+    workspaces=[];libraryRecords={printQuotes:[],ecomm:[]};saveWorkspaces=()=>{};saveLibraryRecords=()=>{};
+    hydrateLiveRecords(null,ensureWorkspace());
+    const save=async(c,copy=false)=>{if(recordSaving){toast('Saving record; please wait');return '';}
+      recordSaving=true;
+      try{return await saveLiveRecord(c,copy);}catch(e){toast('Save needs attention: '+e.message);setSaveStatus('Save needs attention: '+e.message);return '';}
+      finally{recordSaving=false;}};
+    saveRecordFromManager=c=>save(c);saveWorkspaceRecordCollection=c=>save(c);
+    newVersionFromManager=c=>save(c);duplicateRecordFromManager=c=>save(c,true);
+    saveCurrentEstimate=async()=>Boolean(await save('estimates'));duplicateCurrentEstimate=()=>save('estimates',true);
+    attachLibraryRecordToWorkspace=async c=>{
+      const o=db.opportunities.find(o=>o.id===db.selected);if(!o){toast('Select an opportunity first');return;}
+      const r=live.records.filter(r=>r.collection===c&&r.number===activeWorkspaceRecords[c]).at(-1);
+      if(!r){toast('Save the record first');return;}if(!o.records.some(x=>x.id===r.id))o.records.push({...r,role:'Component'});
+      hydrateLiveRecords(o,ensureWorkspace());persist();window.render();
+    };
+    detachLibraryRecordFromWorkspace=async c=>{const o=db.opportunities.find(o=>o.id===db.selected);if(!o)return;o.records=o.records.filter(r=>!(r.collection===c&&r.number===activeWorkspaceRecords[c]));hydrateLiveRecords(o,ensureWorkspace());persist();window.render();};
+    const oldLoad=loadWorkspaceRecord;
+    loadWorkspaceRecord=async(c,...args)=>{
+      if(c!=='estimates')return oldLoad(c,...args);
+      const r=live.records.filter(r=>r.collection===c&&r.number===(args[0]||activeWorkspaceRecords[c])&&(!args[1]||r.version===Number(args[1]))).at(-1);
+      if(r){restoreLiveEstimate(r);window.render();}else toast('Attach and open a saved estimate from opportunity Records.');
+    };
+    recordCatalog=()=>live.records.filter(r=>!live.records.some(n=>n.id===r.id&&n.version>r.version)).map(r=>({...r,account:'Shared record'}));
+    const sampleDocuments=documents;
+    documents=o=>{
+      const host=document.createElement('div');host.innerHTML=sampleDocuments(o);
+      host.querySelectorAll('[data-action="document-event"],[data-document-primary]').forEach(e=>e.remove());
+      const button=host.querySelector('[data-action="document-new"]');if(button)button.textContent='Open proposal to send';
+      host.querySelectorAll('p').forEach(p=>{if(p.textContent.includes('Sample lifecycle'))p.textContent='DocuSeal status from saved transactions';if(p.textContent.includes('Sample signed'))p.textContent='Signed transaction recorded. Review archived documents in the proposal.';});
+      return host.innerHTML;
+    };
+  }
   document.addEventListener('click',async e=>{
     const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,o=current();
+    if(a==='refresh'){location.reload();return;}
+    if(live&&(saving||recordSaving||saveError)&&!['export','close-detail','close-modal'].includes(a)){toast(saveError||'Saving; please wait');return;}
     if(a==='nav')navigate(b.dataset.page);
     if(a==='view'){view=b.dataset.view;if(view==='handoffs')scope='won';else if(scope==='won')scope='open';render();}
     if(a==='new')editModal(null,b.dataset.stage||'intake');
@@ -213,15 +334,17 @@
     if(a==='complete-activity'){const target=db.opportunities.find(x=>x.id===b.dataset.id);const act=target.activities.find(x=>x.id===b.dataset.activity);act.done=true;M.stamp(target,'Completed: '+act.title,'activity');render();if($('#crmDrawer').open)renderDetail();toast('Activity completed');}
     if(a==='add-activity')modal('Schedule activity',`<form id="crmActivityForm" class="crm-form">${input('Activity','title','','text','required') }<div class="crm-form-grid">${select('Type','kind',['Call','Meeting','Email','Task'],'Task')}${input('Due date','due',M.date(1),'date','required')}${select('Owner','owner',people,o.owner)}</div><footer>${btn('close-modal','Cancel')}<button type="submit" class="crm-btn primary">Schedule</button></footer></form>`);
     if(a==='attach')attachModal();
-    if(a==='attach-record'){const r=recordCatalog().find(x=>x.number===b.dataset.number&&x.collection===b.dataset.collection);bindOpportunity(o.id);o.records.push({...structuredClone(r),id:crypto.randomUUID(),role:'Component'});seedRecordEditors(o,ensureWorkspace());M.stamp(o,'Attached '+r.number);$('#crmDialog').close();render();renderDetail();}
+    if(a==='attach-record'){const r=recordCatalog().find(x=>x.number===b.dataset.number&&x.collection===b.dataset.collection);bindOpportunity(o.id);o.records.push({...structuredClone(r),id:live?r.id:crypto.randomUUID(),role:'Component'});seedRecordEditors(o,ensureWorkspace());M.stamp(o,'Attached '+r.number);$('#crmDialog').close();render();renderDetail();}
     if(a==='detach'){const r=o.records.find(r=>r.id===b.dataset.record);o.records=o.records.filter(r=>r.id!==b.dataset.record);if(isLibraryRecordCollection(r.collection)){const t=recordTypeFor(r.collection);setLibraryRecordsFor(r.collection,libraryRecordsFor(r.collection).map(x=>x[t.numberKey]===r.number?{...x,attachedWorkspaces:libraryRecordAttachmentList(x).filter(n=>n!==o.containerId),attachedToWorkspace:''}:x));}M.stamp(o,'Detached '+r.number);render();renderDetail();}
     if(a==='record-open')openRecord(o,o.records.find(r=>r.id===b.dataset.record));
     if(a==='record-new'){bindOpportunity(o.id);navigate(['printQuotes','ecomm'].includes(b.dataset.collection)?'quote':'proposals');const previous=activeWorkspaceRecords[b.dataset.collection];await newWorkspaceRecord(b.dataset.collection);if(isLibraryRecordCollection(b.dataset.collection)&&activeWorkspaceRecords[b.dataset.collection]!==previous)db.pendingLink={opportunity:o.id,collection:b.dataset.collection};renderContext();icons();}
     if(a==='document-new'){
+      if(live){const proposal=o.records.find(r=>r.collection==='proposals'&&r.role==='Primary offer')||o.records.find(r=>r.collection==='proposals');
+        if(proposal)openRecord(o,proposal);else toast('Attach a saved proposal first.');return;}
       const rs=o.records.filter(r=>['proposals','printQuotes'].includes(r.collection));
       modal('Prepare sample signature request',`<form id="crmDocumentForm" class="crm-form">${select('Offer version','record',rs.map(r=>[r.id,r.number+' v'+r.version+' · '+r.name]),rs[0]?.id)}${input('Recipient email','recipient',o.email,'email','required')}<p class="crm-muted">Local sample only. This action does not contact DocuSeal.</p><footer>${btn('close-modal','Cancel')}<button type="submit" class="crm-btn primary" ${!rs.length?'disabled':''}>Prepare sample</button></footer></form>`);
     }
-    if(a==='document-event'){M.receive(o,b.dataset.doc,b.dataset.status);render();renderDetail();}
+    if(a==='document-event'&&!live){M.receive(o,b.dataset.doc,b.dataset.status);render();renderDetail();}
     if(a==='queue-handoff'){const h=o.handoffs[b.dataset.lane];if(!M.handoffIssues(o,b.dataset.lane).length){h.status='queued';M.stamp(o,b.dataset.lane+' handoff queued locally');render();renderDetail();}}
     if(a==='accept-handoff'){o.handoffs[b.dataset.lane].status='accepted';M.stamp(o,b.dataset.lane+' handoff receipt recorded locally');render();renderDetail();}
     if(a==='billing-ready'&&!M.billingIssues(o).length){o.billing.status='ready';M.stamp(o,'Billing details marked ready for future Xero relay');render();renderDetail();}
@@ -230,15 +353,17 @@
   });
   document.addEventListener('submit',e=>{
     const f=e.target;if(!f.closest('#crmShell'))return;e.preventDefault();const data=Object.fromEntries(new FormData(f));const o=current();
+    if(live&&(saving||recordSaving||saveError)){toast(saveError||'Saving; please wait');return;}
     if(f.id==='crmEditForm'){
       const existing=db.opportunities.find(o=>o.id===f.dataset.id);const patch={...data,oneTime:Number(data.oneTime),monthly:Number(data.monthly),term:Number(data.term)};
+      if(live)patch.ownerId=live.lookups.users.find(u=>u.username===patch.owner)?.id;
       if(existing){delete patch.stage;if(['oneTime','monthly','term','account'].some(k=>existing[k]!==patch[k])){existing.approval={method:'',reference:''};existing.documents.forEach(d=>d.superseded=true);M.stamp(existing,'Commercial terms changed; acceptance requires review');}Object.assign(existing,patch);M.stamp(existing,'Opportunity details updated');}
-      else{const created=M.make({...patch,number:M.nextNumber(db.opportunities)});created.handoffs.production.status=created.kind==='Services'?'not-required':'draft';created.handoffs.engagement.status=created.kind==='Print'?'not-required':'draft';M.stamp(created,'Opportunity created','created');db.opportunities.push(created);selected=created.id;}
-      $('#crmDialog').close();render();details(selected);toast('Opportunity saved');
+      else{const created=M.make({...patch,creationKey:crypto.randomUUID(),number:live?'Assigning…':M.nextNumber(db.opportunities)});created.handoffs.production.status=created.kind==='Services'?'not-required':'draft';created.handoffs.engagement.status=created.kind==='Print'?'not-required':'draft';M.stamp(created,'Opportunity created','created');db.opportunities.push(created);selected=created.id;}
+      $('#crmDialog').close();render();details(selected);toast(live?'Saving opportunity…':'Opportunity saved');
     }
     if(f.id==='crmLostForm'){o.status='lost';o.lostReason=data.reason;o.closedAt=new Date().toISOString();M.stamp(o,'Closed lost: '+data.reason+(data.note?' · '+data.note:''));$('#crmDialog').close();render();renderDetail();}
     if(f.id==='crmActivityForm'){o.activities.push({...data,id:crypto.randomUUID(),done:false});M.stamp(o,'Scheduled: '+data.title,'activity');$('#crmDialog').close();render();renderDetail();}
-    if(f.id==='crmNoteForm'){M.stamp(o,data.note,'note');render();renderDetail();}
+    if(f.id==='crmNoteForm'){M.stamp(o,data.note,'note');if(live)o.note=data.note;render();renderDetail();}
     if(f.id==='crmApprovalForm'){o.approval=data;M.stamp(o,'Approval reference updated');render();renderDetail();toast('Approval saved');}
     if(f.id==='crmDocumentForm'){const r=o.records.find(r=>r.id===data.record);o.documents.forEach(d=>d.primary=false);o.documents.push({id:crypto.randomUUID(),number:r.number,version:r.version,status:'prepared',primary:true,recipient:data.recipient,reference:'SAMPLE-'+(o.documents.length+1),updatedAt:new Date().toISOString()});M.stamp(o,'Prepared sample request for '+r.number,'document');$('#crmDialog').close();render();renderDetail();}
     if(f.dataset.handoffForm){const h=o.handoffs[f.dataset.handoffForm];Object.assign(h,{owner:data.owner,target:data.target,scope:data.scope,assets:!!data.assets,status:data.required?'draft':'not-required'});M.stamp(o,f.dataset.handoffForm+' handoff details updated');render();renderDetail();toast('Handoff saved');}
@@ -246,6 +371,16 @@
   });
   document.addEventListener('change',e=>{
     const t=e.target,o=current();
+    if(live&&(saving||recordSaving||saveError))return;
+    if(live&&t.name==='accountRef'){
+      const f=t.form,c=live.lookups.companies.find(c=>c.id===t.value);
+      if(c)f.elements.account.value=c.name;
+      f.elements.contactRef.innerHTML=opts([['','Unlinked contact'],...live.lookups.contacts.filter(c=>c.companyId===t.value).map(c=>[c.id,c.name])],'');
+    }
+    if(live&&t.name==='contactRef'){
+      const c=live.lookups.contacts.find(c=>c.id===t.value&&c.companyId===t.form.elements.accountRef.value);
+      if(c){t.form.elements.contact.value=c.name;t.form.elements.email.value=c.email||'';}
+    }
     if(t.id==='crmOwner'){owner=t.value;render();}if(t.id==='crmKind'){kind=t.value;render();}if(t.id==='crmScope'){scope=t.value;render();}
     if(t.id==='crmOpportunity'){bindOpportunity(t.value);navigate(page);}
     if(t.dataset.qualification){o.qualification[t.dataset.qualification]=t.checked;M.stamp(o,'Qualification updated');render();renderDetail();}
@@ -261,7 +396,7 @@
   document.addEventListener('dragend',()=>{$$('.dragging').forEach(x=>x.classList.remove('dragging'));dragId=null;});
   $('#crmDrawer').addEventListener('click',e=>{if(e.target===$('#crmDrawer'))$('#crmDrawer').close();});
   $('#crmDialog').addEventListener('click',e=>{if(e.target===$('#crmDialog'))$('#crmDialog').close();});
-  window.addEventListener('beforeunload',saveEditor);
+  window.addEventListener('beforeunload',e=>{if(!live)saveEditor();else if(saving||recordSaving||saveError){e.preventDefault();e.returnValue='';}});
   // Reflect legacy save feedback in the opportunity shell without changing the calculators.
   new MutationObserver(()=>{const text=els.estimateSaveStatus.textContent;if(text){saveEditor();const target=$('#crmSaveFeedback');if(target)target.textContent=text.replace(/Workspace/g,'Opportunity').replace(/workspace/g,'opportunity').replace(/W-\d{6}/g,'');}}).observe(els.estimateSaveStatus,{childList:true,subtree:true,characterData:true});
   // Preserve the old container key internally; opportunity is the only visible parent identity.

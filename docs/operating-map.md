@@ -1,5 +1,21 @@
 # Operating Map
 
+## Database-Connected CRM Lane
+
+- September 27: PR33 merged and deployed as quoting-proposals v40 (db0f69a),
+  without production opportunity SQL. This supersedes the older draft status below.
+- Current branch: codex/opportunity-persistence, based on db0f69a.
+- Same isolated worktree; shared New project checkout remains untouched.
+- Scope: authenticated admin pilot, opportunity CRUD, shared immutable calculator
+  versions, pinned links, server signing status, handoffs/readiness and audit.
+- Owned additions: lib/opportunity-store.js, crm/live.js, migration002, tests and
+  release docs; narrow integrations in server.js, app.js, index.html and crm/.
+- Local real-schema PostgreSQL and HTTP/browser tests passed. No production SQL,
+  feature activation, credentials changes or sends in this implementation phase.
+- Review and deployment gates: docs/opportunity-live-release.md. Separate owner
+  credential remains required; user approval alone does not provide DB ownership.
+- ClickUp: https://app.clickup.com/t/868jnxdp7
+
 ## Opportunity CRM Draft Lane
 
 - Owner: Codex, current opportunity CRM task.

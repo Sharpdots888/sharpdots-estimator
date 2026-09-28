@@ -2,6 +2,26 @@
 
 This registry tracks estimator fields that exist in the prototype, need a database home, need a lookup source, or need a decision before production use.
 
+## Shared CRM Pilot: Authored, Awaiting Production Approval
+
+The following supersedes the browser-only homes below for the feature-flagged
+admin pilot, not for legacy data. Neither opportunity migration is applied to
+production yet. See `docs/opportunity-live-release.md` for rollout boundaries.
+
+| Field group | Proposed persistence / source | Remaining boundary |
+| --- | --- | --- |
+| O identity, sales state, qualification, forecast | sfpq_opportunities; bigint identity, generated O number, optimistic row version | Legacy W-to-O mapping remains explicit future migration |
+| Account/contact/operator references | sfvc_companies, sfvc_people, sfvc_company_people, users; validated on server | Portal shared IDs confirmed by John; runtime admin pilot only |
+| Activities, alternative approval, handoff and billing readiness | sfpq_opportunity_state JSONB child, audited changes | Dedicated activity/relay tables before automated downstream work |
+| Shared calculator identity and immutable versions | sfpq_crm_records and sfpq_crm_record_versions | Separate 100001+ record range requires reservation/approval; legacy records untouched |
+| Opportunity record role and pinned version | sfpq_opportunity_records | Shared records may serve multiple opportunities; one primary offer each |
+| Signing state | Existing sfpq_document_transactions matched by primary proposal number/version | No historical W-field rewrite; no automatic close/invoice/production release |
+| Actor-attributed change history | Append-only sfpq_opportunity_audit | Audit is runtime-immutable, not a defense against schema administrators |
+
+Forecast remains operator-entered, not automatically reconciled to signed totals.
+Manual close therefore requires commercial review. Workbench and Xero states are
+coordination indicators only, not confirmation that external work was created.
+
 ## Opportunity CRM Draft
 
 These entries describe the local draft in `CRM_DRAFT.md`, not applied database migrations.

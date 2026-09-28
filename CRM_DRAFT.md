@@ -110,3 +110,10 @@ It fails on browser errors or any actual `/api/` network request. Screenshots go
   not a copied Pipedrive implementation.
 - No relevant Zoom meeting was returned by the estimator search; the user's current
   instruction is the decision source. Shared checkout edits were left untouched.
+# Shared CRM Pilot Follow-up
+
+The database-connected implementation is documented in
+[opportunity-live-release.md](docs/opportunity-live-release.md). It is disabled
+unless ESTIMATOR_CRM_ENABLED=true and the authenticated user is an active Portal
+administrator. The localhost sample mode described below remains isolated.
+Existing W records are preserved, not automatically converted to opportunities.
