@@ -6,6 +6,7 @@ const path = require("path");
 const { createHmac, randomBytes, timingSafeEqual } = require("crypto");
 const { Pool } = require("pg");
 const { createOpportunityStore } = require('./lib/opportunity-store');
+const { createCrmAccess } = require('./lib/crm-access');
 const { loadLocalEnv } = require("./lib/local-env");
 const {
   canSendClientDocuments,
@@ -60,7 +61,8 @@ const pool = legacyConnectionString
   })
   : null;
 const crmEnabled = process.env.ESTIMATOR_CRM_ENABLED === 'true';
-const crmStore = pool ? createOpportunityStore(pool) : null;
+const crmAccess = createCrmAccess(process.env.ESTIMATOR_CRM_USER_IDS);
+const crmStore = pool ? createOpportunityStore(pool, crmAccess) : null;
 
 const mimeTypes = {
   ".html": "text/html; charset=utf-8",
@@ -1419,7 +1421,7 @@ const server = http.createServer(async (req, res) => {
     } else if (authRequiredFor(url) && !session) {
       sendAuthPage(res);
     } else if (url === '/api/crm/status' && method === 'GET') {
-      sendJson(res, 200, {enabled: crmEnabled, access: Boolean(session?.user?.isAdmin)});
+      sendJson(res, 200, {enabled: crmEnabled, access: crmAccess.allowsSession(session?.user)});
     } else if (url.startsWith('/api/crm/')) {
       if (!session) { sendUnauthorized(res); return; }
       if (!crmEnabled || !crmStore) { sendJson(res,503,{error:'CRM is not enabled'}); return; }

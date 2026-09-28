@@ -4,6 +4,7 @@ const {readFileSync}=require('node:fs');
 const {randomUUID}=require('node:crypto');
 const {PGlite}=require('@electric-sql/pglite');
 const {createOpportunityStore}=require('../lib/opportunity-store');
+const {createCrmAccess}=require('../lib/crm-access');
 const M=require('../crm/model');
 
 test('CRM persistence: identities, references, versions, acceptance and conflicts',async()=>{
@@ -84,5 +85,40 @@ test('CRM persistence: identities, references, versions, acceptance and conflict
     b=await store.save(admin,b.id,{...b,status:'open',stage:'qualified',oneTime:200});
     await assert.rejects(store.save(admin,b.id,{...b,status:'won',stage:'won'}),/approval reference/);
     assert.ok(b.documents.every(d=>d.superseded));
+  }finally{await db.close();}
+});
+
+test('named CRM user can use shared records without administrator or document-send rights',async()=>{
+  const db=new PGlite();
+  const query=async(sql,values)=>{const r=await db.query(sql,values);return {...r,rowCount:r.rows.length||r.affectedRows||0};};
+  const client={query,release(){}};
+  const access=createCrmAccess('46');
+  const store=createOpportunityStore({...client,connect:async()=>client},access);
+  try{
+    await db.exec(`CREATE ROLE db_admin;
+      CREATE TABLE users(id integer PRIMARY KEY,username text,is_admin boolean,is_active boolean);
+      INSERT INTO users VALUES(45,'admin',true,true),(46,'ray',false,true),(47,'other',false,true),(48,'disabled',false,false);
+      CREATE TABLE sfvc_companies(company_id uuid PRIMARY KEY);
+      CREATE TABLE sfvc_people(person_id uuid PRIMARY KEY);
+      CREATE TABLE sfvc_company_people(company_id uuid,person_id uuid);`);
+    for(const name of ['001_sfpq_opportunities.sql','002_opportunity_persistence.sql'])
+      await db.exec(readFileSync(require('node:path').join(__dirname,'../migrations',name),'utf8'));
+    const ray={id:46,isAdmin:false};
+    assert.equal(access.allowsSession(ray),true);
+    assert.equal(access.allowsSession({id:47,isAdmin:false}),false);
+    assert.equal(access.allowsSession({id:45,isAdmin:true}),true);
+    assert.equal(access.allowsSession(null),false);
+    assert.deepEqual((await store.list(ray)).opportunities,[]);
+    const input=M.make({title:'Ray pilot',ownerId:46,owner:'ray',creationKey:randomUUID()});
+    const created=await store.save(ray,null,input);
+    assert.equal(created.ownerId,46);
+    const record=await store.saveRecord(ray,null,{collection:'estimates',name:'Ray estimate',snapshot:{rows:[]},creationKey:randomUUID()});
+    assert.equal(record.collection,'estimates');
+    assert.equal((await store.list(ray)).records.length,1);
+    await assert.rejects(store.list({id:47,isAdmin:false}),e=>e.statusCode===403);
+    await assert.rejects(store.saveRecord({id:47,isAdmin:false},null,{collection:'estimates',name:'No',snapshot:{},creationKey:randomUUID()}),e=>e.statusCode===403);
+    await assert.rejects(store.list({id:48,isAdmin:false}),e=>e.statusCode===403);
+    await assert.rejects(store.list({id:47,isAdmin:true}),e=>e.statusCode===403);
+    assert.equal(require('../document-security').canSendClientDocuments({user:ray}),false);
   }finally{await db.close();}
 });

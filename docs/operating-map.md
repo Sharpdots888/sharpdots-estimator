@@ -1,5 +1,14 @@
 # Operating Map
 
+## Named CRM Access Follow-up
+
+- Ray's active Portal user ID 46 is non-admin; the v43 CRM pilot only accepted
+  administrators, explaining the older interface on the current deployment.
+- This branch adds `ESTIMATOR_CRM_USER_IDS` for active, named Portal users.
+  CRM visibility and data operations share the same policy; DocuSeal sending
+  remains under its separate administrator check.
+- Release and validation: `docs/crm-user-access.md`.
+
 ## CRM Client/Contact Follow-up
 
 - September 28: PR34 merged, migrations applied and CRM admin pilot deployed in
