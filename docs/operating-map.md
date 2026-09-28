@@ -1,5 +1,18 @@
 # Operating Map
 
+## CRM Client/Contact Follow-up
+
+- September 28: PR34 merged, migrations applied and CRM admin pilot deployed in
+  v42; user confirms opportunity saves. Earlier pending-deployment notes below
+  are historical.
+- Branch: codex/crm-client-contact, isolated estimator-crm-draft checkout.
+- Scope: replace duplicate text/lookups with top-level company/contact selectors;
+  add new shared client/contact inline, using existing reference tables.
+- Files: crm/crm.js, crm/crm.css, lib/opportunity-store.js, narrow server routes,
+  persistence/browser tests, docs/crm-client-contact.md.
+- No production customer writes or schema/auth changes. New release approval
+  required for this follow-up. Shared New project checkout remains untouched.
+
 ## Database-Connected CRM Lane
 
 - September 27: PR33 merged and deployed as quoting-proposals v40 (db0f69a),

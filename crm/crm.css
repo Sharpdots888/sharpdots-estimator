@@ -205,3 +205,10 @@ html.crm-preview { --crm-ink:#263433; --crm-muted:#697675; --crm-line:#dce3e1; -
 @media print { #crmShell { display:none!important; } }
 @media(max-width:700px) { .crm-filters .crm-search { flex-basis:100%; } }
 .crm-form label:has(>input[type="checkbox"]) { display:flex; flex-direction:row; align-items:center; justify-content:flex-start; gap:7px; }
+.crm-lookup-field { min-width:0; }
+.crm-lookup-field fieldset { margin:10px 0 0; padding:10px; border:1px solid #cbd8d1; border-radius:4px; min-width:0; background:#f4f8f6; }
+.crm-lookup-field fieldset[hidden] { display:none; }
+.crm-lookup-field legend { font-size:12px; font-weight:700; }
+.crm-lookup-field fieldset>div { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.crm-lookup-field [role=status] { font-size:12px; color:#963d35; overflow-wrap:anywhere; }
+.crm-lookup-field select { width:100%; min-width:0; }

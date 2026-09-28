@@ -1428,6 +1428,11 @@ const server = http.createServer(async (req, res) => {
         sendJson(res,403,{error:'Same-origin CRM request required'}); return;
       }
       if (url === '/api/crm/lookups' && method === 'GET') sendJson(res,200,await crmStore.lookups(session.user));
+      else if (['/api/crm/companies','/api/crm/contacts'].includes(url) && method === 'POST') {
+        const input=parseJsonBody(await collectBody(req,10000));
+        const result=url.endsWith('/companies')?await crmStore.createCompany(session.user,input):await crmStore.createContact(session.user,input);
+        sendJson(res,201,result);
+      }
       else if (url === '/api/crm/opportunities' && method === 'GET') sendJson(res,200,await crmStore.list(session.user));
       else if ((url === '/api/crm/opportunities' && method === 'POST') || (/^\/api\/crm\/opportunities\/\d+$/.test(url) && method === 'PUT')) {
         const body=await collectBody(req,2500000);

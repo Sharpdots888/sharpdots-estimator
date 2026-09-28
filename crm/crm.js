@@ -16,6 +16,8 @@
   let lastFocus=null,dragId=null,toastTimer;
   const current=()=>db.opportunities.find(o=>o.id===selected);
   let saving=false,recordSaving=false,saveError='';
+  let resetLiveContact,addLiveLookup;
+  function lookupFields(f,kind,open){const fields=f.querySelector(`[data-create-fields=${kind}]`);fields.hidden=!open;fields.disabled=!open;return fields;}
   const fingerprint=o=>JSON.stringify({...o,history:[],documents:[],editor:undefined});
   const baseline=new Map(db.opportunities.map(o=>[o.id,fingerprint(o)]));
   function persist(){
@@ -272,11 +274,50 @@
     setSaveStatus(`Saved ${saved.number} v${saved.version} to database`);return saved.number;
   }
   if(live){
+    const companyOptions=()=>[['','Select client'],['__new__','+ Add new client...'],...live.lookups.companies.map(c=>[c.id,c.name])];
+    const contactOptions=id=>[['','Select contact'],['__new__','+ Add new contact...'],...live.lookups.contacts.filter(c=>c.companyId===id).map(c=>[c.id,c.name])];
+    function resetContact(f){
+      f.elements.contactRef.innerHTML=opts(contactOptions(f.elements.accountRef.value),'');
+      f.elements.contactRef.disabled=!live.lookups.companies.some(c=>c.id===f.elements.accountRef.value);
+      f.elements.contact.value='';f.elements.email.value='';f.dataset.contactRef='';
+      lookupFields(f,'contact',false);
+    }
+    resetLiveContact=resetContact;
+    async function addLookup(f,kind){
+      const fields=f.querySelector(`[data-create-fields=${kind}]`),status=fields.querySelector('[role=status]');
+      const payload=kind==='company'?{name:f.elements.newClientName.value}:{companyId:f.elements.accountRef.value,firstName:f.elements.newContactFirst.value,lastName:f.elements.newContactLast.value,email:f.elements.newContactEmail.value};
+      fields.dataset.creationKey ||= crypto.randomUUID();payload.creationKey=fields.dataset.creationKey;
+      const controls=[...f.querySelectorAll('input,select,textarea,button')].map(el=>[el,el.disabled]);
+      controls.forEach(([el])=>el.disabled=true);f.dataset.lookupSaving='true';status.textContent='Saving...';
+      try{
+        const saved=await live.request(kind==='company'?'companies':'contacts','POST',payload);
+        if(kind==='company'){
+          live.lookups.companies.push(saved);live.lookups.companies.sort((a,b)=>a.name.localeCompare(b.name));
+          f.elements.accountRef.innerHTML=opts(companyOptions(),saved.id);f.elements.account.value=saved.name;f.dataset.accountRef=saved.id;
+        }else{
+          live.lookups.contacts.push(saved);f.elements.contactRef.innerHTML=opts(contactOptions(saved.companyId),saved.id);
+          f.elements.contact.value=saved.name;f.elements.email.value=saved.email||'';f.dataset.contactRef=saved.id;
+        }
+        lookupFields(f,kind,false);delete fields.dataset.creationKey;fields.querySelectorAll('input').forEach(el=>el.value='');status.textContent='';toast(kind==='company'?'Client added':'Contact added');
+      }catch(e){status.textContent=e.message;}
+      finally{controls.forEach(([el,disabled])=>el.disabled=disabled);delete f.dataset.lookupSaving;}
+      if(kind==='company'&&fields.hidden)resetContact(f);
+    }
+    addLiveLookup=addLookup;
     const oldEdit=editModal;
     editModal=(o=null,stage='intake')=>{
       oldEdit(o,stage);
       const f=$('#crmEditForm');
-      f.querySelector('footer').insertAdjacentHTML('beforebegin',`<div class="crm-form-grid">${select('Existing company','accountRef',[['','Unlinked prospect'],...live.lookups.companies.map(c=>[c.id,c.name])],o?.accountRef||'')}${select('Company contact','contactRef',[['','Unlinked contact'],...live.lookups.contacts.filter(c=>c.companyId===o?.accountRef).map(c=>[c.id,c.name])],o?.contactRef||'')}</div>`);
+      const accountValue=o?.accountRef||(o?.account?'__legacy__':''),contactValue=o?.contactRef||(o?.contact?'__legacy__':'');
+      const companies=companyOptions(),contacts=contactOptions(o?.accountRef);
+      if(accountValue==='__legacy__')companies.push(['__legacy__',o.account+' (unlinked)']);
+      if(contactValue==='__legacy__')contacts.push(['__legacy__',o.contact+' (unlinked)']);
+      f.elements.account.closest('label').outerHTML=`<div class="crm-lookup-field">${select('Client / account','accountRef',companies,accountValue)}<input type="hidden" name="account" value="${esc(o?.account||'')}"><fieldset data-create-fields="company" hidden><legend>New client</legend>${input('Client name','newClientName','')}<p role="status"></p><div>${btn('add-company','Add client','plus')}${btn('cancel-lookup','Cancel','','data-kind="company"')}</div></fieldset></div>`;
+      f.elements.contact.closest('label').outerHTML=`<div class="crm-lookup-field">${select('Contact / decision-maker','contactRef',contacts,contactValue)}<input type="hidden" name="contact" value="${esc(o?.contact||'')}"><fieldset data-create-fields="contact" hidden><legend>New contact</legend>${input('First name','newContactFirst','')}${input('Last name','newContactLast','')}${input('Email','newContactEmail','','email')}<p role="status"></p><div>${btn('add-contact','Add contact','plus')}${btn('cancel-lookup','Cancel','','data-kind="contact"')}</div></fieldset></div>`;
+      f.elements.accountRef.required=true;f.elements.contactRef.disabled=!accountValue;
+      lookupFields(f,'company',false);lookupFields(f,'contact',false);
+      f.dataset.accountRef=accountValue;f.dataset.contactRef=contactValue;
+      f.querySelector('#crmAccounts')?.remove();
     };
     // Legacy browser stores remain untouched; DB snapshots hydrate editor caches.
     workspaces=[];libraryRecords={printQuotes:[],ecomm:[]};saveWorkspaces=()=>{};saveLibraryRecords=()=>{};
@@ -315,6 +356,12 @@
     const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,o=current();
     if(a==='refresh'){location.reload();return;}
     if(live&&(saving||recordSaving||saveError)&&!['export','close-detail','close-modal'].includes(a)){toast(saveError||'Saving; please wait');return;}
+    if(live&&['add-company','add-contact'].includes(a)){await addLiveLookup(b.closest('form'),a==='add-company'?'company':'contact');return;}
+    if(live&&a==='cancel-lookup'){
+      const f=b.closest('form'),company=b.dataset.kind==='company';
+      lookupFields(f,b.dataset.kind,false);
+      f.elements[company?'accountRef':'contactRef'].value=f.dataset[company?'accountRef':'contactRef']||'';return;
+    }
     if(a==='nav')navigate(b.dataset.page);
     if(a==='view'){view=b.dataset.view;if(view==='handoffs')scope='won';else if(scope==='won')scope='open';render();}
     if(a==='new')editModal(null,b.dataset.stage||'intake');
@@ -355,6 +402,8 @@
     const f=e.target;if(!f.closest('#crmShell'))return;e.preventDefault();const data=Object.fromEntries(new FormData(f));const o=current();
     if(live&&(saving||recordSaving||saveError)){toast(saveError||'Saving; please wait');return;}
     if(f.id==='crmEditForm'){
+      if(live&&(f.dataset.lookupSaving||f.elements.accountRef.value==='__new__'||f.elements.contactRef.value==='__new__')){toast('Finish adding the client or contact, or cancel that addition.');return;}
+      if(live){if(data.accountRef==='__legacy__')data.accountRef='';if(data.contactRef==='__legacy__')data.contactRef='';for(const key of ['newClientName','newContactFirst','newContactLast','newContactEmail'])delete data[key];}
       const existing=db.opportunities.find(o=>o.id===f.dataset.id);const patch={...data,oneTime:Number(data.oneTime),monthly:Number(data.monthly),term:Number(data.term)};
       if(live)patch.ownerId=live.lookups.users.find(u=>u.username===patch.owner)?.id;
       if(existing){delete patch.stage;if(['oneTime','monthly','term','account'].some(k=>existing[k]!==patch[k])){existing.approval={method:'',reference:''};existing.documents.forEach(d=>d.superseded=true);M.stamp(existing,'Commercial terms changed; acceptance requires review');}Object.assign(existing,patch);M.stamp(existing,'Opportunity details updated');}
@@ -373,13 +422,17 @@
     const t=e.target,o=current();
     if(live&&(saving||recordSaving||saveError))return;
     if(live&&t.name==='accountRef'){
+      if(t.value==='__new__'){lookupFields(t.form,'company',true);t.form.elements.newClientName.focus();return;}
       const f=t.form,c=live.lookups.companies.find(c=>c.id===t.value);
-      if(c)f.elements.account.value=c.name;
-      f.elements.contactRef.innerHTML=opts([['','Unlinked contact'],...live.lookups.contacts.filter(c=>c.companyId===t.value).map(c=>[c.id,c.name])],'');
+      lookupFields(f,'company',false);
+      if(c)f.elements.account.value=c.name;else if(t.value!=='__legacy__')f.elements.account.value='';
+      f.dataset.accountRef=t.value;resetLiveContact(f);
     }
     if(live&&t.name==='contactRef'){
+      if(t.value==='__new__'){if(!live.lookups.companies.some(c=>c.id===t.form.elements.accountRef.value)){t.value='';toast('Select a saved client before adding a contact');return;}lookupFields(t.form,'contact',true);t.form.elements.newContactFirst.focus();return;}
       const c=live.lookups.contacts.find(c=>c.id===t.value&&c.companyId===t.form.elements.accountRef.value);
-      if(c){t.form.elements.contact.value=c.name;t.form.elements.email.value=c.email||'';}
+      lookupFields(t.form,'contact',false);t.form.dataset.contactRef=t.value;
+      if(c){t.form.elements.contact.value=c.name;t.form.elements.email.value=c.email||'';}else if(t.value!=='__legacy__'){t.form.elements.contact.value='';t.form.elements.email.value='';}
     }
     if(t.id==='crmOwner'){owner=t.value;render();}if(t.id==='crmKind'){kind=t.value;render();}if(t.id==='crmScope'){scope=t.value;render();}
     if(t.id==='crmOpportunity'){bindOpportunity(t.value);navigate(page);}
