@@ -5,6 +5,7 @@ const os = require("os");
 const path = require("path");
 const { createHmac, randomBytes, timingSafeEqual } = require("crypto");
 const { Pool } = require("pg");
+const { createOpportunityStore } = require('./lib/opportunity-store');
 const { loadLocalEnv } = require("./lib/local-env");
 const {
   canSendClientDocuments,
@@ -58,6 +59,8 @@ const pool = legacyConnectionString
     ssl: /@(127\.0\.0\.1|localhost)(:\d+)?\//i.test(legacyConnectionString) ? false : { rejectUnauthorized: false }
   })
   : null;
+const crmEnabled = process.env.ESTIMATOR_CRM_ENABLED === 'true';
+const crmStore = pool ? createOpportunityStore(pool) : null;
 
 const mimeTypes = {
   ".html": "text/html; charset=utf-8",
@@ -280,10 +283,15 @@ async function findOrCreate(client, table, name, extras = {}) {
   return result.rows[0].id;
 }
 
-function collectBody(req) {
+function collectBody(req, maxBytes = Infinity) {
   return new Promise((resolve, reject) => {
     const chunks = [];
-    req.on("data", chunk => chunks.push(chunk));
+    let bytes=0,exceeded=false;
+    req.on("data", chunk => {
+      bytes+=chunk.length;
+      if(bytes>maxBytes){if(!exceeded){exceeded=true;chunks.length=0;reject(Object.assign(new Error('Request body too large'),{statusCode:413}));}return;}
+      if(!exceeded)chunks.push(chunk);
+    });
     req.on("end", () => resolve(Buffer.concat(chunks).toString()));
     req.on("error", reject);
   });
@@ -1410,6 +1418,26 @@ const server = http.createServer(async (req, res) => {
       sendUnauthorized(res);
     } else if (authRequiredFor(url) && !session) {
       sendAuthPage(res);
+    } else if (url === '/api/crm/status' && method === 'GET') {
+      sendJson(res, 200, {enabled: crmEnabled, access: Boolean(session?.user?.isAdmin)});
+    } else if (url.startsWith('/api/crm/')) {
+      if (!session) { sendUnauthorized(res); return; }
+      if (!crmEnabled || !crmStore) { sendJson(res,503,{error:'CRM is not enabled'}); return; }
+      if (!['GET','POST','PUT'].includes(method)) { sendJson(res,405,{error:'Method not allowed'}); return; }
+      if (method !== 'GET' && (req.headers['x-requested-with'] !== 'SharpdotsCRM' || !String(req.headers['content-type']).startsWith('application/json'))) {
+        sendJson(res,403,{error:'Same-origin CRM request required'}); return;
+      }
+      if (url === '/api/crm/lookups' && method === 'GET') sendJson(res,200,await crmStore.lookups(session.user));
+      else if (url === '/api/crm/opportunities' && method === 'GET') sendJson(res,200,await crmStore.list(session.user));
+      else if ((url === '/api/crm/opportunities' && method === 'POST') || (/^\/api\/crm\/opportunities\/\d+$/.test(url) && method === 'PUT')) {
+        const body=await collectBody(req,2500000);
+        if(body.length>2500000){sendJson(res,413,{error:'Opportunity payload too large'});return;}
+        sendJson(res,method==='POST'?201:200,await crmStore.save(session.user,method==='PUT'?url.split('/').pop():null,parseJsonBody(body)));
+      } else if ((url === '/api/crm/records' && method === 'POST') || (/^\/api\/crm\/records\/\d+$/.test(url) && method === 'PUT')) {
+        const body=await collectBody(req,2500000);
+        if(body.length>2500000){sendJson(res,413,{error:'Record payload too large'});return;}
+        sendJson(res,200,await crmStore.saveRecord(session.user,method==='PUT'?url.split('/').pop():null,parseJsonBody(body)));
+      } else sendJson(res,404,{error:'CRM route not found'});
     } else if (url === "/api/sdsp/status" && method === "GET") {
       sendJson(res, 200, await getSdspCatalogStatus());
     } else if (url === "/api/sdsp/catalog" && method === "GET") {
@@ -1501,4 +1529,4 @@ const legacyMigrationStartup = process.env.DATABASE_URL
   : Promise.resolve().then(() => console.warn("DATABASE_URL is not configured; legacy estimate persistence is unavailable in this local session."));
 
 legacyMigrationStartup
-  .finally(() => server.listen(port, host, () => console.log(`Estimator running on http://${host}:${port}`)));
+  .finally(() => server.listen(port, host, () => console.log(`Estimator running on http://${host}:${server.address().port}`)));
