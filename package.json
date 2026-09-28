@@ -20,5 +20,8 @@
     "csv-parse": "^7.0.2",
     "fast-xml-parser": "^5.11.1",
     "pg": "^8.13.0"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8"
   }
 }
