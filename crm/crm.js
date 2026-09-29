@@ -147,6 +147,7 @@
     for(const t of workspaceRecordTypes){const n=activeWorkspaceRecords[t.collection];if(n)recordMap[t.collection]=n;}
     o.editor={rows:structuredClone(rows),proposal:structuredClone(proposal),serviceRows:structuredClone(serviceRows),serviceScenario,serviceExpanded:[...serviceExpanded],sourcing:structuredClone(sourcing),printQuote:structuredClone(printQuote),ecommPriceList:structuredClone(ecommPriceList),active:structuredClone(activeWorkspaceRecords),projectName:els.projectName.value,projectNumber:currentEstimateNumber(),estimateYear:els.estimateYear.value,paymentSettings:structuredClone(paymentSettings),paymentDates:structuredClone(paymentDates)};
     const w=workspaceByNumber(o.containerId);
+    o.editor.serviceEngagement=structuredClone(serviceEngagement);
     for(const [collection,n]of Object.entries(recordMap)){
       const t=recordTypeFor(collection),pool=isLibraryRecordCollection(collection)?libraryRecordsFor(collection):(w?.records[collection]||[]),r=pool.find(r=>r[t.numberKey]===n);
       if(r&&isLibraryRecordCollection(collection)&&db.pendingLink?.opportunity===o.id&&db.pendingLink.collection===collection){
@@ -207,6 +208,8 @@
       const e=o.editor;
       if(e){rows=structuredClone(e.rows);proposal=structuredClone(e.proposal);serviceRows=structuredClone(e.serviceRows);serviceScenario=e.serviceScenario;serviceExpanded=new Set(e.serviceExpanded);sourcing=structuredClone(e.sourcing);printQuote=structuredClone(e.printQuote);ecommPriceList=structuredClone(e.ecommPriceList);activeWorkspaceRecords=structuredClone(e.active);els.projectName.value=e.projectName;els.estimateYear.value=e.estimateYear;paymentSettings=structuredClone(e.paymentSettings);paymentDates=structuredClone(e.paymentDates);setProjectNumber(e.projectNumber);}
       else {els.projectName.value=o.title;els.estimateYear.value=String(new Date().getFullYear());proposal={...defaultProposal(),title:o.title,preparedFor:o.contact,campaign:o.title};printQuote={...defaultPrintQuote(),name:o.title,customerCompany:o.account,customerName:o.contact};}
+      serviceEngagement=ServiceEngagement.restore(e?.serviceEngagement);
+      els.serviceScenario.value=serviceScenario;
       const w=ensureWorkspace();seedRecordEditors(o,w);
     } else {printQuote={...defaultPrintQuote(),customerCompany:'',customerName:''};}
     window.render();persist();

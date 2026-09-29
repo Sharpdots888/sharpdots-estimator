@@ -120,5 +120,22 @@ test('named CRM user can use shared records without administrator or document-se
     await assert.rejects(store.list({id:48,isAdmin:false}),e=>e.statusCode===403);
     await assert.rejects(store.list({id:47,isAdmin:true}),e=>e.statusCode===403);
     assert.equal(require('../document-security').canSendClientDocuments({user:ray}),false);
+    const services=require('../services/model');
+    const engagement=services.empty();
+    engagement.name='Living Ops persistence check';
+    engagement.customLines=[{key:'custom:test',definitionRef:'test',definitionType:'teams',name:'Delivery',currency:'USD',rate:125,quantity:4,rateBasis:'per_hour',unit:'hour'}];
+    engagement.capacity['custom:test']=3;
+    const snapshot={serviceScenario:'livingOps',serviceRows:[],serviceExpanded:[],serviceEngagement:engagement};
+    const initial=await store.saveRecord(ray,null,{collection:'services',name:engagement.name,snapshot,creationKey:randomUUID()});
+    const revised=structuredClone(snapshot);revised.serviceEngagement.overrides['custom:test']={quantity:8,markup:50};
+    await store.saveRecord(ray,initial.id,{collection:'services',name:engagement.name,version:1,snapshot:revised});
+    const versions=(await store.list(ray)).records.filter(r=>r.id===initial.id);
+    assert.equal(versions.length,2);
+    const savedV1=versions.find(r=>r.version===1).snapshot.serviceEngagement;
+    const savedV2=versions.find(r=>r.version===2).snapshot.serviceEngagement;
+    assert.equal(services.totals(savedV1).monthlyPrice,700);
+    assert.equal(services.totals(savedV2).monthlyPrice,1500);
+    assert.equal(services.capacity(savedV1)[0].gap,-1);
+    assert.deepEqual(savedV1,engagement);
   }finally{await db.close();}
 });

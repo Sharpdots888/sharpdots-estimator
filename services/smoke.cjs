@@ -1,0 +1,117 @@
+const { chromium } = require(process.env.PLAYWRIGHT_PATH || '/private/tmp/sharpdots-migration-tools/node_modules/playwright');
+const assert = require('node:assert/strict');
+const url = process.env.SERVICES_PREVIEW_URL || 'http://127.0.0.1:4198/index.html?crm=1&services=1';
+if (!['localhost','127.0.0.1'].includes(new URL(url).hostname)) throw Error('Use a localhost draft only.');
+(async () => {
+  const browser = await chromium.launch();
+  try {
+    const page = await browser.newPage({ viewport: { width:1440,height:1000 } });
+    const errors = [];
+    page.on('pageerror', e => errors.push(e.message));
+    await page.goto(url);
+    await page.locator('[data-action=nav][data-page=proposals]').click();
+    await page.locator('#crmOpportunity').selectOption({ index:1 });
+    await page.evaluate(() => newWorkspaceRecord('services'));
+    await page.locator('[name=engName]').fill('Living Ops review engagement');
+    await page.locator('[name=engName]').press('Tab');
+    await page.locator('[data-service-action=example]').click();
+    assert.equal(await page.locator('.eng-dialog [data-id=product-data]').isDisabled(), true);
+    await page.locator('.eng-dialog [data-service-action=select-product][data-id=product-outbound]').click();
+    await page.locator('.eng-dialog footer [data-service-action=close]').click();
+    assert.equal(await page.evaluate(() => serviceEngagement.products.length), 1);
+    await page.locator('[data-service-action=view][data-view=components]').click();
+    await page.locator('[data-service-action=edit-line][data-key="teams:team-revops"]').click();
+    await page.locator('#engLineForm [name=quantity]').fill('12');
+    await page.locator('#engLineForm [name=markup]').fill('50');
+    await page.locator('#engLineForm [type=submit]').click();
+    assert.equal(await page.evaluate(() => ServiceEngagement.lines(serviceEngagement).find(l=>l.key==='teams:team-revops').calc.monthlyPrice), 2970);
+    await page.locator('[data-service-action=view][data-view=capacity]').click();
+    await page.locator('[data-capacity-key="teams:team-revops"]').fill('10');
+    await page.locator('[data-capacity-key="teams:team-revops"]').press('Tab');
+    assert.equal(await page.evaluate(() => ServiceEngagement.capacity(serviceEngagement).find(l=>l.key==='teams:team-revops').gap), -2);
+    await page.screenshot({ path:'/private/tmp/services-capacity-1440.png' });
+    await page.locator('[data-service-action=view][data-view=components]').click();
+    await page.screenshot({ path:'/private/tmp/services-components-1440.png' });
+    await page.locator('#servicesView [data-record-action=save]').click();
+    const initial = await page.evaluate(() => structuredClone(savedRecordForCollection('services')));
+    assert.equal(initial.snapshot.serviceEngagement.products[0].revision, 'prototype-example-v1');
+    await page.locator('[name=engTerm]').fill('6');
+    await page.locator('[name=engTerm]').press('Tab');
+    await page.evaluate(() => newVersionFromManager('services'));
+    assert.equal(await page.evaluate(() => savedRecordForCollection('services').version), 2);
+    await page.evaluate(() => applyWorkspaceRecord('services', savedRecordForCollection('services'), 1));
+    assert.equal(await page.locator('[name=engTerm]').inputValue(), '3');
+    assert.equal(await page.evaluate(() => ServiceEngagement.capacity(serviceEngagement).find(l=>l.key==='teams:team-revops').gap), -2);
+    await page.locator('[data-service-action=proposal]').click();
+    assert.equal(await page.evaluate(() => activeView), 'proposalView');
+    await page.evaluate(() => { proposal.outputAudience='client'; renderProposal(); });
+    const proposalText = await page.locator('#proposalServicesLines').innerText();
+    assert.match(proposalText,/AI Outbound/);
+    assert.doesNotMatch(proposalText,/Revenue Ops|Engineering|165/);
+    const warnings = await page.evaluate(() => proposalPublishingManifest().warnings);
+    assert.ok(warnings.some(w=>w.message.includes('example product rates')));
+    assert.equal(await page.evaluate(() => proposalPublishingManifest().ready), false);
+    assert.equal(await page.evaluate(() => proposalPublishingCsvPayload().rowsForCsv.filter(r=>r.section==='Services calculator').some(r=>r.item==='AI Outbound')), true);
+    await page.screenshot({ path:'/private/tmp/services-proposal-1440.png' });
+    await page.evaluate(() => setActiveView('servicesView'));
+
+    // Load a catalog through the same file-input boundary as an operator.
+    const packet = await page.evaluate(() => {
+      const packet=structuredClone(ServiceExampleCatalog);
+      packet.payload.catalogId='qa-catalog';packet.sourceRevision='qa-v2';
+      packet.payload.products=packet.payload.products.slice(0,1);
+      packet.payload.products[0].localProductServiceId='qa-product';
+      packet.payload.products[0].cascadePaths.forEach(p=>p.productId='qa-product');
+      packet.payload.products[0].name='QA product';
+      return packet;
+    });
+    await page.locator('#servicesView input[type=file]').setInputFiles({ name:'catalog.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(packet)) });
+    await page.locator('.eng-dialog [data-id=qa-product]').waitFor();
+    await page.locator('.eng-dialog [data-id=qa-product]').click();
+    await page.locator('.eng-dialog footer [data-service-action=close]').click();
+    assert.equal(await page.evaluate(() => serviceEngagement.products[1].catalogSnapshotHash.length), 64);
+    assert.equal(await page.evaluate(() => ServiceEngagement.lines(serviceEngagement).length), 12);
+    await page.locator('[data-service-action=view][data-view=products]').click();
+    await page.screenshot({ path:'/private/tmp/services-products-1440.png' });
+
+    await page.locator('[data-service-action=view][data-view=components]').click();
+    await page.locator('[data-service-action=add-line]').click();
+    await page.locator('#engCustomForm [name=name]').fill('Launch setup');
+    await page.locator('#engCustomForm [type=submit]').click();
+    await page.locator('#engLineForm [name=rate]').fill('300');
+    await page.locator('#engLineForm [name=rateBasis]').selectOption('one_time');
+    await page.locator('#engLineForm [name=unit]').fill('activation');
+    await page.locator('#engLineForm [type=submit]').click();
+    assert.equal(await page.evaluate(() => ServiceEngagement.totals(serviceEngagement).activationPrice), 420);
+    await page.locator('#servicesView [data-record-action=save]').click();
+    await page.locator('#serviceScenario').selectOption('scratch');
+    await page.locator('#serviceAddLine').click();
+    assert.equal(await page.locator('.services-layout').isVisible(),true);
+    assert.equal(await page.locator('#serviceEngagementBuilder').isVisible(),false);
+    await page.locator('#serviceScenario').selectOption('livingOps');
+    assert.equal(await page.evaluate(() => ServiceEngagement.totals(serviceEngagement).activationPrice), 420);
+    for (const width of [1188,768,390]) {
+      await page.setViewportSize({ width,height:1000 });
+      await page.locator('[data-service-action=view][data-view=products]').click();
+      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth<=innerWidth+1), `Page overflow at ${width}`);
+      await page.screenshot({ path:`/private/tmp/services-products-${width}.png`,fullPage:true });
+      await page.locator('[data-service-action=view][data-view=components]').click();
+      await page.screenshot({ path:`/private/tmp/services-components-${width}.png`,fullPage:true });
+      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth<=innerWidth+1), `Component overflow at ${width}`);
+      await page.locator('[data-service-action=edit-line]').first().click();
+      assert.ok(await page.locator('.eng-dialog').evaluate(el=>el.scrollWidth<=el.clientWidth+1));
+      await page.keyboard.press('Escape');
+    }
+    await page.evaluate(async () => {
+      serviceEngagement.products.forEach(p => { p.sample=false; });
+      proposal.includedSections=['copy','services'];
+      await saveRecordFromManager('services');
+      await saveRecordFromManager('proposals');
+    });
+    assert.equal(await page.evaluate(() => proposalPublishingManifest().ready),true);
+    await page.evaluate(() => { serviceEngagement.overrides['teams:team-revops'].rate=null; });
+    assert.ok(await page.evaluate(() => proposalPublishingManifest().warnings.some(w=>w.message.includes('incomplete'))));
+    assert.deepEqual(errors, []);
+    console.log('PASS: catalog import, review gates, component rates, capacity, save/version/restore, proposal rollups, sample send guard, scratch compatibility and responsive views.');
+  } finally { await browser.close(); }
+})().catch(e=>{ console.error(e);process.exitCode=1; });

@@ -698,6 +698,7 @@ let printQuote = defaultPrintQuote();
 let ecommPriceList = defaultEcommPriceList();
 
 const serviceScenarioNames = {
+  livingOps: "Living Ops engagement",
   salesmachine: "SalesMachine base + channels",
   fractional: "Fractional sales focus",
   coldEmail: "Cold email + fractional sales",
@@ -735,7 +736,8 @@ const serviceSeedRows = [
   blankServiceRow("scratch-initial")
 ];
 
-let serviceScenario = "salesmachine";
+let serviceScenario = "livingOps";
+let serviceEngagement = ServiceEngagement.empty();
 let serviceRows = structuredClone(serviceSeedRows);
 let serviceExpanded = new Set(serviceSeedRows.filter((row) => row.level === "product").map((row) => row.id));
 let sourcing = { quotes: {}, selected: {} };
@@ -2101,7 +2103,7 @@ async function loadWorkspace(workspaceNumber) {
 function workspaceRecordDisplayName(type) {
   if (type.collection === "proposals") return proposal.title || "Untitled Proposal";
   if (type.collection === "estimates") return els.projectName.value.trim() || "Untitled Estimate";
-  if (type.collection === "services") return serviceScenarioNames[serviceScenario] || "Service Calculation";
+  if (type.collection === "services") return serviceScenario === "livingOps" ? serviceEngagement.name : serviceScenarioNames[serviceScenario] || "Service Calculation";
   if (type.collection === "sourcing") return `Sourcing for ${currentEstimateNumber() || "draft estimate"}`;
   if (type.collection === "printQuotes") {
     syncPlaceholderDraftsFromInputs();
@@ -2708,6 +2710,7 @@ function workspaceRecordSnapshot(type) {
   if (type.collection === "services") {
     return {
       serviceScenario,
+      serviceEngagement: structuredClone(serviceEngagement),
       serviceRows: structuredClone(serviceRows),
       serviceExpanded: Array.from(serviceExpanded)
     };
@@ -2868,7 +2871,9 @@ async function newWorkspaceRecord(collection) {
     proposalDocumentTransactions = [];
   }
   if (collection === "services") {
-    serviceScenario = "salesmachine";
+    serviceScenario = "livingOps";
+    serviceEngagement = ServiceEngagement.empty();
+    els.serviceScenario.value = serviceScenario;
     serviceRows = structuredClone(serviceSeedRows);
     serviceExpanded = new Set(serviceSeedRows.filter((row) => row.level === "product").map((row) => row.id));
   }
@@ -2904,6 +2909,8 @@ function applyWorkspaceRecord(collection, record, versionNumber = null, options 
   }
   if (collection === "services" && snapshot.serviceRows) {
     serviceScenario = snapshot.serviceScenario || "salesmachine";
+    serviceEngagement = ServiceEngagement.restore(snapshot.serviceEngagement);
+    els.serviceScenario.value = serviceScenario;
     serviceRows = structuredClone(snapshot.serviceRows);
     serviceExpanded = new Set(snapshot.serviceExpanded || serviceRows.filter((row) => row.level === "product").map((row) => row.id));
   }
@@ -3469,7 +3476,9 @@ function startBlankEstimate() {
   paymentDates = {};
   paymentSettings = defaultPaymentSettings();
   proposal = defaultProposal();
-  serviceScenario = "salesmachine";
+  serviceScenario = "livingOps";
+  serviceEngagement = ServiceEngagement.empty();
+  els.serviceScenario.value = serviceScenario;
   serviceRows = structuredClone(serviceSeedRows);
   serviceExpanded = new Set(serviceSeedRows.filter((row) => row.level === "product").map((row) => row.id));
   sourcing = { quotes: {}, selected: {} };
@@ -4598,6 +4607,7 @@ function proposalPublishingManifest(options = {}) {
       status: source.status,
       message: `${source.statusLabel}: ${source.display || source.label}`
     }));
+  warnings.push(...serviceEngagementWarnings());
 
   return {
     workspaceNumber: currentWorkspaceNumber || "",
@@ -4761,6 +4771,10 @@ function proposalPublishingReadinessItems() {
       bannerText: "Attach selected source records to the workspace."
     });
   }
+  serviceEngagementWarnings().forEach(warning => items.push({
+    tone: "warning", label: "Services pricing review", text: "Services pricing review",
+    detail: warning.message, bannerText: warning.message
+  }));
   if (!items.length) {
     items.push({
       tone: "good",
@@ -4775,13 +4789,13 @@ function proposalPublishingReadinessItems() {
 function renderProposalPublishingReadiness() {
   if (!els.proposalPublishReadiness) return;
   const { items, needsSave, needsAttach } = proposalPublishingReadinessItems();
-  const hasWarnings = Boolean(needsSave.length || needsAttach.length);
-  const warningCount = needsSave.length + needsAttach.length;
+  const hasWarnings = items.some(item => item.tone === "warning");
+  const warningCount = needsSave.length + needsAttach.length + serviceEngagementWarnings().length;
   const summaryText = hasWarnings
-    ? `${warningCount} source record${warningCount === 1 ? "" : "s"} need attention before final output`
+    ? `${warningCount} item${warningCount === 1 ? "" : "s"} need attention before final output`
     : "Selected sections use saved records";
 
-  els.proposalPublishReadiness.classList.toggle("is-ready", !needsSave.length && !needsAttach.length);
+  els.proposalPublishReadiness.classList.toggle("is-ready", !hasWarnings);
   els.proposalPublishReadiness.classList.toggle("has-warning", hasWarnings);
   els.proposalPublishReadiness.innerHTML = `
     <div class="readiness-pill ${hasWarnings ? "warning" : "good"}" title="${escapeHtml(summaryText)}">
@@ -4890,7 +4904,7 @@ async function attachProposalManifestSources() {
 function renderProposalDraftBanner() {
   if (!els.proposalDraftBanner) return;
   const { items, needsSave, needsAttach } = proposalPublishingReadinessItems();
-  const hasWarnings = Boolean(needsSave.length || needsAttach.length);
+  const hasWarnings = items.some(item => item.tone === "warning");
   els.proposalDraftBanner.hidden = !hasWarnings;
   els.proposalDraftBanner.innerHTML = hasWarnings
     ? `
@@ -5452,6 +5466,25 @@ function proposalSectionHasClientContent(section) {
   return true;
 }
 
+function serviceEngagementWarnings() {
+  if (serviceScenario !== "livingOps" || !proposalIncludedSections().has("services")) return [];
+  const totals = ServiceEngagement.totals(serviceEngagement);
+  const messages = [];
+  if (!totals.count) messages.push("Services engagement has no components.");
+  if (!totals.complete) messages.push("Services pricing is incomplete. Review component costs, shared defaults, and term.");
+  if (totals.sample) messages.push("Services contains example product rates. Replace example products with a reviewed Living Ops catalog before live sending.");
+  return messages.map(message => ({ collection: "services", label: "Services", status: "needs-review", message }));
+}
+
+function proposalServicesRows() {
+  if (serviceScenario === "livingOps" && proposalIsClientOutput()) {
+    return ServiceEngagement.outputRows(serviceEngagement).map(b => ({ row: { item: b.name, platform: b.description, costType: "" }, calc: b.calc }));
+  }
+  return serviceActiveCalcRows().map(row => ({ row, calc: serviceCalc(row) }))
+    .filter(({ calc }) => calc.activationPrice || calc.monthlyPrice)
+    .sort((a, b) => b.calc.monthlyPrice - a.calc.monthlyPrice);
+}
+
 function renderProposalServicesOutput() {
   if (!els.proposalServicesSection) return;
   const visible = proposalHasSection("services");
@@ -5462,17 +5495,13 @@ function renderProposalServicesOutput() {
   const isMonthlyMode = serviceTermMode() === "monthly";
   const termPrice = (isMonthlyMode ? 0 : totals.activationPrice) + totals.monthlyPrice * totals.termMonths;
   const sourceLabel = proposalRecordSourceLabel("services", "Current services draft");
-  const rowsForOutput = serviceActiveCalcRows()
-    .map((row) => ({ row, calc: serviceCalc(row) }))
-    .filter(({ calc }) => calc.activationPrice || calc.monthlyPrice)
-    .sort((a, b) => b.calc.monthlyPrice - a.calc.monthlyPrice)
-    .slice(0, 8);
+  const rowsForOutput = proposalServicesRows();
   if (proposalIsClientOutput() && !rowsForOutput.length) {
     els.proposalServicesSection.hidden = true;
     return;
   }
 
-  els.proposalServicesNote.textContent = !proposalIsClientOutput()
+  els.proposalServicesNote.textContent = serviceScenario === "livingOps" ? serviceEngagement.name : !proposalIsClientOutput()
     ? `From ${sourceLabel} / ${serviceScenarioNames[serviceScenario] || "Service calculation"}`
     : `${serviceScenarioNames[serviceScenario] || "Services package"} execution plan`;
   els.proposalServicesTotal.textContent = money(termPrice, 2);
@@ -5480,12 +5509,12 @@ function renderProposalServicesOutput() {
     <div><span>Activation</span><strong>${isMonthlyMode ? "$0.00" : money(totals.activationPrice, 2)}</strong></div>
     <div><span>Monthly</span><strong>${money(totals.monthlyPrice, 2)}</strong></div>
     <div><span>Term</span><strong>${totals.termMonths} mo</strong></div>
-    <div><span>Appointments / Mo</span><strong>${decimal(totals.appointments, 1)}</strong></div>
+    <div><span>${serviceScenario === "livingOps" ? "Products" : "Appointments / Mo"}</span><strong>${serviceScenario === "livingOps" ? serviceEngagement.products.length : decimal(totals.appointments, 1)}</strong></div>
   `;
   els.proposalServicesLines.innerHTML = rowsForOutput.length ? `
     <div class="proposal-output-line header">
-      <span>Component</span>
-      <span>Platform</span>
+      <span>${serviceScenario === "livingOps" && proposalIsClientOutput() ? "Product / service" : "Component"}</span>
+      <span>${serviceScenario === "livingOps" && proposalIsClientOutput() ? "Scope" : "Platform"}</span>
       <span>Activation</span>
       <span>Monthly</span>
     </div>
@@ -5792,6 +5821,7 @@ function serviceChildren(row) {
 }
 
 function serviceActiveCalcRows() {
+  if (serviceScenario === "livingOps") return ServiceEngagement.serviceRows(serviceEngagement);
   return serviceVisibleRows().filter((row) => row.active && (row.scenario !== "scratch" || row.item.trim()) && !serviceChildren(row).some((child) => child.active));
 }
 
@@ -5825,6 +5855,7 @@ function servicePlatformValues() {
 }
 
 function serviceCalc(row) {
+  if (row.engagementCalc) return row.engagementCalc;
   const children = serviceChildren(row).filter((child) => child.active);
   if (children.length) {
     return children.reduce(
@@ -5856,6 +5887,7 @@ function serviceCalc(row) {
 }
 
 function serviceTermMode() {
+  if (serviceScenario === "livingOps") return "initial";
   return document.querySelector("input[name='serviceTermMode']:checked")?.value || "initial";
 }
 
@@ -5880,6 +5912,7 @@ function updateServiceAppointmentsFromExecution() {
 }
 
 function serviceTotals() {
+  if (serviceScenario === "livingOps") return ServiceEngagement.totals(serviceEngagement);
   const initialTermMonths = Math.max(Math.round(asNumber(els.serviceTermMonths?.value || 3)), 1);
   const ongoingTermMonths = Math.max(Math.round(asNumber(els.serviceOngoingMonths?.value || 1)), 1);
   const termMonths = serviceTermMode() === "monthly" ? ongoingTermMonths : initialTermMonths;
@@ -6066,6 +6099,10 @@ function renderServiceSummary() {
 function renderServicesCalculator() {
   if (!els.servicesView) return;
   serviceScenario = els.serviceScenario.value || "salesmachine";
+  const engagementMode = serviceScenario === "livingOps";
+  document.querySelector(".services-layout").hidden = engagementMode;
+  window.renderEngagementServices?.();
+  if (engagementMode) return;
   const isScratch = serviceScenario === "scratch";
   els.serviceAddLine.hidden = !isScratch;
   els.serviceExecutionInputs.hidden = isScratch;
@@ -10430,6 +10467,7 @@ function render() {
     renderPrintQuoteDraft();
     renderTabRecordControls();
     renderTabRecordIndicators();
+    if (activeView === "servicesView") renderServicesCalculator();
     if (activeView === "sourcingView") renderSourcing();
   });
 }
@@ -10951,7 +10989,7 @@ function printReport() {
 function printProposalPublishingOutput() {
   renderProposalPreview();
   const { needsSave, needsAttach } = proposalPublishingReadiness();
-  const warningCount = needsSave.length + needsAttach.length;
+  const warningCount = needsSave.length + needsAttach.length + serviceEngagementWarnings().length;
   const audienceLabel = proposalIsClientOutput() ? "client" : "internal";
   setSaveStatus(warningCount
     ? `Preparing ${audienceLabel} PDF preview; ${warningCount} source issue${warningCount === 1 ? "" : "s"} flagged`
@@ -11060,16 +11098,13 @@ function proposalPublishingExportRows() {
     const totals = serviceTotals();
     const isMonthlyMode = serviceTermMode() === "monthly";
     const termPrice = (isMonthlyMode ? 0 : totals.activationPrice) + totals.monthlyPrice * totals.termMonths;
-    const rowsForServicesExport = serviceActiveCalcRows()
-      .map((row) => ({ row, calc: serviceCalc(row) }))
-      .filter(({ calc }) => calc.activationPrice || calc.monthlyPrice)
-      .sort((a, b) => b.calc.monthlyPrice - a.calc.monthlyPrice);
+    const rowsForServicesExport = proposalServicesRows();
     if (!proposalIsClientOutput() || rowsForServicesExport.length) {
       exportRows.push(proposalExportRecord(
         "Services calculator",
         servicesSource,
-        serviceScenarioNames[serviceScenario] || "Service calculation",
-        `${totals.termMonths} month term / ${decimal(totals.appointments, 1)} appointments per month`,
+        serviceScenario === "livingOps" ? serviceEngagement.name : serviceScenarioNames[serviceScenario] || "Service calculation",
+        serviceScenario === "livingOps" ? `${totals.termMonths} month term` : `${totals.termMonths} month term / ${decimal(totals.appointments, 1)} appointments per month`,
         "",
         "",
         money(termPrice, 2),
@@ -11261,6 +11296,7 @@ if (els.serviceScenario) {
   });
   [els.serviceScenario, els.serviceTermMonths, els.serviceOngoingMonths, els.serviceAppointments, els.serviceStartupMarkup, els.serviceMonthlyMarkup, ...els.serviceTermModes].forEach((input) => {
     input.addEventListener("change", () => {
+      if (input === els.serviceScenario) serviceScenario = input.value;
       if (input === els.serviceStartupMarkup) {
         serviceVisibleRows().forEach((row) => {
           row.startupMarkup = asNumber(els.serviceStartupMarkup.value);
@@ -11273,6 +11309,10 @@ if (els.serviceScenario) {
       }
       touchWorkspaceRecord("services");
       renderServicesCalculator();
+      if (input === els.serviceScenario) {
+        renderTabRecordControls();
+        renderProposal();
+      }
     });
   });
   [els.execDialsPerDay, els.execDaysPerWeek, els.execConversationsPerDay, els.execSetsPerWeek, els.execShowRate, els.execWinRate].forEach((input) => {

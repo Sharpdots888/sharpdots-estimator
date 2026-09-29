@@ -8,6 +8,7 @@
     <script src="crm/preview.js"></script>
     <link rel="stylesheet" href="crm/crm.css" />
     <link rel="stylesheet" href="editor-ui.css?v=1" />
+    <link rel="stylesheet" href="services/builder.css?v=1" />
   </head>
   <body>
     <main class="app-shell">
@@ -645,6 +646,7 @@
             <label>
               Scenario
               <select id="serviceScenario">
+                <option value="livingOps">Living Ops engagement</option>
                 <option value="salesmachine">SalesMachine base + channels</option>
                 <option value="fractional">Fractional sales focus</option>
                 <option value="coldEmail">Cold email + fractional sales</option>
@@ -1312,11 +1314,14 @@
       </section>
     </div>
 
+    <script src="services/model.js"></script>
+    <script src="services/example-catalog.js"></script>
     <script src="app.js?v=sdsp-catalog3"></script>
     <script src="crm/vendor/lucide.js"></script>
     <script src="crm/model.js"></script>
     <script src="crm/live.js"></script>
     <script src="crm/crm.js"></script>
     <script src="editor-ui.js?v=1"></script>
+    <script src="services/builder.js?v=1"></script>
   </body>
 </html>

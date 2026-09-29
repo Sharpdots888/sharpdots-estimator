@@ -2,6 +2,23 @@
 
 This registry tracks estimator fields that exist in the prototype, need a database home, need a lookup source, or need a decision before production use.
 
+## Living Ops Services Review Build
+
+The Services builder adds JSON snapshot fields, not database columns. They use
+the existing shared S-record persistence when CRM is live; this build has not
+been deployed. See `docs/living-ops-services.md` for source ownership and limits.
+
+| Field | Home | Purpose / boundary |
+| --- | --- | --- |
+| serviceScenario = livingOps | S snapshot | Selects engagement model; legacy scenarios remain readable |
+| serviceEngagement.schemaVersion/name/termMonths/markup | S snapshot JSONB | Versioned engagement name, initial term, default markup |
+| serviceEngagement.products | S snapshot JSONB | Immutable imported product copies, catalog/product IDs and revisions, import hash, cascade paths, component definitions, sample marker |
+| serviceEngagement.customLines | S snapshot JSONB | Engagement-specific cost items; not company catalog definitions |
+| serviceEngagement.overrides | S snapshot JSONB | Quantities, rates, markup, cost treatment, cost center and shared-default resolution, keyed by definition type/reference |
+| serviceEngagement.capacity | S snapshot JSONB | Manual monthly available hours by team requirement; no staff reservation |
+| proposal.sourceRecords.services | Proposal snapshot JSONB | Pins S number/version used in output; no new execution or billing identity |
+| Cached imported catalog | Browser localStorage | Import convenience only; Living Ops owns definitions; live lookup remains to be connected |
+
 ## Shared CRM Pilot: Authored, Awaiting Production Approval
 
 The following supersedes the browser-only homes below for the feature-flagged
