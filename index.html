@@ -633,11 +633,11 @@
       <section id="servicesView" class="app-view services-view" hidden>
         <section class="tab-record-controls" data-record-type="services" aria-label="Service calculation record controls"></section>
         <section class="services-layout">
-          <aside class="panel services-controls" aria-label="SalesMachine controls">
+          <aside class="panel services-controls" aria-label="Service calculation controls">
             <div class="section-head">
               <div>
-                <h2>SalesMachine</h2>
-                <p>Omnichannel appointment engine prototype</p>
+                <h2 id="serviceWorkbenchTitle">SalesMachine</h2>
+                <p id="serviceWorkbenchDescription">Omnichannel appointment engine prototype</p>
               </div>
             </div>
             <div class="workbench-section-label">Commercial model</div>
@@ -647,6 +647,7 @@
                 <option value="salesmachine">SalesMachine base + channels</option>
                 <option value="fractional">Fractional sales focus</option>
                 <option value="coldEmail">Cold email + fractional sales</option>
+                <option value="scratch">Start from scratch</option>
               </select>
             </label>
             <label>
@@ -662,6 +663,7 @@
               <label><input name="serviceTermMode" type="radio" value="initial" checked /> Initial term</label>
               <label><input name="serviceTermMode" type="radio" value="monthly" /> Monthly after initial</label>
             </fieldset>
+            <div id="serviceExecutionInputs" class="service-execution-inputs">
             <div class="workbench-section-label">Execution inputs</div>
             <label>
               Target Appointments / Month
@@ -676,6 +678,7 @@
               <label>Win Rate % <input id="execWinRate" type="number" min="0" max="100" step="1" value="20" /></label>
               <div id="executionSummary" class="execution-summary"></div>
             </div>
+            </div>
             <div class="workbench-section-label">Pricing policy</div>
             <label>
               Startup Markup %
@@ -688,7 +691,7 @@
           </aside>
 
           <section class="services-workspace">
-            <section class="services-summary" aria-label="SalesMachine summary">
+            <section class="services-summary" aria-label="Service calculation summary">
               <article>
                 <span>Activation Price</span>
                 <strong id="serviceActivationPrice">$0</strong>
@@ -701,7 +704,7 @@
                 <span>Term Price</span>
                 <strong id="serviceTermPrice">$0</strong>
               </article>
-              <article>
+              <article id="serviceAppointmentSummary">
                 <span>Price / Appointment</span>
                 <strong id="serviceAppointmentPrice">$0</strong>
               </article>
@@ -711,8 +714,9 @@
               <div class="section-head">
                 <div>
                   <h2>Service Components</h2>
-                  <p>Services, platforms, assets, reps, and setup/activation</p>
+                  <p id="serviceComponentsDescription">Services, platforms, assets, reps, and setup/activation</p>
                 </div>
+                <button id="serviceAddLine" class="ghost-btn compact-btn" type="button" hidden><i data-lucide="plus" aria-hidden="true"></i> Add line</button>
               </div>
               <div id="serviceRows" class="service-rows"></div>
               <datalist id="servicePlatformLookup"></datalist>
@@ -723,7 +727,7 @@
                 <div class="section-head">
                   <div>
                     <h2>Cost Center Split</h2>
-                    <p>Joint venture execution allocation</p>
+                    <p id="serviceCostCenterDescription">Joint venture execution allocation</p>
                   </div>
                 </div>
                 <div id="serviceCostCenters" class="service-cost-centers"></div>
