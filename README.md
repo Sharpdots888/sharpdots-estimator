@@ -2,6 +2,8 @@
 
 The Estimator is a local-first prototype for estimating, print quotes, and Standard Products pricing. The Standard Products catalog uses a dedicated local PostgreSQL database with `sdsp_` tables; it does not read or modify the production database.
 
+In **Proposals > Services**, choose **Start from scratch** to price a custom service without SalesMachine components. The initial line is blank; name it, enter costs and markups or a direct startup/monthly price, and add or remove lines as needed. Save the Service Calc record to retain the scenario and its custom lines.
+
 ## Local Standard Products setup
 
 The local environment is configured in the ignored `.env.local` file. It requires:

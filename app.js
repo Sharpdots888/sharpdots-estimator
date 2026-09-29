@@ -700,8 +700,16 @@ let ecommPriceList = defaultEcommPriceList();
 const serviceScenarioNames = {
   salesmachine: "SalesMachine base + channels",
   fractional: "Fractional sales focus",
-  coldEmail: "Cold email + fractional sales"
+  coldEmail: "Cold email + fractional sales",
+  scratch: "Start from scratch"
 };
+
+function blankServiceRow(id = crypto.randomUUID()) {
+  return { id, level: "product", active: true, scenario: "scratch", group: "Custom services",
+    item: "", platform: "", costCenter: "Sharpdots", costType: "Services", startup: 0,
+    recurring: 0, variable: 0, quantity: 1, variableModel: "monthly", startupMarkup: 50,
+    monthlyMarkup: 50, startupPrice: null, monthlyPrice: null, notes: "" };
+}
 
 const serviceSeedRows = [
   { id: "base", level: "product", active: true, scenario: "salesmachine", group: "Base Product", item: "SalesMachine base product", platform: "SalesMachine", costCenter: "Sharpdots", costType: "Services", startup: 0, recurring: 0, variable: 0, quantity: 1, variableModel: "monthly", startupMarkup: 50, monthlyMarkup: 50, notes: "Rollup of strategy, copywriting, cold email execution, and campaign management." },
@@ -723,7 +731,8 @@ const serviceSeedRows = [
   { id: "frac-rep", level: "product", active: true, scenario: "fractional", group: "Fractional Representatives", item: "Outsourced Sales Rep LATAM (Base +)", platform: "LATAM BPO / Deel", costCenter: "SalesArmy", costType: "Fractional Representatives", startup: 0, recurring: 2500, variable: 0, quantity: 1, variableModel: "rep/month", startupMarkup: 50, monthlyMarkup: 50, notes: "Prorated rep base." },
   { id: "frac-coach", level: "product", active: true, scenario: "fractional", group: "Fractional Representatives", item: "Sales rep coaching, accountability, onboarding, and training", platform: "SalesArmy", costCenter: "SalesArmy", costType: "Services", startup: 2550, recurring: 1085, variable: 0, quantity: 1, variableModel: "monthly", startupMarkup: 50, monthlyMarkup: 50, notes: "Assessments, onboarding, training, Deel, coaching, recruiting." },
   { id: "cold-platform", level: "product", active: true, scenario: "coldEmail", group: "Cold Email", item: "Cold email platform and domain stack", platform: "ThorsHammer / Bison / Superwave / Smartlead", costCenter: "SalesArmy", costType: "Platforms", startup: 50, recurring: 350, variable: 0, quantity: 1, variableModel: "monthly", startupMarkup: 50, monthlyMarkup: 50, notes: "Sending infrastructure from sheet examples." },
-  { id: "cold-fulfillment", level: "product", active: true, scenario: "coldEmail", group: "Cold Email", item: "Cold email fulfillment and conversion support", platform: "SalesMachine", costCenter: "Sharpdots", costType: "Services", startup: 500, recurring: 500, variable: 0, quantity: 1, variableModel: "monthly", startupMarkup: 50, monthlyMarkup: 50, notes: "External source rows reassigned to Sharpdots." }
+  { id: "cold-fulfillment", level: "product", active: true, scenario: "coldEmail", group: "Cold Email", item: "Cold email fulfillment and conversion support", platform: "SalesMachine", costCenter: "Sharpdots", costType: "Services", startup: 500, recurring: 500, variable: 0, quantity: 1, variableModel: "monthly", startupMarkup: 50, monthlyMarkup: 50, notes: "External source rows reassigned to Sharpdots." },
+  blankServiceRow("scratch-initial")
 ];
 
 let serviceScenario = "salesmachine";
@@ -1087,6 +1096,13 @@ const els = {
   servicesView: document.querySelector("#servicesView"),
   sourcingView: document.querySelector("#sourcingView"),
   serviceScenario: document.querySelector("#serviceScenario"),
+  serviceWorkbenchTitle: document.querySelector("#serviceWorkbenchTitle"),
+  serviceWorkbenchDescription: document.querySelector("#serviceWorkbenchDescription"),
+  serviceAddLine: document.querySelector("#serviceAddLine"),
+  serviceExecutionInputs: document.querySelector("#serviceExecutionInputs"),
+  serviceAppointmentSummary: document.querySelector("#serviceAppointmentSummary"),
+  serviceComponentsDescription: document.querySelector("#serviceComponentsDescription"),
+  serviceCostCenterDescription: document.querySelector("#serviceCostCenterDescription"),
   serviceTermMonths: document.querySelector("#serviceTermMonths"),
   serviceOngoingMonths: document.querySelector("#serviceOngoingMonths"),
   serviceAppointments: document.querySelector("#serviceAppointments"),
@@ -5760,6 +5776,7 @@ function serviceNormalizeCostCenter(value) {
 }
 
 function serviceVisibleRows() {
+  if (serviceScenario === "scratch") return serviceRows.filter((row) => row.scenario === "scratch");
   return serviceRows.filter((row) => row.scenario === serviceScenario || row.scenario === "salesmachine");
 }
 
@@ -5768,7 +5785,7 @@ function serviceChildren(row) {
 }
 
 function serviceActiveCalcRows() {
-  return serviceVisibleRows().filter((row) => row.active && !serviceChildren(row).some((child) => child.active));
+  return serviceVisibleRows().filter((row) => row.active && (row.scenario !== "scratch" || row.item.trim()) && !serviceChildren(row).some((child) => child.active));
 }
 
 function servicePlatformValues() {
@@ -5826,8 +5843,8 @@ function serviceCalc(row) {
   return {
     activationCost,
     monthlyCost,
-    activationPrice: activationCost * (1 + startupMarkup),
-    monthlyPrice: monthlyCost * (1 + monthlyMarkup)
+    activationPrice: row.startupPrice == null ? activationCost * (1 + startupMarkup) : Math.max(asNumber(row.startupPrice), 0),
+    monthlyPrice: row.monthlyPrice == null ? monthlyCost * (1 + monthlyMarkup) : Math.max(asNumber(row.monthlyPrice), 0)
   };
 }
 
@@ -5899,8 +5916,48 @@ function serviceTotals() {
 
 function renderServiceRows() {
   const rowsForScenario = serviceVisibleRows();
+  const isScratch = serviceScenario === "scratch";
   if (els.servicePlatformLookup) {
     els.servicePlatformLookup.innerHTML = servicePlatformValues().map((value) => `<option value="${escapeHtml(value)}"></option>`).join("");
+  }
+  if (isScratch) {
+    const totals = rowsForScenario.filter((row) => row.active && row.item.trim()).reduce((sum, row) => {
+      const calc = serviceCalc(row);
+      sum.startup += calc.activationPrice;
+      sum.monthly += calc.monthlyPrice;
+      return sum;
+    }, {startup: 0, monthly: 0});
+    els.serviceRows.innerHTML = `<section class="service-group service-scratch-group">
+      <h3><span>Custom services</span><small>${money(totals.startup, 2)} startup / ${money(totals.monthly, 2)} monthly</small></h3>
+      ${rowsForScenario.map((row) => {
+        const index = serviceRows.indexOf(row), calc = serviceCalc(row);
+        return `<div class="service-row service-scratch-row" data-index="${index}">
+          <div class="service-scratch-main">
+            <label class="service-scratch-use"><input class="service-active" type="checkbox" ${row.active ? "checked" : ""} /> Use</label>
+            <label class="service-scratch-field service-scratch-name">Item or service<input class="service-item" type="text" value="${escapeHtml(row.item)}" placeholder="Name the service" /></label>
+            <label class="service-scratch-field">Platform / driver<input class="service-platform" list="servicePlatformLookup" type="text" value="${escapeHtml(row.platform || "")}" /></label>
+            <label class="service-scratch-field">Cost type<select class="service-cost-type">${["Services", "Platforms", "Assets", "Fractional Representatives", "Setup/Activation"].map((type) => `<option value="${type}" ${row.costType === type ? "selected" : ""}>${type}</option>`).join("")}</select></label>
+            <label class="service-scratch-field">Cost center<select class="service-cost-center">${["Sharpdots", "SalesArmy"].map((center) => `<option value="${center}" ${serviceNormalizeCostCenter(row.costCenter) === center ? "selected" : ""}>${center}</option>`).join("")}</select></label>
+            <button class="service-remove-line ghost-btn" type="button" aria-label="Remove line" title="Remove line"><i data-lucide="trash-2" aria-hidden="true"></i></button>
+          </div>
+          <div class="service-scratch-pricing">
+            <label class="service-scratch-field">Startup cost<input class="service-startup" type="number" step="0.01" min="0" value="${decimal(row.startup, 2)}" /></label>
+            <label class="service-scratch-field">Startup markup %<input class="service-startup-markup" type="number" step="1" min="0" value="${decimal(row.startupMarkup ?? row.markup, 0)}" /></label>
+            <label class="service-scratch-field">Startup price<input class="service-startup-price" type="number" step="0.01" min="0" placeholder="Calculated" value="${row.startupPrice == null ? "" : escapeHtml(row.startupPrice)}" /></label>
+            <label class="service-scratch-field">Monthly cost<input class="service-recurring" type="number" step="0.01" min="0" value="${decimal(row.recurring, 2)}" /></label>
+            <label class="service-scratch-field">Unit cost<input class="service-variable" type="number" step="0.0001" min="0" value="${decimal(row.variable, 4)}" /></label>
+            <label class="service-scratch-field">Quantity<input class="service-quantity" type="number" step="1" min="0" value="${decimal(row.quantity, 0)}" /></label>
+            <label class="service-scratch-field">Model<select class="service-variable-model">${["monthly", "each", "metered", "seat/account", "rep/month", "profiles", "asset", "budget", "activation"].map((model) => `<option value="${model}" ${row.variableModel === model ? "selected" : ""}>${model}</option>`).join("")}</select></label>
+            <label class="service-scratch-field">Monthly markup %<input class="service-monthly-markup" type="number" step="1" min="0" value="${decimal(row.monthlyMarkup ?? row.markup, 0)}" /></label>
+            <label class="service-scratch-field">Monthly price<input class="service-monthly-price" type="number" step="0.01" min="0" placeholder="Calculated" value="${row.monthlyPrice == null ? "" : escapeHtml(row.monthlyPrice)}" /></label>
+            <div class="service-scratch-total"><span>Calculated</span><strong>${money(calc.activationPrice, 2)} startup / ${money(calc.monthlyPrice, 2)} monthly</strong></div>
+          </div>
+          <label class="service-scratch-field service-scratch-notes">Notes<input class="service-notes" type="text" value="${escapeHtml(row.notes || "")}" /></label>
+        </div>`;
+      }).join("")}
+    </section>`;
+    window.lucide?.createIcons({attrs:{"stroke-width":1.7}});
+    return;
   }
   const grouped = rowsForScenario.reduce((memo, row) => {
     memo[row.group] = memo[row.group] || [];
@@ -5961,6 +6018,7 @@ function renderServiceRows() {
       }).join("")}
     </section>
   `).join("");
+  window.lucide?.createIcons({attrs:{"stroke-width":1.7}});
 }
 
 function renderServiceSummary() {
@@ -5972,7 +6030,9 @@ function renderServiceSummary() {
   els.serviceMonthlyPrice.textContent = money(totals.monthlyPrice, 2);
   els.serviceTermPrice.textContent = money(termPrice, 2);
   els.serviceAppointmentPrice.textContent = money(appointmentCount ? termPrice / appointmentCount : 0, 2);
-  els.serviceCostCenters.innerHTML = Object.entries(totals.byCenter).map(([center, total]) => `
+  els.serviceCostCenters.innerHTML = Object.entries(totals.byCenter)
+    .filter(([, total]) => serviceScenario !== "scratch" || total.activationCost || total.monthlyCost || total.activationPrice || total.monthlyPrice)
+    .map(([center, total]) => `
     <div class="service-center-row">
       <strong>${center}</strong>
       <span>Activation cost ${money(total.activationCost, 2)}</span>
@@ -5981,12 +6041,11 @@ function renderServiceSummary() {
       <span>Monthly price ${money(total.monthlyPrice, 2)}</span>
     </div>
   `).join("");
-  els.serviceAssumptions.innerHTML = `
-    <p><strong>${serviceScenarioNames[serviceScenario]}</strong></p>
-    <p>Base SalesMachine includes cold email, strategy, copywriting, and standard/custom intent topic datastreams.</p>
-    <p>Optional channels can be layered in for the client use case: fractional BDR, automated dialing, Cold LinkedIn, intent DSP ads, ringless voicemail, and other outbound surfaces.</p>
-    <p>Costing types are separated as services, platforms, assets, fractional representatives, and setup/activation.</p>
-  `;
+  els.serviceAssumptions.closest("article").hidden = serviceScenario === "scratch";
+  if (serviceScenario !== "scratch") els.serviceAssumptions.innerHTML = `<p><strong>${serviceScenarioNames[serviceScenario]}</strong></p>
+       <p>Base SalesMachine includes cold email, strategy, copywriting, and standard/custom intent topic datastreams.</p>
+       <p>Optional channels can be layered in for the client use case: fractional BDR, automated dialing, Cold LinkedIn, intent DSP ads, ringless voicemail, and other outbound surfaces.</p>
+       <p>Costing types are separated as services, platforms, assets, fractional representatives, and setup/activation.</p>`;
   const metrics = executionMetrics();
   els.executionSummary.innerHTML = `
     <div><span>Dials / Week</span><strong>${Math.round(metrics.dialsPerWeek).toLocaleString()}</strong></div>
@@ -6000,6 +6059,17 @@ function renderServiceSummary() {
 function renderServicesCalculator() {
   if (!els.servicesView) return;
   serviceScenario = els.serviceScenario.value || "salesmachine";
+  const isScratch = serviceScenario === "scratch";
+  els.serviceAddLine.hidden = !isScratch;
+  els.serviceExecutionInputs.hidden = isScratch;
+  els.serviceAppointmentSummary.hidden = isScratch;
+  els.serviceAppointmentSummary.parentElement.classList.toggle("scratch-mode", isScratch);
+  els.serviceWorkbenchTitle.textContent = isScratch ? "Services" : "SalesMachine";
+  els.serviceWorkbenchDescription.textContent = isScratch ? "Custom service pricing" : "Omnichannel appointment engine prototype";
+  els.serviceComponentsDescription.textContent = isScratch ? "Custom items and pricing" : "Services, platforms, assets, reps, and setup/activation";
+  els.serviceCostCenterDescription.textContent = isScratch ? "Cost and price by center" : "Joint venture execution allocation";
+  const recordTitle = document.querySelector('[data-record-type="services"] .tab-record-identity small');
+  if (recordTitle && dirtyWorkspaceRecords.has("services")) recordTitle.textContent = serviceScenarioNames[serviceScenario];
   updateServiceAppointmentsFromExecution();
   renderServiceRows();
   renderServiceSummary();
@@ -11176,6 +11246,12 @@ els.tabRecordControls.forEach((control) => {
   control.addEventListener("change", workspaceRecordAction);
 });
 if (els.serviceScenario) {
+  els.serviceAddLine.addEventListener("click", () => {
+    serviceRows.push(blankServiceRow());
+    touchWorkspaceRecord("services");
+    renderServicesCalculator();
+    els.serviceRows.querySelector(".service-row[data-index]:last-child .service-item")?.focus();
+  });
   [els.serviceScenario, els.serviceTermMonths, els.serviceOngoingMonths, els.serviceAppointments, els.serviceStartupMarkup, els.serviceMonthlyMarkup, ...els.serviceTermModes].forEach((input) => {
     input.addEventListener("change", () => {
       if (input === els.serviceStartupMarkup) {
@@ -11204,6 +11280,8 @@ if (els.serviceScenario) {
     if (!rowEl) return;
     const row = serviceRows[Number(rowEl.dataset.index)];
     if (!row) return;
+    if (event.target.classList.contains("service-item")) row.item = event.target.value.trim();
+    if (event.target.classList.contains("service-notes")) row.notes = event.target.value;
     if (event.target.classList.contains("service-active")) row.active = event.target.checked;
     if (event.target.classList.contains("service-platform")) row.platform = event.target.value;
     if (event.target.classList.contains("service-cost-type")) row.costType = event.target.value;
@@ -11215,10 +11293,33 @@ if (els.serviceScenario) {
     if (event.target.classList.contains("service-variable-model")) row.variableModel = event.target.value;
     if (event.target.classList.contains("service-startup-markup")) row.startupMarkup = asNumber(event.target.value);
     if (event.target.classList.contains("service-monthly-markup")) row.monthlyMarkup = asNumber(event.target.value);
+    if (event.target.classList.contains("service-startup-price")) row.startupPrice = event.target.value === "" ? null : Math.max(asNumber(event.target.value), 0);
+    if (event.target.classList.contains("service-monthly-price")) row.monthlyPrice = event.target.value === "" ? null : Math.max(asNumber(event.target.value), 0);
     touchWorkspaceRecord("services");
+    if (serviceScenario === "scratch") {
+      const calc = serviceCalc(row);
+      rowEl.querySelector(".service-scratch-total strong").textContent = `${money(calc.activationPrice, 2)} startup / ${money(calc.monthlyPrice, 2)} monthly`;
+      const totals = serviceActiveCalcRows().reduce((sum, item) => {
+        const itemCalc = serviceCalc(item);
+        sum.startup += itemCalc.activationPrice;
+        sum.monthly += itemCalc.monthlyPrice;
+        return sum;
+      }, {startup: 0, monthly: 0});
+      els.serviceRows.querySelector(".service-scratch-group h3 small").textContent = `${money(totals.startup, 2)} startup / ${money(totals.monthly, 2)} monthly`;
+      renderServiceSummary();
+      return;
+    }
     renderServicesCalculator();
   });
   els.serviceRows.addEventListener("click", (event) => {
+    const remove = event.target.closest(".service-remove-line");
+    if (remove && serviceScenario === "scratch") {
+      const rowEl = remove.closest(".service-row[data-index]");
+      serviceRows.splice(Number(rowEl.dataset.index), 1);
+      touchWorkspaceRecord("services");
+      renderServicesCalculator();
+      return;
+    }
     const button = event.target.closest(".service-chevron");
     if (!button) return;
     const rowEl = button.closest(".service-row[data-index]");
