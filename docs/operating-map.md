@@ -1,5 +1,16 @@
 # Operating Map
 
+## Proposal and Quote Interface Lane
+
+- September 29: branch `codex/proposal-quote-interface` from current main after
+  PR37, in the isolated estimator-crm-draft checkout.
+- Scope: shared save/version headers, Proposal Details/Content/Send, Quote
+  item-first layout and collapsible details. No schema/auth/delivery changes.
+- Files: app.js, index.html, editor-ui.js, editor-ui.css and interface docs.
+- Review build and verification: `docs/proposal-quote-interface.md`.
+- ClickUp: https://app.clickup.com/t/868jnxdp7. Production deployment awaits review.
+- Shared New project checkout and its preexisting edits remain untouched.
+
 ## Named CRM Access Follow-up
 
 - Ray's active Portal user ID 46 is non-admin; the v43 CRM pilot only accepted
