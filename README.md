@@ -4,6 +4,11 @@ The Estimator is a local-first prototype for estimating, print quotes, and Stand
 
 In **Proposals > Services**, choose **Start from scratch** to price a custom service without SalesMachine components. The initial line is blank; name it, enter costs and markups or a direct startup/monthly price, and add or remove lines as needed. Save the Service Calc record to retain the scenario and its custom lines.
 
+The new **Living Ops engagement** service model selects reviewed product snapshots,
+costs components, estimates team capacity, and rolls the resulting engagement into
+a proposal. Catalog input currently uses the Living Ops JSON export, not live sync.
+See [Services builder and integration boundary](docs/living-ops-services.md).
+
 ## Local Standard Products setup
 
 The local environment is configured in the ignored `.env.local` file. It requires:

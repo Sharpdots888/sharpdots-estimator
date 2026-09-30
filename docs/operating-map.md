@@ -1,5 +1,17 @@
 # Operating Map
 
+## Living Ops Services Lane
+
+- September 29: `codex/living-ops-services`, based on PR38's unmerged interface
+  branch, in the same isolated estimator-crm-draft checkout.
+- Scope: source-catalog import, product assembly, component costing, team-capacity
+  planning, immutable S snapshots, and proposal rollups. Existing scenarios kept.
+- Living Ops remains product definition owner. No live catalog endpoint assumed;
+  no schema/auth/deployment/execution relay changes.
+- Files: `services/`, narrow `app.js`, `index.html`, `crm/crm.js`, persistence tests,
+  field registry and `docs/living-ops-services.md`.
+- ClickUp: https://app.clickup.com/t/868jnxdp7. Review and release approval pending.
+
 ## Proposal and Quote Interface Lane
 
 - September 29: branch `codex/proposal-quote-interface` from current main after
