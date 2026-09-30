@@ -16,10 +16,20 @@ if(!['localhost','127.0.0.1'].includes(new URL(url).hostname))throw Error('Use a
     const switchTo=async id=>{await radio(id).click();assert.equal(await radio(id).getAttribute('aria-checked'),'true');};
     const all=await data();
     assert.equal(await radio('services').getAttribute('aria-checked'),'true');
+    const themes=[];
     for(const pipeline of ['services','quotes']){
       await switchTo(pipeline);
       const expected=M.inPipeline(all,pipeline);
       assert.equal(await page.locator('.crm-deal').count(),expected.length);
+      const theme=await page.evaluate(()=>{
+        const style=s=>getComputedStyle(document.querySelector(s));
+        return {canvas:style('#crmContent').backgroundColor,heading:style('.crm-stage>header').backgroundColor,
+          accent:style('.crm-stage').borderTopColor,title:style('.crm-stage h2').color,
+          card:style('.crm-deal').backgroundColor,signed:style('.crm-pill.green').backgroundColor};
+      });
+      assert.equal(theme.card,'rgb(255, 255, 255)','Cards must remain neutral for legibility');
+      assert.equal(theme.title,theme.accent,'Column heading uses the pipeline accent');
+      themes.push(theme);
       await page.screenshot({path:`/private/tmp/pipeline-${pipeline}-initial.png`});
       const cash=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);
       assert.equal(await page.locator('.crm-metrics > div').first().locator('strong').innerText(),cash(expected.filter(o=>o.status==='open').reduce((n,o)=>n+M.value(o),0)));
@@ -31,6 +41,8 @@ if(!['localhost','127.0.0.1'].includes(new URL(url).hostname))throw Error('Use a
       }
       await page.locator('#crmScope').selectOption('all');
     }
+    for(const key of ['canvas','heading','accent'])assert.notEqual(themes[0][key],themes[1][key],`Pipeline ${key} must be distinct`);
+    assert.equal(themes[0].signed,themes[1].signed,'Signed status must keep its semantic color');
     await radio('quotes').focus();
     await page.keyboard.press('ArrowLeft');
     assert.equal(await radio('services').getAttribute('aria-checked'),'true');

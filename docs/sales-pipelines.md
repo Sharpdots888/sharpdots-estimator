@@ -8,6 +8,9 @@ build; production deployment requires separate approval.
 
 - Pipeline has two persistent views: **Services** and **Print / Production**.
   Toggle counts show open opportunities in each pipeline, independent of filters.
+- Services uses a green canvas and column headers; Print / Production uses
+  purple. White cards retain neutral body text, and signed/overdue status colors
+  keep their existing meaning. Pipeline styling does not affect document output.
 - Board, List, Activities, Handoffs, search, totals, and the visible result count
   all use the selected pipeline. Metrics also follow the current filters.
 - New opportunities inherit the selected pipeline and default to the corresponding
