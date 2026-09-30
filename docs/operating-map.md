@@ -1,5 +1,23 @@
 # Operating Map
 
+## Separate Sales Pipelines Lane
+
+- Owner: current estimator Codex session, `codex/separate-sales-pipelines` from
+  deployed main b47d7a3. Local implementation verified and ready for user review.
+- Scope: Services / Print-Production selector, scoped pipeline views and totals,
+  creation defaults and explicit reassignment with audit. Existing opportunity
+  state JSON stores membership; no new tables or migration.
+- Older Print opportunities default to Print / Production; Services and Mixed
+  default to Services. Explicit assignments override offering type.
+- Owns `crm/`, narrow opportunity-store persistence/tests, and related docs.
+  No auth, signing, billing, production writes or deployment in this request.
+- Verification: 31 automated tests, pipeline and broader CRM/Services browser
+  regressions, responsive checks, and disposable real PostgreSQL workflow passed.
+- Preview: http://127.0.0.1:4198/index.html?crm=1&pipelines=1.
+  Behavior and compatibility: `docs/sales-pipelines.md`. Not deployed.
+- ClickUp: https://app.clickup.com/t/868jnxdp7. Prior interface and Services lanes
+  below are now merged and deployed in v47; their earlier pending notes are historical.
+
 ## Living Ops Services Lane
 
 - September 29: `codex/living-ops-services`, based on PR38's unmerged interface

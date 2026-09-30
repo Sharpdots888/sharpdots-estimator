@@ -19,6 +19,23 @@
     printQuotes:['Print quote','PQ','printQuoteNumber','printQuoteView'],
     ecomm:['Price list','EPL','ecommNumber','ecommView']
   };
+  const pipelines = [
+    {id:'services', name:'Services', icon:'handshake'},
+    {id:'quotes', name:'Print / Production', icon:'printer'}
+  ];
+  function pipelineFor(o) {
+    if (pipelines.some(p=>p.id===o.pipeline)) return o.pipeline;
+    // Old opportunities have no pipeline assignment; mixed work stays services-led.
+    return o.kind==='Print' ? 'quotes' : 'services';
+  }
+  function pipelineName(o) { return pipelines.find(p=>p.id===pipelineFor(o)).name; }
+  function inPipeline(list, pipeline) { return list.filter(o=>pipelineFor(o)===pipeline); }
+  function assignPipeline(o, pipeline) {
+    if (!pipelines.some(p=>p.id===pipeline)) throw new Error('Unknown pipeline.');
+    const previous=pipelineFor(o);
+    o.pipeline=pipeline;
+    if(previous!==pipeline) stamp(o, 'Pipeline moved from '+pipelines.find(p=>p.id===previous).name+' to '+pipelineName(o));
+  }
   function nextNumber(list) { return 'O-' + String(Math.max(0, ...list.map(o=>Number(o.number?.split('-')[1])||0))+1).padStart(6,'0'); }
   function value(o) { return Number(o.oneTime||0) + Number(o.monthly||0)*Number(o.term||0); }
   function probability(o) { return o.status==='lost'?0:o.status==='won'?100:(stages.find(s=>s.id===o.stage)?.probability||0); }
@@ -116,5 +133,5 @@
       return o;
     });
   }
-  return {stages,collectionMeta,nextNumber,value,probability,acceptedDoc,closeIssues,handoffIssues,billingIssues,stamp,move,receive,make,samples,date};
+  return {stages,pipelines,pipelineFor,pipelineName,inPipeline,assignPipeline,collectionMeta,nextNumber,value,probability,acceptedDoc,closeIssues,handoffIssues,billingIssues,stamp,move,receive,make,samples,date};
 });

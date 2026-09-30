@@ -46,6 +46,36 @@ html.crm-preview { --crm-ink:#263433; --crm-muted:#697675; --crm-line:#dce3e1; -
 .crm-pill.amber { background:#fff1d6; color:#8b6418; }
 .crm-pill.red { background:#fbe9e6; color:#a04c43; }
 .crm-page-heading { display:flex; justify-content:space-between; align-items:center; padding:25px 24px 20px; }
+.crm-page-heading { gap:18px; flex-wrap:wrap; }
+.crm-pipeline-heading { display:flex; align-items:center; gap:28px; min-width:0; flex-wrap:wrap; }
+.crm-pipeline-toggle { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.45fr); width:390px; max-width:100%; padding:3px; gap:3px; border:1px solid #d5deda; border-radius:6px; background:#eaf0ed; }
+#crmShell .crm-pipeline-toggle button { display:flex; align-items:center; justify-content:center; gap:7px; min-width:0; min-height:40px; padding:8px; border:1px solid transparent; border-radius:4px; background:transparent; color:#596960; font-weight:600; font-size:13px; line-height:1.25; }
+#crmShell .crm-pipeline-toggle button:hover { background:#f7faf8; }
+#crmShell .crm-pipeline-toggle [aria-checked="true"] { background:#fff; border-color:#a4cbbb; color:#17664e; box-shadow:0 1px 3px #223d3010; }
+#crmShell .crm-pipeline-toggle [data-pipeline="quotes"][aria-checked="true"] { border-color:#c9b4db; color:#704991; }
+.crm-pipeline-count { flex-shrink:0; min-width:23px; padding:2px 4px; border-radius:4px; background:#e7eeea; color:#60746a; font-size:11px; font-variant-numeric:tabular-nums; }
+#crmShell .crm-pipeline-toggle [data-pipeline="quotes"][aria-checked="true"] .crm-pipeline-count { background:#efe8f6; color:#704991; }
+body[data-crm-page="pipeline"] { --pipeline-accent:#186b56; --pipeline-canvas:#f4f9f6; --pipeline-paper:#f4f9f6; --pipeline-heading:#cce5d9; --pipeline-line:#cbd8d1; background:var(--pipeline-canvas); }
+body[data-crm-page="pipeline"][data-crm-pipeline="quotes"] { --pipeline-accent:#704491; --pipeline-canvas:#f8f5fb; --pipeline-paper:#f8f5fb; --pipeline-heading:#e1d1eb; --pipeline-line:#d8cee2; }
+body[data-crm-page="pipeline"] #crmContent { background:var(--pipeline-canvas); }
+body[data-crm-page="pipeline"] .crm-page-heading,body[data-crm-page="pipeline"] #crmPipelineMetrics { background:var(--pipeline-paper); }
+body[data-crm-page="pipeline"] .crm-metrics { border-bottom-color:var(--pipeline-line); }
+body[data-crm-page="pipeline"] #crmShell .crm-header nav .selected,
+body[data-crm-page="pipeline"] #crmContent .crm-view-tabs .selected { color:var(--pipeline-accent); border-color:var(--pipeline-line); background:var(--pipeline-paper); }
+body[data-crm-page="pipeline"] #crmContent .crm-btn.primary { background:var(--pipeline-accent); border-color:var(--pipeline-accent); }
+body[data-crm-page="pipeline"] #crmContent .crm-pipeline-toggle { background:var(--pipeline-paper); border-color:var(--pipeline-line); }
+body[data-crm-page="pipeline"] #crmContent .crm-pipeline-toggle [aria-checked="true"] { background:#fff; color:var(--pipeline-accent); border-color:var(--pipeline-accent); }
+body[data-crm-page="pipeline"] #crmContent .crm-stage { border-top-color:var(--pipeline-accent); }
+body[data-crm-page="pipeline"] #crmContent .crm-stage>header { background:var(--pipeline-heading); padding:12px 10px; }
+body[data-crm-page="pipeline"] #crmContent .crm-stage h2 { color:var(--pipeline-accent); }
+body[data-crm-page="pipeline"] #crmContent .crm-stage-cards { padding-top:10px; }
+body[data-crm-page="pipeline"] #crmContent .crm-stage>header .crm-btn { color:var(--pipeline-accent); border-color:var(--pipeline-line); background:var(--pipeline-paper); }
+body[data-crm-page="pipeline"] #crmContent .crm-deal:hover { border-color:var(--pipeline-accent); }
+body[data-crm-page="pipeline"] #crmContent .crm-stage-empty { border-color:var(--pipeline-line); background:var(--pipeline-paper); color:var(--crm-muted); }
+body[data-crm-page="pipeline"] #crmContent .crm-table th { background:var(--pipeline-heading); color:var(--pipeline-accent); }
+body[data-crm-page="pipeline"] #crmContent button:focus-visible,
+body[data-crm-page="pipeline"] #crmContent [tabindex]:focus-visible { outline-color:var(--pipeline-accent); }
+@media(max-width:700px) { .crm-pipeline-heading { width:100%; gap:14px; } .crm-pipeline-toggle { width:100%; } #crmShell .crm-pipeline-toggle button { font-size:12px; } }
 .crm-eyebrow { font-size:10px; font-weight:700; color:#6c8078; }
 #crmShell h1 { font-size:26px; font-weight:700; line-height:1.3; margin-top:4px; }
 #crmShell h1 span { font-size:12px; font-weight:400; margin-left:9px; color:#697675; }

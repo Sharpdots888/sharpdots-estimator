@@ -1,6 +1,25 @@
 const test=require('node:test');
 const assert=require('node:assert/strict');
 const M=require('./model.js');
+test('pipeline defaults classify older opportunities without changing them',()=>{
+  const list=M.samples(),before=JSON.stringify(list);
+  const services=M.inPipeline(list,'services'),quotes=M.inPipeline(list,'quotes');
+  assert.equal(services.length,6);assert.equal(quotes.length,6);
+  assert.ok(services.every(o=>['Services','Mixed'].includes(o.kind)));
+  assert.ok(quotes.every(o=>o.kind==='Print'));
+  assert.equal(new Set([...services,...quotes].map(o=>o.id)).size,list.length);
+  assert.equal(JSON.stringify(list),before);
+});
+test('explicit pipeline membership overrides offering without changing acceptance or records',()=>{
+  const o=M.samples()[10],before=structuredClone(o);
+  M.assignPipeline(o,'quotes');
+  assert.equal(M.pipelineFor(o),'quotes');assert.equal(o.kind,'Mixed');
+  for(const key of ['id','number','stage','status','records','documents','approval','billing','handoffs'])assert.deepEqual(o[key],before[key],key);
+  assert.ok(M.acceptedDoc(o));assert.match(o.history[0].text,/Pipeline moved from Services to Print/);
+  assert.equal(M.pipelineFor(JSON.parse(JSON.stringify(o))),'quotes');
+  assert.throws(()=>M.assignPipeline(o,'all'),/Unknown pipeline/);
+  const count=o.history.length;M.assignPipeline(o,'quotes');assert.equal(o.history.length,count);
+});
 test('sample identifiers and contract arithmetic',()=>{const os=M.samples();assert.equal(new Set(os.map(o=>o.number)).size,12);assert.equal(M.nextNumber(os),'O-000013');assert.equal(M.value(os[8]),8400);assert.equal(M.probability({...os[0],status:'lost'}),0);});
 test('won requires acceptance, client and positive value',()=>{const o=M.make();assert.equal(M.closeIssues(o).length,3);assert.ok(M.move(o,'won').length);assert.equal(o.status,'open');});
 test('signed primary must match the current offer version',()=>{const o=M.samples()[10];assert.ok(M.acceptedDoc(o));o.records[0].version++;assert.equal(M.acceptedDoc(o),undefined);assert.ok(M.closeIssues(o).length);assert.ok(M.billingIssues(o).length);});

@@ -13,6 +13,13 @@
   if(live)db={schema:2,opportunities:live.opportunities,selected:null};
   if(!db || !Array.isArray(db.opportunities))db={schema:1,opportunities:M.samples(),selected:null};
   let page='pipeline',view='board',detailTab='overview',selected=null,search='',owner='all',kind='all',scope='all',attention=false;
+  let pipeline='services';
+  try { const saved=localStorage.getItem('sharpdots-crm-pipeline-v1');if(M.pipelines.some(p=>p.id===saved))pipeline=saved; } catch {}
+  function selectPipeline(next){
+    if(!M.pipelines.some(p=>p.id===next))return;
+    pipeline=next;
+    try{localStorage.setItem('sharpdots-crm-pipeline-v1',pipeline);}catch{}
+  }
   let lastFocus=null,dragId=null,toastTimer;
   const current=()=>db.opportunities.find(o=>o.id===selected);
   let saving=false,recordSaving=false,saveError='';
@@ -51,7 +58,14 @@
   const next=(o)=>pending(o)[0];
   function overdue(o){return pending(o).some(a=>a.due<M.date(0));}
   function needs(o){return overdue(o)||!next(o)||o.documents.some(d=>['expired','declined','failed'].includes(d.status))||!!M.acceptedDoc(o)&&o.status==='open';}
-  function filtered(){return db.opportunities.filter(o=>(scope==='all'||o.status===scope)&&(owner==='all'||o.owner===owner)&&(kind==='all'||o.kind===kind)&&(!attention||needs(o))&&`${o.title} ${o.account} ${o.number} ${o.contact}`.toLowerCase().includes(search.toLowerCase()));}
+  function filtered(){return M.inPipeline(db.opportunities,pipeline).filter(o=>(scope==='all'||o.status===scope)&&(owner==='all'||o.owner===owner)&&(kind==='all'||o.kind===kind)&&(!attention||needs(o))&&`${o.title} ${o.account} ${o.number} ${o.contact}`.toLowerCase().includes(search.toLowerCase()));}
+  function pipelineToggle(){return `<div class="crm-pipeline-toggle" role="radiogroup" aria-label="Sales pipeline">${M.pipelines.map(p=>`<button type="button" data-action="pipeline" data-pipeline="${p.id}" role="radio" aria-checked="${p.id===pipeline}" tabindex="${p.id===pipeline?0:-1}" aria-label="${p.name}">${icon(p.icon)}<span>${p.name}</span><span class="crm-pipeline-count" aria-label="Open opportunities">${M.inPipeline(db.opportunities,p.id).filter(o=>o.status==='open').length}</span></button>`).join('')}</div>`;}
+  function refreshResults(){
+    $('#crmResults').innerHTML=results();
+    $('#crmPipelineMetrics').innerHTML=metrics(filtered());
+    $('#crmResultCount').textContent=filtered().length+' opportunities · USD · Initial-term contract value';
+    icons();
+  }
   function icons(){lucide.createIcons({attrs:{'stroke-width':1.7}});}
   function toast(text){$('#crmToast').textContent=text;$('#crmToast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#crmToast').hidden=true,5000);}
   document.body.insertAdjacentHTML('afterbegin',`<div id="crmShell">
@@ -74,14 +88,15 @@
     persist();
     document.body.classList.toggle('crm-save-error',!!saveError);
     document.body.dataset.crmPage=page;
+    document.body.dataset.crmPipeline=pipeline;
     $$('.crm-header [data-page]').forEach(b=>{b.classList.toggle('selected',b.dataset.page===page);b.setAttribute('aria-current',b.dataset.page===page?'page':'false');});
     if(page==='pipeline'){
       $('#crmContext').innerHTML='';
-      $('#crmContent').innerHTML=`<div class="crm-page-heading"><div><div class="crm-eyebrow">SALES / OPPORTUNITIES</div><h1>Pipeline <span>${db.opportunities.filter(o=>o.status==='open').length} open</span></h1></div>${btn('new','Opportunity','plus','','primary')}</div>
-      ${metrics(db.opportunities)}
+      $('#crmContent').innerHTML=`<div class="crm-page-heading"><div class="crm-pipeline-heading"><div><div class="crm-eyebrow">SALES / OPPORTUNITIES</div><h1>Pipeline</h1></div>${pipelineToggle()}</div>${btn('new','Opportunity','plus','','primary')}</div>
+      <div id="crmPipelineMetrics">${metrics(filtered())}</div>
       <div class="crm-toolbar"><div class="crm-view-tabs" role="group" aria-label="Pipeline view">${[['board','Board','columns-3'],['list','List','list'],['activities','Activities','calendar-days'],['handoffs','Handoffs','arrow-right-left']].map(([v,l,i])=>btn('view',l,i,`data-view="${v}"`,view===v?'selected':'')).join('')}</div>
       <div class="crm-filters"><label class="crm-search">${icon('search')}<input id="crmSearch" aria-label="Search opportunities" placeholder="Search opportunities" value="${esc(search)}"></label><select id="crmOwner" aria-label="Owner">${opts([['all','All owners'],...people],owner)}</select><select id="crmKind" aria-label="Offering">${opts([['all','All offerings'],'Print','Services','Mixed'],kind)}</select><select id="crmScope" aria-label="Opportunity status">${opts([['open','Open'],['all','All statuses'],['won','Won'],['lost','Lost']],scope)}</select>${attention?btn('attention','Attention only','x','','chosen'):''}</div></div>
-      <div id="crmResults">${results()}</div><footer class="crm-board-footer"><span>${filtered().length} opportunities · USD · Initial-term contract value</span><span role="status">${icon('check')}${live?(saveError?'NOT SAVED: '+esc(saveError)+' · Export a backup, then reload.':saving?'Saving to database…':'Saved to database'):'Draft saved on this browser'}</span></footer>`;
+      <div id="crmResults">${results()}</div><footer class="crm-board-footer"><span id="crmResultCount">${filtered().length} opportunities · USD · Initial-term contract value</span><span role="status">${icon('check')}${live?(saveError?'NOT SAVED: '+esc(saveError)+' · Export a backup, then reload.':saving?'Saving to database…':'Saved to database'):'Draft saved on this browser'}</span></footer>`;
     }else{
       $('#crmContent').innerHTML=''; renderContext();
     }
@@ -107,12 +122,13 @@
     renderDetail();if(!$('#crmDrawer').open)$('#crmDrawer').showModal();
   }
   function renderDetail(){const o=current();if(!o)return;const d=M.acceptedDoc(o);
-    $('#crmDrawer').innerHTML=`<header class="crm-drawer-header"><div><span class="crm-eyebrow">${o.number} ${pill(o.kind,o.kind==='Print'?'purple':'teal')}</span><h2 id="crmDetailTitle">${esc(o.title)}</h2><p>${esc(o.account)} · ${esc(o.contact)}</p></div>${btn('close-detail','','x','aria-label="Close opportunity"','icon-only')}</header>
+    $('#crmDrawer').innerHTML=`<header class="crm-drawer-header"><div><span class="crm-eyebrow">${o.number} ${pill(M.pipelineName(o),M.pipelineFor(o)==='quotes'?'purple':'teal')}</span><h2 id="crmDetailTitle">${esc(o.title)}</h2><p>${esc(o.account)} · ${esc(o.contact)}</p></div>${btn('close-detail','','x','aria-label="Close opportunity"','icon-only')}</header>
     <div class="crm-detail-commercial"><div><strong>${money(M.value(o))}</strong><span>Initial contract</span></div><div><strong>${o.monthly?money(o.monthly)+'/mo':'One-time'}</strong><span>${o.monthly?o.term+' month initial term':'Print / project'}</span></div><div><strong>${shortDate(o.close)}</strong><span>Expected close</span></div><span class="crm-avatar" title="${esc(o.owner)}">${initials(o.owner)}</span></div>
     <div class="crm-stage-path" aria-label="Opportunity stage">${M.stages.map(s=>`<button data-action="stage" data-stage="${s.id}" class="${o.stage===s.id?'current':''}" aria-pressed="${o.stage===s.id}">${s.name}</button>`).join('')}</div>
     <div class="crm-detail-actions">${o.status==='open'?`${btn('win','Mark won','check','','success')}${btn('lost','Mark lost','x')}`:`${pill(o.status==='won'?'Won':'Lost',tone(o.status))}${btn('reopen','Reopen','undo-2')}`}<span>${d?'Primary offer signed':o.status==='lost'?esc(o.lostReason||'Closed lost'):o.approval.method&&o.approval.reference?esc(o.approval.method+' recorded'):'Awaiting commercial acceptance'}</span>${btn('edit','Edit opportunity','pencil')}</div>
     <nav class="crm-detail-tabs" aria-label="Opportunity detail tabs">${[['overview','Overview'],['records','Records'],['documents','Documents'],['handoff','Handoff & billing'],['activity','Activity']].map(([t,l])=>btn('detail-tab',l,'',`data-tab="${t}"`,detailTab===t?'selected':'')).join('')}</nav>
     <div class="crm-detail-body">${detailTab==='overview'?overview(o):detailTab==='records'?records(o):detailTab==='documents'?documents(o):detailTab==='handoff'?handoff(o):activity(o)}</div>`;
+    $('.crm-detail-actions').insertAdjacentHTML('beforeend',btn('move-pipeline','Move pipeline','arrow-right-left'));
     if(live){
       $('#crmDrawer').querySelectorAll('[data-record-role]').forEach(select=>{
         const record=o.records.find(r=>String(r.id)===select.dataset.recordRole);
@@ -132,7 +148,7 @@
     <section class="crm-delivery-section"><div class="crm-section-title"><h3>${icon('receipt')}Xero billing handoff</h3>${pill(label(o.billing.status),tone(o.billing.status))}</div><form id="crmBillingForm" class="crm-form"><div class="crm-form-grid">${input('Billing email','contact',o.billing.contact,'email')}${select('Payment terms','terms',['Due on receipt','Net 15','Net 30','Net 60'],o.billing.terms)}${input('First invoice date','start',o.billing.start,'date')}${input('Deposit %','deposit',o.billing.deposit,'number','min="0" max="100"')}${input('Client PO / reference','po',o.billing.po)}${select('Payment status','payment',[['not-invoiced','Not invoiced'],['awaiting','Awaiting payment'],['deposit-paid','Deposit paid'],['paid','Paid'],['overdue','Overdue']],o.billing.payment)}</div><div class="crm-billing-summary"><span>One-time <strong>${money(o.oneTime)}</strong></span><span>Monthly <strong>${money(o.monthly)}</strong></span><span>Initial term <strong>${o.term} months</strong></span></div><button type="submit" class="crm-btn">Save billing details</button>${btn('billing-ready','Mark ready for Xero','check',M.billingIssues(o).length?'disabled':'')}</form><p class="crm-hint">${esc(M.billingIssues(o).join(' '))}</p><small class="crm-muted">Xero relay not connected · Payment status recorded manually · Authorize.net retained</small></section>`;}
   function activity(o){return `<div class="crm-section-title"><h3>Activity & audit trail</h3>${btn('add-activity','Schedule activity','plus')}</div><form id="crmNoteForm" class="crm-form"><label class="crm-field">Internal note<textarea name="note" rows="2" required placeholder="Capture a decision or conversation"></textarea></label><button class="crm-btn" type="submit">Add note</button></form><div class="crm-timeline">${o.history.map(h=>`<article><span>${icon(h.type==='document'?'file-text':h.type==='note'?'message-square':'circle-check')}</span><div><p>${esc(h.text)}</p><small>${new Date(h.at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</small></div></article>`).join('')}</div>`;}
   function modal(title,body){$('#crmDialog').innerHTML=`<header><h2 id="crmDialogTitle">${title}</h2>${btn('close-modal','','x','aria-label="Close dialog"','icon-only')}</header>${body}`;$('#crmDialog').showModal();icons();}
-  function editModal(o=null,stage='intake'){const x=o||M.make({stage});modal(o?'Edit opportunity':'New opportunity',`<form id="crmEditForm" data-id="${o?.id||''}" class="crm-form">${input('Opportunity name','title',x.title,'text','required placeholder="e.g. Fall customer reactivation"')}<div class="crm-form-grid">${input('Client / account','account',x.account,'text','required list="crmAccounts"')}${input('Contact / decision-maker','contact',x.contact)}${input('Contact email','email',x.email,'email')}${select('Owner','owner',people,x.owner)}${select('Offering','kind',['Print','Services','Mixed'],x.kind)}${select('Source','source',['Existing client','Referral','Inbound','Outbound','Partner'],x.source)}${input('One-time value ($)','oneTime',x.oneTime,'number','min="0" step="0.01"')}${input('Monthly value ($)','monthly',x.monthly,'number','min="0" step="0.01"')}${input('Initial term (months)','term',x.term,'number','min="1" step="1"')}${input('Expected close','close',x.close,'date','required')}</div><label class="crm-field">Opportunity brief<textarea name="notes" rows="3">${esc(x.notes)}</textarea></label><input type="hidden" name="stage" value="${stage==='won'?'intake':stage}"><datalist id="crmAccounts">${[...new Set(db.opportunities.map(o=>o.account))].map(a=>`<option value="${esc(a)}">`).join('')}</datalist><footer>${btn('close-modal','Cancel')}<button type="submit" class="crm-btn primary">${o?'Save changes':'Create opportunity'}</button></footer></form>`);}
+  function editModal(o=null,stage='intake'){const x=o||M.make({stage,pipeline,kind:pipeline==='quotes'?'Print':'Services'});modal(o?'Edit opportunity':'New opportunity',`<form id="crmEditForm" data-id="${o?.id||''}" class="crm-form">${input('Opportunity name','title',x.title,'text','required placeholder="e.g. Fall customer reactivation"')}<div class="crm-form-grid">${select('Pipeline','pipeline',M.pipelines.map(p=>[p.id,p.name]),M.pipelineFor(x))}${select('Offering','kind',['Print','Services','Mixed'],x.kind)}${input('Client / account','account',x.account,'text','required list="crmAccounts"')}${input('Contact / decision-maker','contact',x.contact)}${input('Contact email','email',x.email,'email')}${select('Owner','owner',people,x.owner)}${select('Source','source',['Existing client','Referral','Inbound','Outbound','Partner'],x.source)}${input('One-time value ($)','oneTime',x.oneTime,'number','min="0" step="0.01"')}${input('Monthly value ($)','monthly',x.monthly,'number','min="0" step="0.01"')}${input('Initial term (months)','term',x.term,'number','min="1" step="1"')}${input('Expected close','close',x.close,'date','required')}</div><label class="crm-field">Opportunity brief<textarea name="notes" rows="3">${esc(x.notes)}</textarea></label><input type="hidden" name="stage" value="${stage==='won'?'intake':stage}"><datalist id="crmAccounts">${[...new Set(db.opportunities.map(o=>o.account))].map(a=>`<option value="${esc(a)}">`).join('')}</datalist><footer>${btn('close-modal','Cancel')}<button type="submit" class="crm-btn primary">${o?'Save changes':'Create opportunity'}</button></footer></form>`);}
   function closeReview(o){const issues=M.closeIssues(o);modal('Close opportunity as won',`<div class="crm-form"><p><strong>${esc(o.title)}</strong><br>${o.number} · ${esc(o.account)}</p><div class="crm-close-value">${money(M.value(o))}<small>Agreed initial contract value</small></div><p>${M.acceptedDoc(o)?'Signed primary offer: '+M.acceptedDoc(o).number:'Approval: '+esc(o.approval.reference||'Not recorded')}</p>${issues.length?`<ul class="crm-issues">${issues.map(x=>`<li>${x}</li>`).join('')}</ul>`:'<p>Delivery and billing handoffs will remain pending until reviewed.</p>'}<footer>${btn('close-modal','Back')}${btn('confirm-win','Confirm won','check',issues.length?'disabled':'','success')}</footer></div>`);}
   function download(name,content,type='application/json'){const url=URL.createObjectURL(new Blob([content],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Download requested: '+name);}
   function recordCatalog(){const found=new Map();db.opportunities.forEach(o=>o.records.forEach(r=>found.set(r.collection+':'+r.number,{...r,account:o.account})));workspaces.forEach(w=>Object.entries(w.records||{}).forEach(([c,rs])=>rs.forEach(r=>{if(!M.collectionMeta[c])return;const n=r[M.collectionMeta[c][2]];found.set(c+':'+n,{collection:c,number:n,name:r.name||n,version:r.version||1,account:w.clientName||'',role:'Component'});})));Object.entries(libraryRecords).forEach(([c,rs])=>rs.forEach(r=>{const n=r[M.collectionMeta[c][2]];found.set(c+':'+n,{collection:c,number:n,name:r.name||n,version:r.version||1,account:'Standalone',role:'Component'});}));return [...found.values()];}
@@ -366,9 +382,11 @@
       f.elements[company?'accountRef':'contactRef'].value=f.dataset[company?'accountRef':'contactRef']||'';return;
     }
     if(a==='nav')navigate(b.dataset.page);
+    if(a==='pipeline'){selectPipeline(b.dataset.pipeline);search='';kind='all';attention=false;render();$(`[data-action=pipeline][data-pipeline=${pipeline}]`).focus();}
     if(a==='view'){view=b.dataset.view;if(view==='handoffs')scope='won';else if(scope==='won')scope='open';render();}
     if(a==='new')editModal(null,b.dataset.stage||'intake');
     if(a==='edit'){if(o.status==='won')toast('Reopen the opportunity before changing agreed commercial details.');else editModal(o);}
+    if(a==='move-pipeline')modal('Move opportunity',`<form id="crmPipelineForm" class="crm-form"><p><strong>${esc(o.title)}</strong><br>${esc(o.number)}</p>${select('Destination pipeline','pipeline',M.pipelines.map(p=>[p.id,p.name]),M.pipelineFor(o))}<footer>${btn('close-modal','Cancel')}<button type="submit" class="crm-btn primary">Move opportunity</button></footer></form>`);
     if(a==='open')details(b.dataset.id);
     if(a==='handoff-open')details(b.dataset.id,'handoff');
     if(a==='close-detail'){$('#crmDrawer').close();lastFocus?.focus();}
@@ -409,9 +427,13 @@
       if(live){if(data.accountRef==='__legacy__')data.accountRef='';if(data.contactRef==='__legacy__')data.contactRef='';for(const key of ['newClientName','newContactFirst','newContactLast','newContactEmail'])delete data[key];}
       const existing=db.opportunities.find(o=>o.id===f.dataset.id);const patch={...data,oneTime:Number(data.oneTime),monthly:Number(data.monthly),term:Number(data.term)};
       if(live)patch.ownerId=live.lookups.users.find(u=>u.username===patch.owner)?.id;
-      if(existing){delete patch.stage;if(['oneTime','monthly','term','account'].some(k=>existing[k]!==patch[k])){existing.approval={method:'',reference:''};existing.documents.forEach(d=>d.superseded=true);M.stamp(existing,'Commercial terms changed; acceptance requires review');}Object.assign(existing,patch);M.stamp(existing,'Opportunity details updated');}
+      if(existing){delete patch.stage;if(['oneTime','monthly','term','account'].some(k=>existing[k]!==patch[k])){existing.approval={method:'',reference:''};existing.documents.forEach(d=>d.superseded=true);M.stamp(existing,'Commercial terms changed; acceptance requires review');}M.assignPipeline(existing,patch.pipeline);Object.assign(existing,patch);M.stamp(existing,'Opportunity details updated');}
       else{const created=M.make({...patch,creationKey:crypto.randomUUID(),number:live?'Assigning…':M.nextNumber(db.opportunities)});created.handoffs.production.status=created.kind==='Services'?'not-required':'draft';created.handoffs.engagement.status=created.kind==='Print'?'not-required':'draft';M.stamp(created,'Opportunity created','created');db.opportunities.push(created);selected=created.id;}
-      $('#crmDialog').close();render();details(selected);toast(live?'Saving opportunity…':'Opportunity saved');
+      selectPipeline(patch.pipeline);$('#crmDialog').close();render();details(selected);toast(live?'Saving opportunity…':'Opportunity saved');
+    }
+    if(f.id==='crmPipelineForm'){
+      M.assignPipeline(o,data.pipeline);selectPipeline(data.pipeline);search='';kind='all';attention=false;
+      $('#crmDialog').close();render();renderDetail();toast(live?'Saving pipeline…':'Moved to '+M.pipelineName(o));
     }
     if(f.id==='crmLostForm'){o.status='lost';o.lostReason=data.reason;o.closedAt=new Date().toISOString();M.stamp(o,'Closed lost: '+data.reason+(data.note?' · '+data.note:''));$('#crmDialog').close();render();renderDetail();}
     if(f.id==='crmActivityForm'){o.activities.push({...data,id:crypto.randomUUID(),done:false});M.stamp(o,'Scheduled: '+data.title,'activity');$('#crmDialog').close();render();renderDetail();}
@@ -424,6 +446,7 @@
   document.addEventListener('change',e=>{
     const t=e.target,o=current();
     if(live&&(saving||recordSaving||saveError))return;
+    if(t.name==='pipeline'&&t.form?.id==='crmEditForm'&&!t.form.dataset.id&&t.form.elements.kind.value!=='Mixed')t.form.elements.kind.value=t.value==='quotes'?'Print':'Services';
     if(live&&t.name==='accountRef'){
       if(t.value==='__new__'){lookupFields(t.form,'company',true);t.form.elements.newClientName.focus();return;}
       const f=t.form,c=live.lookups.companies.find(c=>c.id===t.value);
@@ -443,7 +466,14 @@
     if(t.dataset.recordRole){if(t.value==='Primary offer')o.records.forEach(r=>{if(r.role==='Primary offer')r.role='Alternative';});o.records.find(r=>r.id===t.dataset.recordRole).role=t.value;persist();renderDetail();}
     if(t.dataset.documentPrimary){o.documents.forEach(d=>d.primary=d.id===t.dataset.documentPrimary&&t.checked);persist();renderDetail();}
   });
-  document.addEventListener('input',e=>{if(e.target.id==='crmSearch'){search=e.target.value;$('#crmResults').innerHTML=results();icons();}if(e.target.id==='crmRecordSearch'){$('#crmAttachList').innerHTML=attachList(e.target.value);icons();}});
+  document.addEventListener('input',e=>{if(e.target.id==='crmSearch'){search=e.target.value;refreshResults();}if(e.target.id==='crmRecordSearch'){$('#crmAttachList').innerHTML=attachList(e.target.value);icons();}});
+  document.addEventListener('keydown',e=>{
+    const b=e.target.closest('[data-action=pipeline]');
+    if(!b||!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
+    e.preventDefault();
+    const index=M.pipelines.findIndex(p=>p.id===pipeline),next=e.key==='Home'?0:e.key==='End'?M.pipelines.length-1:(index+(e.key==='ArrowRight'?1:-1)+M.pipelines.length)%M.pipelines.length;
+    $(`[data-action=pipeline][data-pipeline=${M.pipelines[next].id}]`).click();
+  });
   document.addEventListener('click',e=>{const c=e.target.closest('.crm-deal');if(c&&!e.target.closest('[data-action]'))details(c.dataset.id);});
   document.addEventListener('keydown',e=>{const c=e.target.closest('.crm-deal');if(c&&['Enter',' '].includes(e.key)){e.preventDefault();details(c.dataset.id);}});
   document.addEventListener('dragstart',e=>{const c=e.target.closest('.crm-deal');if(c){dragId=c.dataset.id;e.dataTransfer.setData('text/plain',dragId);e.dataTransfer.effectAllowed='move';c.classList.add('dragging');}});
