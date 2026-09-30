@@ -33,9 +33,12 @@ module.exports=async function smoke(socket){
       return route.continue();
     });
     await page.goto(url);await page.waitForSelector('#crmShell');
+    await page.getByRole('radio',{name:'Print / Production',exact:true}).click();
     await page.locator('[data-action=new]').first().click();
     await page.locator('#crmEditForm [name=title]').fill('Live DB browser test');
     const form=page.locator('#crmEditForm');
+    assert.equal(await form.locator('[name=pipeline]').inputValue(),'quotes');
+    assert.equal(await form.locator('[name=kind]').inputValue(),'Print');
     assert.equal(await form.locator('select[name=accountRef]').count(),1);
     assert.equal(await form.locator('input[name=account]:visible').count(),0);
     assert.equal(await form.locator('input[name=contact]:visible').count(),0);
@@ -122,6 +125,12 @@ module.exports=async function smoke(socket){
     await page.waitForFunction(()=>!document.body.classList.contains('crm-saving'));
     await page.locator('[data-action=accept-handoff][data-lane=production]').click();
     await page.waitForFunction(()=>!document.body.classList.contains('crm-saving'));
+    await page.locator('[data-action=move-pipeline]').click();
+    await page.locator('#crmPipelineForm [name=pipeline]').selectOption('services');
+    await page.locator('#crmPipelineForm [type=submit]').click();
+    await page.waitForFunction(()=>!document.body.classList.contains('crm-saving'));
+    await page.reload();
+    await page.getByRole('button',{name:'Open Live DB browser test',exact:true}).click();
     for(const width of [390,1188,1440,2560]){
       await page.setViewportSize({width,height:1000});
       await page.screenshot({path:`/private/tmp/crm-live-${width}.png`});
@@ -132,6 +141,7 @@ module.exports=async function smoke(socket){
     assert.equal(result.opportunities.find(o=>o.title==='Live DB browser test').accountRef,newCompany);
     assert.equal(result.opportunities.find(o=>o.title==='Live DB browser test').contactRef,newContact);
     assert.equal(result.opportunities.find(o=>o.title==='Live DB browser test').status,'won');
+    assert.equal(result.opportunities.find(o=>o.title==='Live DB browser test').pipeline,'services');
     assert.equal(result.opportunities.find(o=>o.title==='Live DB browser test').handoffs.production.status,'accepted');
     console.log('PASS: authenticated live HTTP/browser create, reload, proposal save/link, approval/close and responsive checks; no external network or sends.');
   }finally{

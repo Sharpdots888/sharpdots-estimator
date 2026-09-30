@@ -116,3 +116,13 @@ Status values:
   - `Print / Ecomm Mode`: default to Print Quote; emphasize Print Quote and Ecomm Pricing; keep Estimate available as read-only/reference.
   - `Full Workspace`: show all tabs and restore the last active tab.
   - Keep the same workspace records underneath; mode should change navigation and emphasis, not split data.
+
+## Opportunity Pipeline Assignment
+
+- `pipeline`: `services` or `quotes`, stored in the existing opportunity state
+  JSONB and audit snapshots; no new sequence or relational table.
+- Missing assignment: Print offerings resolve to quotes; Services/Mixed resolve
+  to services. Reading legacy records does not backfill them.
+- Explicit assignment overrides Offering and is preserved by saves from older
+  clients that omit the field. Moves retain identity, linked versions, approvals,
+  close state and handoffs. See `docs/sales-pipelines.md`.

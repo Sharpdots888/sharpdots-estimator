@@ -7,6 +7,44 @@ const {createOpportunityStore}=require('../lib/opportunity-store');
 const {createCrmAccess}=require('../lib/crm-access');
 const M=require('../crm/model');
 
+test('pipeline assignment persists, supports legacy clients and preserves a won opportunity',async()=>{
+  const db=new PGlite();
+  const query=async(sql,values)=>{const r=await db.query(sql,values);return {...r,rowCount:r.rows.length||r.affectedRows||0};};
+  const client={query,release(){}};
+  const store=createOpportunityStore({...client,connect:async()=>client}),admin={id:45,isAdmin:true};
+  try{
+    await db.exec(`CREATE ROLE db_admin;CREATE TABLE users(id integer PRIMARY KEY,username text,is_admin boolean,is_active boolean);
+      INSERT INTO users VALUES(45,'test-admin',true,true);
+      CREATE TABLE sfvc_companies(company_id uuid PRIMARY KEY);
+      CREATE TABLE sfvc_people(person_id uuid PRIMARY KEY);
+      CREATE TABLE sfvc_company_people(company_id uuid,person_id uuid);`);
+    for(const name of ['001_sfpq_opportunities.sql','002_opportunity_persistence.sql'])await db.exec(readFileSync(require('node:path').join(__dirname,'../migrations',name),'utf8'));
+    const draft=M.make({title:'Pipeline test',kind:'Mixed',ownerId:45,owner:'test-admin',account:'Synthetic client',contact:'Buyer',oneTime:100,creationKey:randomUUID()});
+    let o=await store.save(admin,null,draft);
+    assert.equal(o.pipeline,'services');
+    await query("UPDATE sfpq_opportunity_state SET state=state-'pipeline' WHERE opportunity_id=$1",[o.id]);
+    const oldVersion=o.rowVersion;
+    o=(await store.list(admin)).opportunities[0];
+    assert.equal(M.pipelineFor(o),'services');assert.equal(o.rowVersion,oldVersion);
+    assert.equal(Object.hasOwn((await query('SELECT state FROM sfpq_opportunity_state WHERE opportunity_id=$1',[o.id])).rows[0].state,'pipeline'),false);
+    const record=await store.saveRecord(admin,null,{collection:'proposals',name:'Retained offer',creationKey:randomUUID(),snapshot:{proposal:{title:'Retained offer'}}});
+    o=await store.save(admin,o.id,{...o,records:[{...record,role:'Primary offer'}]});
+    o=await store.save(admin,o.id,{...o,approval:{method:'Purchase order',reference:'TEST-PO'}});
+    o=await store.save(admin,o.id,{...o,status:'won',stage:'won'});
+    const before=structuredClone(o);
+    o=await store.save(admin,o.id,{...o,pipeline:'quotes'});
+    for(const key of ['id','number','kind','status','stage','closedAt','records','approval','documents','handoffs','billing'])assert.deepEqual(o[key],before[key],key);
+    assert.equal(o.pipeline,'quotes');assert.match(o.history[0].text,/Pipeline moved from Services to Print/);
+    const audit=(await query('SELECT detail FROM sfpq_opportunity_audit WHERE opportunity_id=$1 ORDER BY id DESC LIMIT 1',[o.id])).rows[0].detail;
+    assert.equal(audit.before.pipeline,'services');assert.equal(audit.after.pipeline,'quotes');
+    const legacy={...o};delete legacy.pipeline;
+    o=await store.save(admin,o.id,legacy);assert.equal(o.pipeline,'quotes');
+    assert.equal((await store.list(admin)).opportunities[0].pipeline,'quotes');
+    for(const pipeline of ['all','other',null,{}])await assert.rejects(store.save(admin,o.id,{...o,pipeline}),e=>e.statusCode===400);
+    await assert.rejects(store.save(admin,o.id,{...before,pipeline:'services'}),e=>e.statusCode===409);
+  }finally{await db.close();}
+});
+
 test('CRM persistence: identities, references, versions, acceptance and conflicts',async()=>{
   const db=new PGlite();
   const query=async(sql,values)=>{const r=await db.query(sql,values);return {...r,rowCount:r.rows.length||r.affectedRows||0};};
