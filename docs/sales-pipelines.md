@@ -12,6 +12,10 @@ build; production deployment requires separate approval.
   Production uses purple headers and a very light purple canvas. Cards keep
   white backgrounds and neutral borders/text. Signed/overdue status colors keep
   their existing meaning. Pipeline styling does not affect document output.
+- Proposal tools carry the same restrained treatment: blue Proposal, teal
+  Estimate, green Services and muted green Sourcing tabs/record headers, with
+  matching light work surfaces. Details / Content / Send use the Proposal accent.
+  Document pages remain white; these rules are screen-only and exclude Quote.
 - Board, List, Activities, Handoffs, search, totals, and the visible result count
   all use the selected pipeline. Metrics also follow the current filters.
 - New opportunities inherit the selected pipeline and default to the corresponding
@@ -51,6 +55,10 @@ opportunities explicitly, without duplicating an opportunity in both forecasts.
 - `node crm/pipelines-smoke.cjs`: both pipelines and all four views, totals,
   search, defaults, moves, won-record preservation, browser preference, keyboard
   controls, and 1440/1188/768/390-pixel layouts.
+- `node crm/proposal-tabs-smoke.cjs`: tool tab/header colors, inner tabs and
+  keyboard, four responsive widths, neutral client document/print output, and
+  isolation from Quote. Narrow-screen Estimate/Sourcing toolbars now wrap within
+  their panels; mobile tool tabs remain on one row.
 - Disposable real PostgreSQL plus authenticated HTTP/browser workflow: create
   and reload an opportunity, save all six record types, approve/close, accept a
   production handoff, move pipeline, and verify the closed state and records.
