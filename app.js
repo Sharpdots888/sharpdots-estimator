@@ -1367,6 +1367,8 @@ function updateWorkspaceRecordDirtyUi(collection = "") {
       : null;
     const badge = control.querySelector(".record-dirty-badge");
     if (badge) badge.hidden = !(isDirty && activeRecord);
+    const recordName = control.querySelector(".tab-record-identity small");
+    if (recordName && type) recordName.textContent = workspaceRecordDisplayName(type);
     const status = control.querySelector(".record-status");
     if (status) {
       status.classList.toggle("dirty", isDirty);
@@ -2562,8 +2564,7 @@ function updatePrintQuoteLine(lineId, field, value) {
     };
   });
   touchWorkspaceRecord("printQuotes");
-  renderPrintQuoteDraft();
-  renderTabRecordControls();
+  els.printQuoteTotals.innerHTML = renderPrintQuoteTotals();
   renderProposalPreview();
 }
 
@@ -2600,7 +2601,7 @@ function refreshPrintQuoteLinesFromEstimate() {
 function renderPrintQuoteLines(isCustomerOutput) {
   const lines = printQuoteLineRows();
   if (!lines.length) {
-    return `<div class="print-quote-empty">No draft quote lines yet. Add a quote line or refresh lines from the active estimate.</div>`;
+    return `<div class="print-quote-empty"><i data-lucide="package-open" aria-hidden="true"></i><strong>No quote items</strong></div>`;
   }
 
   const header = isCustomerOutput
@@ -2621,22 +2622,22 @@ function renderPrintQuoteLines(isCustomerOutput) {
     ` : `
       <div class="print-quote-line builder-line" data-print-quote-line-id="${escapeHtml(line.id)}">
         <label>
-          Item
+          <span class="quote-field-label">Item</span>
           <span class="print-quote-line-name"><input class="print-quote-line-input" type="text" data-print-quote-line-field="name" value="${escapeHtml(line.name)}" />${line.standardProductId ? `<small class="standard-product-line-label">Standard product</small>` : ""}</span>
         </label>
         <label>
-          Description
+          <span class="quote-field-label">Description</span>
           <textarea class="print-quote-line-input print-quote-line-description" rows="2" data-print-quote-line-field="description">${escapeHtml(line.description)}</textarea>
         </label>
         <label>
-          Qty
+          <span class="quote-field-label">Qty</span>
           <input class="print-quote-line-input" type="number" min="0" step="1" data-print-quote-line-field="quantity" value="${escapeHtml(line.quantity)}" />
         </label>
         <label>
-          Customer total
+          <span class="quote-field-label">Customer total</span>
           <input class="print-quote-line-input" type="number" min="0" step="0.01" data-print-quote-line-field="customerTotal" value="${escapeHtml(line.customerTotal)}" />
         </label>
-        <button class="ghost-btn compact-btn" type="button" data-print-quote-line-remove>Remove</button>
+        <button class="ghost-btn compact-btn quote-remove-line" type="button" data-print-quote-line-remove aria-label="Remove ${escapeHtml(line.name || "quote line")}" title="Remove line"><i data-lucide="trash-2" aria-hidden="true"></i></button>
       </div>
     `).join("")}
   `;
@@ -2678,10 +2679,10 @@ function renderPrintQuoteDraft() {
   syncPlaceholderDraftsFromInputs();
   const isCustomerOutput = printQuote.outputMode === "customer";
   els.printQuoteView.dataset.outputMode = printQuote.outputMode;
-  els.printQuoteOutputTitle.textContent = isCustomerOutput ? "Customer Preview" : "Quote Builder";
+  els.printQuoteOutputTitle.textContent = isCustomerOutput ? "Customer preview" : "Quote items";
   els.printQuoteOutputSubtitle.textContent = isCustomerOutput
-    ? "Customer-safe draft view. Manual QA required before sending."
-    : "Internal draft built from customer-safe estimate totals.";
+    ? "Draft for customer review"
+    : `${printQuoteLineRows().length} item${printQuoteLineRows().length === 1 ? "" : "s"}`;
   els.printQuoteOutputModeButtons.forEach((button) => {
     const isActive = button.dataset.printQuoteMode === printQuote.outputMode;
     button.classList.toggle("active", isActive);
@@ -2693,6 +2694,7 @@ function renderPrintQuoteDraft() {
   els.printQuoteLines.innerHTML = renderPrintQuoteLines(isCustomerOutput);
   els.printQuoteTotals.innerHTML = renderPrintQuoteTotals();
   renderPrintQuoteMessage(isCustomerOutput);
+  window.lucide?.createIcons();
 }
 
 function workspaceRecordSnapshot(type) {
@@ -3161,6 +3163,7 @@ function estimateVersionOptions(records, projectNumber) {
 
 function renderTabRecordControls() {
   if (!els.tabRecordControls?.length) return;
+  const icon = (name) => `<i data-lucide="${name}" aria-hidden="true"></i>`;
   const workspace = ensureWorkspace();
   els.tabRecordControls.forEach((control) => {
     const collection = control.dataset.recordType;
@@ -3171,11 +3174,12 @@ function renderTabRecordControls() {
     control.classList.toggle("estimate-record-controls", collection === "estimates");
     control.classList.toggle("library-record-controls", isLibraryRecord);
     control.classList.toggle("print-mode-record-controls", isLibraryRecord && workspaceMode === "printEcomm");
+    control.classList.add("document-record-header");
     const records = isLibraryRecord ? libraryRecordsFor(collection) : workspace.records?.[collection] || [];
     const activeNumber = activeRecordNumber(collection)
       || (isLibraryRecord ? nextLibraryRecordNumber(collection) : nextWorkspaceRecordNumber(collection, type.prefix, type.numberKey, type.start));
     const activeRecord = collection === "estimates"
-      ? latestEstimateRecord(records, activeNumber)
+      ? estimateRecordsForNumber(records, activeNumber).find((record) => asNumber(record.version) === currentEstimateVersion()) || latestEstimateRecord(records, activeNumber)
       : records.find((record) => record[type.numberKey] === activeNumber);
     const hasUnsavedChanges = dirtyWorkspaceRecords.has(collection);
     control.classList.toggle("has-record-changes", hasUnsavedChanges);
@@ -3189,27 +3193,11 @@ function renderTabRecordControls() {
           return `<option value="${escapeHtml(number)}" ${number === activeNumber ? "selected" : ""}>${escapeHtml(number)} · ${escapeHtml(record.name || type.label)}</option>`;
         }).join("")
           : `<option value="">${escapeHtml(`No saved ${type.label} records`)}</option>`;
-    const lookupControl = isLibraryRecord
-      ? `
-        <div class="library-lookup-summary">
-          <button class="ghost-btn compact-btn library-browse-btn" type="button" data-record-action="browse" title="Search the full ${escapeHtml(type.label)} library">${escapeHtml(libraryUi.browseLabel)}</button>
-          <span>${records.length.toLocaleString()} library · ${records.filter((record) => libraryRecordAttachedToWorkspace(record, currentWorkspaceNumber)).length.toLocaleString()} attached</span>
-        </div>
-      `
-      : `
-        <select class="record-load-select" aria-label="${escapeHtml(libraryUi?.savedLabel || `Saved ${type.label} records`)}">
+    const lookupControl = `
+        <select class="record-load-select" aria-label="${escapeHtml(`Saved ${type.label} records`)}">
           ${selectOptions}
         </select>
       `;
-    const identityLabel = libraryUi?.identityLabel || `${type.label} #`;
-    const actionLabels = libraryUi || {
-      newLabel: "New",
-      saveLabel: "Save",
-      versionLabel: "Version",
-      duplicateLabel: "Copy",
-      loadLabel: "Load"
-    };
-    const loadRecordsEnabled = collection === "estimates" || records.length > 0;
     const libraryRecordIsAttached = isLibraryRecord && libraryRecordAttachedToWorkspace(activeRecord, currentWorkspaceNumber);
     const associationLabel = isLibraryRecord
       ? activeRecord
@@ -3249,29 +3237,43 @@ function renderTabRecordControls() {
       `
       : "";
     control.innerHTML = `
-      <div class="tab-record-identity">
-        <span>${escapeHtml(identityLabel)}</span>
-        <strong>${escapeHtml(activeNumber)}</strong>
-        <small>${escapeHtml(activeRecord?.name || workspaceRecordDisplayName(type))}</small>
-      </div>
-      ${estimateMeta}
-      ${lookupControl}
-      <select class="record-version-select" aria-label="${escapeHtml(type.label)} version" ${activeRecord ? "" : "disabled"}>
-        ${collection === "estimates" ? estimateVersionOptions(records, activeNumber) : recordVersionOptions(activeRecord)}
-      </select>
-      <div class="record-state">
-        <span class="record-status ${hasUnsavedChanges ? "dirty" : ""}">${escapeHtml(statusText)}</span>
-        ${associationLabel ? `<span class="record-association-badge ${escapeHtml(associationClass)}" title="${escapeHtml(associationTitle)}">${escapeHtml(associationLabel)}</span>` : ""}
-        ${showDirtyBadge ? `<span class="record-dirty-badge">Unsaved changes</span>` : ""}
+      <div class="record-heading">
+        <div class="tab-record-identity">
+          <div class="record-reference"><span>${escapeHtml(type.label)}</span><strong>${escapeHtml(activeNumber)}</strong></div>
+          <small>${escapeHtml(workspaceRecordDisplayName(type))}</small>
+        </div>
+        <div class="record-state" aria-live="polite">
+          <span class="record-status ${hasUnsavedChanges ? "dirty" : ""}">${escapeHtml(statusText)}</span>
+          ${associationLabel ? `<span class="record-association-badge ${escapeHtml(associationClass)}" title="${escapeHtml(associationTitle)}">${escapeHtml(associationLabel)}</span>` : ""}
+          <span class="record-dirty-badge" ${showDirtyBadge ? "" : "hidden"}>Unsaved changes</span>
+        </div>
       </div>
       <div class="record-actions">
-        <button class="ghost-btn compact-btn" type="button" data-record-action="new" title="Start a new ${escapeHtml(type.label)} record">${escapeHtml(actionLabels.newLabel)}</button>
-        <button class="ghost-btn compact-btn" type="button" data-record-action="save" title="Save this ${escapeHtml(type.label)} record">${escapeHtml(actionLabels.saveLabel)}</button>
-        <button class="ghost-btn compact-btn" type="button" data-record-action="version" title="Save as a new version">${escapeHtml(actionLabels.versionLabel)}</button>
-        <button class="ghost-btn compact-btn" type="button" data-record-action="duplicate" title="Duplicate this ${escapeHtml(type.label)} record">${escapeHtml(actionLabels.duplicateLabel)}</button>
-        ${isLibraryRecord ? "" : `<button class="ghost-btn compact-btn" type="button" data-record-action="load" title="Load ${escapeHtml(type.label)} records" ${loadRecordsEnabled ? "" : "disabled"}>${escapeHtml(actionLabels.loadLabel)}</button>`}
-        ${isLibraryRecord ? `<button class="ghost-btn compact-btn attach-record-btn" type="button" data-record-action="${escapeHtml(libraryAttachAction)}" title="${escapeHtml(libraryAttachTitle)}">${escapeHtml(libraryAttachLabel)}</button>` : ""}
+        ${isLibraryRecord ? `<button class="ghost-btn record-open-button" type="button" data-record-action="browse">${icon("search")}${escapeHtml(libraryUi.browseLabel)}</button>` : `
+          <details class="record-popover record-open-menu">
+            <summary>${icon("folder-open")}<span>Open</span>${icon("chevron-down")}</summary>
+            <div class="record-popover-panel"><label>Saved ${escapeHtml(type.label)} records${lookupControl}</label>
+              ${collection === "estimates" ? `<button class="ghost-btn" type="button" data-record-action="browse-estimates">Browse estimates</button>` : ""}
+            </div>
+          </details>`}
+        <details class="record-popover record-version-menu">
+          <summary aria-label="${escapeHtml(type.label)} version history">${icon("history")}<span>${activeRecord ? `Version ${activeRecord.version || 1}` : "Versions"}</span>${icon("chevron-down")}</summary>
+          <div class="record-popover-panel">
+            <label>Saved versions<select class="record-version-select" aria-label="${escapeHtml(type.label)} version" ${activeRecord ? "" : "disabled"}>${collection === "estimates" ? estimateVersionOptions(records, activeNumber) : recordVersionOptions(activeRecord)}</select></label>
+            <button class="ghost-btn" type="button" data-record-action="version">${icon("copy-plus")}Save new version</button>
+          </div>
+        </details>
+        <button class="record-save-button" type="button" data-record-action="save">${icon("save")}Save</button>
+        <details class="record-popover record-more-menu">
+          <summary aria-label="More ${escapeHtml(type.label)} actions" title="More ${escapeHtml(type.label)} actions">${icon("ellipsis")}</summary>
+          <div class="record-popover-panel">
+            <button class="ghost-btn" type="button" data-record-action="new">${icon("file-plus-2")}New ${escapeHtml(type.label.toLowerCase())}</button>
+            <button class="ghost-btn" type="button" data-record-action="duplicate">${icon("copy")}Duplicate</button>
+            ${isLibraryRecord ? `<button class="ghost-btn attach-record-btn" type="button" data-record-action="${escapeHtml(libraryAttachAction)}" title="${escapeHtml(libraryAttachTitle)}">${icon(libraryRecordIsAttached ? "unlink" : "link")}${escapeHtml(libraryAttachLabel)}</button>` : ""}
+          </div>
+        </details>
       </div>
+      ${estimateMeta ? `<div class="record-meta-fields">${estimateMeta}</div>` : ""}
     `;
     if (collection === "estimates") {
       els.projectName = document.querySelector("#projectName");
@@ -3280,6 +3282,7 @@ function renderTabRecordControls() {
       bindEstimateMetaInputs();
     }
   });
+  window.lucide?.createIcons();
 }
 
 function renderTabRecordIndicators() {
@@ -3341,6 +3344,10 @@ async function workspaceRecordAction(event) {
   const selectedVersion = row.querySelector(".record-version-select")?.value;
   if (action === "open") setActiveView(type.viewId);
   if (action === "browse") openLibraryRecordDialog(collection);
+  if (action === "browse-estimates" && collection === "estimates") {
+    await fetchEstimatesList();
+    openLoadEstimateDialog();
+  }
   if (action === "new") await newWorkspaceRecord(collection);
   if (action === "save") await saveRecordFromManager(collection);
   if (action === "version") await newVersionFromManager(collection);
@@ -5716,8 +5723,8 @@ function syncProposalPreviewEditableState() {
   }
   if (els.proposalPreviewEditStatus) {
     els.proposalPreviewEditStatus.textContent = proposalPreviewEditMode
-      ? "Narrative fields editable"
-      : "Pricing and operational sections locked";
+      ? "Editing copy"
+      : "Read only";
   }
 }
 
@@ -11835,7 +11842,7 @@ els.ecommProductPriceRows?.addEventListener("input", (event) => {
 els.saveEcommProductPricesBtn?.addEventListener("click", saveEcommProductPrices);
 els.saveEcommOptionalPricesBtn?.addEventListener("click", saveEcommOptionalPrices);
 els.refreshPrintQuoteLinesBtn?.addEventListener("click", refreshPrintQuoteLinesFromEstimate);
-els.printQuoteLines?.addEventListener("change", (event) => {
+els.printQuoteLines?.addEventListener("input", (event) => {
   const input = event.target.closest("[data-print-quote-line-field]");
   if (!input) return;
   const row = input.closest("[data-print-quote-line-id]");
