@@ -25,7 +25,8 @@ if(!['localhost','127.0.0.1'].includes(new URL(url).hostname))throw Error('Use a
         const style=s=>getComputedStyle(document.querySelector(s));
         return {canvas:style('#crmContent').backgroundColor,heading:style('.crm-stage>header').backgroundColor,
           accent:style('.crm-stage').borderTopColor,title:style('.crm-stage h2').color,
-          card:style('.crm-deal').backgroundColor,signed:style('.crm-pill.green').backgroundColor};
+          card:style('.crm-deal').backgroundColor,border:style('.crm-deal').borderColor,
+          signed:style('.crm-pill.green').backgroundColor};
       });
       assert.equal(theme.card,'rgb(255, 255, 255)','Cards must remain neutral for legibility');
       assert.equal(theme.title,theme.accent,'Column heading uses the pipeline accent');
@@ -42,6 +43,7 @@ if(!['localhost','127.0.0.1'].includes(new URL(url).hostname))throw Error('Use a
       await page.locator('#crmScope').selectOption('all');
     }
     for(const key of ['canvas','heading','accent'])assert.notEqual(themes[0][key],themes[1][key],`Pipeline ${key} must be distinct`);
+    assert.equal(themes[0].border,themes[1].border,'Resting card outlines remain neutral in both pipelines');
     assert.equal(themes[0].signed,themes[1].signed,'Signed status must keep its semantic color');
     await radio('quotes').focus();
     await page.keyboard.press('ArrowLeft');
