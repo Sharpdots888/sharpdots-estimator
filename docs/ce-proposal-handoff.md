@@ -200,9 +200,12 @@ Never clear a failed/attempted ledger as a retry mechanism.
   build. The local browser explicitly sends its synthetic Portal session over
   loopback HTTP; production Secure cookie handling is unchanged.
 - CE reports existing-grant, transactional rollback, backup/restore and tampered
-  backup rejection checks passed. No new grants or schema are needed. Required
-  remaining proof is the final pinned paired review and approved hosted check.
-  No production delivery is proven.
+  backup rejection checks passed. Its Node22 suite reports **187 passing / 3
+  existing DB-gated skips**, with check/build passing. CE is packaging its final
+  receiver commit for paired/Steward review; no final SHA is claimed here yet.
+  Producer implementation and paired harness are committed at `cf9ecf2`. No new
+  grants or schema are needed. Required remaining proof is the final pinned paired
+  review and approved hosted check. No production delivery is proven.
 
 No production/customer sends, invoices, Xero calls, schema migration, CE engagement
 creation, Portal change or catalog edit was performed during implementation.
