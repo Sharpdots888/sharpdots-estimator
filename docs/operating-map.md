@@ -4,13 +4,13 @@
 
 - Owner: current estimator session, `codex/services-catalog-connection`, from
   deployed PR40/main dd6f7a6 (Heroku v48).
-- State: Estimator backend locally verified, source endpoint blocked on approval
-  to publish its required GitHub planning issue. The user approved the scoped
-  read-only connection and operator checks; publication approval is pending.
+- State: source and Estimator backends locally verified. User approved the scoped
+  read-only connection, operator checks and publication of source planning
+  [issue97](https://github.com/Sharpdots888/sharpdots-apps/issues/97).
 - Scope: lossless recipe mapping, source pricing parity, subtractive configuration,
   snapshot tests, fixed-scope HTTPS reader and opt-in same-origin catalog route.
 - Boundary: no deployment, source data edits, schemas/grants, live catalog imports,
-  credentials provisioning or sends. CE source implementation has not begun.
+  credentials provisioning or sends. CE source implementation is isolated.
   No cross-chat reply authorized. Browser Services remains import-only.
 - Source: sharpdots-apps PR87, commit 9bb0bff and the eight-service projection at
   revision 136. Projection is test evidence, not a fresh production read.
@@ -18,13 +18,17 @@
   the production Browse products path can be connected.
 - Verified: 54 automated tests on Node 26 and 376 parity cases covering all eight
   products / 120 rows. Loopback route tests, current-user revocation, redaction,
-  fixed workspace and deadline/byte limits passed. Node 22 and CE end-to-end
-  verification remain outstanding. Durable versions/old records preserved.
+  fixed workspace and deadline/byte limits passed. CE: 180 pass / 3 unrelated DB
+  skips, static/build checks pass. Cross-repo HTTP/PGlite integration passed,
+  including source SQL read-only enforcement. Node22 and actual signed-in
+  production verification remain outstanding. Durable versions/old records preserved.
 - Plan and source requirement: `docs/ce-catalog-connection.md`. The source worktree
   `/private/tmp/estimator-ce-catalog-read` on `codex/estimator-catalog-read` starts at
-  9bb0bff, remains clean, and does not disturb the active Living Ops source branch.
+  9bb0bff and does not disturb the active Living Ops source branch. Source guide:
+  `apps/client-engagement/docs/estimator-catalog-read.md` in that checkout.
   Backend disabled by default; no UI activation or successful live read claimed.
 - ClickUp: https://app.clickup.com/t/868jnxdp7
+- Decision Log updated: "CE catalog: approved read-only Estimator connection".
 
 ## Release Baseline
 
