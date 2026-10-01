@@ -15,9 +15,13 @@ scope; they do not accept the intake contract below. The receiver must be agreed
 implemented and tested with the CE owner before enabling this transport. No CE
 files, credentials, production data, grants, schemas or releases were changed.
 
-Tracking: [Estimator task](https://app.clickup.com/t/868jnxdp7). External status
-and cross-chat coordination are pending permission; this document is the local
-execution record, not a claim that ClickUp or the CE task has been updated.
+Tracking: [Estimator task](https://app.clickup.com/t/868jnxdp7). John explicitly
+approved direct coordination with the active CE chat on September30. The tested
+producer commit4f62991, this contract candidate and the receiving-side request were
+sent to chat01a07874-3db6-7e00-8465-bdfeaa84a2e9. CE owns receiver/intake UI;
+Estimator retains producer/receipt tracking. This does not authorize production
+activation or change the scope of the existing catalog reader. ClickUp has not
+been updated by this coordination message.
 
 ## Operator Flow
 

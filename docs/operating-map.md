@@ -22,7 +22,12 @@
   `docs/ce-proposal-handoff.md`.
 - CE supplied PR100/head a2b8423 confirming the exact-version draft rehearsal;
   it explicitly has no production receiver or live accepted-proposal UI flow.
-  Cross-chat coordination permission requested, not yet received in this chat.
+  John explicitly approved direct CE-chat coordination on September30; the
+  producer commit4f62991 and receiving-side implementation request have now been
+  sent to CE chat01a07874-3db6-7e00-8465-bdfeaa84a2e9. Estimator owns producer/
+  receipt tracking; CE owns receiver/intake UI. Reconcile the contract and verify
+  both handlers against disposable storage before requesting release approval.
+  This approval does not authorize deployment or production credential/data changes.
   Existing drafts, saved versions, source catalog and parallel checkouts remain intact.
 - Tracking: https://app.clickup.com/t/868jnxdp7
 
