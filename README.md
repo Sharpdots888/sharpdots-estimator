@@ -12,6 +12,10 @@ costs components, estimates team capacity, and rolls the resulting engagement in
 a proposal. Catalog input currently uses the Living Ops JSON export, not live sync.
 See [Services builder and integration boundary](docs/living-ops-services.md).
 
+The CE catalog backend is implemented and verified locally on both sides but
+disabled by default; UI integration and production activation are pending. See the
+[read-only connection scope and activation gates](docs/ce-catalog-connection.md).
+
 ## Local Standard Products setup
 
 The local environment is configured in the ignored `.env.local` file. It requires:

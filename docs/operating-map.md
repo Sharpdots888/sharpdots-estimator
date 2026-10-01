@@ -1,5 +1,57 @@
 # Operating Map
 
+## Catalog Connection Lane
+
+- September 30 release approval: user explicitly said proceed with the real CE
+  connection after the synthetic preview was distinguished. Supersedes the older
+  local-only boundary below for the two app releases and dedicated read key only.
+- Pre-release production: Estimator v50, same dd6f7a6 code as v48, with newer DB
+  config preserved; CE v26, subtree 4ec2058 from catalog branch 9bb0bff. Source PR
+  must target that deployed feature branch; do not release unrelated main changes.
+- Node22 verification: Estimator 59 pass, CE 180 pass / 3 gated skips, check/build,
+  376 pricing cases and cross-repo read-only rehearsal pass. Hosted verification
+  pending. Source writes, grants, schema, Portal auth and sends remain out of scope.
+
+- Owner: current estimator session, `codex/services-catalog-connection`, from
+  deployed PR40/main dd6f7a6 (Heroku v48).
+- State: source and Estimator backends plus Services UI locally verified. User approved the scoped
+  read-only connection, operator checks and publication of source planning
+  [issue97](https://github.com/Sharpdots888/sharpdots-apps/issues/97).
+- Scope: lossless recipe mapping, source pricing parity, subtractive configuration,
+  snapshot tests, fixed-scope HTTPS reader and opt-in same-origin catalog route.
+- Boundary: no deployment, source data edits, schemas/grants, live catalog imports,
+  credentials provisioning or sends. CE source implementation is isolated.
+  No cross-chat reply authorized. Services UI and client-output safeguards are
+  locally implemented for review. Production connection remains disabled.
+- Source: sharpdots-apps PR87, commit 9bb0bff and the eight-service projection at
+  revision 136. Projection is test evidence, not a fresh production read.
+- Integration needs an approved source endpoint/workspace authorization before
+  the production Browse products path can be connected.
+- Verified: 59 automated tests on Node 26 and 376 parity cases covering all eight
+  products / 120 rows. Loopback route tests, current-user revocation, redaction,
+  fixed workspace and deadline/byte limits passed. CE: 180 pass / 3 unrelated DB
+  skips, static/build checks pass. Cross-repo HTTP/PGlite integration passed,
+  including source SQL read-only enforcement. Node22 and actual signed-in
+  production verification remain outstanding. Durable versions/old records preserved.
+- Plan and source requirement: `docs/ce-catalog-connection.md`. The source worktree
+  `/private/tmp/estimator-ce-catalog-read` on `codex/estimator-catalog-read` starts at
+  9bb0bff and does not disturb the active Living Ops source branch. Source guide:
+  `apps/client-engagement/docs/estimator-catalog-read.md` in that checkout.
+  Backend disabled by default; no successful live read claimed. CE and legacy
+  browser flows pass at desktop/mobile widths. Preview uses only synthetic data:
+  http://127.0.0.1:4201/index.html?crm=1&cePreview=1.
+- UI behavior: revision-pinned CE selection, component exclusions/overrides,
+  contribution-margin pricing, shared-scope owner and term confirmation, capacity
+  planning. Client PDF/CSV/print/DocuSeal blocked for draft catalog configurations;
+  saved legacy calculations and imports preserved. No source approval shortcut.
+- ClickUp: https://app.clickup.com/t/868jnxdp7
+- Decision Log updated: "CE catalog: approved read-only Estimator connection".
+
+## Release Baseline
+
+- PR40 is merged and deployed as quoting-proposals v48. The older review/pending
+  entries below describe historical implementation stages, not current release state.
+
 ## Separate Sales Pipelines Lane
 
 - Owner: current estimator Codex session, `codex/separate-sales-pipelines` from

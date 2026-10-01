@@ -10,6 +10,12 @@
     const url = new URL(typeof input === 'string' ? input : input.url, location.href);
     if (!url.pathname.startsWith('/api/')) return originalFetch(input, options);
     const json = (body, status = 200) => Promise.resolve(new Response(JSON.stringify(body), {status, headers: {'Content-Type': 'application/json'}}));
+    if (url.pathname === '/api/services/catalog') {
+      if (new URLSearchParams(location.search).get('cePreview') === '1' && url.origin === location.origin && (!options.method || options.method === 'GET')) {
+        return originalFetch('/api/services/catalog', { method: 'GET', credentials: 'omit', cache: 'no-store', signal: options.signal });
+      }
+      return json({ error: 'The CE catalog connection is not enabled in this local preview.' }, 503);
+    }
     if (url.pathname === '/api/document-signing/status') return json({configured: false, mode: 'preview', emailDeliveryEnabled: false});
     if (url.pathname.startsWith('/api/document')) return json({error: 'Document sending is unavailable in the local CRM draft.'}, 403);
     if (url.pathname === '/api/estimates' && options.method === 'POST') {

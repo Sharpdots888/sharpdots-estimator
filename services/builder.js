@@ -93,6 +93,7 @@
   function renderBuilder() {
     root.hidden = serviceScenario !== "livingOps";
     if (root.hidden) return;
+    if (ce.render()) return;
     const t = M.totals(serviceEngagement);
     const margin = t.termPrice ? (t.termPrice - t.termCost) / t.termPrice * 100 : 0;
     root.innerHTML = `<div class="eng-setup-row"><div class="eng-settings">${input("Engagement name", "engName", serviceEngagement.name, "text", 'maxlength="150"')}${input("Term (months)", "engTerm", serviceEngagement.termMonths, "number", 'min="1" max="120" step="1"')}${input("Default markup (%)", "engMarkup", serviceEngagement.markup, "number", 'min="0" step="any"')}</div>${button("proposal", "Use in proposal", "file-output", `class="eng-primary" ${!t.count || !t.complete ? "disabled" : ""}`)}</div>
@@ -138,10 +139,16 @@
     const a = target.dataset.serviceAction, key = target.dataset.key, id = target.dataset.id;
     if (a === "close") return dialog.close();
     if (a === "view") { view = target.dataset.view; renderBuilder(); return; }
-    if (a === "catalog") return openCatalog();
-    if (a === "import") return file.click();
-    if (a === "example") { catalog = M.normalizeCatalog(window.ServiceExampleCatalog); openCatalog(); return; }
-    if (a === "select-product") { M.addProduct(serviceEngagement, catalog, id); notice = "Product snapshot added to engagement."; changed(); openCatalog(); return; }
+    if (ce.action(target)) return;
+    if (a === "catalog") return ce.openCatalog();
+    if (a === "imported-catalog") { ce.cancelRead(); return openCatalog(); }
+    if (a === "import") { ce.cancelRead(); return file.click(); }
+    if (a === "example") { ce.cancelRead(); catalog = M.normalizeCatalog(window.ServiceExampleCatalog); openCatalog(); return; }
+    if (a === "select-product") {
+      try { M.addProduct(serviceEngagement, catalog, id); notice = "Product snapshot added to engagement."; changed(); openCatalog(); }
+      catch (e) { const p = document.createElement("p"); p.className = "eng-warning"; p.textContent = e.message; $(".eng-dialog-body", dialog).prepend(p); }
+      return;
+    }
     if (a === "inspect-product") { group = `product:${id}`; view = "components"; renderBuilder(); return; }
     if (a === "remove-product") {
       serviceEngagement.products = serviceEngagement.products.filter(p => p.id !== id);
@@ -164,6 +171,7 @@
         const source = proposalPublishingSourceState("services");
         if (!source.saved) throw Error("Save Services before adding it to a proposal.");
         proposal.includedSections = [...new Set([...proposalIncludedSections(), "services"])];
+        if (CeEngagement.isCatalog(serviceEngagement)) proposal.outputAudience = "internal";
         proposal.sourceRecords = { ...proposal.sourceRecords, services: { number: source.number, version: source.version } };
         markWorkspaceRecordDirty("proposals");
         setActiveView("proposalView");
@@ -202,6 +210,7 @@
       dialog.close(); changed();
     }
   });
+  const ce = window.createCeServicesBuilder({ root, dialog, modal, changed, input, button, opts, esc, currency });
   window.renderEngagementServices = renderBuilder;
   renderServicesCalculator();
 })();

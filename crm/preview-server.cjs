@@ -8,6 +8,16 @@ http.createServer((req,res) => {
   let pathname;
   try { pathname = decodeURIComponent(new URL(req.url,'http://localhost').pathname); } catch { res.writeHead(400).end(); return; }
   if(pathname==='/') {res.writeHead(302,{Location:'/index.html?crm=1'}).end();return;}
+  if (req.method === 'GET' && req.url === '/api/services/catalog' && process.env.CE_CATALOG_PREVIEW === 'true') {
+    const source = require('../services/ce-fixture.cjs').sourceFixture();
+    const second = structuredClone(source.catalog.products[0]);
+    second.id = 'example-b'; second.name = 'Second synthetic service'; second.termMonths = 6;
+    source.catalog.products.push(second);
+    const catalog = require('../services/ce-catalog').adaptCatalog(source, { id: 3, slug: 'sharpdots' });
+    catalog.source.preview = 'synthetic';
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }).end(JSON.stringify(catalog));
+    return;
+  }
   // Static, localhost-only review server. Never loads credentials, DB clients or app routes.
   if(req.method!=='GET' || pathname.startsWith('/api/') || pathname.split('/').some(p=>p.startsWith('.')) || !/\.(html|js|css|json|svg|png|jpg|woff2)$/.test(pathname)) {res.writeHead(403).end('Not available on the draft server.');return;}
   const file = path.resolve(root,'.'+pathname);

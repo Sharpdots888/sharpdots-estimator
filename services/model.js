@@ -1,8 +1,8 @@
 (function (root, factory) {
-  const api = factory();
+  const api = factory(typeof module === "object" && module.exports ? require('./ce-engagement') : root.CeEngagement);
   if (typeof module === "object" && module.exports) module.exports = api;
   else root.ServiceEngagement = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (CE) {
   const groups = { items: "Item / service", platforms: "Platform", capabilities: "Workflow / capability", teams: "Team / role" };
   const bases = { one_time: "One-time", per_month: "Monthly", per_year: "Annual", per_hour: "Hourly / month", per_run: "Per run / month" };
   const clone = value => JSON.parse(JSON.stringify(value));
@@ -54,6 +54,7 @@
       importedAt: new Date().toISOString(), products };
   }
   function addProduct(state, catalog, id) {
+    if (CE.isCatalog(state)) throw Error("Create a new Services record for imported products. The CE snapshot is unchanged.");
     const product = catalog.products.find(p => p.id === id);
     if (!product) throw Error("Product is no longer in this catalog.");
     const issue = productIssue(product);
@@ -97,6 +98,7 @@
     return { activationCost: oneTime ? round(cost) : 0, monthlyCost: oneTime ? 0 : round(cost), activationPrice: oneTime ? round(price) : 0, monthlyPrice: oneTime ? 0 : round(price), complete: true };
   }
   function totals(state) {
+    if (CE.isCatalog(state)) return CE.totals(state);
     const entries = lines(state);
     const sum = entries.reduce((a, l) => { for (const key of ["activationCost", "monthlyCost", "activationPrice", "monthlyPrice"]) a[key] = round(a[key] + l.calc[key]); return a; }, { activationCost: 0, monthlyCost: 0, activationPrice: 0, monthlyPrice: 0 });
     const termValid = Number.isInteger(state.termMonths) && state.termMonths >= 1 && state.termMonths <= 120;
@@ -107,6 +109,7 @@
       count: entries.length, sample: state.products.some(p => p.sample) };
   }
   function outputRows(state) {
+    if (CE.isCatalog(state)) return CE.outputRows(state);
     const ledger = lines(state);
     const buckets = state.products.map(p => ({ id: p.id, name: p.name, description: p.description || "", rows: ledger.filter(l => l.productIds.length === 1 && l.productIds[0] === p.id) }));
     const sharedRows = ledger.filter(l => l.productIds.length > 1);
@@ -123,6 +126,7 @@
     });
   }
   function serviceRows(state) {
+    if (CE.isCatalog(state)) return CE.outputRows(state).map(b => ({ id: b.id, level: "element", active: true, item: b.name, platform: b.description, costType: "Services", costCenter: "", engagementCalc: b.calc }));
     return lines(state).filter(l => !["reference", "excluded"].includes(l.treatment)).map(l => ({ id: l.key, level: "element", active: true, item: l.name, platform: groups[l.definitionType], costType: l.definitionType === "platforms" ? "Platforms" : "Services", costCenter: l.costCenter, engagementCalc: l.calc }));
   }
   return { groups, bases, empty, restore, normalizeCatalog, productIssue, addProduct, lines, totals, capacity, outputRows, serviceRows, calculate };
