@@ -1,5 +1,7 @@
-// Draft adapter only. Production catalog transport and UI activation are separate.
-const { createHash } = require('node:crypto');
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory(require('node:crypto').createHash);
+  else root.CeServiceCatalog = factory();
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (createHash) {
 const clone = value => JSON.parse(JSON.stringify(value));
 const money = value => Math.round((value + Number.EPSILON) * 100) / 100;
 const numeric = value => typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 1e9;
@@ -214,4 +216,5 @@ function calculate(configuration) {
     termCost: complete ? money(cost('once') + cost('monthly') * configuration.termMonths) : null };
 }
 
-module.exports = { adaptCatalog, selectProducts, configureProduct, calculate, keyOf };
+return { adaptCatalog, selectProducts, configureProduct, calculate, keyOf };
+});

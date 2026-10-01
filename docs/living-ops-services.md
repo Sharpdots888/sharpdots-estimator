@@ -7,9 +7,10 @@ products through their execution components. Estimator selects those products,
 costs an engagement, and packages the result into a proposal. It must not become
 a competing product-authoring catalog.
 
-This is a review build on `codex/living-ops-services`, based on the Proposal/Quote
-interface branch (PR38). No deployment, schema, authentication, billing, external
-message, or other-app change is included.
+The original import builder shipped with PR39. Its cost-plus model is documented
+below. The new `codex/services-catalog-connection` branch adds a separate CE
+recipe/pricing path, locally verified but not deployed; see
+[CE catalog connection](ce-catalog-connection.md) for its current boundaries.
 
 ## Domain structure
 
@@ -95,17 +96,18 @@ copy, and proposal source restoration use the existing record mechanism.
   That checkout has synthetic workspace routes, not an authenticated product
   catalog endpoint for Estimator. No relevant Zoom-derived decision was found.
 
-## Remaining integration boundary
+## CE connection boundary
 
-The eight-service CE draft now has a local, separately tested adapter and proposed
-read-only connection contract. See [catalog connection](ce-catalog-connection.md).
-It preserves contribution-margin pricing and is not yet wired into Browse
-products or production routes; existing import behavior below remains in effect.
+The eight-service CE draft has a local read-only backend connection, CE-aware
+Browse products UI and draft publishing safeguards. See
+[catalog connection](ce-catalog-connection.md). It preserves contribution-margin
+pricing without changing the older import calculator. Production remains off;
+source revisions are never silently converted, mixed or refreshed into saved work.
 
 Confirm the current deployed Client Engagement/Living Ops catalog endpoint,
 authentication, revision semantics, and rates before implementing live sync.
-The builder currently imports the documented export; it does not claim to fetch
-live products, reserve people, create CER engagements, schedule execution, or
+The separate import option remains available. No successful live catalog read is
+claimed; the builder does not reserve people, create CER engagements, schedule execution, or
 relay to Xero. Such integrations require a reviewed contract and separate release.
 Complex subscription pricing requires a capable adapter before those products can
 be selected. Approved engagement handoff should reuse the frozen S snapshot.

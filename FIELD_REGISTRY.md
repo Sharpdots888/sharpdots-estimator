@@ -133,9 +133,13 @@ Status values:
   definitions; includes workspace, catalog/version/baseRevision and fingerprint.
 - `ce-services-configuration-v1`: immutable selected definitions plus client
   quantities, exclusions, cadence, term, shared resolutions and pricing overrides.
-- `serviceEngagement.catalogConfiguration`: reserved review metadata, locally
-  round-tripped through existing S-record JSONB versions. Not yet read by the
-  production renderer; does not replace legacy `serviceRows` or product snapshots.
+- `serviceEngagement.catalogConfiguration`: explicit CE calculator/renderer
+  dispatch, preserved by existing S-record JSONB versions. Source definitions are
+  frozen; rowOverrides, sharedResolutions and pricingOverrides are engagement
+  decisions. No implicit conversion to legacy markup or mixed-model S records.
+- `proposal.servicesPricing`: CE snapshot provenance for included Services;
+  `sourceRecords.services` still pins the S number/version. CRM signing checks
+  stored immutable versions in addition to supplied metadata.
 - `complete` is numeric completeness; `publishable` remains false throughout the
   draft adapter. Source `under_review` is preserved, never promoted to reviewed.
 - No new table, sequence, migration, shared registry or source write. Activation

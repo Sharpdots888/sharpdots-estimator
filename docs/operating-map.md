@@ -4,19 +4,20 @@
 
 - Owner: current estimator session, `codex/services-catalog-connection`, from
   deployed PR40/main dd6f7a6 (Heroku v48).
-- State: source and Estimator backends locally verified. User approved the scoped
+- State: source and Estimator backends plus Services UI locally verified. User approved the scoped
   read-only connection, operator checks and publication of source planning
   [issue97](https://github.com/Sharpdots888/sharpdots-apps/issues/97).
 - Scope: lossless recipe mapping, source pricing parity, subtractive configuration,
   snapshot tests, fixed-scope HTTPS reader and opt-in same-origin catalog route.
 - Boundary: no deployment, source data edits, schemas/grants, live catalog imports,
   credentials provisioning or sends. CE source implementation is isolated.
-  No cross-chat reply authorized. Browser Services remains import-only.
+  No cross-chat reply authorized. Services UI and client-output safeguards are
+  locally implemented for review. Production connection remains disabled.
 - Source: sharpdots-apps PR87, commit 9bb0bff and the eight-service projection at
   revision 136. Projection is test evidence, not a fresh production read.
 - Integration needs an approved source endpoint/workspace authorization before
   the production Browse products path can be connected.
-- Verified: 54 automated tests on Node 26 and 376 parity cases covering all eight
+- Verified: 59 automated tests on Node 26 and 376 parity cases covering all eight
   products / 120 rows. Loopback route tests, current-user revocation, redaction,
   fixed workspace and deadline/byte limits passed. CE: 180 pass / 3 unrelated DB
   skips, static/build checks pass. Cross-repo HTTP/PGlite integration passed,
@@ -26,7 +27,13 @@
   `/private/tmp/estimator-ce-catalog-read` on `codex/estimator-catalog-read` starts at
   9bb0bff and does not disturb the active Living Ops source branch. Source guide:
   `apps/client-engagement/docs/estimator-catalog-read.md` in that checkout.
-  Backend disabled by default; no UI activation or successful live read claimed.
+  Backend disabled by default; no successful live read claimed. CE and legacy
+  browser flows pass at desktop/mobile widths. Preview uses only synthetic data:
+  http://127.0.0.1:4201/index.html?crm=1&cePreview=1.
+- UI behavior: revision-pinned CE selection, component exclusions/overrides,
+  contribution-margin pricing, shared-scope owner and term confirmation, capacity
+  planning. Client PDF/CSV/print/DocuSeal blocked for draft catalog configurations;
+  saved legacy calculations and imports preserved. No source approval shortcut.
 - ClickUp: https://app.clickup.com/t/868jnxdp7
 - Decision Log updated: "CE catalog: approved read-only Estimator connection".
 

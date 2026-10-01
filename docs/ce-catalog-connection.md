@@ -14,10 +14,12 @@ The source implementation is isolated on `codex/estimator-catalog-read` from
 9bb0bff; the active Living Ops checkout and catalog edits remain untouched.
 Both sides passed a local HTTP/disposable-database integration rehearsal.
 
-Browse products still uses the existing import bridge. No catalog has been
-imported, no production source database was read or written, and no production
-credentials or configuration were changed. The legacy Services model, existing
-saved calculations and client document behavior remain unchanged.
+Browse products is now connected to the same-origin reader in the local build.
+The live connection remains disabled. Import is a separate, explicit alternative;
+neither an imported catalog nor a cached response silently replaces a failed CE
+read. No production source database was read or written, and no production
+credentials or configuration were changed. Existing calculations remain on their
+original pricing model. CE configurations are restricted to internal review.
 
 Source evidence: sharpdots-apps PR87, commit
 `9bb0bff3e1b47dc90ff88252bbab48e7984949af`,
@@ -29,7 +31,7 @@ Tracking: https://app.clickup.com/t/868jnxdp7
 Decision: [Sharpdots AI OS Decision Log](https://docs.google.com/document/d/1Jy-VrcoUpYANr1uGC1oNJbxJDiQFTbulx3511LZffpo/edit),
 "CE catalog: approved read-only Estimator connection".
 
-## Proposed flow
+## Implemented flow
 
 1. Services opens the shared Product library through an authenticated, same-origin
    Estimator route. The server obtains a narrowly authorized CE catalog snapshot.
@@ -64,13 +66,53 @@ DocuSeal send or invoice is implied by selection.
   product library. Actual source data is supplied to the verifier by local path.
 - Existing JSONB persistence tests save two review configurations, reload both,
   and verify the first S version, pinned proposal and old Services estimate stay
-  unchanged. `catalogConfiguration` is reserved draft metadata in that test;
-  the current renderer must not be used to price it before integration activation.
+  unchanged. `catalogConfiguration` explicitly selects the CE calculator and UI;
+  malformed configuration metadata fails closed instead of falling into the
+  legacy zero-price calculator.
+- `services/ce-engagement.js` and `services/ce-builder.js`: browser configuration,
+  revision-pinned selections, unknown-cost display, component exclusions and
+  overrides, contribution-margin/reserve/fixed-fee controls, explicit shared
+  pricing owner, term confirmation, and derived role hours.
+- `lib/services-publishing-guard.js`: rejects CE draft configurations before
+  DocuSeal transaction insertion or provider calls. With CRM enabled, it reads
+  the saved proposal and referenced immutable S version, not browser readiness
+  flags. Missing proposal/source versions fail closed. Dormant CE editor state
+  in a record using a legacy scenario does not alter that scenario's pricing.
 
 The adapter does **not** rename a candidate export to the older
 `living-ops-estimator-services-v1` contract. That would falsely imply compatibility
-with the scalar markup calculator. It retains the CE configuration separately
-until a reviewed renderer/calculator dispatch handles this pricing method.
+with the scalar markup calculator. The two configuration models cannot be mixed
+within one Services record. Use a new S record to switch source models or adopt
+a newer catalog revision; refreshing never rewrites selected products.
+
+### Publishing and review
+
+Use in internal proposal saves the S record, pins its version, includes Services,
+and selects Internal audience. It does not remove other proposal sections.
+Client PDF/CSV buttons and direct export functions reject included CE draft
+pricing. Client previews omit the draft Services block, and the print guard hides
+the blocked proposal for browser printing. The publishing panel shows the reason.
+Internal previews/CSV remain available with draft warnings; unknown totals are
+shown as Unknown, not zero. DocuSeal preparation is blocked for every CE draft,
+even if numerically complete. No approval checkbox bypasses source review.
+
+The server guard verifies stored pricing provenance; it does not replace the
+app's existing browser-supplied document HTML with a server-rendered document or
+claim protection against arbitrary manually forged document content.
+
+### Local preview
+
+The existing localhost preview keeps all document sends disabled. To review CE
+screens without credentials or a source database:
+
+```sh
+PORT=4201 CE_CATALOG_PREVIEW=true node crm/preview-server.cjs
+```
+
+Open `http://127.0.0.1:4201/index.html?crm=1&cePreview=1`, then Proposals, Services,
+Browse products. This server exposes only a clearly labeled synthetic catalog.
+It never loads local environment credentials or connects to a database. The
+preview option is not used by the production server. No product auto-loads.
 
 ## Mapping and pricing
 
@@ -185,24 +227,24 @@ previously saved record snapshots are not retroactively deleted or altered.
 ## Remaining activation work
 
 Review and reconcile the CE implementation with newer Living Ops source work.
-Connect Browse
-products with loading/error/revision states; add CE-aware draft pricing rendering,
-subtractive controls and shared-resolution UI; preserve old model dispatch; make
-draft/unknown-cost restrictions cover proposal PDF/CSV/DocuSeal preflight. Test
-real current-revision reads and old-record compatibility. Review and deployment
-are separate gates. This document does not claim those screens are complete.
+Review the integrated Services screens and publishing guards. Verify the Node22
+deployment runtime and real signed-in current-revision reads. Production release
+of both apps and provisioning the dedicated credential remain separately approved
+actions. Catalog price/delivery approval is also outstanding; activating a read
+connection alone does not make draft products publishable.
 
 ## Verification
 
-`npm test`: 54 passing tests on Node v26.7.0, including old Services, CRM,
+`npm test`: 59 passing tests on Node v26.7.0, including old Services, CRM,
 signing/auth invariants, adapter validation and snapshot isolation. New tests cover
 transport scope, byte/deadline limits, redaction, current-user deactivation,
 allowlist removal, wrong actor, malformed source, and fresh revision reads.
 The real server route was exercised over loopback with forged/expired/missing
 sessions in all three auth modes, method/query rejection and disabled status.
-HTTP tests disable local env loading, use no database URL, disallow outbound fetch
-inside the server, and stop all listeners. Node 22 deployment-runtime verification
-verification remains outstanding. Local CE endpoint integration passed as below.
+HTTP tests disable local env loading, replace PostgreSQL with a rejecting fake
+pool, disallow outbound fetch inside the server, and stop all listeners. They
+also verify CE signing rejection before any database insert or provider call.
+Node22 deployment-runtime verification remains outstanding.
 
 ```sh
 node scripts/verify-ce-catalog.cjs /absolute/catalog.json /absolute/catalog-model.mjs
@@ -227,6 +269,14 @@ CE `npm test`: 180 pass / 3 unrelated explicit-database skips, plus static/build
 checks. Its response projection and this adapter also accept all eight products
 from the saved revision-136 local file, leaving that input unchanged.
 
-No browser test is claimed for this slice: it adds no active UI. No successful
-production read or actual end-user acceptance is claimed. The backend does not
-make Browse Products live or source drafts publishable.
+- `node services/ce-smoke.cjs`: synthetic intercepted reader; selection,
+  save/version/restore, shared scope, terms, pricing edits, null costs, refreshed
+  revision isolation, authorization/error states, capacity, client PDF/CSV/print
+  and DocuSeal guards; layouts at 1440, 1188, 768 and 390 pixels.
+- `node services/smoke.cjs`: existing imported catalog, example, saved records,
+  capacity, proposal rollups and Start from scratch regressions.
+- `node services/ce-source-smoke.cjs /absolute/catalog.json`: local eight-product
+  projection UI, all recipe rows, complete/incomplete totals and source lineage.
+
+No successful production read or actual end-user acceptance is claimed. No live
+connection, deployment, sends, schema changes or catalog edits occurred.

@@ -9,6 +9,7 @@ const { createOpportunityStore } = require('./lib/opportunity-store');
 const { createCrmAccess } = require('./lib/crm-access');
 const { catalogConnectionConfig } = require('./lib/ce-catalog-transport');
 const { createServiceCatalogEndpoint } = require('./lib/service-catalog-endpoint');
+const { assertServicesPublishable } = require('./lib/services-publishing-guard');
 const { loadLocalEnv } = require("./lib/local-env");
 const {
   canSendClientDocuments,
@@ -1049,10 +1050,22 @@ async function handleCreateDocumentTransaction(body, res, session) {
     return;
   }
 
-  const transactionId = crypto.randomUUID();
   const snapshot = payload.proposalSnapshot && typeof payload.proposalSnapshot === "object"
     ? payload.proposalSnapshot
     : {};
+  try {
+    await assertServicesPublishable({ snapshot, proposalNumber, proposalVersion,
+      readSnapshot: crmEnabled ? async (collection, number, version) => (await pool.query(
+        `SELECT v.snapshot FROM public.sfpq_crm_records r
+         JOIN public.sfpq_crm_record_versions v ON v.record_id=r.id
+         WHERE r.collection=$1 AND r.number=$2 AND v.version=$3`, [collection, number, version]
+      )).rows[0]?.snapshot : null
+    });
+  } catch (error) {
+    sendJson(res, error.statusCode || 503, { error: error.statusCode === 409 ? error.message : "Source pricing could not be verified" });
+    return;
+  }
+  const transactionId = crypto.randomUUID();
   await pool.query(
     `INSERT INTO sfpq_document_transactions (
       transaction_id, workspace_number, proposal_number, proposal_version,

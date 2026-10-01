@@ -75,6 +75,14 @@
 .eng-lineage p { padding:8px; background:#f3f7f5; overflow-wrap:anywhere; }
 .eng-dialog .eng-check { display:flex; flex-direction:row; align-items:center; padding-top:15px; }
 .eng-check input { width:18px; height:18px; }
+.eng-builder input[type="checkbox"] { width:18px; height:18px; }
+.ce-settings { grid-template-columns:minmax(180px,1fr) 160px; }
+.eng-metrics .ce-draft-label { font-size:19px; }
+.eng-catalog-product > div { flex:1; overflow-wrap:anywhere; }
+.eng-catalog-product > button { flex-shrink:0; }
+.eng-source-footer > div { flex-wrap:wrap; }
+.eng-warning { overflow-wrap:anywhere; }
+@media print { body.ce-client-print-blocked #proposalView { display:none !important; } }
 .eng-sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
 @media(max-width:850px) { .eng-settings { grid-template-columns:minmax(0,1fr) 130px 150px; } .eng-product { grid-template-columns:minmax(0,1fr) auto; } .eng-inline-actions { grid-column:2; } .eng-metrics strong { font-size:20px; } }
 @media(max-width:600px) { .eng-builder { padding:15px 8px; } .eng-settings { flex-basis:100%; grid-template-columns:repeat(2,minmax(0,1fr)); } .eng-settings label:first-child { grid-column:1/-1; } .eng-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px 0; } .eng-metrics > div:nth-child(3) { padding-left:0; } .eng-product { gap:12px; } .eng-product-price { grid-column:1; text-align:left; } .eng-product > div:first-child { grid-column:1/-1; } .eng-form-grid { grid-template-columns:1fr; } .eng-dialog header,.eng-dialog footer,.eng-dialog-body { padding:15px; } .eng-view-tabs button { padding:10px 7px; font-size:12px; } }

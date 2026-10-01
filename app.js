@@ -4647,7 +4647,9 @@ function proposalSnapshotWithSources(manifest = proposalPublishingManifest(), op
   if (options.persist) proposal.sourceRecords = structuredClone(sourceRecords);
   return {
     ...structuredClone(proposal),
-    sourceRecords
+    sourceRecords,
+    servicesPricing: proposalIncludedSections().has("services") && CeEngagement.isCatalog(serviceEngagement)
+      ? { serviceScenario, serviceEngagement: structuredClone(serviceEngagement) } : null
   };
 }
 
@@ -5054,6 +5056,7 @@ const docusealProposalStyles = `
 `;
 
 function frozenProposalHtml() {
+  if (catalogClientOutputBlocked()) throw new Error(CeEngagement.blockedMessage);
   const source = document.querySelector(".proposal-page");
   if (!source) throw new Error("Proposal preview is unavailable");
   const page = source.cloneNode(true);
@@ -5274,6 +5277,7 @@ function renderProposalPublishingActions() {
       : "Restore the selected output preset's pricing view, audience, output, and included sections.";
   }
   if (els.proposalPublishPdfBtn) {
+    els.proposalPublishPdfBtn.disabled = catalogClientOutputBlocked();
     els.proposalPublishPdfBtn.classList.remove("ghost-btn");
     els.proposalPublishPdfBtn.textContent = hasPublishWarnings ? `Preview ${audienceName} PDF` : `${audienceName} PDF`;
     els.proposalPublishPdfBtn.title = hasPublishWarnings
@@ -5281,6 +5285,7 @@ function renderProposalPublishingActions() {
       : `Prepare a ${audienceLower} PDF from the selected publishing sections.`;
   }
   if (els.proposalPublishCsvBtn) {
+    els.proposalPublishCsvBtn.disabled = catalogClientOutputBlocked();
     els.proposalPublishCsvBtn.classList.add("ghost-btn");
     els.proposalPublishCsvBtn.textContent = hasPublishWarnings ? `Preview ${audienceName} CSV` : `${audienceName} CSV`;
     els.proposalPublishCsvBtn.title = hasPublishWarnings
@@ -5306,7 +5311,7 @@ function renderProposalPublishingActions() {
             : "Prepare a DocuSeal signature request without emailing the client.";
   }
   if (els.proposalPublishNote) {
-    els.proposalPublishNote.textContent = hasPublishWarnings
+    els.proposalPublishNote.textContent = catalogClientOutputBlocked() ? CeEngagement.blockedMessage : hasPublishWarnings
       ? `${audienceName} preview output is available; save or attach flagged records before final output.`
       : docusealConfiguration.configured
         ? `Ready for ${audienceLower} output${proposalIsClientOutput() ? " and DocuSeal preparation" : ""}.`
@@ -5470,13 +5475,20 @@ function serviceEngagementWarnings() {
   if (serviceScenario !== "livingOps" || !proposalIncludedSections().has("services")) return [];
   const totals = ServiceEngagement.totals(serviceEngagement);
   const messages = [];
+  if (CeEngagement.isCatalog(serviceEngagement)) messages.push(CeEngagement.blockedMessage);
   if (!totals.count) messages.push("Services engagement has no components.");
   if (!totals.complete) messages.push("Services pricing is incomplete. Review component costs, shared defaults, and term.");
   if (totals.sample) messages.push("Services contains example product rates. Replace example products with a reviewed Living Ops catalog before live sending.");
   return messages.map(message => ({ collection: "services", label: "Services", status: "needs-review", message }));
 }
 
+function catalogClientOutputBlocked() {
+  return proposalIsClientOutput() && proposalIncludedSections().has("services")
+    && serviceScenario === "livingOps" && CeEngagement.isCatalog(serviceEngagement);
+}
+
 function proposalServicesRows() {
+  if (catalogClientOutputBlocked()) return [];
   if (serviceScenario === "livingOps" && proposalIsClientOutput()) {
     return ServiceEngagement.outputRows(serviceEngagement).map(b => ({ row: { item: b.name, platform: b.description, costType: "" }, calc: b.calc }));
   }
@@ -5487,7 +5499,7 @@ function proposalServicesRows() {
 
 function renderProposalServicesOutput() {
   if (!els.proposalServicesSection) return;
-  const visible = proposalHasSection("services");
+  const visible = proposalHasSection("services") && !catalogClientOutputBlocked();
   els.proposalServicesSection.toggleAttribute("hidden", !visible);
   if (!visible) return;
 
@@ -5504,12 +5516,13 @@ function renderProposalServicesOutput() {
   els.proposalServicesNote.textContent = serviceScenario === "livingOps" ? serviceEngagement.name : !proposalIsClientOutput()
     ? `From ${sourceLabel} / ${serviceScenarioNames[serviceScenario] || "Service calculation"}`
     : `${serviceScenarioNames[serviceScenario] || "Services package"} execution plan`;
-  els.proposalServicesTotal.textContent = money(termPrice, 2);
+  const serviceMoney = value => value == null || totals.complete === false ? "Unknown" : money(value, 2);
+  els.proposalServicesTotal.textContent = serviceMoney(termPrice);
   els.proposalServicesSummary.innerHTML = `
-    <div><span>Activation</span><strong>${isMonthlyMode ? "$0.00" : money(totals.activationPrice, 2)}</strong></div>
-    <div><span>Monthly</span><strong>${money(totals.monthlyPrice, 2)}</strong></div>
+    <div><span>Activation</span><strong>${isMonthlyMode ? "$0.00" : serviceMoney(totals.activationPrice)}</strong></div>
+    <div><span>Monthly</span><strong>${serviceMoney(totals.monthlyPrice)}</strong></div>
     <div><span>Term</span><strong>${totals.termMonths} mo</strong></div>
-    <div><span>${serviceScenario === "livingOps" ? "Products" : "Appointments / Mo"}</span><strong>${serviceScenario === "livingOps" ? serviceEngagement.products.length : decimal(totals.appointments, 1)}</strong></div>
+    <div><span>${serviceScenario === "livingOps" ? "Products" : "Appointments / Mo"}</span><strong>${serviceScenario === "livingOps" ? (serviceEngagement.catalogConfiguration?.products || serviceEngagement.products).length : decimal(totals.appointments, 1)}</strong></div>
   `;
   els.proposalServicesLines.innerHTML = rowsForOutput.length ? `
     <div class="proposal-output-line header">
@@ -10945,6 +10958,7 @@ function setPrintInputValue(input, formattedValue) {
 }
 
 function prepareReportPrint() {
+  document.body.classList.toggle("ce-client-print-blocked", catalogClientOutputBlocked());
   printInputState = [];
   document.querySelectorAll("#lineItems tr").forEach((tr) => {
     const row = rows.find((candidate) => candidate.id === tr.dataset.id);
@@ -10966,6 +10980,7 @@ function prepareReportPrint() {
 }
 
 function restoreReportPrint() {
+  document.body.classList.remove("ce-client-print-blocked");
   printInputState.forEach(({ input, type, value, step }) => {
     input.type = type;
     input.value = value;
@@ -10987,6 +11002,7 @@ function printReport() {
 }
 
 function printProposalPublishingOutput() {
+  if (catalogClientOutputBlocked()) { setSaveStatus(CeEngagement.blockedMessage); return; }
   renderProposalPreview();
   const { needsSave, needsAttach } = proposalPublishingReadiness();
   const warningCount = needsSave.length + needsAttach.length + serviceEngagementWarnings().length;
@@ -11107,8 +11123,8 @@ function proposalPublishingExportRows() {
         serviceScenario === "livingOps" ? `${totals.termMonths} month term` : `${totals.termMonths} month term / ${decimal(totals.appointments, 1)} appointments per month`,
         "",
         "",
-        money(termPrice, 2),
-        `Activation ${isMonthlyMode ? "$0.00" : money(totals.activationPrice, 2)} / Monthly ${money(totals.monthlyPrice, 2)}`
+        totals.complete === false ? "Unknown" : money(termPrice, 2),
+        totals.complete === false ? "Incomplete Services pricing" : `Activation ${isMonthlyMode ? "$0.00" : money(totals.activationPrice, 2)} / Monthly ${money(totals.monthlyPrice, 2)}`
       ));
       rowsForServicesExport.forEach(({ row, calc }) => {
         exportRows.push(proposalExportRecord(
@@ -11190,6 +11206,7 @@ function proposalPublishingExportRows() {
 }
 
 function proposalPublishingCsvPayload() {
+  if (catalogClientOutputBlocked()) throw new Error(CeEngagement.blockedMessage);
   const manifest = proposalPublishingManifest();
   const isInternalOutput = manifest.audience === "internal";
   const columns = isInternalOutput
@@ -11231,6 +11248,7 @@ function proposalPublishingCsvPayload() {
 }
 
 async function exportProposalPublishingCsv() {
+  if (catalogClientOutputBlocked()) { setSaveStatus(CeEngagement.blockedMessage); return; }
   const { manifest, isInternalOutput, csv, filename } = proposalPublishingCsvPayload();
   try {
     const result = await saveCsvToDownloads(csv, filename);
