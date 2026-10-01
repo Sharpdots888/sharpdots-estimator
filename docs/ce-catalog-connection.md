@@ -1,5 +1,16 @@
 # Client Engagement Catalog Connection
 
+## Current Status
+
+Released and activated September30: Estimator v52 / PR41 main6119417 and CE v28 /
+PR98 application subtree d428e363. Live read verified workspace3/sharpdots,
+revision136, eight products / 120 rows; John has now confirmed seeing the real
+products in Estimator. Existing catalog draft/publishing restrictions remain.
+The older implementation and activation notes below are historical and do not
+mean this reader still needs deployment or a new key. The separate closed-proposal
+return path is tracked in [CE proposal handoff](ce-proposal-handoff.md); it is not
+enabled by the read credential.
+
 ## Approved release - September 30, 2026
 
 John approved proceeding with release and activation after the distinction between

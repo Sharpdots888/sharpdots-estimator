@@ -6,6 +6,7 @@ const path = require("path");
 const { createHmac, randomBytes, timingSafeEqual } = require("crypto");
 const { Pool } = require("pg");
 const { createOpportunityStore } = require('./lib/opportunity-store');
+const { handoffConnectionConfig, createHandoffTransport } = require('./lib/ce-handoff-transport');
 const { createCrmAccess } = require('./lib/crm-access');
 const { catalogConnectionConfig } = require('./lib/ce-catalog-transport');
 const { createServiceCatalogEndpoint } = require('./lib/service-catalog-endpoint');
@@ -65,7 +66,7 @@ const pool = legacyConnectionString
   : null;
 const crmEnabled = process.env.ESTIMATOR_CRM_ENABLED === 'true';
 const crmAccess = createCrmAccess(process.env.ESTIMATOR_CRM_USER_IDS);
-const crmStore = pool ? createOpportunityStore(pool, crmAccess) : null;
+const crmStore = pool ? createOpportunityStore(pool, crmAccess, createHandoffTransport({config:handoffConnectionConfig()})) : null;
 const serviceCatalogEndpoint = createServiceCatalogEndpoint({
   config: catalogConnectionConfig(), crmEnabled, authorizeActor: crmStore?.authorizeActor
 });
@@ -1446,6 +1447,7 @@ const server = http.createServer(async (req, res) => {
     } else if (url === '/api/crm/status' && method === 'GET') {
       sendJson(res, 200, {enabled: crmEnabled, access: crmAccess.allowsSession(session?.user)});
     } else if (url.startsWith('/api/crm/')) {
+      res.setHeader('Cache-Control', 'no-store');
       if (!session) { sendUnauthorized(res); return; }
       if (!crmEnabled || !crmStore) { sendJson(res,503,{error:'CRM is not enabled'}); return; }
       if (!['GET','POST','PUT'].includes(method)) { sendJson(res,405,{error:'Method not allowed'}); return; }
@@ -1459,6 +1461,12 @@ const server = http.createServer(async (req, res) => {
         sendJson(res,201,result);
       }
       else if (url === '/api/crm/opportunities' && method === 'GET') sendJson(res,200,await crmStore.list(session.user));
+      else if (/^\/api\/crm\/opportunities\/\d+\/ce-handoff\/(prepare|send)$/.test(url) && method === 'POST') {
+        const input=parseJsonBody(await collectBody(req,10000));
+        if (!input || Object.keys(input).some(k=>k!=='rowVersion')) {sendJson(res,400,{error:'Only the current opportunity version is accepted'});return;}
+        const id=url.split('/')[4];
+        sendJson(res,200,await (url.endsWith('/prepare')?crmStore.prepareCeHandoff:crmStore.sendCeHandoff)(session.user,id,input));
+      }
       else if ((url === '/api/crm/opportunities' && method === 'POST') || (/^\/api\/crm\/opportunities\/\d+$/.test(url) && method === 'PUT')) {
         const body=await collectBody(req,2500000);
         if(body.length>2500000){sendJson(res,413,{error:'Opportunity payload too large'});return;}

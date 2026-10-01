@@ -1,5 +1,31 @@
 # Operating Map
 
+## Closed Proposal To CE Lane
+
+- Owner: Build estimating app, `codex/ce-engagement-handoff`, from deployed
+  PR41/main 6119417 in the isolated estimator-crm-draft checkout.
+- User confirmed the real CE products appear, then requested completing the
+  downstream handoff for closed proposals. Catalog connection is verified live
+  (Estimator v52 / CE v28); older pending catalog notes below are historical.
+- Scope: authoritative pinned proposal/Services package, durable server-owned
+  handoff state, duplicate prevention, receiving acknowledgement and retry UI.
+  Reuse existing opportunity state/audit storage; no schema changes required.
+- CE session owns the receiver and draft delivery mapping in
+  `/private/tmp/ce-pilot-readiness`. Do not modify its in-progress files. Current
+  source contract is a local draft rehearsal, not live admission authority.
+- No catalog-read-key reuse for writes, source price promotion, client sends,
+  Xero calls, CER/n8n/Hermes execution, production configuration or deployment.
+  New transport activation and release need explicit review/approval.
+- State: local producer ready for contract review. 66 Node22 tests and three-width
+  browser rehearsal passed using disposable SQL and simulated CE receipts. No
+  actual CE delivery or production readiness claimed. Contract/remaining gates:
+  `docs/ce-proposal-handoff.md`.
+- CE supplied PR100/head a2b8423 confirming the exact-version draft rehearsal;
+  it explicitly has no production receiver or live accepted-proposal UI flow.
+  Cross-chat coordination permission requested, not yet received in this chat.
+  Existing drafts, saved versions, source catalog and parallel checkouts remain intact.
+- Tracking: https://app.clickup.com/t/868jnxdp7
+
 ## Catalog Connection Lane
 
 - September 30 release approval: user explicitly said proceed with the real CE

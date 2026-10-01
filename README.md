@@ -7,14 +7,20 @@ The Estimator is a local-first prototype for estimating, print quotes, and Stand
 
 In **Proposals > Services**, choose **Start from scratch** to price a custom service without SalesMachine components. The initial line is blank; name it, enter costs and markups or a direct startup/monthly price, and add or remove lines as needed. Save the Service Calc record to retain the scenario and its custom lines.
 
-The new **Living Ops engagement** service model selects reviewed product snapshots,
+The **Living Ops engagement** service model selects product snapshots,
 costs components, estimates team capacity, and rolls the resulting engagement into
-a proposal. Catalog input currently uses the Living Ops JSON export, not live sync.
+a proposal. The legacy JSON import remains available separately from the CE reader.
 See [Services builder and integration boundary](docs/living-ops-services.md).
 
-The CE catalog backend is implemented and verified locally on both sides but
-disabled by default; UI integration and production activation are pending. See the
-[read-only connection scope and activation gates](docs/ce-catalog-connection.md).
+The CE catalog reader is live in Estimator v52 / CE v28, and the user has confirmed
+the real products appear. Configured CE products remain internal-review drafts;
+selection does not approve pricing, delivery or client sending. See the
+[read-only connection and release record](docs/ce-catalog-connection.md).
+
+The [closed-proposal CE handoff](docs/ce-proposal-handoff.md) has a local producer
+implementation: durable preparation, saved source versions, retry and receipt
+tracking. Its separate write transport is disabled; the CE receiver and paired
+release still require coordination and approval.
 
 ## Local Standard Products setup
 
