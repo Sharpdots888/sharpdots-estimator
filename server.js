@@ -7,6 +7,8 @@ const { createHmac, randomBytes, timingSafeEqual } = require("crypto");
 const { Pool } = require("pg");
 const { createOpportunityStore } = require('./lib/opportunity-store');
 const { createCrmAccess } = require('./lib/crm-access');
+const { catalogConnectionConfig } = require('./lib/ce-catalog-transport');
+const { createServiceCatalogEndpoint } = require('./lib/service-catalog-endpoint');
 const { loadLocalEnv } = require("./lib/local-env");
 const {
   canSendClientDocuments,
@@ -63,6 +65,9 @@ const pool = legacyConnectionString
 const crmEnabled = process.env.ESTIMATOR_CRM_ENABLED === 'true';
 const crmAccess = createCrmAccess(process.env.ESTIMATOR_CRM_USER_IDS);
 const crmStore = pool ? createOpportunityStore(pool, crmAccess) : null;
+const serviceCatalogEndpoint = createServiceCatalogEndpoint({
+  config: catalogConnectionConfig(), crmEnabled, authorizeActor: crmStore?.authorizeActor
+});
 
 const mimeTypes = {
   ".html": "text/html; charset=utf-8",
@@ -1395,6 +1400,7 @@ const server = http.createServer(async (req, res) => {
   const reqUrl = new URL(`http://estimator.local${req.url || "/"}`);
   const ssoToken = reqUrl.searchParams.get("sso_token");
   const session = readSession(req);
+  if (url === '/api/services/catalog') res.setHeader('Cache-Control', 'no-store');
 
   try {
     if (ssoToken) {
@@ -1420,6 +1426,10 @@ const server = http.createServer(async (req, res) => {
       sendUnauthorized(res);
     } else if (authRequiredFor(url) && !session) {
       sendAuthPage(res);
+    } else if (url === '/api/services/catalog') {
+      const result = await serviceCatalogEndpoint({ method, url: reqUrl, session });
+      if (result.status === 405) res.setHeader('Allow', 'GET');
+      sendJson(res, result.status, result.body);
     } else if (url === '/api/crm/status' && method === 'GET') {
       sendJson(res, 200, {enabled: crmEnabled, access: crmAccess.allowsSession(session?.user)});
     } else if (url.startsWith('/api/crm/')) {

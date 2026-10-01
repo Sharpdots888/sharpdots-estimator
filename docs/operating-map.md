@@ -4,21 +4,26 @@
 
 - Owner: current estimator session, `codex/services-catalog-connection`, from
   deployed PR40/main dd6f7a6 (Heroku v48).
-- State: review ready, local adapter/contract implementation. The source-session
-  handoff reports approval of the eight-service draft and local integration work;
-  this does not approve final prices, source publication, access or deployment.
+- State: Estimator backend locally verified, source endpoint blocked on approval
+  to publish its required GitHub planning issue. The user approved the scoped
+  read-only connection and operator checks; publication approval is pending.
 - Scope: lossless recipe mapping, source pricing parity, subtractive configuration,
-  snapshot persistence tests and a narrow read-only source API contract.
-- Boundary: production routes/auth, schemas/grants, CE source files, live catalog
-  imports, credentials and sends remain unchanged. No cross-chat reply authorized.
+  snapshot tests, fixed-scope HTTPS reader and opt-in same-origin catalog route.
+- Boundary: no deployment, source data edits, schemas/grants, live catalog imports,
+  credentials provisioning or sends. CE source implementation has not begun.
+  No cross-chat reply authorized. Browser Services remains import-only.
 - Source: sharpdots-apps PR87, commit 9bb0bff and the eight-service projection at
   revision 136. Projection is test evidence, not a fresh production read.
 - Integration needs an approved source endpoint/workspace authorization before
   the production Browse products path can be connected.
-- Verified: 42 automated tests and 376 parity cases covering all eight products /
-  120 rows against source calculator. Durable versions/old records preserved.
-- Plan and exact source requirement: `docs/ce-catalog-connection.md`. No UI/runtime
-  activation in this slice. Read-only source credential approval is the next gate.
+- Verified: 54 automated tests on Node 26 and 376 parity cases covering all eight
+  products / 120 rows. Loopback route tests, current-user revocation, redaction,
+  fixed workspace and deadline/byte limits passed. Node 22 and CE end-to-end
+  verification remain outstanding. Durable versions/old records preserved.
+- Plan and source requirement: `docs/ce-catalog-connection.md`. The source worktree
+  `/private/tmp/estimator-ce-catalog-read` on `codex/estimator-catalog-read` starts at
+  9bb0bff, remains clean, and does not disturb the active Living Ops source branch.
+  Backend disabled by default; no UI activation or successful live read claimed.
 - ClickUp: https://app.clickup.com/t/868jnxdp7
 
 ## Release Baseline

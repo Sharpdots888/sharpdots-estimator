@@ -2,16 +2,21 @@
 
 ## Current boundary
 
-Local implementation, not a live integration. Source-session handoff reports that
-John accepted the eight-service library as a draft and authorized Estimator-side
-integration planning/local work. Final prices, source publication, new credentials
-or grants, schema changes and production deployment are not approved.
+Local implementation, not a live integration. John approved the dedicated
+server-to-server, read-only connection restricted to workspace `3 / sharpdots`,
+with operator membership checks. This approval does not permit deployment,
+source edits, sending, new memberships, database changes or final price approval.
 
-This first slice is deliberately not included in `index.html` or `server.js`.
-Browse products still uses the existing import bridge in production. No new
-catalog has been imported, no source database was read or written, and no login,
-grant or client document behavior changed. The local adapter is a separate module;
-the legacy Services model and existing saved calculations remain unchanged.
+The Estimator transport and same-origin read route are now implemented locally,
+disabled by default. The CE source endpoint is **not implemented yet**. Its repo
+requires a planning issue for cross-app/auth work; publishing that issue was
+blocked by the safety check, and explicit publication approval is pending.
+No external issue was created. The source worktree remains unchanged.
+
+Browse products still uses the existing import bridge. No catalog has been
+imported, no production source database was read or written, and no production
+credentials or configuration were changed. The legacy Services model, existing
+saved calculations and client document behavior remain unchanged.
 
 Source evidence: sharpdots-apps PR87, commit
 `9bb0bff3e1b47dc90ff88252bbab48e7984949af`,
@@ -42,9 +47,16 @@ DocuSeal send or invoice is implied by selection.
 - `services/ce-catalog.js`: scoped source validation, complete recipe snapshots,
   subtractive configuration and CE pricing rules. It does not turn source drafts
   into `reviewed_template` or enable sending.
-- `lib/service-catalog-reader.js`: dependency-injected read contract. The transport
-  must authenticate the operator and authorize workspace access; this module does
-  not supply a credential, implement authorization or register an HTTP route.
+- `lib/service-catalog-reader.js`: dependency-injected source validation and adapter.
+- `lib/ce-catalog-transport.js`: server-only, fixed HTTPS source, dedicated read
+  key, fixed workspace, verified actor header, no cookies, no redirects, no cache,
+  10-second deadline, 5 MB streamed byte limit, and redacted failure responses.
+- `lib/service-catalog-endpoint.js` and `server.js`: `GET /api/services/catalog`
+  requires a valid Portal session even when general app authentication is in local
+  disabled mode. It rechecks current CRM access through `authorizeActor`, rejects
+  other methods and query parameters, and returns no-store draft projections.
+  Only the actor ID is forwarded; browser headers, customer information and
+  session credentials are not relayed to CE.
 - `services/ce-fixture.cjs`: synthetic contract fixture, not an authoritative
   product library. Actual source data is supplied to the verifier by local path.
 - Existing JSONB persistence tests save two review configurations, reload both,
@@ -125,14 +137,14 @@ example. Preserve source order and IDs. Read one consistent saved revision from
 field-editor metadata, member profiles, `knownPeople`, `lastEdited`, preserved
 client baselines and customer records. Keep source maps, null costs and policies.
 
-### Authorization decision required
+### Approved authorization design
 
 The current CE route uses its own app-bound Portal session plus delivery
 membership. Estimator currently stores a legacy Portal user session without CE
 workspace/application grants. Neither is a valid cross-app service credential.
 Same user IDs do not by themselves authorize a catalog read.
 
-Recommendation for the first connection: a **dedicated server-to-server read-only
+Approved design for the first connection: a **dedicated server-to-server read-only
 credential**, restricted by the CE server to this endpoint and workspace
 `3 / sharpdots`. Estimator obtains the actor from its verified session and checks
 current CRM access; CE also verifies that actor's active workspace membership.
@@ -141,14 +153,36 @@ require HTTPS, limit response size/time, refuse redirects, avoid logging tokens,
 and provide independent revocation. An eventual Portal-issued delegated token may
 replace this transport; do not share session cookies or add warehouse credentials.
 
-Approval is needed before creating that credential/grant or modifying either
-app's authorization. No blanket CE access or automatic membership creation is
-proposed. The legacy workspace-1 Portal routing issue stays separate.
+The Estimator side is implemented; the CE-side credential validation, active
+workspace membership check and read-only saved-revision transaction remain
+required. No blanket CE access or automatic membership creation is authorized.
+The legacy workspace-1 Portal routing issue stays separate.
+
+### Configuration and activation gate
+
+Do not set these values in production as part of local implementation:
+
+| App | Setting | Purpose |
+| --- | --- | --- |
+| Estimator | `ESTIMATOR_CE_CATALOG_ENABLED` | Exactly `true` enables the backend; omitted/false disables it |
+| Estimator | `ESTIMATOR_CE_CATALOG_READ_KEY` | Dedicated 32-byte secret encoded as 64 lowercase hex characters |
+| CE (proposed, not implemented) | `CE_ESTIMATOR_CATALOG_READ_ENABLED` | Independent source-side revocation switch |
+| CE (proposed, not implemented) | `CE_ESTIMATOR_CATALOG_READ_KEY` | Matching dedicated read credential, never a Portal or warehouse key |
+
+Estimator still requires CRM enabled and a live current-user authorization check.
+The URL and workspace are constants, not browser or environment overrides. The
+intended source is `sharpdots-client-engagement-f985e9fee403.herokuapp.com`, path
+`/api/integrations/estimator/catalog`. No secret has been generated for production;
+tests use random ephemeral synthetic keys. Activation requires separate approval
+for production configuration and both app deployments after source implementation
+and end-to-end verification. Disabling either side must prevent future reads;
+previously saved record snapshots are not retroactively deleted or altered.
 
 ## Remaining activation work
 
-After authorization design is approved: implement/test the restricted source
-endpoint and transport; add same-origin Estimator read route; connect Browse
+First approve publication of the required source planning issue, then implement
+and test the restricted CE endpoint and membership checks. Verify both sides
+together using a local synthetic saved catalog and key revocation. Connect Browse
 products with loading/error/revision states; add CE-aware draft pricing rendering,
 subtractive controls and shared-resolution UI; preserve old model dispatch; make
 draft/unknown-cost restrictions cover proposal PDF/CSV/DocuSeal preflight. Test
@@ -157,8 +191,15 @@ are separate gates. This document does not claim those screens are complete.
 
 ## Verification
 
-`npm test`: 42 passing tests, including old Services, CRM, signing/auth invariants,
-adapter validation, conflicts, nulls, revisions and durable snapshot isolation.
+`npm test`: 54 passing tests on Node v26.7.0, including old Services, CRM,
+signing/auth invariants, adapter validation and snapshot isolation. New tests cover
+transport scope, byte/deadline limits, redaction, current-user deactivation,
+allowlist removal, wrong actor, malformed source, and fresh revision reads.
+The real server route was exercised over loopback with forged/expired/missing
+sessions in all three auth modes, method/query rejection and disabled status.
+HTTP tests disable local env loading, use no database URL, disallow outbound fetch
+inside the server, and stop all listeners. Node 22 deployment-runtime verification
+and actual CE endpoint integration remain outstanding.
 
 ```sh
 node scripts/verify-ce-catalog.cjs /absolute/catalog.json /absolute/catalog-model.mjs
@@ -168,4 +209,6 @@ Using source commit 9bb0bff / revision-136 local projection: exact eight product
 and 120 recipe rows; **376 parity cases** against CE's actual `recalculate` function
 passed (base, every-row subtraction, doubled quantity, cadence swap, six-month
 term). Source files unchanged. No production API calls, data imports or sends.
-No browser test is claimed for this slice: it adds no active UI or runtime route.
+No browser test is claimed for this slice: it adds no active UI. No successful
+production or CE endpoint read is claimed; source responses in transport tests
+are synthetic.
