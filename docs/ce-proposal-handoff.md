@@ -12,7 +12,9 @@ controls. CE's [PR100](https://github.com/Sharpdots888/sharpdots-apps/pull/100)
 remains a **local rehearsal**, not a production receiver. CE has accepted the
 receiving implementation slice and this packet/receipt shape. Its earlier draft
 mapper preserves exact S versions and configured delivery scope; the new receiving
-route and intake screen still require paired verification before activation.
+route, protected HTTP readback and receiving screen now pass paired verification.
+CE reports its restricted-runtime-grant, rollback and backup/restore checks passed.
+The final committed CE review point and paired release approval remain required.
 No CE files were edited by this lane; no credentials, production data, grants,
 schemas or releases were changed.
 
@@ -35,6 +37,8 @@ been updated by this coordination message.
 3. In Handoff & billing, assign a receiving owner, target start and delivery
    scope. Save intake details, then **Prepare CE intake**. Missing customer links,
    source records or required details become persistent review issues.
+   Contact email, a valid calendar start date and a confirmed Services term are
+   checked before an attempt is frozen; missing details remain editable.
 4. Preparation reads the immutable P version and the S version that P references,
    even if a newer S version exists. The browser cannot provide the package or
    claim signature/receipt status. The original opportunity total remains separate
@@ -165,19 +169,40 @@ Never clear a failed/attempted ledger as a retry mechanism.
 
 ## Verification
 
-- Node22 full suite: **67 passing**, including real-server anonymous/expired
+- Node22 full suite: **68 passing**, including real-server anonymous/expired
   session denial in all auth modes, CRM request-marker and browser-payload rejection.
-- Eight focused disposable-SQL/transport tests cover version pins, null costs,
+- Nine focused disposable-SQL/transport tests cover version pins, null costs,
   missing sources, permission/stale-version failures, forged receipts, lost
   responses, lease recovery, immutable retry with a different current operator,
-  original preparer attribution and concurrent reopening.
+  original preparer attribution, editable preparation failures and concurrent reopening.
 - Browser rehearsal passed at 1440, 1188 and 390 pixels, including receipt readback,
   the exact protected CE intake link, reload and reopened-opportunity amendment
   lock. `node scripts/ce-handoff-browser.cjs` uses loopback static
   assets and the real opportunity store in disposable PGlite. API interception
   and a simulated CE receipt are explicit. It is **not** cross-app delivery proof.
-- Required remaining proof: the actual CE receiver, duplicate/conflict behavior,
-  current membership rejection, protected intake readback and visible review UI.
+- Paired local HTTP rehearsal passed using the actual Estimator store/transport,
+  CE `createAppServer`, two disposable PGlite databases and a synthetic local
+  Portal. It covers a committed-but-lost response, immutable retry by a different
+  authorized lead, request/source duplicate and conflict behavior, current CE
+  profile/role denial, protected list/detail readback, no new profile/retry-actor
+  membership, exclusion from actionable Team work, unknown costs and Portal
+  revocation. Run:
+
+  ```sh
+  node scripts/verify-ce-handoff-connection.cjs /absolute/path/to/apps/client-engagement
+  ```
+
+  Set `CE_INTAKE_BROWSER=1` for the receiving-page browser check. The final run
+  passed at 1440/1188/390 with the real received source, reload and unknown-cost
+  display. CE corrected mobile grid overflow and duplicate review-check wording.
+  This check serves current CE `public` assets through the actual server without
+  writing the parallel checkout's generated `dist`; CE separately verifies its
+  build. The local browser explicitly sends its synthetic Portal session over
+  loopback HTTP; production Secure cookie handling is unchanged.
+- CE reports existing-grant, transactional rollback, backup/restore and tampered
+  backup rejection checks passed. No new grants or schema are needed. Required
+  remaining proof is the final pinned paired review and approved hosted check.
+  No production delivery is proven.
 
 No production/customer sends, invoices, Xero calls, schema migration, CE engagement
 creation, Portal change or catalog edit was performed during implementation.

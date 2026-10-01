@@ -164,6 +164,27 @@ test('expired delivery lease can recover with the same identity; tampered receip
   }finally{await f.db.close();}
 });
 
+test('receiver-required contact, calendar date and confirmed term are checked before freezing an attempt',async()=>{
+  const f=await fixture();
+  try{
+    const {preparePacket}=require('../lib/ce-handoff');
+    const prepare=(opportunity,config=configuration())=>preparePacket({opportunity,receivingOwnerId:45,operatorId:45,
+      readRecord:async collection=>collection==='proposals'?f.proposal:{...f.services,snapshot:{serviceEngagement:{catalogConfiguration:config}}}});
+    await assert.rejects(prepare({...f.o,email:''}),/contact email/);
+    for(const target of ['2026-02-30','2026-13-01','not-a-date']){
+      await assert.rejects(prepare({...f.o,handoffs:{...f.o.handoffs,engagement:{...f.o.handoffs.engagement,target}}}),/valid target start/);
+    }
+    await assert.rejects(prepare(f.o,{...configuration(),termConfirmed:false}),/Confirm the Services engagement term/);
+    await assert.rejects(prepare(f.o,{...configuration(),termMonths:0}),/Confirm the Services engagement term/);
+    let o=await f.store.save(admin,f.o.id,{...f.o,handoffs:{...f.o.handoffs,engagement:{...f.o.handoffs.engagement,target:'2026-02-30'}}});
+    o=await f.store.prepareCeHandoff(admin,o.id,{rowVersion:o.rowVersion});
+    assert.equal(o.ceHandoff.status,'needs-review');assert.equal(o.ceHandoff.attempts,0);
+    o=await f.store.save(admin,o.id,{...o,handoffs:{...o.handoffs,engagement:{...o.handoffs.engagement,target:'2026-10-15'}}});
+    o=await f.store.prepareCeHandoff(admin,o.id,{rowVersion:o.rowVersion});
+    assert.equal(o.ceHandoff.status,'ready');assert.equal(o.ceHandoff.attempts,0);
+  }finally{await f.db.close();}
+});
+
 test('DocuSeal acceptance is server-observed and is rechecked before the HTTP attempt',async()=>{
   let calls=0;
   const f=await fixture({enabled:true,send:async({packet,idempotencyKey})=>{calls++;return receipt(idempotencyKey,packet);}});
