@@ -2,11 +2,14 @@
 
 ## Current State
 
-October 1 update: John approved merge and code-only deployment. Estimator PR42
-is merged/live as v53; CE PR100/102 are merged/live as v29. Both new handoff flags
-remain unset. [Release evidence](ce-handoff-release-2026-10-01.md) supersedes the
-pre-release status below. Credential setup, activation and one bounded signed-in
-production transfer still require separate approval; no live handoff is claimed.
+October 1 update: John approved merge/deployment, followed by dedicated credential
+setup, activation and a controlled transfer test. Estimator PR42 is live as v54
+and CE PR100/102 as v30, including configuration activation over v53/v29 code.
+Both handoff flags are enabled with a separate server-only write key; unrelated
+settings and source data are unchanged. [Release evidence](ce-handoff-release-2026-10-01.md)
+supersedes the pre-release status below. A signed-in controlled transfer and
+receipt are still unverified: browser control timed out and a test opportunity
+designation is pending. No customer intake, delivery admission or invoice was made.
 
 User request, September 30: complete the downstream handoff so a closed proposal
 does not stop in Estimator. The catalog reader is already live and the user has

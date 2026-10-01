@@ -1,5 +1,47 @@
 # CE Handoff Code Release - October 1, 2026
 
+## Latest State: Connection Activated
+
+After the code release, John explicitly approved configuring the dedicated
+credential, enabling the connection and verifying one controlled transfer. CE
+was enabled first as **v30**, then Estimator as **v54**. Both retain the code
+slugs recorded below; no code deployment or database migration was added.
+
+- CE activation release: 3a5daf71-8d93-495a-8fe3-e5deff2df91e.
+- Estimator activation release: 521e8777-0fe9-4d83-95ec-31716754f8f5.
+- Both new flags are true. One freshly generated 32-byte random write key is
+  installed only in each app's protected configuration. Private readback verifies
+  equality and independence from both existing catalog read keys. No secret was
+  printed, committed, stored in an operational script or sent through chat.
+- Historical-release configuration comparison confirms only the two scoped
+  handoff variables per app changed, plus Heroku's automatic release metadata.
+  An initial strict comparison paused on that metadata; the already-installed CE
+  key was reconciled and reused without rotation before completing Estimator.
+- Both web processes and health/authentication checks pass. CE returns 405 for
+  GET on the now-enabled service endpoint, while browser intake and catalog
+  requests still require authorization. A deliberately operator-less POST with
+  the configured key stops at the expected 403 operator gate before database
+  writes. No privileged actor was substituted for a real Portal session.
+- Read-only eligibility confirms current user45 is active/admin in Estimator
+  and already an active CE lead. This grants no new profile, role or membership.
+- CE has zero received intakes after activation. No customer record, signing
+  email, invoice, Xero action or delivery execution was created.
+
+**Controlled signed-in receipt verification remains pending.** Browser control
+timed out again. John was asked to designate a test O-number. The services example
+O-000001, TEST Opp, is still open with no linked client/contact; it was not altered
+or treated as commercially accepted. Do not manufacture acceptance to finish a test.
+
+Credential custody remains the two existing apps' protected Heroku configuration.
+Maintenance is an app-owner-approved operation: disable sender and receiver,
+rotate the separate key on both, privately verify equality/independence, then
+enable receiver before sender. Never reuse catalog, Portal or warehouse secrets.
+For containment, turn off the new sender/receiver flags without changing existing
+catalog access. Once received intakes exist, retain intake-aware read/backup code.
+The user-facing send is explicit; enabling the flags does not send old proposals.
+
+The rest of this document preserves the preceding code-only release evidence.
+
 John approved: "proceed with merge and deployment". This releases the reviewed
 code with the new transfer connection disabled. Credential setup, activation and
 a bounded signed-in production transfer remain a separate approval.

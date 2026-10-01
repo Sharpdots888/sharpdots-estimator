@@ -6,11 +6,16 @@
   merged into main and live as v53; CE PR100/102 are merged into its existing
   catalog release branch and live as v29. Exact release pins and verification:
   [release record](ce-handoff-release-2026-10-01.md).
-- Both new handoff flags remain unset. Credential setup, activation and a
-  designated signed-in production receipt check still require separate approval.
-  Existing catalog readers, Portal protection and DocuSeal settings are preserved.
+- John subsequently approved dedicated credential setup and activation. CE is
+  now v30 and Estimator v54 with both handoff flags enabled; exact code slugs are
+  unchanged. Private key readback, current lead eligibility and protected-route
+  checks pass. Existing catalog, Portal and DocuSeal settings are preserved.
+- Controlled signed-in transfer/receipt verification is pending: browser control
+  timed out and John was asked to designate a test O-number. O-000001, TEST Opp,
+  is open and has no client/contact links. No intake/customer records were made.
 - The pending release statements below describe the pre-release work. They are
-  superseded by this record for code deployment only, not live transfer authority.
+  superseded by this record for deployment and the approved connection activation,
+  not automatic delivery admission, execution or billing authority.
 
 ## Closed Proposal To CE Lane
 

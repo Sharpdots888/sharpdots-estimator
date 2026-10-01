@@ -17,10 +17,12 @@ the real products appear. Configured CE products remain internal-review drafts;
 selection does not approve pricing, delivery or client sending. See the
 [read-only connection and release record](docs/ce-catalog-connection.md).
 
-The [closed-proposal CE handoff](docs/ce-proposal-handoff.md) has a local producer
-implementation: durable preparation, saved source versions, retry and receipt
-tracking. Its separate write transport is disabled; the CE receiver and paired
-release still require coordination and approval.
+The [closed-proposal CE handoff](docs/ce-proposal-handoff.md) is deployed and its
+separate write connection enabled in Estimator v54 / CE v30. It provides durable
+preparation, pinned saved versions, retry and receipt tracking. An operator must
+explicitly send each intake; receipt does not authorize delivery or invoicing.
+The first controlled signed-in production transfer remains unverified. See the
+[release and activation record](docs/ce-handoff-release-2026-10-01.md).
 
 ## Local Standard Products setup
 
