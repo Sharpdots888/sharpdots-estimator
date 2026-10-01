@@ -74,6 +74,9 @@ const adapter=require('../services/ce-catalog');
     await page.reload();await page.waitForSelector('.crm-deal');
     await page.locator('.crm-deal').click();await page.locator('[data-tab=handoff]').click();
     await page.getByText('Received by CE',{exact:true}).waitFor();
+    const received=(await store.list(user)).opportunities.find(item=>item.id===o.id);
+    assert.equal(await page.getByRole('link',{name:'Open Client Engagement'}).getAttribute('href'),
+      'https://sharpdots-client-engagement-f985e9fee403.herokuapp.com/delivery/intakes/?engagement='+encodeURIComponent(received.ceHandoff.receipt.engagementId));
     assert.equal(await page.locator('.crm-ce-fields [name=owner]').isDisabled(),true);
     await page.locator('[data-action=reopen]').click();
     await page.getByText('Amendment review',{exact:true}).waitFor();

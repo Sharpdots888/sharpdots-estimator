@@ -16,7 +16,7 @@
 - No catalog-read-key reuse for writes, source price promotion, client sends,
   Xero calls, CER/n8n/Hermes execution, production configuration or deployment.
   New transport activation and release need explicit review/approval.
-- State: local producer ready for contract review. 66 Node22 tests and three-width
+- State: local producer ready for paired verification. 67 Node22 tests and three-width
   browser rehearsal passed using disposable SQL and simulated CE receipts. No
   actual CE delivery or production readiness claimed. Contract/remaining gates:
   `docs/ce-proposal-handoff.md`.
@@ -27,6 +27,11 @@
   sent to CE chat01a07874-3db6-7e00-8465-bdfeaa84a2e9. Estimator owns producer/
   receipt tracking; CE owns receiver/intake UI. Reconcile the contract and verify
   both handlers against disposable storage before requesting release approval.
+  CE accepted the receiver/intake UI slice on
+  `codex/client-engagement-estimator-intake` from readiness commit2d65ef6.
+  Canonical Portal ID mapping is confirmed; the frozen preparer and current
+  retrying actor may differ. Both remain attributed. The verified receipt opens
+  CE's protected `/delivery/intakes/` screen at the encoded engagement ID.
   This approval does not authorize deployment or production credential/data changes.
   Existing drafts, saved versions, source catalog and parallel checkouts remain intact.
 - Tracking: https://app.clickup.com/t/868jnxdp7

@@ -157,7 +157,7 @@
       ${h?.review?.issues?.length?`<details class="crm-ce-review"><summary>Intake review · ${h.review.issues.length} checks</summary><ul>${h.review.issues.map(i=>`<li>${esc(i)}</li>`).join('')}</ul></details>`:''}
       <div class="crm-ce-actions">${!locked?btn('ce-prepare',h?.proposal?'Refresh prepared intake':'Prepare CE intake','clipboard-check',` ${o.status!=='won'||busy?'disabled':''}`):''}
       ${['ready','failed','sending'].includes(h?.status)?btn('ce-review-send',h.status==='ready'?'Send to CE':'Retry receipt','send',`${busy||!o.ceHandoffEnabled?'disabled':''}`,'primary'):''}
-      ${h?.receipt?'<a class="crm-btn" href="https://sharpdots-client-engagement-f985e9fee403.herokuapp.com/" target="_blank" rel="noopener noreferrer">'+icon('arrow-up-right')+'Open Client Engagement</a>':''}</div>
+      ${h?.receipt?`<a class="crm-btn" href="https://sharpdots-client-engagement-f985e9fee403.herokuapp.com/delivery/intakes/?engagement=${esc(encodeURIComponent(h.receipt.engagementId))}" target="_blank" rel="noopener noreferrer">${icon('arrow-up-right')}Open Client Engagement</a>`:''}</div>
       ${h?.issues?.length?`<p class="crm-hint">${esc(h.issues.join(' '))}</p>`:''}
       ${h?.lastError?`<p class="crm-hint" role="status">${esc(h.lastError)}</p>`:''}
       ${!o.ceHandoffEnabled?'<p class="crm-hint">CE intake connection awaiting activation. Prepared records remain saved.</p>':''}

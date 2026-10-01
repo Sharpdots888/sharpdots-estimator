@@ -8,12 +8,13 @@ confirmed the real products appear. This change is a separate, **local producer
 implementation**, not an activated integration.
 
 Estimator has durable preparation, source pins, transport, receipt and retry
-controls. CE's current [PR100](https://github.com/Sharpdots888/sharpdots-apps/pull/100)
-is a **draft rehearsal only**, not a production receiver. Its head a2b8423 and
-`domain/estimator-handoff.mjs` preserve exact S versions and configured delivery
-scope; they do not accept the intake contract below. The receiver must be agreed,
-implemented and tested with the CE owner before enabling this transport. No CE
-files, credentials, production data, grants, schemas or releases were changed.
+controls. CE's [PR100](https://github.com/Sharpdots888/sharpdots-apps/pull/100)
+remains a **local rehearsal**, not a production receiver. CE has accepted the
+receiving implementation slice and this packet/receipt shape. Its earlier draft
+mapper preserves exact S versions and configured delivery scope; the new receiving
+route and intake screen still require paired verification before activation.
+No CE files were edited by this lane; no credentials, production data, grants,
+schemas or releases were changed.
 
 Tracking: [Estimator task](https://app.clickup.com/t/868jnxdp7). John explicitly
 approved direct coordination with the active CE chat on September30. The tested
@@ -109,12 +110,32 @@ Proposed fixed route on the existing CE app:
   after the receiving commit succeeds.
 - Return `ce-estimator-intake-receipt-v1` with exact `idempotencyKey`, `sha256`,
   saved `engagementId`, `receivedAt`, and `status:intake-review`. Estimator accepts
-  no provider-supplied navigation URL; the UI opens the known CE origin.
+  no provider-supplied navigation URL; the UI opens the known CE origin at
+  `/delivery/intakes/?engagement=<encoded verified receipt ID>`. CE owns the
+  protected list/detail read model; these intakes stay out of actionable legacy
+  Team work until separately authorized delivery admission exists.
 - Keep delivery-admission approval and later status synchronization separate.
   This candidate does not yet implement CE acceptance/progress callbacks.
 
 These receiver rules are a coordination proposal, **not** a verified production
 contract or approval to change CE authentication, memberships or data ownership.
+
+### Portal Identity And Retry Attribution
+
+Both applications use the canonical Portal `user.id`: Estimator validates its
+equality with the current `public.users.id`, and CE keys its existing profile by
+workspace plus `String(context.user.id)`. `X-Estimator-Actor-Id` is the current
+authorized operator; `intake.ownerId` is the receiving owner's `public.users.id`,
+not an opportunity, company or contact identifier. CE must validate current active
+profiles and the permitted receiving role; identity equality grants no privilege.
+Estimator's current owner list includes active Estimator users, so CE may reject
+an owner without the required CE profile/role. Do not auto-create or promote one.
+
+The frozen `intake.preparedBy` records the original preparer. A later authorized
+operator can retry the same packet and key, so the current actor header can differ
+from `preparedBy`. Preserve both attributions, rather than requiring equality or
+rewriting the accepted packet. Current actor/receiver authorization remains a CE
+gate on every request.
 
 ## Transport And Activation
 
@@ -144,13 +165,15 @@ Never clear a failed/attempted ledger as a retry mechanism.
 
 ## Verification
 
-- Node22 full suite: **66 passing**, including real-server anonymous/expired
+- Node22 full suite: **67 passing**, including real-server anonymous/expired
   session denial in all auth modes, CRM request-marker and browser-payload rejection.
-- Seven focused disposable-SQL/transport tests cover version pins, null costs,
+- Eight focused disposable-SQL/transport tests cover version pins, null costs,
   missing sources, permission/stale-version failures, forged receipts, lost
-  responses, lease recovery, immutable retry and concurrent reopening.
+  responses, lease recovery, immutable retry with a different current operator,
+  original preparer attribution and concurrent reopening.
 - Browser rehearsal passed at 1440, 1188 and 390 pixels, including receipt readback,
-  reload and reopened-opportunity amendment lock. `node scripts/ce-handoff-browser.cjs` uses loopback static
+  the exact protected CE intake link, reload and reopened-opportunity amendment
+  lock. `node scripts/ce-handoff-browser.cjs` uses loopback static
   assets and the real opportunity store in disposable PGlite. API interception
   and a simulated CE receipt are explicit. It is **not** cross-app delivery proof.
 - Required remaining proof: the actual CE receiver, duplicate/conflict behavior,

@@ -93,6 +93,31 @@ test('lost response retries the identical packet and receipt survives reload and
   }finally{await f.db.close();}
 });
 
+test('authorized retry uses the current Portal actor while preserving the original preparer',async()=>{
+  const seen=[];
+  const f=await fixture({enabled:true,send:async({packet,idempotencyKey,actor})=>{
+    seen.push({packet:structuredClone(packet),idempotencyKey,actorId:actor.id});
+    if(seen.length===1)throw Error('Simulated lost response');
+    return receipt(idempotencyKey,packet);
+  }});
+  try{
+    await f.query("INSERT INTO users VALUES(47,'second-lead',true,true)");
+    let o=await f.store.save(admin,f.o.id,{...f.o,handoffs:{...f.o.handoffs,engagement:{...f.o.handoffs.engagement,owner:'second-lead'}}});
+    o=await f.store.prepareCeHandoff(admin,o.id,{rowVersion:o.rowVersion});
+    o=await f.store.sendCeHandoff(admin,o.id,{rowVersion:o.rowVersion});
+    await f.query('UPDATE users SET is_active=false WHERE id=45');
+    await assert.rejects(f.store.sendCeHandoff(admin,o.id,{rowVersion:o.rowVersion}),e=>e.statusCode===403);
+    assert.equal(seen.length,1);
+    o=await f.store.sendCeHandoff({id:47,isAdmin:true},o.id,{rowVersion:o.rowVersion});
+    assert.equal(o.ceHandoff.status,'received');
+    assert.deepEqual(seen.map(s=>s.actorId),[45,47]);
+    assert.deepEqual(seen[0].packet,seen[1].packet);
+    assert.equal(seen[0].idempotencyKey,seen[1].idempotencyKey);
+    assert.equal(seen[1].packet.intake.preparedBy,45);
+    assert.equal(seen[1].packet.intake.ownerId,47);
+  }finally{await f.db.close();}
+});
+
 test('source changes while awaiting CE preserve the receipt but require amendment review',async()=>{
   let release,entered;
   const waiting=new Promise(r=>entered=r);
