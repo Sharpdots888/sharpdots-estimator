@@ -208,6 +208,14 @@ body[data-crm-page="pipeline"] #crmContent [tabindex]:focus-visible { outline-co
 .crm-issues li { margin:7px 0; }
 .crm-muted,.crm-hint { color:#849088; font-size:12px; }
 .crm-hint { margin:10px 0!important; color:#987444; }
+.crm-ce-fields { border:0; padding:0; margin:0; min-width:0; display:grid; gap:14px; }
+.crm-ce-fields button { justify-self:start; }
+.crm-ce-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+.crm-ce-intake .crm-pill { white-space:normal; }
+.crm-ce-intake h3 { display:flex; align-items:center; gap:7px; }
+.crm-ce-review { border-block:1px solid #e1e8e3; padding:12px 0; font-size:12px; }
+.crm-ce-review summary { cursor:pointer; font-weight:600; }
+.crm-ce-review li { margin:8px 0; overflow-wrap:anywhere; }
 .crm-attach-result { display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; background:white; border:0; border-bottom:1px solid #e1e9e3; text-align:left; padding:14px 2px; }
 .crm-attach-result strong { font-size:12px; }
 .crm-attach-result small { margin-top:4px; }

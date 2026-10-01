@@ -1,5 +1,49 @@
 # Operating Map
 
+## Closed Proposal To CE Lane
+
+- Owner: Build estimating app, `codex/ce-engagement-handoff`, from deployed
+  PR41/main 6119417 in the isolated estimator-crm-draft checkout.
+- User confirmed the real CE products appear, then requested completing the
+  downstream handoff for closed proposals. Catalog connection is verified live
+  (Estimator v52 / CE v28); older pending catalog notes below are historical.
+- Scope: authoritative pinned proposal/Services package, durable server-owned
+  handoff state, duplicate prevention, receiving acknowledgement and retry UI.
+  Reuse existing opportunity state/audit storage; no schema changes required.
+- CE session owns the receiver and draft delivery mapping in
+  `/private/tmp/ce-pilot-readiness`. Do not modify its in-progress files. Current
+  source contract is a local draft rehearsal, not live admission authority.
+- No catalog-read-key reuse for writes, source price promotion, client sends,
+  Xero calls, CER/n8n/Hermes execution, production configuration or deployment.
+  New transport activation and release need explicit review/approval.
+- State: 68 Node22 tests and three-width Estimator browser rehearsal passed.
+  Actual Estimator-to-CE HTTP delivery/readback now passes with disposable SQL
+  and a synthetic Portal, including duplicate protection and current access
+  rejection. CE fixed receiving mobile overflow and repeated review wording;
+  the real receiving page passes at 1440/1188/390. CE reports runtime-grant,
+  rollback and backup/restore checks passed. CE is pinned at `d77711a` in draft
+  PR102 (stacked on readiness PR100), Estimator implementation at `cf9ecf2`.
+  The paired HTTP/three-width browser run passed again against the committed CE
+  source. CE final Node22 suite: 188 pass / 3 existing DB-gated skips. Await paired
+  review and explicit release/activation approval; no production delivery claimed.
+  Contract/remaining gates:
+  `docs/ce-proposal-handoff.md`.
+- CE supplied PR100/head a2b8423 confirming the exact-version draft rehearsal;
+  it explicitly has no production receiver or live accepted-proposal UI flow.
+  John explicitly approved direct CE-chat coordination on September30; the
+  producer commit4f62991 and receiving-side implementation request have now been
+  sent to CE chat01a07874-3db6-7e00-8465-bdfeaa84a2e9. Estimator owns producer/
+  receipt tracking; CE owns receiver/intake UI. Reconcile the contract and verify
+  both handlers against disposable storage before requesting release approval.
+  CE accepted the receiver/intake UI slice on
+  `codex/client-engagement-estimator-intake` from readiness commit2d65ef6.
+  Canonical Portal ID mapping is confirmed; the frozen preparer and current
+  retrying actor may differ. Both remain attributed. The verified receipt opens
+  CE's protected `/delivery/intakes/` screen at the encoded engagement ID.
+  This approval does not authorize deployment or production credential/data changes.
+  Existing drafts, saved versions, source catalog and parallel checkouts remain intact.
+- Tracking: https://app.clickup.com/t/868jnxdp7
+
 ## Catalog Connection Lane
 
 - September 30 release approval: user explicitly said proceed with the real CE
