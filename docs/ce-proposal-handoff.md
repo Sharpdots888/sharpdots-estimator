@@ -8,13 +8,14 @@ confirmed the real products appear. This change is a separate, **local producer
 implementation**, not an activated integration.
 
 Estimator has durable preparation, source pins, transport, receipt and retry
-controls. CE's [PR100](https://github.com/Sharpdots888/sharpdots-apps/pull/100)
-remains a **local rehearsal**, not a production receiver. CE has accepted the
-receiving implementation slice and this packet/receipt shape. Its earlier draft
-mapper preserves exact S versions and configured delivery scope; the new receiving
-route, protected HTTP readback and receiving screen now pass paired verification.
-CE reports its restricted-runtime-grant, rollback and backup/restore checks passed.
-The final committed CE review point and paired release approval remain required.
+controls. CE's receiver is now committed at `d77711a93863eb6600ba96b2417a6a7fb183b1d0`
+in draft [PR102](https://github.com/Sharpdots888/sharpdots-apps/pull/102), stacked
+on readiness [PR100](https://github.com/Sharpdots888/sharpdots-apps/pull/100).
+The receiving route, protected HTTP readback and receiving screen pass paired
+verification against that committed source and Estimator `cf9ecf2`. These are
+local, disabled-by-default release candidates, not an activated integration.
+CE's restricted-runtime-grant, rollback and backup/restore evidence is included
+with PR102. Paired review and explicit production release approval remain required.
 No CE files were edited by this lane; no credentials, production data, grants,
 schemas or releases were changed.
 
@@ -200,12 +201,21 @@ Never clear a failed/attempted ledger as a retry mechanism.
   build. The local browser explicitly sends its synthetic Portal session over
   loopback HTTP; production Secure cookie handling is unchanged.
 - CE reports existing-grant, transactional rollback, backup/restore and tampered
-  backup rejection checks passed. Its Node22 suite reports **187 passing / 3
-  existing DB-gated skips**, with check/build passing. CE is packaging its final
-  receiver commit for paired/Steward review; no final SHA is claimed here yet.
-  Producer implementation and paired harness are committed at `cf9ecf2`. No new
-  grants or schema are needed. Required remaining proof is the final pinned paired
-  review and approved hosted check. No production delivery is proven.
+  backup rejection checks passed; the committed evidence is in
+  `.spacefold/evidence/ce17-estimator-intake/` in the CE repo. Its final Node22
+  suite reports **188 passing / 3 existing DB-gated skips**, with check/build
+  passing. Estimator reran paired HTTP and all three browser widths successfully
+  against CE `d77711a` after commit. Producer implementation and paired harness
+  are committed at `cf9ecf2`; later Estimator commits only record coordination
+  evidence. No new grants or schema are needed.
+- Remaining: paired/Steward review, approved exact release candidates and a
+  dedicated write credential with maintenance ownership, current real sender/
+  receiver lead eligibility, and an explicitly approved bounded signed-in
+  production receipt check. No production delivery is proven. CE's receiving
+  runbook is `docs/client-engagement/19-estimator-intake-receiver.md`.
+- Recovery after eventual activation: disable new handoff writes first. Retain
+  intake-aware CE read/backup support for records already received; reverting to
+  an older incompatible backup validator is not a safe automatic rollback.
 
 No production/customer sends, invoices, Xero calls, schema migration, CE engagement
 creation, Portal change or catalog edit was performed during implementation.

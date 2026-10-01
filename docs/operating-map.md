@@ -21,8 +21,11 @@
   and a synthetic Portal, including duplicate protection and current access
   rejection. CE fixed receiving mobile overflow and repeated review wording;
   the real receiving page passes at 1440/1188/390. CE reports runtime-grant,
-  rollback and backup/restore checks passed. Await the final paired commit review
-  and explicit release/activation approval; no production delivery claimed.
+  rollback and backup/restore checks passed. CE is pinned at `d77711a` in draft
+  PR102 (stacked on readiness PR100), Estimator implementation at `cf9ecf2`.
+  The paired HTTP/three-width browser run passed again against the committed CE
+  source. CE final Node22 suite: 188 pass / 3 existing DB-gated skips. Await paired
+  review and explicit release/activation approval; no production delivery claimed.
   Contract/remaining gates:
   `docs/ce-proposal-handoff.md`.
 - CE supplied PR100/head a2b8423 confirming the exact-version draft rehearsal;
