@@ -2,6 +2,16 @@
 
 ## Catalog Connection Lane
 
+- September 30 release approval: user explicitly said proceed with the real CE
+  connection after the synthetic preview was distinguished. Supersedes the older
+  local-only boundary below for the two app releases and dedicated read key only.
+- Pre-release production: Estimator v50, same dd6f7a6 code as v48, with newer DB
+  config preserved; CE v26, subtree 4ec2058 from catalog branch 9bb0bff. Source PR
+  must target that deployed feature branch; do not release unrelated main changes.
+- Node22 verification: Estimator 59 pass, CE 180 pass / 3 gated skips, check/build,
+  376 pricing cases and cross-repo read-only rehearsal pass. Hosted verification
+  pending. Source writes, grants, schema, Portal auth and sends remain out of scope.
+
 - Owner: current estimator session, `codex/services-catalog-connection`, from
   deployed PR40/main dd6f7a6 (Heroku v48).
 - State: source and Estimator backends plus Services UI locally verified. User approved the scoped

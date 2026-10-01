@@ -1,6 +1,34 @@
 # Client Engagement Catalog Connection
 
-## Current boundary
+## Approved release - September 30, 2026
+
+John approved proceeding with release and activation after the distinction between
+the synthetic preview and the live connection was explained. This supersedes the
+local-only release restriction in the implementation history below. Scope is both
+reviewed apps, a new dedicated read credential, and read access to workspace
+`3 / sharpdots`. Existing Portal authorization, CRM access, source membership,
+database credentials, data and draft-publishing restrictions remain unchanged.
+No source edits, grants, migration, sending or price approval are authorized.
+
+Release baseline: Estimator v50 / PR40 dd6f7a6 (v49-v50 updated database URLs;
+preserve them), CE v26 / application subtree 4ec2058. CE's deployed catalog is on
+`codex/client-engagement-catalog-editor` at 9bb0bff, not monorepo main. The narrow
+reader PR targets that branch; deploy only `apps/client-engagement`, not the
+monorepo root or unrelated stacked PRs. Deploy code disabled first, then configure
+only the four catalog settings below. Never record the key in Git or logs.
+
+Release verification on official Node v22.23.2: Estimator 59/59; CE 180 pass,
+3 explicitly gated database tests skipped; CE build/check, 376 pricing-parity
+cases and the read-only cross-app HTTP/PGlite rehearsal pass. Earlier browser
+checks cover CE and legacy flows, revision pins, client guards and mobile layouts.
+Hosted read, release IDs and signed-in browser verification must be recorded after
+deployment; local success is not evidence of a live catalog read.
+
+Revocation: disable either catalog feature flag. Code rollback baselines are
+Estimator v50 and CE v26; preserve current unrelated config, especially the
+Estimator database URLs. Source drafts and saved S records are never reversed.
+
+## Implementation history (before release approval)
 
 Local implementation, not a live integration. John approved the dedicated
 server-to-server, read-only connection restricted to workspace `3 / sharpdots`,
