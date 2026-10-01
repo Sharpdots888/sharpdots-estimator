@@ -1,5 +1,17 @@
 # Operating Map
 
+## Latest Release - October 1
+
+- John approved the paired merge and code-only deployment. Estimator PR42 is
+  merged into main and live as v53; CE PR100/102 are merged into its existing
+  catalog release branch and live as v29. Exact release pins and verification:
+  [release record](ce-handoff-release-2026-10-01.md).
+- Both new handoff flags remain unset. Credential setup, activation and a
+  designated signed-in production receipt check still require separate approval.
+  Existing catalog readers, Portal protection and DocuSeal settings are preserved.
+- The pending release statements below describe the pre-release work. They are
+  superseded by this record for code deployment only, not live transfer authority.
+
 ## Closed Proposal To CE Lane
 
 - Owner: Build estimating app, `codex/ce-engagement-handoff`, from deployed

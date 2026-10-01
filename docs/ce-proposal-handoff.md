@@ -2,6 +2,12 @@
 
 ## Current State
 
+October 1 update: John approved merge and code-only deployment. Estimator PR42
+is merged/live as v53; CE PR100/102 are merged/live as v29. Both new handoff flags
+remain unset. [Release evidence](ce-handoff-release-2026-10-01.md) supersedes the
+pre-release status below. Credential setup, activation and one bounded signed-in
+production transfer still require separate approval; no live handoff is claimed.
+
 User request, September 30: complete the downstream handoff so a closed proposal
 does not stop in Estimator. The catalog reader is already live and the user has
 confirmed the real products appear. This change is a separate, **local producer
