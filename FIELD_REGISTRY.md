@@ -126,3 +126,17 @@ Status values:
 - Explicit assignment overrides Offering and is preserved by saves from older
   clients that omit the field. Moves retain identity, linked versions, approvals,
   close state and handoffs. See `docs/sales-pipelines.md`.
+
+## CE Catalog Connection Draft
+
+- `ce-estimator-catalog-v1`: read-only adapter projection of CE-owned product
+  definitions; includes workspace, catalog/version/baseRevision and fingerprint.
+- `ce-services-configuration-v1`: immutable selected definitions plus client
+  quantities, exclusions, cadence, term, shared resolutions and pricing overrides.
+- `serviceEngagement.catalogConfiguration`: reserved review metadata, locally
+  round-tripped through existing S-record JSONB versions. Not yet read by the
+  production renderer; does not replace legacy `serviceRows` or product snapshots.
+- `complete` is numeric completeness; `publishable` remains false throughout the
+  draft adapter. Source `under_review` is preserved, never promoted to reviewed.
+- No new table, sequence, migration, shared registry or source write. Activation
+  and restricted cross-app access require review. See `docs/ce-catalog-connection.md`.

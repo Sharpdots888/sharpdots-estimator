@@ -175,5 +175,28 @@ test('named CRM user can use shared records without administrator or document-se
     assert.equal(services.totals(savedV2).monthlyPrice,1500);
     assert.equal(services.capacity(savedV1)[0].gap,-1);
     assert.deepEqual(savedV1,engagement);
+    // Review-only CE configuration uses existing immutable JSONB versions. It is
+    // not yet activated by the production Services renderer.
+    const adapter=require('../services/ce-catalog');
+    const source=require('../services/ce-fixture.cjs').sourceFixture();
+    const catalog=adapter.adaptCatalog(source,{id:3,slug:'sharpdots'});
+    const config=adapter.selectProducts(catalog,['service-a']);
+    const draftSnapshot={serviceScenario:'livingOps',serviceEngagement:{...services.empty(),catalogConfiguration:config}};
+    const draftRecord=await store.saveRecord(ray,null,{collection:'services',name:'Catalog draft',snapshot:draftSnapshot,creationKey:randomUUID()});
+    const proposalSnapshot={proposal:{title:'Pinned review',sourceRecords:{services:{number:draftRecord.number,version:1}}}};
+    const pinned=await store.saveRecord(ray,null,{collection:'proposals',name:'Pinned review',snapshot:proposalSnapshot,creationKey:randomUUID()});
+    const revisedDraft=structuredClone(draftSnapshot);
+    revisedDraft.serviceEngagement.catalogConfiguration=adapter.configureProduct(config,'service-a','media:monthly',{included:false});
+    await store.saveRecord(ray,draftRecord.id,{collection:'services',name:'Catalog draft',version:1,snapshot:revisedDraft});
+    source.version=source.catalog.version=8;source.catalog.products[0].recipe[0].quantity=99;
+    adapter.adaptCatalog(source,{id:3,slug:'sharpdots'});
+    const records=(await store.list(ray)).records;
+    const first=records.find(r=>r.id===draftRecord.id&&r.version===1).snapshot.serviceEngagement;
+    const second=records.find(r=>r.id===draftRecord.id&&r.version===2).snapshot.serviceEngagement;
+    assert.equal(adapter.calculate(services.restore(first).catalogConfiguration).termPrice,4125);
+    assert.equal(adapter.calculate(second.catalogConfiguration).termPrice,1125);
+    assert.equal(first.catalogConfiguration.source.revision,7);
+    assert.deepEqual(records.find(r=>r.id===pinned.id).snapshot,proposalSnapshot);
+    assert.deepEqual(records.find(r=>r.id===initial.id&&r.version===1).snapshot.serviceEngagement,engagement);
   }finally{await db.close();}
 });

@@ -97,6 +97,11 @@ copy, and proposal source restoration use the existing record mechanism.
 
 ## Remaining integration boundary
 
+The eight-service CE draft now has a local, separately tested adapter and proposed
+read-only connection contract. See [catalog connection](ce-catalog-connection.md).
+It preserves contribution-margin pricing and is not yet wired into Browse
+products or production routes; existing import behavior below remains in effect.
+
 Confirm the current deployed Client Engagement/Living Ops catalog endpoint,
 authentication, revision semantics, and rates before implementing live sync.
 The builder currently imports the documented export; it does not claim to fetch

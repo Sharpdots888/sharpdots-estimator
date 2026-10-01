@@ -1,5 +1,31 @@
 # Operating Map
 
+## Catalog Connection Lane
+
+- Owner: current estimator session, `codex/services-catalog-connection`, from
+  deployed PR40/main dd6f7a6 (Heroku v48).
+- State: review ready, local adapter/contract implementation. The source-session
+  handoff reports approval of the eight-service draft and local integration work;
+  this does not approve final prices, source publication, access or deployment.
+- Scope: lossless recipe mapping, source pricing parity, subtractive configuration,
+  snapshot persistence tests and a narrow read-only source API contract.
+- Boundary: production routes/auth, schemas/grants, CE source files, live catalog
+  imports, credentials and sends remain unchanged. No cross-chat reply authorized.
+- Source: sharpdots-apps PR87, commit 9bb0bff and the eight-service projection at
+  revision 136. Projection is test evidence, not a fresh production read.
+- Integration needs an approved source endpoint/workspace authorization before
+  the production Browse products path can be connected.
+- Verified: 42 automated tests and 376 parity cases covering all eight products /
+  120 rows against source calculator. Durable versions/old records preserved.
+- Plan and exact source requirement: `docs/ce-catalog-connection.md`. No UI/runtime
+  activation in this slice. Read-only source credential approval is the next gate.
+- ClickUp: https://app.clickup.com/t/868jnxdp7
+
+## Release Baseline
+
+- PR40 is merged and deployed as quoting-proposals v48. The older review/pending
+  entries below describe historical implementation stages, not current release state.
+
 ## Separate Sales Pipelines Lane
 
 - Owner: current estimator Codex session, `codex/separate-sales-pipelines` from
