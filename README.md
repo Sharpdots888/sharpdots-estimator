@@ -21,7 +21,10 @@ The [closed-proposal CE handoff](docs/ce-proposal-handoff.md) is deployed and it
 separate write connection enabled in Estimator v54 / CE v30. It provides durable
 preparation, pinned saved versions, retry and receipt tracking. An operator must
 explicitly send each intake; receipt does not authorize delivery or invoicing.
-The first controlled signed-in production transfer remains unverified. See the
+The controlled O-000001 rehearsal is verified through CE review and explicit
+internal-plan acceptance into Team work. CE's later v32 release preserves the
+original receipt and source versions; execution and invoicing remain disabled.
+See the [acceptance record](docs/ce-handoff-acceptance-2026-10-02.md) and
 [release and activation record](docs/ce-handoff-release-2026-10-01.md).
 
 ## Local Standard Products setup

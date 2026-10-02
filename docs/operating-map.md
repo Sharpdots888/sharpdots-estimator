@@ -1,6 +1,22 @@
 # Operating Map
 
-## Latest Release - October 1
+## Latest Outcome - October 2
+
+- Closed-proposal handoff lane is complete through the designated human rehearsal:
+  O-000001 / P-100049 v1 / S-100048 v1 was received once, then explicitly accepted
+  in CE Overview into 24 assigned internal work items from 10 components.
+- Estimator remains v54 / `84d4f56`; CE's owner released Overview/defaults as
+  v32 / `75199775`. CE acceptance evidence records version 4 / delivery-ready,
+  rehearsal true, unchanged source digest, and no execution/invoicing permission.
+- Preserve this record. No resend, repeat group test or parallel CE release is
+  needed. No new Estimator human decision is pending for this completed slice.
+- CE owns subsequent scope-validation work; Steward 3 owns the program projection.
+  Estimator retains immutable source selection and receipt/retry ownership.
+  No new independent implementation lane has been assigned by this closeout.
+- Exact pins, read-only receipt verification and retained human acceptance:
+  [acceptance record](ce-handoff-acceptance-2026-10-02.md).
+
+## Historical Activation Checkpoint - October 1
 
 - John approved the paired merge and code-only deployment. Estimator PR42 is
   merged into main and live as v53; CE PR100/102 are merged into its existing
@@ -17,7 +33,12 @@
   superseded by this record for deployment and the approved connection activation,
   not automatic delivery admission, execution or billing authority.
 
-## Closed Proposal To CE Lane
+## Closed Proposal To CE Lane - Completed
+
+The preparation/release narrative below is historical. The October 2 outcome
+above supersedes its pending approvals and local-only statements for the approved
+release, activation and designated rehearsal only. Further execution, billing,
+pricing promotion or source amendments still require their own authority.
 
 - Owner: Build estimating app, `codex/ce-engagement-handoff`, from deployed
   PR41/main 6119417 in the isolated estimator-crm-draft checkout.

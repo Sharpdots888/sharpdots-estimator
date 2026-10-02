@@ -1,6 +1,16 @@
 # CE Handoff Code Release - October 1, 2026
 
-## Latest State: Connection Activated
+## Acceptance Update - October 2
+
+The controlled test is complete: one O-000001 transfer, matching saved P/S
+versions and CE receipt, followed by John's explicit CE internal-plan acceptance
+and arrival in Team work. Estimator remains v54; the CE owner subsequently
+released Overview/defaults as v32. External execution and invoicing stay disabled.
+See [exact acceptance evidence](ce-handoff-acceptance-2026-10-02.md).
+Pending-test statements below describe the historical activation checkpoint,
+not an outstanding request to repeat the test.
+
+## Activation Checkpoint - October 1
 
 After the code release, John explicitly approved configuring the dedicated
 credential, enabling the connection and verifying one controlled transfer. CE
