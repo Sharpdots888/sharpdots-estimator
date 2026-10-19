@@ -7,8 +7,9 @@ Head: `codex/ce-engagement-handoff`. Base: `main`. Create as **draft** only.
 No open PR for this head/base existed at the October 19 safety check.
 John approved coordinated source publication and exact archive deployment;
 main merge is excluded. Heroku auto-deploy and review apps are disabled. CE v45
-released first. Estimator recovery/preflight passed; see the current checkpoint
-in the [release review](ce31b-release-candidate.md).
+released first. Estimator is now **v55/source91fac0e**, with all134 deployed hashes
+matching. Recovery, preservation and fictional hosted handoff passed. PR43 stays
+draft and unmerged. Full [release and rehearsal evidence](ce31b-live-release-2026-10-19.md).
 
 ---
 
@@ -74,11 +75,20 @@ all other schema fields and all complete rowsets match exactly. No shared user o
 customer rowsets were exported. Source owner/ACL metadata is retained privately,
 not reapplied. This is scoped app recovery, not whole-warehouse recovery.
 
-Fresh preflight confirms unchanged Estimator v54/source84d4f56, settings, schema,
-data and sequences. Heroku auto-deploy/review apps are disabled. Deploy the frozen
-91fac0e archive, not this moving documentation tip, and record hosted verification
-separately. Existing Portal, credentials, flags, schema, grants and lockfile remain
-unchanged. This PR stays draft; no merge or unrelated activation is authorized.
+Fresh preflight confirmed unchanged Estimator v54/source84d4f56, settings, schema,
+data and sequences. The exact frozen91fac0e archive then released as v55; all134
+deployed file hashes match. Heroku auto-deploy/review apps remain disabled.
+Existing Portal, credentials, flags, schema, grants and lockfile remain unchanged.
+This PR stays draft; no main merge or unrelated activation is authorized.
+
+Hosted rehearsal O-000034 preserves S-100053 v1/v2 and P-100054 v1/v2. Four
+proposal-only adjustments survive save/reload; Services/product source remains
+unchanged. Draft catalog pricing blocks client PDF/CSV/DocuSeal. CE acknowledged
+the frozen packet once, engagement a8f75582-bd26-4d4a-828c-4be1120a0642. CE's owner
+verified its comparison and accepted the clearly fictional internal plan into52
+ready Team cards without execution/billing. All7,004 pre-existing Estimator rows,
+58 versions and eight signed artifacts remain unchanged after the rehearsal.
+See the release evidence for exact hashes and CE-owned verification limits.
 
 Preserve saved v2 records, source evidence, overrides, proofs, receipts and accepted
 work during containment or rollback. Never down-convert to v1 or silently reprice.
