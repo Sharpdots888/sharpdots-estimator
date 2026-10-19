@@ -27,6 +27,11 @@
   rehearsal readiness are not established by that metadata check.
   CE support must release before the consumer; CE owner gathers John's single
   coordinated release approval. Existing v2 records must survive any rollback.
+- Source publication held: read-only GitHub inspection confirms main equals
+  `84d4f56`, active main PR protection, zero Actions workflows and no open head PR.
+  Active Heroku webhook `627556589` subscribes to all events; auto-deploy/review-app
+  filters are not established. The conditional no-live-effect push is therefore
+  withheld. [Draft PR text](ce31b-draft-pr.md) is local only; no push/PR/merge/deploy.
 
 ## Latest Outcome - October 2
 

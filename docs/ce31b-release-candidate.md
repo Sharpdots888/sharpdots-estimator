@@ -80,9 +80,9 @@ database-backup, hosted-rehearsal or data-persistence evidence. The frozen
 archive's `candidate.json` predates this receipt and remains unchanged; use this
 supplement for live-release attribution. No network calls were made here.
 
-Remote main has not been refreshed. Cached `origin/main` equals the verified
-release source but cannot establish the current GitHub branch tip. The deployed
-merge commit is not an ancestor of this feature branch. Their
+The subsequent read-only GitHub check below also confirms current remote `main`
+equals that verified release source; no Git fetch or branch write was performed.
+The deployed merge commit is not an ancestor of this feature branch. Their
 common commit is `006743883520cc021af6045a932bc790414bf956`; its tree exactly
 matches the recorded deployed tree `49aea6e0fc598364c177e9155f449fe755cac267`.
 This explains the branch history without assuming a fast-forward. The frozen
@@ -91,6 +91,36 @@ candidate changes 33 files relative to the recorded base; the delta is packaged.
 The earlier bootstrap instructions in `DEPLOY.md` are not this release procedure:
 do not initialize/recreate the app, push directly to protected main, force-push,
 or release unrelated changes from a shared checkout.
+
+## GitHub Source Publication Safety Check
+
+October 19, read-only GitHub API inspection under CE's conditional source-review
+request. **No push or draft PR was performed**, because its no-deployment-effect
+condition is not established:
+
+- Repository is public, default branch `main`; current remote main is
+  `84d4f56d7784d86741ad866a207e94ab19f72089`. Automatic PR merge is disabled.
+- Active ruleset `16656355`, **Protect main**, applies to the default branch,
+  requires pull requests, and blocks deletion/non-fast-forward updates with no
+  bypass actors. Its required approving-review count is zero; protection is not
+  a substitute for John's release approval.
+- Remote `codex/ce-engagement-handoff` is
+  `d9c810303edfb4831a7a9daba49b3db345de8ef2`; it is an ancestor of the local head.
+  No force push would be needed. There is no open PR for this head/base pair.
+- GitHub Actions workflow count is zero. However, active repository webhook
+  **627556589** targets **`kolkrabbi.heroku.com`** and subscribes to **`*` events**.
+  Full callback URLs/secrets were not displayed or retained. A feature push and
+  PR creation both fall within those subscribed events.
+- GitHub's webhook metadata does **not** reveal Heroku's auto-deploy branch filters
+  or review-app behavior. This does not prove either action would deploy, but it
+  prevents claiming that source publication is effect-free. No Heroku settings,
+  credentials, integrations or hooks were changed to bypass this uncertainty.
+
+The CE release owner must establish the applicable Heroku integration rules before
+resuming this conditional source-only push/PR. The exact local source archive and
+hashes above remain valid and unchanged. A complete
+[draft PR description](ce31b-draft-pr.md) is saved locally for that review.
+There is no PR URL or attachment to report yet.
 
 ## Coordinated Publication Checklist
 
@@ -148,8 +178,9 @@ native PostgreSQL evidence accepted both fictional packets into 52 work items
 each with immutable source preserved. These tests were **not rerun** for packaging.
 Only archive/content/mode/hash/delta checks ran, without network or live access.
 
-Next gate: CE owner finalizes both exact source packages and requests John's one
-coordinated publication/deployment approval. Current live code is attributed to
-CE's verified receipt; remote branch reconciliation and current recovery readiness
-remain pre-release checks. No push/merge/deploy or external tracker/chat/Drive
+Next gate: CE owner resolves the source-publication hook uncertainty, finalizes
+both exact review packages and requests John's one coordinated publication/
+deployment approval. Current live code is attributed to CE's verified receipt;
+GitHub main matches it, while current recovery readiness remains a pre-release
+check. No push/merge/deploy or external tracker/chat/Drive
 update was performed here. Tracking remains ClickUp868jnxdp7, CE issue124/PR116.
