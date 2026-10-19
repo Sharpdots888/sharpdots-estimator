@@ -9,6 +9,14 @@ http.createServer((req,res) => {
   try { pathname = decodeURIComponent(new URL(req.url,'http://localhost').pathname); } catch { res.writeHead(400).end(); return; }
   if(pathname==='/') {res.writeHead(302,{Location:'/index.html?crm=1'}).end();return;}
   if (req.method === 'GET' && req.url === '/api/services/catalog' && process.env.CE_CATALOG_PREVIEW === 'true') {
+    if (process.env.CE_PAIRED_FIXTURE && req.headers['x-estimator-catalog-contract'] === 'ce-estimator-paired-v2') {
+      try {
+        const pair = JSON.parse(fs.readFileSync(process.env.CE_PAIRED_FIXTURE, 'utf8'));
+        const catalog = require('../services/ce-pricing').adaptPaired(pair, { id: 3, slug: 'sharpdots' });
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }).end(JSON.stringify(catalog));
+      } catch { res.writeHead(502).end('Invalid local paired fixture'); }
+      return;
+    }
     const source = require('../services/ce-fixture.cjs').sourceFixture();
     const second = structuredClone(source.catalog.products[0]);
     second.id = 'example-b'; second.name = 'Second synthetic service'; second.termMonths = 6;

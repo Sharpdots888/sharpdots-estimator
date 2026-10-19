@@ -12,7 +12,9 @@
     const json = (body, status = 200) => Promise.resolve(new Response(JSON.stringify(body), {status, headers: {'Content-Type': 'application/json'}}));
     if (url.pathname === '/api/services/catalog') {
       if (new URLSearchParams(location.search).get('cePreview') === '1' && url.origin === location.origin && (!options.method || options.method === 'GET')) {
-        return originalFetch('/api/services/catalog', { method: 'GET', credentials: 'omit', cache: 'no-store', signal: options.signal });
+        const contract = new Headers(options.headers).get('X-Estimator-Catalog-Contract');
+        return originalFetch('/api/services/catalog', { method: 'GET', credentials: 'omit', cache: 'no-store', signal: options.signal,
+          headers: contract ? { 'X-Estimator-Catalog-Contract': contract } : {} });
       }
       return json({ error: 'The CE catalog connection is not enabled in this local preview.' }, 503);
     }

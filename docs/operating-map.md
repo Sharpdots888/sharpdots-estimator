@@ -1,5 +1,25 @@
 # Operating Map
 
+## Active CE31B Local Lane - October 19
+
+- Owner: Build estimating app, `codex/ce-engagement-handoff`, from local
+  `65a4a44346aefcfdb97a90e4af2bda1bb556b176`; prior local commits preserved.
+- Approved: paired catalog consumer, frozen assessed rates, traceable Services
+  and proposal-version rate/markup adjustments, isolated persistence/UI/intake
+  qualification. CE owns paired projection and versioned new-review precision.
+- Dependencies: CE31B paired fixture/engine identity; CE receiver support for new
+  configuration and proposal-effective pricing with immutable Services baseline.
+- No live publication, config/credentials/grants/schema/provider/vNext changes,
+  client sends, external tracker writes or replay of accepted O-000001.
+- Contract: CE `docs/client-engagement/31b-cost-connection-plan.md`, approved
+  October19. Shared-work bundles remain blocked; v1 records stay unchanged.
+- Local implementation verified:112 Node22 tests, zero skips; paired and legacy
+  browser rehearsals pass. CE validated both fresh fictional packets and reports
+  native PostgreSQL acceptance/52 work items each with source preservation.
+  Source freeze, precise contract and release gates:
+  [CE31B review](ce31b-local-review.md), [packet contract](ce31b-pricing-contract.md).
+  No push/deployment, customer send, production query or external tracker update.
+
 ## Latest Outcome - October 2
 
 - Closed-proposal handoff lane is complete through the designated human rehearsal:

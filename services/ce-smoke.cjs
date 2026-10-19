@@ -33,7 +33,7 @@ if (!['localhost', '127.0.0.1'].includes(new URL(url).hostname)) throw Error('Lo
     const ceTotal = () => page.evaluate(() => ServiceEngagement.totals(serviceEngagement));
     await action('catalog').first().click();
     await page.locator('.eng-dialog [data-id=service-a]').waitFor({ timeout: 5000 }).catch(async e => {
-      console.error({ errors, requests, dialog: await page.locator('.eng-dialog').innerText() }); throw e;
+      console.error({ errors, requests, dialog: await page.locator('.eng-dialog[open]').innerText() }); throw e;
     });
     await page.locator('.eng-dialog [data-id=service-a]').click();
     await page.locator('.eng-dialog footer [data-service-action=close]').click();
@@ -104,7 +104,7 @@ if (!['localhost', '127.0.0.1'].includes(new URL(url).hostname)) throw Error('Lo
       }
       await page.locator('[data-service-action=ce-view][data-view=products]').click();
       await action('ce-pricing').first().click();
-      assert.ok(await page.locator('.eng-dialog').evaluate(el => el.scrollWidth <= el.clientWidth + 1));
+      assert.ok(await page.locator('.eng-dialog[open]').evaluate(el => el.scrollWidth <= el.clientWidth + 1));
       await page.screenshot({ path: `/private/tmp/ce-services-pricing-${width}.png`, fullPage: true });
       await page.keyboard.press('Escape');
     }
