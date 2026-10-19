@@ -4644,12 +4644,15 @@ function proposalSourceRecordsFromManifest(manifest = proposalPublishingManifest
 
 function proposalSnapshotWithSources(manifest = proposalPublishingManifest(), options = {}) {
   const sourceRecords = proposalSourceRecordsFromManifest(manifest);
+  const pinnedServices = proposalSavedServices();
+  if (CePricing.isAssessed(pinnedServices?.snapshot.serviceEngagement?.catalogConfiguration)) sourceRecords.services = { number: pinnedServices.number, version: pinnedServices.version };
+  if (proposal.servicesPricingOverride) sourceRecords.services = structuredClone(proposal.servicesPricingOverride.sourceRecord);
   if (options.persist) proposal.sourceRecords = structuredClone(sourceRecords);
   return {
     ...structuredClone(proposal),
     sourceRecords,
-    servicesPricing: proposalIncludedSections().has("services") && CeEngagement.isCatalog(serviceEngagement)
-      ? { serviceScenario, serviceEngagement: structuredClone(serviceEngagement) } : null
+    servicesPricing: proposalIncludedSections().has("services") && CeEngagement.isCatalog(proposalServicesState())
+      ? { serviceScenario: "livingOps", serviceEngagement: structuredClone(proposalSavedServices()?.snapshot.serviceEngagement || serviceEngagement) } : null
   };
 }
 
@@ -5461,6 +5464,7 @@ function proposalSectionHasClientContent(section) {
   if (section === "estimate") return proposal.outputScope === "schedule" || proposalPricingRows().length > 0;
   if (section === "schedule") return proposal.outputScope === "costs" || proposalPaymentRows().length > 0;
   if (section === "services") {
+    if (CeEngagement.isCatalog(proposalServicesState())) return proposalServiceTotals().count > 0;
     return serviceActiveCalcRows()
       .map((row) => serviceCalc(row))
       .some((calc) => calc.activationPrice || calc.monthlyPrice);
@@ -5471,11 +5475,41 @@ function proposalSectionHasClientContent(section) {
   return true;
 }
 
+function proposalSavedServices() {
+  const ref = proposal.servicesPricingOverride?.sourceRecord || proposal.sourceRecords?.services;
+  if (!ref?.number) return null;
+  const type = recordTypeFor("services");
+  const record = workspaceByNumber(currentWorkspaceNumber)?.records?.services?.find(r => r[type.numberKey] === ref.number);
+  const version = record?.versions?.find(v => Number(v.version) === Number(ref.version));
+  const embedded = proposal.servicesPricing?.serviceEngagement;
+  const snapshot = version?.snapshot || (Number(record?.version) === Number(ref.version) ? record.snapshot : null)
+    || (CePricing.isAssessed(embedded?.catalogConfiguration) ? { serviceEngagement: structuredClone(embedded) } : null);
+  return snapshot ? { number: ref.number, version: Number(ref.version), snapshot } : null;
+}
+
+function proposalServicesState() {
+  const saved = proposalSavedServices();
+  const embedded = proposal.servicesPricing?.serviceEngagement;
+  if (!proposal.servicesPricingOverride && !CePricing.isAssessed(saved?.snapshot.serviceEngagement?.catalogConfiguration)) {
+    return CePricing.isAssessed(embedded?.catalogConfiguration) ? structuredClone(embedded) : serviceEngagement;
+  }
+  const state = structuredClone(saved?.snapshot.serviceEngagement || ServiceEngagement.empty());
+  try { state.catalogConfiguration = CePricing.proposalConfiguration(proposal, saved || {}); }
+  catch { state.catalogConfiguration = { schema: "invalid-proposal-pricing" }; }
+  return state;
+}
+
+function proposalServiceTotals() {
+  const state = proposalServicesState();
+  return CeEngagement.isCatalog(state) ? ServiceEngagement.totals(state) : serviceTotals();
+}
+
 function serviceEngagementWarnings() {
-  if (serviceScenario !== "livingOps" || !proposalIncludedSections().has("services")) return [];
-  const totals = ServiceEngagement.totals(serviceEngagement);
+  const state = proposalServicesState();
+  if ((serviceScenario !== "livingOps" && !CeEngagement.isCatalog(state)) || !proposalIncludedSections().has("services")) return [];
+  const totals = ServiceEngagement.totals(state);
   const messages = [];
-  if (CeEngagement.isCatalog(serviceEngagement)) messages.push(CeEngagement.blockedMessage);
+  if (CeEngagement.isCatalog(state)) messages.push(CeEngagement.blockedMessage);
   if (!totals.count) messages.push("Services engagement has no components.");
   if (!totals.complete) messages.push("Services pricing is incomplete. Review component costs, shared defaults, and term.");
   if (totals.sample) messages.push("Services contains example product rates. Replace example products with a reviewed Living Ops catalog before live sending.");
@@ -5484,11 +5518,12 @@ function serviceEngagementWarnings() {
 
 function catalogClientOutputBlocked() {
   return proposalIsClientOutput() && proposalIncludedSections().has("services")
-    && serviceScenario === "livingOps" && CeEngagement.isCatalog(serviceEngagement);
+    && (Boolean(proposal.servicesPricingOverride) || CeEngagement.isCatalog(proposalServicesState()));
 }
 
 function proposalServicesRows() {
   if (catalogClientOutputBlocked()) return [];
+  if (CeEngagement.isCatalog(proposalServicesState())) return CeEngagement.outputRows(proposalServicesState()).map(b => ({ row: { item: b.name, platform: b.description, costType: "Services" }, calc: b.calc }));
   if (serviceScenario === "livingOps" && proposalIsClientOutput()) {
     return ServiceEngagement.outputRows(serviceEngagement).map(b => ({ row: { item: b.name, platform: b.description, costType: "" }, calc: b.calc }));
   }
@@ -5503,8 +5538,8 @@ function renderProposalServicesOutput() {
   els.proposalServicesSection.toggleAttribute("hidden", !visible);
   if (!visible) return;
 
-  const totals = serviceTotals();
-  const isMonthlyMode = serviceTermMode() === "monthly";
+  const totals = proposalServiceTotals();
+  const isMonthlyMode = !CeEngagement.isCatalog(proposalServicesState()) && serviceTermMode() === "monthly";
   const termPrice = (isMonthlyMode ? 0 : totals.activationPrice) + totals.monthlyPrice * totals.termMonths;
   const sourceLabel = proposalRecordSourceLabel("services", "Current services draft");
   const rowsForOutput = proposalServicesRows();
@@ -5513,7 +5548,7 @@ function renderProposalServicesOutput() {
     return;
   }
 
-  els.proposalServicesNote.textContent = serviceScenario === "livingOps" ? serviceEngagement.name : !proposalIsClientOutput()
+  els.proposalServicesNote.textContent = CeEngagement.isCatalog(proposalServicesState()) ? proposalServicesState().name : serviceScenario === "livingOps" ? serviceEngagement.name : !proposalIsClientOutput()
     ? `From ${sourceLabel} / ${serviceScenarioNames[serviceScenario] || "Service calculation"}`
     : `${serviceScenarioNames[serviceScenario] || "Services package"} execution plan`;
   const serviceMoney = value => value == null || totals.complete === false ? "Unknown" : money(value, 2);
@@ -5522,7 +5557,7 @@ function renderProposalServicesOutput() {
     <div><span>Activation</span><strong>${isMonthlyMode ? "$0.00" : serviceMoney(totals.activationPrice)}</strong></div>
     <div><span>Monthly</span><strong>${serviceMoney(totals.monthlyPrice)}</strong></div>
     <div><span>Term</span><strong>${totals.termMonths} mo</strong></div>
-    <div><span>${serviceScenario === "livingOps" ? "Products" : "Appointments / Mo"}</span><strong>${serviceScenario === "livingOps" ? (serviceEngagement.catalogConfiguration?.products || serviceEngagement.products).length : decimal(totals.appointments, 1)}</strong></div>
+    <div><span>${serviceScenario === "livingOps" || CeEngagement.isCatalog(proposalServicesState()) ? "Products" : "Appointments / Mo"}</span><strong>${CeEngagement.isCatalog(proposalServicesState()) ? proposalServicesState().catalogConfiguration.products?.length || 0 : serviceScenario === "livingOps" ? serviceEngagement.products.length : decimal(totals.appointments, 1)}</strong></div>
   `;
   els.proposalServicesLines.innerHTML = rowsForOutput.length ? `
     <div class="proposal-output-line header">
@@ -11111,8 +11146,8 @@ function proposalPublishingExportRows() {
 
   if (proposalHasSection("services")) {
     const servicesSource = proposalRecordSourceLabel("services", "Current services draft");
-    const totals = serviceTotals();
-    const isMonthlyMode = serviceTermMode() === "monthly";
+    const totals = proposalServiceTotals();
+    const isMonthlyMode = !CeEngagement.isCatalog(proposalServicesState()) && serviceTermMode() === "monthly";
     const termPrice = (isMonthlyMode ? 0 : totals.activationPrice) + totals.monthlyPrice * totals.termMonths;
     const rowsForServicesExport = proposalServicesRows();
     if (!proposalIsClientOutput() || rowsForServicesExport.length) {

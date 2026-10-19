@@ -87,3 +87,16 @@
 @media(max-width:850px) { .eng-settings { grid-template-columns:minmax(0,1fr) 130px 150px; } .eng-product { grid-template-columns:minmax(0,1fr) auto; } .eng-inline-actions { grid-column:2; } .eng-metrics strong { font-size:20px; } }
 @media(max-width:600px) { .eng-builder { padding:15px 8px; } .eng-settings { flex-basis:100%; grid-template-columns:repeat(2,minmax(0,1fr)); } .eng-settings label:first-child { grid-column:1/-1; } .eng-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px 0; } .eng-metrics > div:nth-child(3) { padding-left:0; } .eng-product { gap:12px; } .eng-product-price { grid-column:1; text-align:left; } .eng-product > div:first-child { grid-column:1/-1; } .eng-form-grid { grid-template-columns:1fr; } .eng-dialog header,.eng-dialog footer,.eng-dialog-body { padding:15px; } .eng-view-tabs button { padding:10px 7px; font-size:12px; } }
 @media print { .eng-dialog,.eng-builder,.eng-modebar { display:none !important; } }
+.ce-adjustments { border-block:1px solid #cdd9d7; padding:10px 0; margin:10px 0; color:#355e52; }
+.ce-adjustments summary { cursor:pointer; font-weight:600; }
+.ce-adjustments div { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:6px 16px; padding:8px 0; border-bottom:1px solid #e3e8e7; }
+.ce-adjustments small { grid-column:1/-1; overflow-wrap:anywhere; }
+.ce-proposal-pricing { border-top:1px solid #cbd7de; padding-top:12px; display:grid; gap:8px; }
+.ce-proposal-pricing h3,.ce-proposal-pricing p { margin:0; }
+.ce-proposal-pricing button { justify-self:start; display:flex; gap:6px; align-items:center; }
+.ce-proposal-pricing svg { width:16px; height:16px; }
+.ce-proposal-dialog { width:min(1000px,calc(100vw - 24px)); max-width:calc(100vw - 24px); }
+.ce-proposal-dialog .eng-builder { padding:16px; min-width:0; }
+.ce-proposal-status { padding:0 16px; color:#9a3e1e; overflow-wrap:anywhere; }
+@media(max-width:600px) { .ce-adjustments div { grid-template-columns:minmax(0,1fr); } .ce-proposal-dialog footer { flex-wrap:wrap; } }
+@media print { .ce-proposal-pricing,.ce-proposal-dialog,.ce-adjustments { display:none!important; } }

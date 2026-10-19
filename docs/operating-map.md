@@ -1,6 +1,111 @@
 # Operating Map
 
-## Closed Proposal To CE Lane
+## Current CE31B Outcome - October 19
+
+Approved exact archive released as Estimator **v55/source91fac0e**, after verified
+CE v45. All134 deployed files match; scoped native restore and old-data/settings/
+schema preservation pass. [Draft PR43](https://github.com/Sharpdots888/sharpdots-estimator/pull/43)
+is open and unmerged; no main merge or production settings change.
+
+New fictional O-000034 / S-100053 v2 / P-100054 v2 passed normal John Portal UI
+save, proposal-only four-adjustment comparison, draft-client-output blocking and
+CE receipt, engagement `a8f75582-bd26-4d4a-828c-4be1120a0642`. All7,004 older
+rows/58 versions remain unchanged. CE reports normal John UI review/acceptance
+of the automated fictional plan and52 ready Team cards, without starting work;
+CE's final receiving old-row preservation and post-test isolated restore both
+passed. No duplicate CE review here. Completed
+O-000001 stays untouched. No customer sending, execution, billing or vNext change.
+Details, exact pins and recovery limitations:
+[live release](ce31b-live-release-2026-10-19.md).
+
+The held/local-only checkpoints below are historical and superseded for this
+explicitly approved publication and fictional rehearsal only.
+
+## Active CE31B Local Lane - October 19
+
+Current checkpoint superseding the local-only/held statements below: John approved
+coordinated publication, backups, restore and verification. CE v45 has released
+first and passed its checks. Estimator's 36-table/7,004-row private backup passed
+fresh isolated PostgreSQL restore, including all 58 versions, 30 sequences and
+eight signed artifacts. Three legacy CHECK definitions passed narrow equivalence
+and allowed/rejected-value tests; all other schema/data fields match exactly.
+Fresh read-only preflight confirms unchanged v54/source84d4f56/settings/data.
+Heroku auto-deploy/review apps are disabled. Next: feature push + draft PR, then
+exact frozen91fac0e release (no main merge), preservation checks and new fictional
+hosted rehearsal. No completed TEST Opp replay, client send, execution, billing,
+configuration, auth, grants, schema or vNext changes. See the current checkpoint in
+[release candidate](ce31b-release-candidate.md).
+
+- Owner: Build estimating app, `codex/ce-engagement-handoff`, from local
+  `65a4a44346aefcfdb97a90e4af2bda1bb556b176`; prior local commits preserved.
+- Approved: paired catalog consumer, frozen assessed rates, traceable Services
+  and proposal-version rate/markup adjustments, isolated persistence/UI/intake
+  qualification. CE owns paired projection and versioned new-review precision.
+- Dependencies: CE31B paired fixture/engine identity; CE receiver support for new
+  configuration and proposal-effective pricing with immutable Services baseline.
+- No live publication, config/credentials/grants/schema/provider/vNext changes,
+  client sends, external tracker writes or replay of accepted O-000001.
+- Contract: CE `docs/client-engagement/31b-cost-connection-plan.md`, approved
+  October19. Shared-work bundles remain blocked; v1 records stay unchanged.
+- Local implementation verified:112 Node22 tests, zero skips; paired and legacy
+  browser rehearsals pass. CE validated both fresh fictional packets and reports
+  native PostgreSQL acceptance/52 work items each with source preservation.
+  Source freeze, precise contract and release gates:
+  [CE31B review](ce31b-local-review.md), [packet contract](ce31b-pricing-contract.md).
+  No push/deployment, customer send, production query or external tracker update.
+- Release preparation ready: exact candidate `91fac0e` frozen locally as a
+  read-only 134-file archive with per-file hashes and verified contents.
+  [Paired publication/rollback checklist](ce31b-release-candidate.md) records the
+  v54 base/tree relationship and CE owner's retained, read-only live release
+  receipt. Current code identity is verified; current database-backup and hosted
+  rehearsal readiness are not established by that metadata check.
+  CE support must release before the consumer; CE owner gathers John's single
+  coordinated release approval. Existing v2 records must survive any rollback.
+- Source publication held: read-only GitHub inspection confirms main equals
+  `84d4f56`, active main PR protection, zero Actions workflows and no open head PR.
+  Active Heroku webhook `627556589` subscribes to all events; auto-deploy/review-app
+  filters are not established. The conditional no-live-effect push is therefore
+  withheld. [Draft PR text](ce31b-draft-pr.md) is local only; no push/PR/merge/deploy.
+
+## Latest Outcome - October 2
+
+- Closed-proposal handoff lane is complete through the designated human rehearsal:
+  O-000001 / P-100049 v1 / S-100048 v1 was received once, then explicitly accepted
+  in CE Overview into 24 assigned internal work items from 10 components.
+- Estimator remains v54 / `84d4f56`; CE's owner released Overview/defaults as
+  v32 / `75199775`. CE acceptance evidence records version 4 / delivery-ready,
+  rehearsal true, unchanged source digest, and no execution/invoicing permission.
+- Preserve this record. No resend, repeat group test or parallel CE release is
+  needed. No new Estimator human decision is pending for this completed slice.
+- CE owns subsequent scope-validation work; Steward 3 owns the program projection.
+  Estimator retains immutable source selection and receipt/retry ownership.
+  No new independent implementation lane has been assigned by this closeout.
+- Exact pins, read-only receipt verification and retained human acceptance:
+  [acceptance record](ce-handoff-acceptance-2026-10-02.md).
+
+## Historical Activation Checkpoint - October 1
+
+- John approved the paired merge and code-only deployment. Estimator PR42 is
+  merged into main and live as v53; CE PR100/102 are merged into its existing
+  catalog release branch and live as v29. Exact release pins and verification:
+  [release record](ce-handoff-release-2026-10-01.md).
+- John subsequently approved dedicated credential setup and activation. CE is
+  now v30 and Estimator v54 with both handoff flags enabled; exact code slugs are
+  unchanged. Private key readback, current lead eligibility and protected-route
+  checks pass. Existing catalog, Portal and DocuSeal settings are preserved.
+- Controlled signed-in transfer/receipt verification is pending: browser control
+  timed out and John was asked to designate a test O-number. O-000001, TEST Opp,
+  is open and has no client/contact links. No intake/customer records were made.
+- The pending release statements below describe the pre-release work. They are
+  superseded by this record for deployment and the approved connection activation,
+  not automatic delivery admission, execution or billing authority.
+
+## Closed Proposal To CE Lane - Completed
+
+The preparation/release narrative below is historical. The October 2 outcome
+above supersedes its pending approvals and local-only statements for the approved
+release, activation and designated rehearsal only. Further execution, billing,
+pricing promotion or source amendments still require their own authority.
 
 - Owner: Build estimating app, `codex/ce-engagement-handoff`, from deployed
   PR41/main 6119417 in the isolated estimator-crm-draft checkout.

@@ -164,6 +164,7 @@
       modal("Custom engagement component", `<form id="engCustomForm"><div class="eng-dialog-body eng-form-grid">${input("Item name", "name", "", "text", "required maxlength=150")}<label>Type<select name="definitionType">${opts(M.groups, "items")}</select></label></div><footer>${button("close", "Cancel", "x")}<button type="submit" class="eng-primary">Add component</button></footer></form>`); return;
     }
     if (a === "proposal") {
+      if (proposal.servicesPricingOverride && !window.confirm("Replace this proposal's pricing adjustments with the current saved Services version?")) return;
       target.disabled = true;
       try {
         const saved = await saveRecordFromManager("services");
@@ -173,6 +174,7 @@
         proposal.includedSections = [...new Set([...proposalIncludedSections(), "services"])];
         if (CeEngagement.isCatalog(serviceEngagement)) proposal.outputAudience = "internal";
         proposal.sourceRecords = { ...proposal.sourceRecords, services: { number: source.number, version: source.version } };
+        delete proposal.servicesPricingOverride;
         markWorkspaceRecordDirty("proposals");
         setActiveView("proposalView");
         render();

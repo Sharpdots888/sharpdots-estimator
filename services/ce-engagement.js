@@ -1,13 +1,13 @@
 (function (root, factory) {
-  if (typeof module === 'object' && module.exports) module.exports = factory(require('./ce-catalog'));
-  else root.CeEngagement = factory(root.CeServiceCatalog);
+  if (typeof module === 'object' && module.exports) module.exports = factory(require('./ce-pricing'));
+  else root.CeEngagement = factory(root.CePricing);
 })(typeof globalThis !== 'undefined' ? globalThis : this, function (C) {
   const clone = value => JSON.parse(JSON.stringify(value));
   const assert = (ok, message) => { if (!ok) throw Error(message); };
   const isCatalog = state => Boolean(state && Object.hasOwn(state, 'catalogConfiguration'));
   const blockedMessage = 'CE catalog pricing is draft-only. Client PDF, CSV and DocuSeal are unavailable; use Internal review.';
   function validateCatalog(catalog) {
-    assert(catalog?.schema === 'ce-estimator-catalog-v1' && catalog.source?.system === 'client-engagement'
+    assert(['ce-estimator-catalog-v1', C.CATALOG].includes(catalog?.schema) && catalog.source?.system === 'client-engagement'
       && String(catalog.source.workspace?.id) === '3' && catalog.source.workspace?.slug === 'sharpdots'
       && Number.isSafeInteger(catalog.source.revision) && catalog.source.revision > 0
       && typeof catalog.source.baseRevision === 'string' && catalog.source.baseRevision
@@ -45,6 +45,7 @@
     const current = state.catalogConfiguration;
     assert(current?.catalogFingerprint === catalog.fingerprint, 'This record uses a different catalog revision. Create a new Services record to use the refreshed catalog.');
     if (current.products.some(p => p.id === id)) return;
+    assert(!C.isAssessed(current), 'Assessed-cost bundles are not qualified. Start a separate Services record for another product.');
     const product = next.products[0];
     current.products.push(product);
     if (product.productDefinition.termMonths !== current.termMonths) current.termConfirmed = false;

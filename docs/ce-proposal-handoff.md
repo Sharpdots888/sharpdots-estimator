@@ -2,6 +2,26 @@
 
 ## Current State
 
+October 2: the designated O-000001 rehearsal is complete through receipt,
+CE Overview reconciliation, explicit internal-plan acceptance and Team work.
+P-100049 v1 / S-100048 v1 and the original receipt remain immutable. Estimator
+remains v54; CE's owner released Overview/defaults as v32. Native execution,
+invoicing and client pricing promotion are not authorized by this test.
+[Exact acceptance evidence](ce-handoff-acceptance-2026-10-02.md). No repeat send
+or group exercise is needed. CE progress callbacks and amendment workflows are
+not implemented by this slice.
+
+## Historical Release Context
+
+October 1 update: John approved merge/deployment, followed by dedicated credential
+setup, activation and a controlled transfer test. Estimator PR42 is live as v54
+and CE PR100/102 as v30, including configuration activation over v53/v29 code.
+Both handoff flags are enabled with a separate server-only write key; unrelated
+settings and source data are unchanged. [Release evidence](ce-handoff-release-2026-10-01.md)
+supersedes the pre-release status below. A signed-in controlled transfer and
+receipt are still unverified: browser control timed out and a test opportunity
+designation is pending. No customer intake, delivery admission or invoice was made.
+
 User request, September 30: complete the downstream handoff so a closed proposal
 does not stop in Estimator. The catalog reader is already live and the user has
 confirmed the real products appear. This change is a separate, **local producer

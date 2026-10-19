@@ -8,7 +8,8 @@ const { Pool } = require("pg");
 const { createOpportunityStore } = require('./lib/opportunity-store');
 const { handoffConnectionConfig, createHandoffTransport } = require('./lib/ce-handoff-transport');
 const { createCrmAccess } = require('./lib/crm-access');
-const { catalogConnectionConfig } = require('./lib/ce-catalog-transport');
+const { catalogConnectionConfig, createCatalogTransport, SOURCE_WORKSPACE } = require('./lib/ce-catalog-transport');
+const { createServiceCatalogReader } = require('./lib/service-catalog-reader');
 const { createServiceCatalogEndpoint } = require('./lib/service-catalog-endpoint');
 const { assertServicesPublishable } = require('./lib/services-publishing-guard');
 const { loadLocalEnv } = require("./lib/local-env");
@@ -66,9 +67,11 @@ const pool = legacyConnectionString
   : null;
 const crmEnabled = process.env.ESTIMATOR_CRM_ENABLED === 'true';
 const crmAccess = createCrmAccess(process.env.ESTIMATOR_CRM_USER_IDS);
-const crmStore = pool ? createOpportunityStore(pool, crmAccess, createHandoffTransport({config:handoffConnectionConfig()})) : null;
+const catalogConfig = catalogConnectionConfig();
+const readServiceCatalog = createServiceCatalogReader({ workspace: SOURCE_WORKSPACE, readAuthorizedSnapshot: createCatalogTransport({ config: catalogConfig }) });
+const crmStore = pool ? createOpportunityStore(pool, crmAccess, createHandoffTransport({config:handoffConnectionConfig()}), readServiceCatalog) : null;
 const serviceCatalogEndpoint = createServiceCatalogEndpoint({
-  config: catalogConnectionConfig(), crmEnabled, authorizeActor: crmStore?.authorizeActor
+  config: catalogConfig, crmEnabled, authorizeActor: crmStore?.authorizeActor
 });
 
 const mimeTypes = {
@@ -1441,7 +1444,7 @@ const server = http.createServer(async (req, res) => {
     } else if (authRequiredFor(url) && !session) {
       sendAuthPage(res);
     } else if (url === '/api/services/catalog') {
-      const result = await serviceCatalogEndpoint({ method, url: reqUrl, session });
+      const result = await serviceCatalogEndpoint({ method, url: reqUrl, session, contract: req.headers['x-estimator-catalog-contract'] });
       if (result.status === 405) res.setHeader('Allow', 'GET');
       sendJson(res, result.status, result.body);
     } else if (url === '/api/crm/status' && method === 'GET') {
