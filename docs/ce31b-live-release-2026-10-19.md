@@ -82,8 +82,13 @@ The completed O-000001/TEST Opp was not replayed or changed.
   and separate monthly1/2/3 checkpoints. No Start work, task completion, provider,
   campaign, invoice or membership-grant action was taken. This is automated
   internal-plan verification under release approval, not human client acceptance.
-  CE owns the receiving post-rehearsal old-row preservation proof and private
-  capture; its final evidence remains separate from the Estimator receipt.
+  CE's receiving post-rehearsal proof subsequently passed: all pre-existing full
+  rows, catalog, settings and schema marker remain unchanged. Its fresh isolated
+  PostgreSQL restore also reproduced the newly accepted v2 rehearsal, including
+  the exact $24,737.85 cost. Evidence is separate from the Estimator receipt:
+  `/private/tmp/ce31-release-preparation/live/hosted-rehearsal.json` and
+  `after-restore-proof.json`. This is scoped CE recovery, not a shared-runtime
+  recovery claim; the accepted v2 plan requires a compatible reader.
 
 ## Evidence And Limits
 

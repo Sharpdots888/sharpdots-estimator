@@ -12,7 +12,8 @@ save, proposal-only four-adjustment comparison, draft-client-output blocking and
 CE receipt, engagement `a8f75582-bd26-4d4a-828c-4be1120a0642`. All7,004 older
 rows/58 versions remain unchanged. CE reports normal John UI review/acceptance
 of the automated fictional plan and52 ready Team cards, without starting work;
-CE owns its final receiving preservation proof. No duplicate CE review here. Completed
+CE's final receiving old-row preservation and post-test isolated restore both
+passed. No duplicate CE review here. Completed
 O-000001 stays untouched. No customer sending, execution, billing or vNext change.
 Details, exact pins and recovery limitations:
 [live release](ce31b-live-release-2026-10-19.md).
