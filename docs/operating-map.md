@@ -19,6 +19,14 @@
   Source freeze, precise contract and release gates:
   [CE31B review](ce31b-local-review.md), [packet contract](ce31b-pricing-contract.md).
   No push/deployment, customer send, production query or external tracker update.
+- Release preparation ready: exact candidate `91fac0e` frozen locally as a
+  read-only 134-file archive with per-file hashes and verified contents.
+  [Paired publication/rollback checklist](ce31b-release-candidate.md) records the
+  v54 base/tree relationship and CE owner's retained, read-only live release
+  receipt. Current code identity is verified; current database-backup and hosted
+  rehearsal readiness are not established by that metadata check.
+  CE support must release before the consumer; CE owner gathers John's single
+  coordinated release approval. Existing v2 records must survive any rollback.
 
 ## Latest Outcome - October 2
 
