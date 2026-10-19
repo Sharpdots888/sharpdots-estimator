@@ -1,10 +1,48 @@
 # CE31B Estimator Release Candidate
 
-October 19, 2026. Local preparation only. Nothing pushed, merged or deployed;
-no live calls by this Estimator lane. CE supplied its separately authorized,
-read-only release metadata check below. No configuration, credential, grant,
-schema or data changes.
-CE's release owner assembles the paired release and asks John once for approval.
+October 19, 2026. John approved coordinated CE and Estimator publication with
+backups, isolated restore checks and verification, keeping vNext boundaries.
+The checkpoint below supersedes the earlier hold/preparation narrative retained
+later in this document. Application candidate and frozen archive are unchanged.
+
+## Approved Recovery And Publication Checkpoint
+
+- Actual human approval verified in CE chat `01a07874-3db6-7e00-8465-bdfeaa84a2e9`.
+  Publish the existing feature branch and a draft PR; do not merge main. Deploy
+  only the exact frozen candidate after CE support and recovery verification.
+- CE released first as v45 / `ce31-27bf561d5d6b7226`; its owner verified all 138
+  runtime hashes, saved data preservation, Portal access and paired saved144 output.
+- Heroku integration inspection resolved the earlier webhook uncertainty:
+  Estimator automatic deployment is false and both review-app flags are false.
+  Main remains protected and unchanged at `84d4f56`; no hook settings changed.
+- Fresh Estimator recovery archive is private, outside Git. Scope: 36 app-owned
+  sfpq_/sdsp_ tables, all 7,004 rows, 58 record versions, 30 sequence states, eight
+  signed-document artifacts, settings and baseline source. No shared warehouse,
+  user, company or contact rowsets were exported.
+- A fresh isolated PostgreSQL16.14 cluster restored every full owned rowset and
+  all sequence values exactly, including artifact content hashes, indexes and FKs.
+  External FK key-only stubs came solely from the owned rows, not shared data.
+  Owner/ACL metadata is archived privately but was not reapplied. Corrupt backup
+  and nonempty restore-target checks reject as expected. The cluster was stopped
+  and removed; this is not a whole-warehouse or identity-system recovery proof.
+- Three named legacy CHECK constraints have equivalent deparser text rather than
+  byte-identical definitions: `chk_project_status`, `chk_detail_type`, and
+  `chk_quote_status`. PostgreSQL distributes their varchar-array-to-text casts
+  elementwise on restore. Both exact definitions parse identically in isolated
+  PostgreSQL16.14 and pass explicit valid, invalid and NULL-value tests. All other
+  schema fields match exactly. No constraints were dropped or weakened; original
+  native dump and DDL are retained. No generic SQL normalization was used.
+- Dump SHA-256: `c1694828c68122db7cd63aa9ce35af17f58f41d854e563a38040db3e67218bc6`.
+- Full rowset SHA-256: `0207bebc6936fddf9e622b9925215c265e455f6c7e806b1c524262af5d237ead`.
+- Read-only prepublication recheck at 18:23 UTC confirms v54/source84d4f56,
+  unchanged settings, schema, all owned rows/artifacts and sequence states.
+- Next: feature push, draft PR and exact archive release; hosted verification and
+  a new clearly fictional operator-authenticated rehearsal. Do not reuse the
+  completed O-000001/TEST Opp. No customer send, delivery execution, billing,
+  schema, grant, credential, settings or vNext changes are authorized by this slice.
+
+Sanitized local recovery/preflight receipts:
+`/private/tmp/ce31b-estimator-pre-release/`. Private backups are never PR attachments.
 
 ## Exact Source
 

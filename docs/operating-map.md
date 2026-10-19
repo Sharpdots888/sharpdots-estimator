@@ -2,6 +2,19 @@
 
 ## Active CE31B Local Lane - October 19
 
+Current checkpoint superseding the local-only/held statements below: John approved
+coordinated publication, backups, restore and verification. CE v45 has released
+first and passed its checks. Estimator's 36-table/7,004-row private backup passed
+fresh isolated PostgreSQL restore, including all 58 versions, 30 sequences and
+eight signed artifacts. Three legacy CHECK definitions passed narrow equivalence
+and allowed/rejected-value tests; all other schema/data fields match exactly.
+Fresh read-only preflight confirms unchanged v54/source84d4f56/settings/data.
+Heroku auto-deploy/review apps are disabled. Next: feature push + draft PR, then
+exact frozen91fac0e release (no main merge), preservation checks and new fictional
+hosted rehearsal. No completed TEST Opp replay, client send, execution, billing,
+configuration, auth, grants, schema or vNext changes. See the current checkpoint in
+[release candidate](ce31b-release-candidate.md).
+
 - Owner: Build estimating app, `codex/ce-engagement-handoff`, from local
   `65a4a44346aefcfdb97a90e4af2bda1bb556b176`; prior local commits preserved.
 - Approved: paired catalog consumer, frozen assessed rates, traceable Services

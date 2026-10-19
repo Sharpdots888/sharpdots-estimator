@@ -1,13 +1,14 @@
-# Draft PR Text - Not Published
+# Draft PR Text
 
 Proposed title: **Consume assessed CE pricing with versioned Services and proposal overrides**
 
 Repository: `Sharpdots888/sharpdots-estimator`.
 Head: `codex/ce-engagement-handoff`. Base: `main`. Create as **draft** only.
 No open PR for this head/base existed at the October 19 safety check.
-Publication is held by the active Heroku webhook described in the
-[release review](ce31b-release-candidate.md#github-source-publication-safety-check).
-The text below is prepared locally; it is not a GitHub PR or release approval.
+John approved coordinated source publication and exact archive deployment;
+main merge is excluded. Heroku auto-deploy and review apps are disabled. CE v45
+released first. Estimator recovery/preflight passed; see the current checkpoint
+in the [release review](ce31b-release-candidate.md).
 
 ---
 
@@ -64,13 +65,20 @@ The text below is prepared locally; it is not a GitHub PR or release approval.
 
 ## Coordinated Release Gate
 
-This draft source review does **not** approve merge, deployment or live activation.
-CE's exact support package must be reviewed and deployed **first**, including the
-paired projection, final pure-module copies, v2 receiver and new-review precision.
-Only after CE support verification may Estimator deploy to `quoting-proposals`.
-John's coordinated publication/deployment approval and recovery readiness remain
-required. Existing Portal, credentials, flags, schema, grants and package lockfile
-are unchanged by this candidate.
+John approved coordinated source publication and exact archive deployment, not
+main merge. CE v45 support released first and passed verification. Estimator's
+private native backup passed fresh isolated PostgreSQL restore: all 7,004 rows,
+58 saved versions, 30 sequence states and eight signed artifacts. Three named
+legacy CHECK definitions required explicitly tested cast/deparser equivalence;
+all other schema fields and all complete rowsets match exactly. No shared user or
+customer rowsets were exported. Source owner/ACL metadata is retained privately,
+not reapplied. This is scoped app recovery, not whole-warehouse recovery.
+
+Fresh preflight confirms unchanged Estimator v54/source84d4f56, settings, schema,
+data and sequences. Heroku auto-deploy/review apps are disabled. Deploy the frozen
+91fac0e archive, not this moving documentation tip, and record hosted verification
+separately. Existing Portal, credentials, flags, schema, grants and lockfile remain
+unchanged. This PR stays draft; no merge or unrelated activation is authorized.
 
 Preserve saved v2 records, source evidence, overrides, proofs, receipts and accepted
 work during containment or rollback. Never down-convert to v1 or silently reprice.
