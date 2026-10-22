@@ -4668,6 +4668,7 @@ function normalizeProposalRecord(value = {}) {
   if (!proposalAudienceLabels[next.outputAudience]) next.outputAudience = "client";
   if (!proposalOutputScopeLabels[next.outputScope]) next.outputScope = "both";
   if (!["package", "detail", "type"].includes(next.pricingMode)) next.pricingMode = "package";
+  if (Object.hasOwn(next, "additionalLines")) next.additionalLines = ProposalLines.normalize(next.additionalLines);
   next.templateMeta = normalizeProposalTemplateMeta(next.templateMeta);
   next.sourceRecords = normalizeProposalSourceRecords(next.sourceRecords);
   return next;
@@ -11174,6 +11175,12 @@ function proposalPublishingExportRows() {
         ));
       });
     }
+  }
+
+  for (const line of ProposalLines.rows(proposal.additionalLines || [])) {
+    exportRows.push(proposalExportRecord("Additional proposal item", "This proposal", line.name,
+      [line.description, line.cadence === 'monthly' ? `Monthly for ${line.months} months` : 'One-time'].filter(Boolean).join(' / '),
+      String(line.quantity), money(line.unitPrice, 2), money(line.total, 2), "Proposal-specific; original service unchanged"));
   }
 
   if (proposalHasSection("sourcing")) {
