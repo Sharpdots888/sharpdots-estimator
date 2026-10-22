@@ -49,12 +49,37 @@ Fresh read-only release check: quoting-proposals v55, release
 Publish only this Estimator delta through an exact frozen source archive, without
 merging main or changing CE/shared vNext. Recheck baseline before publication.
 
-Deployment was explicitly authorized. The separate recovery preparation is
-pending a specific sensitive-data approval: automatic approval review rejected
-reading and privately backing up full Heroku config-vars because they may contain
-credentials. That rejected operation was not executed. Do not reuse old secrets
-as a workaround. Before release, obtain authorized fresh app-only backup and
-isolated restore verification, then verify source hashes and preserved records.
+Deployment and the specific private backup were explicitly authorized by John.
+The automatic-review backup block was resolved by that additional approval.
+
+## Live result — October 22, 2026
+
+- Estimator **v56**, release `525303b8-e2a5-45ad-ac9a-b49e7d83a086`,
+  slug `257c7c67-4716-4c78-9cf6-0ab562643f94`.
+- Exact runtime source `3d208a6a5d13d4641921c36fcdc3522237fb67a7`;
+  archive SHA256 `0723bb229455aedbd2e801258a3e2e620e917ad149d71035332ed9d4ff854bc3`.
+  All 141 deployed source files match. This subsequent documentation update is
+  not part of the frozen runtime. Draft PR44 remains unmerged.
+- Fresh private settings/source/slug and app-only database backup was retained
+  outside Git with directory0700/file0600. The native PostgreSQL16 isolated
+  restore reproduced 36 app-owned tables, 7,047 full rows, 71 saved record
+  versions, eight stored document artifacts and 30 sequence states. Only key
+  stubs from owned references were used for shared identities, not shared rows.
+- Complete restored rowsets and sequence states match. Three documented legacy
+  CHECK renderings were qualified through equal parser trees (source character
+  offsets excluded) plus allowed/rejected/NULL-value tests. All other schema
+  definitions match exactly. Local restore server was stopped.
+- Fresh pre- and post-release reads confirm unchanged complete app rowsets,
+  schema and sequence states. Settings are unchanged. Web process is up;
+  unauthenticated CRM/catalog/estimate/signing routes still reject with401.
+- Normal Portal launch and P-100052 → Content → Add line item were verified
+  on the deployed app. The empty form was cancelled. Ray's P-100052 v1,
+  P-100051 v6 and S-100050 v8 were not edited or saved; no hosted test charge,
+  signing request, CE handoff, invoice or workflow execution was created.
+- Private recovery archive:
+  `/Volumes/JTMMX/Users/JT/.codex/private-backups/estimator/2026-10-22-proposal-line/`.
+  These private files are not Git or PR attachments. No main merge, auth,
+  schema, settings, CE or vNext change was performed.
 
 Execution tracking: [Estimating App - Project Calculation](https://app.clickup.com/t/868jnxdp7).
 Reference model: docs/living-ops-services.md and its linked Drive cascade source.
