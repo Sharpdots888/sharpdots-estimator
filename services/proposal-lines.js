@@ -15,5 +15,9 @@
  }
  function rows(value){return normalize(value).map(line=>{const amount=round(line.quantity*line.unitPrice);return {...line,amount,total:round(amount*(line.cadence==='monthly'?line.months:1))};});}
  function totals(value){return rows(value).reduce((sum,line)=>({once:round(sum.once+(line.cadence==='once'?line.amount:0)),monthly:round(sum.monthly+(line.cadence==='monthly'?line.amount:0)),total:round(sum.total+line.total)}),{once:0,monthly:0,total:0});}
- return {normalize,rows,totals};
+ function serviceTotals(base,value,monthlyOnly=false){
+  const extra=totals(value),activationPrice=round((monthlyOnly?0:base.activationPrice)+extra.once),monthlyPrice=round(base.monthlyPrice+extra.monthly);
+  return {...base,activationPrice,monthlyPrice,termPrice:base.complete===false?null:round((monthlyOnly?0:base.activationPrice)+base.monthlyPrice*base.termMonths+extra.total)};
+ }
+ return {normalize,rows,totals,serviceTotals};
 });

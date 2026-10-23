@@ -12,12 +12,17 @@ monthly, with an explicit term for monthly items. Apply, then Save the proposal.
 Edit and Remove apply to this proposal only. Standard record versions retain
 prior proposals and the loaded Services source remains pinned and unchanged.
 
-Additional items appear as their own priced section and subtotal in the document
-preview/print/PDF surface and CSV export. The editor flags these as adjustments
-from the saved service. A selling price is not treated as a delivery cost.
-These items do not change catalog pricing, source Services, opportunity value,
-payment schedule or any original service subtotal.
+Added items are rows in the proposal's existing Services pricing table, with a
+combined table total. With no Services section selected, they join estimate pricing.
+There is no separate Additional items output table. An empty estimate-pricing
+placeholder is suppressed when Services provides the pricing. PDF/print uses the
+same preview table and CSV keeps the added rows in the corresponding section once.
+Existing saved additionalLines are projected automatically without rewriting them.
 
+The editor flags adjustments from the saved service. Selling price is not delivery
+cost. Catalog, source Services, opportunity value and payment schedule remain
+unchanged. One-time additions and monthly additions with explicit terms count once;
+unknown original service pricing remains unknown.
 CE handoff explicitly refuses proposals containing additional items until their
 scope and pricing are reconciled with the delivery plan. The current receiving
 contract cannot represent these new items; silently omitting them is prohibited.
@@ -84,3 +89,19 @@ The automatic-review backup block was resolved by that additional approval.
 Execution tracking: [Estimating App - Project Calculation](https://app.clickup.com/t/868jnxdp7).
 Reference model: docs/living-ops-services.md and its linked Drive cascade source.
 No new relevant Zoom-derived decision was supplied for this narrow change.
+
+## October 23 correction — one pricing table
+
+John clarified the added line must join the existing pricing table rather than
+create another table. This narrow correction continues the originally approved
+Estimator feature and publication scope. Optional saved additionalLines remain
+compatible with v56; no schema or data rewrite. The Services table adds one-time
+amounts to Activation and recurring amounts to Monthly, retaining each manual
+line's explicit term in scope text. Its overall price adds each line's extended
+term total once. Standalone lines join the existing estimate-pricing table.
+
+123 tests cover combined totals, differing monthly terms, unknown pricing,
+existing saved-version preservation, same-table rendering/CSV and client catalog
+publication restrictions. Local browser verifies the appended row. A fictional
+review rendered by the actual table function shows one table and a combined total.
+The supplied private client capture remains outside Git. No real proposal is edited.
