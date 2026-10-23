@@ -220,3 +220,22 @@ test('transport is opt-in, uses a separate key, rejects bad receipts, redirects 
   await assert.rejects(timeout.send({packet,idempotencyKey,actor:admin}),e=>e.statusCode===504);
   assert.equal(afterSave(null,M.make({kind:'Print',status:'won'})),null);
 });
+
+
+test('additional proposal lines survive versioned saves and cannot silently disappear from CE handoff',async()=>{
+ const f=await fixture();
+ try{
+  const extra={id:'fictional-extra',name:'Fictional additional support',description:'Proposal-only scope',quantity:2,unitPrice:100,cadence:'monthly',months:3};
+  const changed=await f.store.saveRecord(admin,f.proposal.id,{collection:'proposals',name:f.proposal.name,version:1,snapshot:{...f.proposal.snapshot,proposal:{...f.proposal.snapshot.proposal,additionalLines:[extra]}}});
+  assert.equal(changed.version,2);
+  const saved=(await f.query('SELECT snapshot FROM sfpq_crm_record_versions WHERE record_id=$1 AND version=2',[f.proposal.id])).rows[0].snapshot;
+  assert.deepEqual(saved.proposal.additionalLines,[extra]);
+  assert.deepEqual(saved.proposal.sourceRecords,f.proposal.snapshot.proposal.sourceRecords);
+  const old=(await f.query('SELECT snapshot FROM sfpq_crm_record_versions WHERE record_id=$1 AND version=1',[f.proposal.id])).rows[0].snapshot;
+  assert.equal(old.proposal.additionalLines,undefined);
+  await assert.rejects(f.store.saveRecord(admin,f.proposal.id,{collection:'proposals',name:f.proposal.name,version:2,snapshot:{proposal:{additionalLines:[{...extra,unitPrice:null}]}}}),/price/i);
+  const {preparePacket}=require('../lib/ce-handoff');
+  await assert.rejects(preparePacket({opportunity:f.o,receivingOwnerId:45,operatorId:45,readRecord:async collection=>collection==='proposals'?changed:f.services}),/Reconcile their scope and price/);
+  assert.deepEqual((await f.query('SELECT snapshot FROM sfpq_crm_record_versions WHERE record_id=$1 AND version=1',[f.services.id])).rows[0].snapshot,f.services.snapshot);
+ }finally{await f.db.close();}
+});

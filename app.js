@@ -3772,13 +3772,28 @@ function activeLeafRowsForSimulation() {
   return Array.from(targets.values());
 }
 
+function proposalAdditionalTarget() {
+  return proposalHasSection("services") ? "services" : "estimate";
+}
+
+function proposalAddedPricingRows() {
+  if (proposalAdditionalTarget() !== "estimate") return [];
+  return ProposalLines.rows(proposal.additionalLines || []).map(line => ({
+    name: line.name, context: [line.description, line.cadence === "monthly" ? `Monthly for ${line.months} months` : "One-time"].filter(Boolean).join(" / "),
+    qty: line.quantity, unit: line.unitPrice, total: line.total, additional: true
+  }));
+}
+
 function proposalTotals() {
   const activePackages = packageRows().filter((row) => row.active);
-  const totals = totalFor(activePackages);
+  const totals = { ...totalFor(activePackages) };
+  const additions = proposalAddedPricingRows();
+  totals.client += additions.reduce((sum, line) => sum + line.total, 0);
+  totals.qty += additions.reduce((sum, line) => sum + line.qty, 0);
   return {
     ...totals,
     packageCount: activePackages.length,
-    lineCount: activeLeafRowsForProposal().length,
+    lineCount: activeLeafRowsForProposal().length + additions.length,
     weightedPpp: totals.qty ? totals.client / totals.qty : 0
   };
 }
@@ -4668,6 +4683,7 @@ function normalizeProposalRecord(value = {}) {
   if (!proposalAudienceLabels[next.outputAudience]) next.outputAudience = "client";
   if (!proposalOutputScopeLabels[next.outputScope]) next.outputScope = "both";
   if (!["package", "detail", "type"].includes(next.pricingMode)) next.pricingMode = "package";
+  if (Object.hasOwn(next, "additionalLines")) next.additionalLines = ProposalLines.normalize(next.additionalLines);
   next.templateMeta = normalizeProposalTemplateMeta(next.templateMeta);
   next.sourceRecords = normalizeProposalSourceRecords(next.sourceRecords);
   return next;
@@ -5330,6 +5346,10 @@ function proposalLineName(row) {
 }
 
 function proposalPricingRows() {
+  return [...proposalBasePricingRows(), ...proposalAddedPricingRows()];
+}
+
+function proposalBasePricingRows() {
   if (proposal.pricingMode === "detail") {
     return activeLeafRowsForProposal()
       .sort((a, b) => a.packageName.localeCompare(b.packageName) || proposalLineName(a).localeCompare(proposalLineName(b)))
@@ -5385,8 +5405,10 @@ function proposalPricingRows() {
 function renderProposalPricing() {
   const totals = proposalTotals();
   const rowsForPricing = proposalPricingRows();
-  document.querySelector(".proposal-pricing-section")?.toggleAttribute("hidden", proposalIsClientOutput() && !rowsForPricing.length);
-  if (proposalIsClientOutput() && !rowsForPricing.length) return;
+  const visible = ((proposalHasSection("estimate") && proposal.outputScope !== "schedule") || proposalAddedPricingRows().length > 0)
+    && !(rowsForPricing.length === 0 && (proposalIsClientOutput() || proposalHasSection("services")));
+  document.querySelector(".proposal-pricing-section")?.toggleAttribute("hidden", !visible);
+  if (!visible) return;
   const internalOutput = proposal.outputAudience === "internal";
   const modeLabels = internalOutput ? {
     package: "Active package rows from the estimate grid",
@@ -5398,7 +5420,7 @@ function renderProposalPricing() {
     type: "Project pricing grouped by production type"
   };
   els.proposalPricingNote.textContent = modeLabels[proposal.pricingMode] || modeLabels.package;
-  els.proposalPricingTotal.textContent = money(totals.client, 0);
+  els.proposalPricingTotal.textContent = money(totals.client, 2);
   els.proposalPricingSummary.innerHTML = `
     <div><span>Total</span><strong>${money(totals.client, 2)}</strong></div>
     <div><span>Quantity</span><strong>${Math.round(totals.qty).toLocaleString()}</strong></div>
@@ -5421,7 +5443,7 @@ function renderProposalPricing() {
     ${rowsForPricing.map((row) => `
       <div class="proposal-line">
         <span><strong>${escapeHtml(row.name)}</strong><small>${escapeHtml(row.context)}</small></span>
-        <span>${Math.round(row.qty).toLocaleString()}</span>
+        <span>${row.additional ? escapeHtml(String(row.qty)) : Math.round(row.qty).toLocaleString()}</span>
         <span>${money(row.unit, 3)}</span>
         <span>${money(row.total, 2)}</span>
       </div>
@@ -5521,7 +5543,21 @@ function catalogClientOutputBlocked() {
     && (Boolean(proposal.servicesPricingOverride) || CeEngagement.isCatalog(proposalServicesState()));
 }
 
+function proposalServiceOutputTotals() {
+  const monthlyOnly = !CeEngagement.isCatalog(proposalServicesState()) && serviceTermMode() === "monthly";
+  return ProposalLines.serviceTotals(proposalServiceTotals(), proposal.additionalLines || [], monthlyOnly);
+}
+
 function proposalServicesRows() {
+  if (catalogClientOutputBlocked()) return [];
+  const additions = proposalAdditionalTarget() === "services" ? ProposalLines.rows(proposal.additionalLines || []).map(line => ({
+    row: { item: line.name, platform: [line.description, `Qty ${line.quantity} × ${money(line.unitPrice, 2)}${line.cadence === "monthly" ? `/month · ${line.months} months` : " · One-time"}`].filter(Boolean).join(" / "), costType: "" },
+    calc: { activationPrice: line.cadence === "once" ? line.amount : 0, monthlyPrice: line.cadence === "monthly" ? line.amount : 0 }, additionalLine: line
+  })) : [];
+  return [...proposalBaseServicesRows(), ...additions];
+}
+
+function proposalBaseServicesRows() {
   if (catalogClientOutputBlocked()) return [];
   if (CeEngagement.isCatalog(proposalServicesState())) return CeEngagement.outputRows(proposalServicesState()).map(b => ({ row: { item: b.name, platform: b.description, costType: "Services" }, calc: b.calc }));
   if (serviceScenario === "livingOps" && proposalIsClientOutput()) {
@@ -5538,9 +5574,8 @@ function renderProposalServicesOutput() {
   els.proposalServicesSection.toggleAttribute("hidden", !visible);
   if (!visible) return;
 
-  const totals = proposalServiceTotals();
-  const isMonthlyMode = !CeEngagement.isCatalog(proposalServicesState()) && serviceTermMode() === "monthly";
-  const termPrice = (isMonthlyMode ? 0 : totals.activationPrice) + totals.monthlyPrice * totals.termMonths;
+  const totals = proposalServiceOutputTotals();
+  const termPrice = totals.termPrice;
   const sourceLabel = proposalRecordSourceLabel("services", "Current services draft");
   const rowsForOutput = proposalServicesRows();
   if (proposalIsClientOutput() && !rowsForOutput.length) {
@@ -5554,7 +5589,7 @@ function renderProposalServicesOutput() {
   const serviceMoney = value => value == null || totals.complete === false ? "Unknown" : money(value, 2);
   els.proposalServicesTotal.textContent = serviceMoney(termPrice);
   els.proposalServicesSummary.innerHTML = `
-    <div><span>Activation</span><strong>${isMonthlyMode ? "$0.00" : serviceMoney(totals.activationPrice)}</strong></div>
+    <div><span>Activation</span><strong>${serviceMoney(totals.activationPrice)}</strong></div>
     <div><span>Monthly</span><strong>${serviceMoney(totals.monthlyPrice)}</strong></div>
     <div><span>Term</span><strong>${totals.termMonths} mo</strong></div>
     <div><span>${serviceScenario === "livingOps" || CeEngagement.isCatalog(proposalServicesState()) ? "Products" : "Appointments / Mo"}</span><strong>${CeEngagement.isCatalog(proposalServicesState()) ? proposalServicesState().catalogConfiguration.products?.length || 0 : serviceScenario === "livingOps" ? serviceEngagement.products.length : decimal(totals.appointments, 1)}</strong></div>
@@ -11113,7 +11148,7 @@ function proposalPublishingExportRows() {
     );
   }
 
-  if (proposalHasSection("estimate") && proposal.outputScope !== "schedule") {
+  if ((proposalHasSection("estimate") && proposal.outputScope !== "schedule") || proposalAddedPricingRows().length) {
     const estimateSource = proposalRecordSourceLabel("estimates", "Current estimate");
     proposalPricingRows().forEach((row) => {
       exportRows.push(proposalExportRecord(
@@ -11121,7 +11156,7 @@ function proposalPublishingExportRows() {
         estimateSource,
         row.name,
         row.context,
-        row.qty ? Math.round(row.qty).toLocaleString() : "",
+        row.additional ? String(row.qty) : row.qty ? Math.round(row.qty).toLocaleString() : "",
         row.unit ? money(row.unit, 3) : "",
         money(row.total, 2)
       ));
@@ -11146,9 +11181,8 @@ function proposalPublishingExportRows() {
 
   if (proposalHasSection("services")) {
     const servicesSource = proposalRecordSourceLabel("services", "Current services draft");
-    const totals = proposalServiceTotals();
-    const isMonthlyMode = !CeEngagement.isCatalog(proposalServicesState()) && serviceTermMode() === "monthly";
-    const termPrice = (isMonthlyMode ? 0 : totals.activationPrice) + totals.monthlyPrice * totals.termMonths;
+    const totals = proposalServiceOutputTotals();
+    const termPrice = totals.termPrice;
     const rowsForServicesExport = proposalServicesRows();
     if (!proposalIsClientOutput() || rowsForServicesExport.length) {
       exportRows.push(proposalExportRecord(
@@ -11159,9 +11193,14 @@ function proposalPublishingExportRows() {
         "",
         "",
         totals.complete === false ? "Unknown" : money(termPrice, 2),
-        totals.complete === false ? "Incomplete Services pricing" : `Activation ${isMonthlyMode ? "$0.00" : money(totals.activationPrice, 2)} / Monthly ${money(totals.monthlyPrice, 2)}`
+        totals.complete === false ? "Incomplete Services pricing" : `Activation ${money(totals.activationPrice, 2)} / Monthly ${money(totals.monthlyPrice, 2)}`
       ));
-      rowsForServicesExport.forEach(({ row, calc }) => {
+      rowsForServicesExport.forEach(({ row, calc, additionalLine }) => {
+        if (additionalLine) {
+          exportRows.push(proposalExportRecord("Services calculator", "This proposal", row.item, row.platform,
+            String(additionalLine.quantity), money(additionalLine.unitPrice, 2), money(additionalLine.total, 2), "Proposal-specific; original service unchanged"));
+          return;
+        }
         exportRows.push(proposalExportRecord(
           "Services calculator",
           servicesSource,
