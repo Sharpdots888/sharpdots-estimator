@@ -105,3 +105,29 @@ existing saved-version preservation, same-table rendering/CSV and client catalog
 publication restrictions. Local browser verifies the appended row. A fictional
 review rendered by the actual table function shows one table and a combined total.
 The supplied private client capture remains outside Git. No real proposal is edited.
+
+
+## Correction published — October 23, 2026
+
+- Estimator **v57**, release `91d63e74-2398-4c20-a43c-d228dc45a28d`,
+  slug `1134e677-1a90-4bd1-9ab4-a1aeef6c009c`.
+- Frozen runtime source `3d0dbcd68425589279a9ceadb8a510ce3efe5c35`;
+  archive SHA256 `5c195b72044498d98924cfb55f25401bce92bc033a6ce9497a079b864b7f6932`.
+  All 142 deployed source files match. This later documentation commit is not
+  part of the runtime. Draft PR44 remains unmerged.
+- Fresh private settings/source/slug and app-only database backup retained
+  outside Git with directory0700/file0600. Isolated native PostgreSQL16 restore
+  qualified 36 app-owned tables, 7,055 rows, 75 record versions, eight stored
+  artifacts and 30 sequence states. Legacy CHECK parser equivalence and value
+  tests pass. Restore server stopped.
+- Full pre/post-release app rowsets, schema and sequences match; settings are
+  unchanged. Web is up; anonymous private API requests still return401.
+- Normal Portal launch and the existing saved proposal were inspected read-only.
+  Its saved additional line appears beside the source service in the existing
+  Services table, and the combined total is correct. No duplicate table or empty
+  estimate table is shown. No client record was edited or saved for verification.
+- Ray can refresh, reopen his saved proposal, and use Content → Proposal line
+  items → Add line item → Apply → Save. Existing saved lines need no re-entry.
+- Private recovery archive:
+  `/Volumes/JTMMX/Users/JT/.codex/private-backups/estimator/2026-10-23-proposal-table/`.
+  No main merge, schema, auth, settings, CE or vNext changes.
